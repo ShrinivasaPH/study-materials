@@ -434,60 +434,63 @@
         }
     </style>
 
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,300;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+
+
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* ── SPH Unified Nav (Cream Theme) ── */
+/* ── SPH Unified Nav (Sleek theme) ── */
 #sph-nav {
   position: fixed; top: 0; left: 0; right: 0; height: 54px;
-  background: rgba(250,246,238,0.95);
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid #E0D8C8;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid #E4E4E7;
   display: flex; align-items: center; padding: 0 28px; z-index: 999999;
-  font-family: 'Plus Jakarta Sans', sans-serif; gap: 14px;
-  box-shadow: 0 2px 16px rgba(26,18,8,0.07);
+  font-family: 'Geist', system-ui, sans-serif; gap: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 #sph-nav a { text-decoration: none; }
 #sph-nav .sph-logo {
   display: flex; align-items: center; gap: 10px;
-  font-family: 'Fraunces', serif; font-weight: 700;
-  font-size: 15px; color: #D4820A; letter-spacing: 0.01em; white-space: nowrap;
 }
 #sph-nav .sph-badge {
-  background: #D4820A; color: #FAF6EE;
+  background: #18181B; color: #FAFAFA;
   width: 30px; height: 30px; border-radius: 7px;
   display: flex; align-items: center; justify-content: center;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px; font-weight: 700; letter-spacing: 0.08em; flex-shrink: 0;
+  font-family: 'Geist Mono', monospace;
+  font-size: 9px; font-weight: 500; letter-spacing: 0.08em; flex-shrink: 0;
+  transition: background 0.15s;
 }
+#sph-nav .sph-badge:hover { background: #3F3F46; }
 #sph-nav .sph-spacer { flex: 1; }
 #sph-nav .sph-home {
-  color: #8A7660; font-size: 12.5px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #71717A; font-size: 12.5px;
+  font-family: 'Geist', sans-serif;
   display: flex; align-items: center; gap: 5px;
-  transition: color 0.2s;
+  transition: color 0.15s;
 }
-#sph-nav .sph-home:hover { color: #1A1208; }
+#sph-nav .sph-home:hover { color: #18181B; }
 #sph-nav .sph-cat {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10.5px; font-weight: 500; padding: 4px 12px;
-  border-radius: 99px; border: 1px solid; white-space: nowrap;
-  letter-spacing: 0.06em;
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px; font-weight: 500; padding: 4px 12px;
+  border-radius: 4px; border: 1px solid; white-space: nowrap;
+  letter-spacing: 0.06em; text-transform: uppercase;
 }
 #sph-footer {
-  background: #1A1208;
-  border-top: 1px solid #2e2510;
+  background: #18181B;
+  border-top: 1px solid #1A1A1D;
   padding: 36px 28px; text-align: center;
-  font-family: 'Plus Jakarta Sans', sans-serif; color: #8A7660;
-  font-size: 13.5px; line-height: 2;
+  font-family: 'Geist', sans-serif; color: #52525B;
+  font-size: 13px; line-height: 2;
 }
-#sph-footer strong { color: #D4820A; }
+#sph-footer strong { color: #A1A1AA; font-style: italic; font-family: 'Instrument Serif', serif; font-weight: 400; }
 #sph-footer a {
-  color: #8A7660; text-decoration: none; font-size: 12.5px;
-  border: 1px solid #3d2e14; padding: 6px 18px; border-radius: 99px;
-  display: inline-block; margin-top: 10px; transition: all 0.2s;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #52525B; text-decoration: none; font-size: 12px;
+  border: 1px solid #2E2E32; padding: 6px 18px; border-radius: 5px;
+  display: inline-block; margin-top: 10px; transition: all 0.15s;
+  font-family: 'Geist', sans-serif;
 }
-#sph-footer a:hover { color: #D4820A; border-color: #D4820A; }
+#sph-footer a:hover { color: #A1A1AA; border-color: #52525B; }
 </style>
 
 </head>
@@ -499,7 +502,7 @@
   </a>
   <span class="sph-spacer"></span>
   <a class="sph-home" href="index.html">← All Topics</a>
-  <span class="sph-cat" style="color:#5B3FA6; border-color:#5B3FA655; background:#5B3FA615;">Deep Learning</span>
+  <span class="sph-cat" style="color:#4C1D95; border-color:#C4B5FD; background:#EDE9FE;">Deep Learning</span>
 </nav>
 <div style="height:54px"></div>
 

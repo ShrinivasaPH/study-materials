@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shrinivasa PH — Data Science & Analytics Learning Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+:root{
+  --cream:#FAF6EE;--cream-dark:#F0EAD8;--cream-deeper:#E8E0CC;
+  --ink:#1A1208;--ink-light:#3D2E14;--muted:#8A7660;--muted-lt:#B5A890;
+  --amber:#D4820A;--amber-dim:#A8630A;--amber-lt:#FFF3C4;
+  --teal:#0E7C7B;--teal-lt:#D4EEEE;
+  --violet:#5B3FA6;--violet-lt:#EDE8F8;
+  --coral:#C94F3A;--coral-lt:#FAE8E5;
+  --green:#2A7A4B;--green-lt:#D8F0E4;
+  --card-bg:#FFFDF8;--border:#E0D8C8;--border-dark:#C8BDA8;
+  --shadow:0 4px 24px rgba(26,18,8,0.08);--shadow-lg:0 12px 48px rgba(26,18,8,0.14);
+  --serif:'Fraunces',Georgia,serif;--sans:'Plus Jakarta Sans',system-ui,sans-serif;--mono:'JetBrains Mono',monospace
+}
+body{font-family:var(--sans);background:var(--cream);color:var(--ink);font-size:16px;line-height:1.7;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--cream-dark)}::-webkit-scrollbar-thumb{background:var(--border-dark);border-radius:99px}
+
+/* NAV */
+.site-nav{position:sticky;top:0;z-index:1000;background:rgba(250,246,238,0.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:0 40px;height:56px;display:flex;align-items:center;gap:16px;box-shadow:0 1px 12px rgba(26,18,8,0.06)}
+.nav-badge{background:var(--amber);color:var(--cream);width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.1em;text-decoration:none;flex-shrink:0}
+.nav-spacer{flex:1}
+.nav-links{display:flex;gap:4px}
+.nav-link{font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;padding:6px 14px;border-radius:99px;transition:all 0.2s}
+.nav-link:hover{background:var(--cream-dark);color:var(--ink)}
+
+/* HERO — split layout */
+.hero{background:var(--ink);padding:0;position:relative;overflow:hidden;min-height:100vh;display:flex;flex-direction:column;justify-content:center}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 80% at 5% 50%,rgba(212,130,10,0.12) 0%,transparent 65%),radial-gradient(ellipse 50% 60% at 95% 60%,rgba(14,124,123,0.09) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 50% 100%,rgba(91,63,166,0.07) 0%,transparent 60%);pointer-events:none}
+.hero-inner{max-width:1180px;margin:0 auto;padding:100px 40px 100px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative;z-index:1;width:100%}
+
+/* Hero left — portal content */
+.hero-left{}
+.hero-eyebrow{font-family:var(--mono);font-size:0.72rem;letter-spacing:0.2em;color:var(--amber);text-transform:uppercase;margin-bottom:1.6rem;opacity:0;animation:fadeUp 0.6s 0.15s forwards}
+.hero-title{font-family:var(--serif);font-size:clamp(2.6rem,5vw,4.2rem);font-weight:900;color:var(--cream);line-height:1.08;letter-spacing:-0.02em;margin-bottom:1rem;opacity:0;animation:fadeUp 0.7s 0.28s forwards}
+.hero-title em{font-style:italic;color:var(--amber)}
+.hero-desc{font-size:1rem;color:#6a5a42;max-width:440px;margin-bottom:2rem;line-height:1.8;opacity:0;animation:fadeUp 0.7s 0.42s forwards}
+.hero-chips{display:flex;flex-wrap:wrap;gap:7px;opacity:0;animation:fadeUp 0.7s 0.55s forwards}
+.hero-chip{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--cream-dark);border-radius:100px;padding:5px 14px;font-size:0.78rem;font-weight:500;cursor:pointer;transition:all 0.2s;text-decoration:none}
+.hero-chip:hover{background:var(--amber);border-color:var(--amber);color:var(--ink)}
+
+/* Hero right — trainer card */
+.hero-right{opacity:0;animation:fadeUp 0.8s 0.45s forwards}
+.trainer-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:16px;padding:32px}
+.trainer-avatar{width:52px;height:52px;border-radius:50%;background:rgba(212,130,10,0.15);border:2px solid rgba(212,130,10,0.35);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:18px;font-weight:700;color:var(--amber);margin-bottom:16px}
+.trainer-name{font-family:var(--serif);font-size:1.5rem;font-weight:900;color:var(--cream);line-height:1.1;margin-bottom:5px}
+.trainer-name em{font-style:italic;color:var(--amber)}
+.trainer-role{font-family:var(--mono);font-size:0.7rem;color:var(--muted);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:18px}
+.trainer-bio{font-size:13.5px;color:#6a5a42;line-height:1.8;margin-bottom:20px;padding-left:14px;border-left:2px solid rgba(212,130,10,0.3)}
+.trainer-stats{display:flex;gap:24px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.06)}
+.tstat .n{font-family:var(--serif);font-size:1.8rem;font-weight:900;color:var(--cream);display:block;line-height:1}
+.tstat .n em{font-style:italic;color:var(--amber)}
+.tstat .l{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-top:5px;display:block}
+
+/* scroll cue */
+.scroll-cue{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--muted);font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;font-family:var(--mono);animation:scrollBounce 2.2s ease-in-out infinite;z-index:2;opacity:0.6}
+
+/* SECTIONS */
+.content-area{background:var(--cream)}
+.section{max-width:1180px;margin:0 auto;padding:80px 40px}
+.section-header{display:flex;align-items:center;gap:18px;margin-bottom:42px}
+.cat-pill{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;padding:5px 14px;border-radius:99px;border:1px solid;white-space:nowrap;flex-shrink:0}
+.section-title{font-family:var(--serif);font-size:clamp(1.5rem,2.5vw,2rem);font-weight:700;color:var(--ink);line-height:1.2}
+.section-rule{height:1px;background:var(--border);max-width:1180px;margin:0 auto}
+
+/* CARDS */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:20px}
+.card{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:28px;display:flex;flex-direction:column;gap:14px;text-decoration:none;color:inherit;position:relative;overflow:hidden;transition:transform 0.25s ease,box-shadow 0.25s ease,border-color 0.25s ease}
+.card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--cat-color,var(--amber));transform:scaleX(0);transform-origin:left;transition:transform 0.3s ease}
+.card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg);border-color:var(--border-dark)}
+.card:hover::after{transform:scaleX(1)}
+.card-icon{width:46px;height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.card-name{font-family:var(--serif);font-size:1.15rem;font-weight:700;color:var(--ink);line-height:1.2}
+.card-desc{font-size:13.5px;color:var(--muted);line-height:1.65;flex:1}
+.card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border)}
+.card-badge{font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:3px 10px;border-radius:99px;border:1px solid;background:transparent}
+.card-arrow{width:30px;height:30px;border-radius:50%;border:1px solid var(--border-dark);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;transition:all 0.2s}
+.card:hover .card-arrow{color:var(--card-bg);border-color:transparent;background:var(--cat-color,var(--amber))}
+
+/* COMING SOON CARD */
+.card-soon{
+  background:transparent;
+  border:2px dashed var(--border-dark);
+  border-radius:14px;padding:28px;
+  display:flex;flex-direction:column;gap:14px;
+  position:relative;overflow:hidden;
+  cursor:default;
+}
+.card-soon::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    -45deg,
+    transparent,transparent 6px,
+    rgba(212,130,10,0.025) 6px,rgba(212,130,10,0.025) 7px
+  );
+}
+.soon-icon{width:46px;height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--amber-lt);position:relative;z-index:1}
+.soon-pulse{display:inline-flex;align-items:center;gap:7px;position:relative;z-index:1}
+.soon-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);animation:pulse 1.8s ease-in-out infinite}
+.soon-label{font-family:var(--mono);font-size:10.5px;font-weight:500;color:var(--amber);letter-spacing:0.1em;text-transform:uppercase}
+.soon-title{font-family:var(--serif);font-size:1.15rem;font-weight:700;color:var(--ink-light);line-height:1.2;position:relative;z-index:1}
+.soon-desc{font-size:13px;color:var(--muted-lt);line-height:1.65;flex:1;position:relative;z-index:1}
+.soon-footer{display:flex;align-items:center;padding-top:10px;border-top:1px dashed var(--border-dark);position:relative;z-index:1}
+.soon-badge{font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:3px 10px;border-radius:99px;border:1px dashed var(--amber-dim);color:var(--amber-dim);background:var(--amber-lt)}
+
+/* ABOUT */
+.about-strip{background:var(--ink);padding:90px 40px;position:relative;overflow:hidden}
+.about-strip::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 0% 50%,rgba(212,130,10,0.10) 0%,transparent 60%),radial-gradient(ellipse 50% 60% at 100% 50%,rgba(14,124,123,0.08) 0%,transparent 60%);pointer-events:none}
+.about-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;position:relative;z-index:1}
+.about-kicker{font-family:var(--mono);font-size:0.72rem;color:var(--amber);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:1.2rem}
+.about-heading{font-family:var(--serif);font-size:clamp(1.8rem,2.8vw,2.6rem);font-weight:900;line-height:1.15;color:var(--cream);margin-bottom:1.4rem}
+.about-heading em{font-style:italic;color:var(--amber)}
+.about-body{font-size:14.5px;color:var(--muted);line-height:1.85}
+.about-body p+p{margin-top:1rem}
+.expertise-label{font-family:var(--mono);font-size:10.5px;color:var(--amber);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:16px}
+.expertise-pills{display:flex;flex-wrap:wrap;gap:10px}
+.expertise-pill{font-family:var(--mono);font-size:11.5px;letter-spacing:0.04em;padding:7px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.04);color:var(--cream-dark);transition:all 0.2s}
+.expertise-pill:hover{border-color:var(--amber);color:var(--amber)}
+
+/* FOOTER */
+.site-footer{background:var(--ink);border-top:1px solid #2e2510;padding:60px 40px;text-align:center;font-family:var(--sans)}
+.footer-name{font-family:var(--serif);font-size:2rem;font-weight:900;color:var(--cream);margin-bottom:6px}
+.footer-name em{font-style:italic;color:var(--amber)}
+.footer-role{font-family:var(--mono);font-size:11.5px;color:var(--muted);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:28px}
+.footer-line{width:40px;height:1px;background:var(--amber);margin:0 auto 24px;opacity:0.4}
+.footer-copy{font-size:12.5px;color:#4a3e2a}
+
+/* ANIMS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scrollBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.75)}}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity 0.65s ease,transform 0.65s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-d1{transition-delay:0.1s}.reveal-d2{transition-delay:0.2s}.reveal-d3{transition-delay:0.3s}
+
+@media(max-width:900px){
+  .hero-inner{grid-template-columns:1fr;gap:40px;padding:100px 24px 80px}
+  .hero-title{font-size:clamp(2.2rem,8vw,3.2rem)}
+  .about-inner{grid-template-columns:1fr;gap:48px}
+}
+@media(max-width:768px){
+  .site-nav{padding:0 20px}.nav-links{display:none}
+  .section{padding:60px 20px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV: SPH badge only, no name -->
+<nav class="site-nav">
+  <a class="nav-badge" href="#">SPH</a>
+  <div class="nav-spacer"></div>
+  <div class="nav-links">
+    <a class="nav-link" href="#statistics">Statistics</a>
+    <a class="nav-link" href="#deep-learning">Deep Learning</a>
+    <a class="nav-link" href="#generative-ai">Gen AI</a>
+    <a class="nav-link" href="#bi-tools">BI Tools</a>
+  </div>
+</nav>
+
+<!-- HERO: split layout -->
+<section class="hero">
+  <div class="hero-inner">
+
+    <!-- Left: portal identity -->
+    <div class="hero-left">
+      <div class="hero-eyebrow">Interactive Learning Resources</div>
+      <h1 class="hero-title"><em>Data Science</em><br>Field Guides</h1>
+      <p class="hero-desc">A curated collection of interactive guides — built from real teaching experience to make complex topics genuinely click.</p>
+      <div class="hero-chips">
+        <a class="hero-chip" href="#statistics">Statistics &amp; Math</a>
+        <a class="hero-chip" href="#deep-learning">Deep Learning</a>
+        <a class="hero-chip" href="#generative-ai">Generative AI</a>
+        <a class="hero-chip" href="#bi-tools">BI &amp; Data Tools</a>
+      </div>
+    </div>
+
+    <!-- Right: trainer card -->
+    <div class="hero-right">
+      <div class="trainer-card">
+        <div class="trainer-avatar">S</div>
+        <div class="trainer-name"><em>Shrinivasa</em> PH</div>
+        <div class="trainer-role">Data Science &amp; Analytics Trainer</div>
+        <p class="trainer-bio">Every guide here is crafted from real, hands-on teaching — not copied from textbooks. The goal is always to build genuine intuition first, then layer in the formalism.</p>
+        <div class="trainer-stats">
+          <div class="tstat"><span class="n">8</span><span class="l">Guides</span></div>
+          <div class="tstat"><span class="n"><em>4</em></span><span class="l">Domains</span></div>
+          <div class="tstat"><span class="n">100%</span><span class="l">Interactive</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="scroll-cue">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M8 13l-3.5-3.5M8 13l3.5-3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Explore
+  </div>
+</section>
+
+<div class="content-area">
+
+  <!-- STATISTICS -->
+  <div class="section-rule"></div>
+  <section class="section" id="statistics">
+    <div class="section-header reveal">
+      <span class="cat-pill" style="color:var(--teal);border-color:#0E7C7B44;background:var(--teal-lt);">Statistics &amp; Math</span>
+      <h2 class="section-title">Building Analytical Intuition</h2>
+    </div>
+    <div class="cards-grid">
+      <a class="card reveal" href="hypothesis-testing.html" style="--cat-color:var(--teal);">
+        <div class="card-icon" style="background:var(--teal-lt);">📊</div>
+        <div class="card-name">Hypothesis Testing</div>
+        <div class="card-desc">From p-values to statistical power, t-tests to chi-square — master the logic of statistical decision-making with interactive calculators and visual intuition builders.</div>
+        <div class="card-footer">
+          <span class="card-badge" style="color:var(--teal);border-color:#0E7C7B55;background:var(--teal-lt);">Interactive</span>
+          <span class="card-arrow">→</span>
+        </div>
+      </a>
+      <!-- Coming soon -->
+      <div class="card-soon reveal reveal-d1">
+        <div class="soon-icon">📐</div>
+        <div class="soon-pulse"><span class="soon-dot"></span><span class="soon-label">Coming Soon</span></div>
+        <div class="soon-title">More Statistics Guides</div>
+        <div class="soon-desc">Probability distributions, Bayesian inference, regression analysis and more — currently being cooked up.</div>
+        <div class="soon-footer"><span class="soon-badge">In the works</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEEP LEARNING -->
+  <div class="section-rule"></div>
+  <section class="section" id="deep-learning">
+    <div class="section-header reveal">
+      <span class="cat-pill" style="color:var(--violet);border-color:#5B3FA655;background:var(--violet-lt);">Deep Learning</span>
+      <h2 class="section-title">From Neurons to Transformers</h2>
+    </div>
+    <div class="cards-grid">
+      <a class="card reveal" href="neural-networks.html" style="--cat-color:var(--violet);">
+        <div class="card-icon" style="background:var(--violet-lt);">🧠</div>
+        <div class="card-name">Neural Networks</div>
+        <div class="card-desc">Understand the fundamentals — forward propagation, backprop, activation functions and gradient descent — with animated step-by-step walkthroughs.</div>
+        <div class="card-footer">
+          <span class="card-badge" style="color:var(--violet);border-color:#5B3FA655;background:var(--violet-lt);">Animated</span>
+          <span class="card-arrow">→</span>
+        </div>
+      </a>
+      <a class="card reveal reveal-d1" href="attention-transformers.html" style="--cat-color:var(--violet);">
+        <div class="card-icon" style="background:var(--violet-lt);">🔍</div>
+        <div class="card-name">Attention &amp; Transformers</div>
+        <div class="card-desc">A visual study guide to Query-Key-Value mechanics, self vs cross-attention, multi-head attention and Flash Attention — the architecture behind every modern LLM.</div>
+        <div class="card-footer">
+          <span class="card-badge" style="color:var(--violet);border-color:#5B3FA655;background:var(--violet-lt);">Visual Guide</span>
+          <span class="card-arrow">→</span>
+        </div>
+      </a>
+      <a class="card reveal reveal-d2" href="computer-vision.html" style="--cat-color:var(--violet);">
+        <div class="card-icon" style="background:var(--violet-lt);">👁️</div>
+        <div class="card-name">Computer Vision</div>
+        <div class="card-desc">How computers see the world — pixels to tensors, preprocessing pipelines, CNNs, YOLO, object detection, segmentation and real-world CV applications.</div>
+        <div class="card-footer">
+          <span class="card-badge" style="color:var(--violet);border-color:#5B3FA655;background:var(--violet-lt);">Complete Guide</span>
+          <span class="card-arrow">→</span>
+        </div>
+      </a>
+      <!-- Coming soon -->
+      <div class="card-soon reveal reveal-d3">
+        <div class="soon-icon">⚡</div>
+        <div class="soon-pulse"><span class="soon-dot"></span><span class="soon-label">Coming Soon</span></div>
+        <div class="soon-title">More Deep Learning Guides</div>
+        <div class="soon-desc">RNNs &amp; LSTMs, diffusion models, fine-tuning strategies and more — actively being written.</div>
+        <div class="soon-footer"><span class="soon-badge">In the works</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GENERATIVE AI -->
+  <div class="section-rule"></div>
+  <section class="section" id="generative-ai">
+    <div class="section-header reveal">
+      <span class="cat-pill" style="color:var(--coral);border-color:#C94F3A55;background:var(--coral-lt);">Generative AI</span>
+      <h2 class="section-title">Building &amp; Prompting LLM Applications</h2>
+    </div>
+    <div class="cards-grid">
+      <a class="card reveal" href="langchain.html" style="--cat-color:var(--coral);">
+        <div class="card-icon" style="background:var(--coral-lt);">⛓️</div>
+        <div class="card-name">LangChain Ecosystem</div>
+        <div class="card-desc">Build, orchestrate &amp; observe AI apps — chains, agents, memory, RAG, LangSmith and 6 real-world use cases including PDF Q&amp;A, SQL agents and customer support bots.</div>
+        <div class="card-footer">
+          <span class="card-badge" style="color:var(--coral);border-color:#C94F3A55;background:var(--coral-lt);">12 Modules</span>
+          <span class="card-arrow">→</span>
+        </div>
+      </a>
+      <a class="card reveal reveal-d1" href="prompt-engineering.html" style="--cat-color:var(--coral);">
+        <div class="card-icon" style="background:var(--coral-lt);">✍️</div>
+        <div class="card-name">Prompt Engineering</div>
+        <div class="card-desc">Zero-shot, few-shot, Chain of Thought, ReAct, role prompting — a complete field guide covering every major technique with real examples and practical frameworks.</div>
+        <div class="card-footer">
+          <span class="card-badge" style="color:var(--coral);border-color:#C94F3A55;background:var(--coral-lt);">Field Guide</span>
+          <span class="card-arrow">→</span>
+        </div>
+      </a>
+      <!-- Coming soon -->
+      <div class="card-soon reveal reveal-d2">
+        <div class="soon-icon">🤖</div>
+        <div class="soon-pulse"><span class="soon-dot"></span><span class="soon-label">Coming Soon</span></div>
+        <div class="soon-title">More Gen AI Guides</div>
+        <div class="soon-desc">LangGraph deep-dive, vector databases, evaluation frameworks, production deployments — in progress.</div>
+        <div class="soon-footer"><span class="soon-badge">In the works</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BI & DATA TOOLS -->
+  <div class="section-rule"></div>
+  <section class="section" id="bi-tools">
+    <div class="section-header reveal">
+      <span class="cat-pill" style="color:var(--green);border-color:#2A7A4B55;background:var(--green-lt);">BI &amp; Data Tools</span>
+      <h2 class="section-title">Turning Data into Decisions</h2>
+    </div>
+    <div class="cards-grid">
+      <a class="card reveal" href="powerbi.html" style="--cat-color:var(--green);">
+        <div class="card-icon" style="background:var(--green-lt);">📈</div>
+        <div class="card-name">Power BI Mastery</div>
+        <div class="card-desc">Star schema, DAX functions, CALCULATE, time intelligence, iterator functions — everything you need to go from raw data model to insight-driven dashboards.</div>
+        <div class="card-footer">
+          <span class="card-badge" style="color:var(--green);border-color:#2A7A4B55;background:var(--green-lt);">Interactive Hub</span>
+          <span class="card-arrow">→</span>
+        </div>
+      </a>
+      <a class="card reveal reveal-d1" href="tableau.html" style="--cat-color:var(--green);">
+        <div class="card-icon" style="background:var(--green-lt);">🎨</div>
+        <div class="card-name">Tableau Mastery</div>
+        <div class="card-desc">Chart types, calculated fields, LOD expressions, cohort analysis and real-world use cases — learn Tableau by actually building things, not just reading about them.</div>
+        <div class="card-footer">
+          <span class="card-badge" style="color:var(--green);border-color:#2A7A4B55;background:var(--green-lt);">Learn by Doing</span>
+          <span class="card-arrow">→</span>
+        </div>
+      </a>
+      <!-- Coming soon -->
+      <div class="card-soon reveal reveal-d2">
+        <div class="soon-icon">🗂️</div>
+        <div class="soon-pulse"><span class="soon-dot"></span><span class="soon-label">Coming Soon</span></div>
+        <div class="soon-title">More BI &amp; Analytics Guides</div>
+        <div class="soon-desc">SQL deep-dive, dbt, data modelling patterns and advanced Power Query — all on the roadmap.</div>
+        <div class="soon-footer"><span class="soon-badge">In the works</span></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ABOUT STRIP -->
+<div class="about-strip">
+  <div class="about-inner">
+    <div class="reveal">
+      <div class="about-kicker">About the Trainer</div>
+      <h2 class="about-heading">Teaching Data Science<br>the way it <em>should</em> be taught</h2>
+      <div class="about-body">
+        <p>Every guide in this portal is crafted from real, hands-on teaching — not copied from textbooks. The goal is always the same: build genuine intuition first, then layer in formalism.</p>
+        <p>If you can't draw it, explain it, or interact with it — you haven't truly understood it yet.</p>
+      </div>
+    </div>
+    <div class="reveal reveal-d1">
+      <div class="expertise-label">Areas of Expertise</div>
+      <div class="expertise-pills">
+        <span class="expertise-pill">Statistics</span>
+        <span class="expertise-pill">Machine Learning</span>
+        <span class="expertise-pill">Deep Learning</span>
+        <span class="expertise-pill">Generative AI</span>
+        <span class="expertise-pill">LangChain / RAG</span>
+        <span class="expertise-pill">Transformers</span>
+        <span class="expertise-pill">Computer Vision</span>
+        <span class="expertise-pill">NLP</span>
+        <span class="expertise-pill">Prompt Engineering</span>
+        <span class="expertise-pill">Power BI</span>
+        <span class="expertise-pill">Tableau</span>
+        <span class="expertise-pill">SQL</span>
+        <span class="expertise-pill">Python</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-name"><em>Shrinivasa</em> PH</div>
+  <div class="footer-role">Data Science &amp; Analytics Trainer</div>
+  <div class="footer-line"></div>
+  <div class="footer-copy">All learning materials personally curated &amp; crafted.</div>
+</footer>
+
+<script>
+const reveals=document.querySelectorAll('.reveal');
+const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}})},{threshold:0.1});
+reveals.forEach(r=>io.observe(r));
+</script>
+</body>
+</html>

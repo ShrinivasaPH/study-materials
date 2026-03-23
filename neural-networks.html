@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neural Networks: An Interactive Guide | Shrinivasa PH</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366F1;
+            --secondary: #8B5CF6;
+            --accent: #06B6D4;
+            --bg-light: #FAFBFF;
+            --bg-lighter: #FFFFFF;
+            --text-dark: #0F172A;
+            --text-muted: #64748B;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --info: #3B82F6;
+            --border: #E2E8F0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, var(--bg-light) 0%, #F1F5FE 100%);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+            padding: 3rem 2rem;
+            text-align: center;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        h1 {
+            font-size: 2.75rem;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            font-weight: 400;
+            margin-top: 0.5rem;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .nav-btn {
+            padding: 0.7rem 1.6rem;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1.5px solid var(--border);
+            color: var(--text-dark);
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95rem;
+        }
+
+        .nav-btn:hover {
+            background: rgba(99, 102, 241, 0.12);
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        h3 {
+            font-size: 1.35rem;
+            margin: 2rem 0 1rem 0;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        p, li {
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+            font-size: 1rem;
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 12px 24px rgba(99, 102, 241, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .example-box {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 10px;
+            border-left: 4px solid var(--success);
+        }
+
+        .example-box h4 {
+            color: var(--success);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        /* Code */
+        .code-block {
+            background: rgba(30, 41, 59, 0.04);
+            border: 1px solid rgba(226, 232, 240, 0.7);
+            border-radius: 10px;
+            padding: 0;
+            margin: 1.5rem 0;
+            overflow: hidden;
+            font-family: 'Fira Code', 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            position: relative;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(99, 102, 241, 0.08);
+            padding: 0.75rem 1.5rem;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .code-language {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .copy-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .copy-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .copy-btn.copied {
+            background: var(--success);
+        }
+
+        .code-content {
+            padding: 1.5rem;
+            overflow-x: auto;
+            background: rgba(248, 249, 250, 0.5);
+        }
+
+        .code-block code {
+            color: var(--secondary);
+            font-weight: 500;
+            display: block;
+            white-space: pre;
+            word-break: normal;
+            overflow-wrap: normal;
+        }
+
+        /* Neural Network Visualization */
+        .nn-canvas-container {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Interactive Elements */
+        .toggle-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 1rem 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95rem;
+        }
+
+        .toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Step-by-step */
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            margin: 2rem 0;
+        }
+
+        .step {
+            background: rgba(255, 255, 255, 0.5);
+            border-left: 3px solid var(--primary);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            border-left: 3px solid var(--primary);
+            padding: 1.75rem;
+            border-radius: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .step:hover {
+            border-left-color: var(--accent);
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.1);
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+
+        /* Comparison */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .comparison-box {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            padding: 2rem;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .comparison-box:hover {
+            background: rgba(255, 255, 255, 0.8);
+            border-color: var(--primary);
+            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.1);
+        }
+
+        .comparison-box h4 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.15rem;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2.5rem 2rem;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(226, 232, 240, 0.5);
+            margin-top: 3rem;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .list-item {
+            margin-left: 2rem;
+            padding: 0.75rem 0;
+            color: var(--text-dark);
+            font-size: 1rem;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            h2 {
+                font-size: 1.5rem;
+            }
+            .container {
+                padding: 1rem;
+            }
+            nav {
+                gap: 0.5rem;
+            }
+            .nav-btn {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+
+
+
+
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── SPH Unified Nav (Sleek theme) ── */
+#sph-nav {
+  position: fixed; top: 0; left: 0; right: 0; height: 54px;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid #E4E4E7;
+  display: flex; align-items: center; padding: 0 28px; z-index: 999999;
+  font-family: 'Geist', system-ui, sans-serif; gap: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+#sph-nav a { text-decoration: none; }
+#sph-nav .sph-logo {
+  display: flex; align-items: center; gap: 10px;
+}
+#sph-nav .sph-badge {
+  background: #18181B; color: #FAFAFA;
+  width: 30px; height: 30px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Geist Mono', monospace;
+  font-size: 9px; font-weight: 500; letter-spacing: 0.08em; flex-shrink: 0;
+  transition: background 0.15s;
+}
+#sph-nav .sph-badge:hover { background: #3F3F46; }
+#sph-nav .sph-spacer { flex: 1; }
+#sph-nav .sph-home {
+  color: #71717A; font-size: 12.5px;
+  font-family: 'Geist', sans-serif;
+  display: flex; align-items: center; gap: 5px;
+  transition: color 0.15s;
+}
+#sph-nav .sph-home:hover { color: #18181B; }
+#sph-nav .sph-cat {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px; font-weight: 500; padding: 4px 12px;
+  border-radius: 4px; border: 1px solid; white-space: nowrap;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+#sph-footer {
+  background: #18181B;
+  border-top: 1px solid #1A1A1D;
+  padding: 36px 28px; text-align: center;
+  font-family: 'Geist', sans-serif; color: #52525B;
+  font-size: 13px; line-height: 2;
+}
+#sph-footer strong { color: #A1A1AA; font-style: italic; font-family: 'Instrument Serif', serif; font-weight: 400; }
+#sph-footer a {
+  color: #52525B; text-decoration: none; font-size: 12px;
+  border: 1px solid #2E2E32; padding: 6px 18px; border-radius: 5px;
+  display: inline-block; margin-top: 10px; transition: all 0.15s;
+  font-family: 'Geist', sans-serif;
+}
+#sph-footer a:hover { color: #A1A1AA; border-color: #52525B; }
+</style>
+
+</head>
+<body>
+
+<nav id="sph-nav">
+  <a class="sph-logo" href="index.html">
+    <div class="sph-badge">SPH</div>
+  </a>
+  <span class="sph-spacer"></span>
+  <a class="sph-home" href="index.html">← All Topics</a>
+  <span class="sph-cat" style="color:#4C1D95; border-color:#C4B5FD; background:#EDE9FE;">Deep Learning</span>
+</nav>
+<div style="height:54px"></div>
+
+    <header>
+        <h1>🧠 Neural Networks</h1>
+        <p class="subtitle">From Neurons to Deep Learning</p>
+    </header>
+
+    <nav>
+        <button class="nav-btn active" onclick="showSection('concepts')">Concepts</button>
+        <button class="nav-btn" onclick="showSection('forward')">Forward Prop</button>
+        <button class="nav-btn" onclick="showSection('backward')">Back Prop</button>
+        <button class="nav-btn" onclick="showSection('examples')">Real Examples</button>
+        <button class="nav-btn" onclick="showSection('code')">Python Code</button>
+    </nav>
+
+    <div class="container">
+        <!-- CONCEPTS SECTION -->
+        <div id="concepts" class="section active">
+            <h2>Neural Networks Basics</h2>
+            
+            <p>A neural network is inspired by how our brains work. It learns patterns from data through layers of interconnected nodes (neurons) that process information.</p>
+
+            <div class="card">
+                <h3>Key Components</h3>
+                <div class="list-item">
+                    <strong>Neurons (Nodes):</strong> Basic units that process inputs and produce outputs
+                </div>
+                <div class="list-item">
+                    <strong>Weights:</strong> Parameters that determine the strength of connections between neurons
+                </div>
+                <div class="list-item">
+                    <strong>Biases:</strong> Additional parameters that shift the activation function
+                </div>
+                <div class="list-item">
+                    <strong>Activation Functions:</strong> Non-linear transformations (ReLU, Sigmoid, Tanh)
+                </div>
+                <div class="list-item">
+                    <strong>Layers:</strong> Input, hidden layers, and output layers that process data progressively
+                </div>
+            </div>
+
+            <h3>How Neural Networks Learn</h3>
+            <p>Neural networks learn by comparing their predictions to actual answers, calculating how wrong they were (loss), and adjusting their weights backwards through the network to minimize that error. This process happens thousands or millions of times until the network gets very good at predicting.</p>
+
+            <div class="nn-canvas-container">
+                <canvas id="basicNN"></canvas>
+            </div>
+
+            <h3>Why Are They Powerful?</h3>
+            <div class="card">
+                <p>✨ <strong>Pattern Recognition:</strong> Can find complex patterns humans might miss</p>
+                <p>✨ <strong>Automatic Feature Learning:</strong> Learns what features matter without explicit programming</p>
+                <p>✨ <strong>Scalability:</strong> Works with small datasets or billions of data points</p>
+                <p>✨ <strong>Universality:</strong> Can approximate almost any function with enough neurons</p>
+            </div>
+
+            <h3>Weight Initialization: The Critical First Step</h3>
+            <p>Before training begins, we need to initialize weights. Starting with the wrong values can make training fail or take forever. Here are the main strategies:</p>
+
+            <div class="card" style="background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.3);">
+                <h4 style="color: var(--success);">🎲 Random Normal (Small Values)</h4>
+                <p><strong>Weights = random values from a normal distribution</strong></p>
+                <p><strong>Formula:</strong> w ~ N(0, 0.01²) or w ~ randn() * 0.01</p>
+                <p><strong>✅ Good for:</strong> Simple networks, quick experiments</p>
+                <p><strong>❌ Problem:</strong> In deep networks, activations can vanish (become nearly 0) in early layers. Slow training!</p>
+            </div>
+
+            <div class="card" style="background: rgba(52, 152, 219, 0.08); border-color: rgba(52, 152, 219, 0.3);">
+                <h4 style="color: var(--info);">⚖️ Xavier (Glorot) Initialization</h4>
+                <p><strong>Best for: Sigmoid and Tanh activation functions</strong></p>
+                <p><strong>Formula:</strong> w ~ Uniform(-√(6/(n_in + n_out)), √(6/(n_in + n_out)))</p>
+                <p><strong>Intuition:</strong> Scales weights based on layer sizes. Keeps activations in a healthy range! If you have 100 inputs and 50 outputs, use different scaling than 10 inputs and 5 outputs.</p>
+                <p><strong>Why it works:</strong> Prevents signal shrinking or exploding as it passes through layers—perfect balance!</p>
+            </div>
+
+            <div class="card" style="background: rgba(139, 92, 246, 0.08); border-color: rgba(139, 92, 246, 0.3);">
+                <h4 style="color: var(--secondary);">⚡ He Initialization</h4>
+                <p><strong>Best for: ReLU, Leaky ReLU, and other ReLU variants (MODERN DEFAULT!)</strong></p>
+                <p><strong>Formula:</strong> w ~ Normal(0, √(2/n_in))</p>
+                <p><strong>Why it's special:</strong> ReLU kills half the activations (sets negative values to 0), so we start with slightly larger weights to compensate. It's like giving the network more power to overcome ReLU's destructiveness!</p>
+                <p><strong>Result:</strong> Deep networks with ReLU train MUCH faster. Use this for modern deep learning!</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-language">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <span>📋 Copy</span>
+                    </button>
+                </div>
+                <div class="code-content">
+                    <code>import numpy as np
+from tensorflow.keras import layers
+
+# 1. Random Normal (basic, avoid for deep networks)
+weights_random = np.random.randn(100, 50) * 0.01
+
+# 2. Xavier/Glorot initialization (for Sigmoid/Tanh)
+def xavier_init(shape):
+    fan_in, fan_out = shape[0], shape[1]
+    limit = np.sqrt(6 / (fan_in + fan_out))
+    return np.random.uniform(-limit, limit, shape)
+
+weights_xavier = xavier_init((100, 50))
+
+# 3. He initialization (for ReLU - BEST!)
+def he_init(shape):
+    fan_in = shape[0]
+    std = np.sqrt(2 / fan_in)
+    return np.random.randn(*shape) * std
+
+weights_he = he_init((100, 50))
+
+# In Keras (automatic):
+model = keras.Sequential([
+    layers.Dense(128, activation='relu', 
+                 kernel_initializer='he_normal'),  # Automatic He init
+    layers.Dense(64, activation='relu', 
+                 kernel_initializer='he_normal'),
+    layers.Dense(10, activation='sigmoid', 
+                 kernel_initializer='glorot_uniform')  # Xavier for output
+])</code>
+                </div>
+            </div>
+
+            <h3>Activation Functions Deep Dive</h3>
+            <p>Activation functions add non-linearity to neural networks. Without them, multiple layers would just be matrix multiplications—equivalent to a single linear layer! Here are the most important ones:</p>
+
+            <div class="card" style="background: rgba(139, 92, 246, 0.08); border-color: rgba(139, 92, 246, 0.3);">
+                <h4 style="color: var(--secondary);">🔥 ReLU (Rectified Linear Unit) - THE STANDARD</h4>
+                <p><strong>Formula:</strong> f(x) = max(0, x)</p>
+                <p><strong>Output:</strong> 0 for negative inputs, x for positive inputs</p>
+                <p><strong>Why it's amazing:</strong></p>
+                <div class="list-item">✅ Super simple (just set negatives to 0)</div>
+                <div class="list-item">✅ Incredibly fast to compute</div>
+                <div class="list-item">✅ Works great in deep networks</div>
+                <div class="list-item">✅ Helps with vanishing gradient problem</div>
+                <p><strong>🎯 Use for:</strong> Hidden layers in most modern networks (default choice!)</p>
+                <p><strong>⚠️ Problem:</strong> "Dying ReLU" - some neurons might get stuck outputting 0 and never recover. Solution: Use Leaky ReLU</p>
+            </div>
+
+            <div class="card" style="background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.3);">
+                <h4 style="color: var(--success);">💚 Leaky ReLU - ReLU's Smarter Cousin</h4>
+                <p><strong>Formula:</strong> f(x) = x if x > 0 else 0.01*x</p>
+                <p><strong>Output:</strong> For negative inputs, output a small fraction (usually 0.01x instead of 0)</p>
+                <p><strong>Why it's better:</strong> Prevents dying ReLU! Negative values still have a small gradient, so neurons can recover.</p>
+                <p><strong>🎯 Use for:</strong> When you're getting poor training results with ReLU, or in very deep networks</p>
+            </div>
+
+            <div class="card" style="background: rgba(52, 152, 219, 0.08); border-color: rgba(52, 152, 219, 0.3);">
+                <h4 style="color: var(--info);">😊 Sigmoid - Outputs Probabilities</h4>
+                <p><strong>Formula:</strong> f(x) = 1 / (1 + e^-x)</p>
+                <p><strong>Output:</strong> Values between 0 and 1 (probability-like)</p>
+                <p><strong>Historical:</strong> Was the standard before ReLU became popular</p>
+                <p><strong>🎯 Use for:</strong> Binary classification output layer (yes/no predictions)</p>
+                <p><strong>⚠️ Problem in hidden layers:</strong> Vanishing gradients in deep networks (gradients become very small)</p>
+            </div>
+
+            <div class="card" style="background: rgba(245, 158, 11, 0.08); border-color: rgba(245, 158, 11, 0.3);">
+                <h4 style="color: var(--warning);">🌊 Tanh (Hyperbolic Tangent)</h4>
+                <p><strong>Formula:</strong> f(x) = (e^x - e^-x) / (e^x + e^-x)</p>
+                <p><strong>Output:</strong> Values between -1 and 1 (stronger gradients than sigmoid)</p>
+                <p><strong>vs Sigmoid:</strong> Similar shape but centered at 0, slightly stronger gradients</p>
+                <p><strong>🎯 Use for:</strong> Hidden layers with RNNs/LSTMs, or when centered output helps</p>
+                <p><strong>⚠️ Problem:</strong> Still suffers from vanishing gradients (though less than sigmoid)</p>
+            </div>
+
+            <div class="card" style="background: rgba(99, 102, 241, 0.08); border-color: rgba(99, 102, 241, 0.3);">
+                <h4 style="color: var(--primary);">🎯 Softmax - Multi-class Probabilities</h4>
+                <p><strong>Formula:</strong> f(x_i) = e^(x_i) / Σ(e^(x_j) for all j)</p>
+                <p><strong>Output:</strong> Probability distribution (all outputs sum to 1)</p>
+                <p><strong>Special property:</strong> Outputs are mutually exclusive probabilities</p>
+                <p><strong>🎯 Use for:</strong> Multi-class classification output layer (cat/dog/bird prediction)</p>
+                <p><strong>Example:</strong> If you're classifying images into 10 categories, Softmax gives you 10 probabilities that sum to 1.0</p>
+            </div>
+
+            <div class="comparison">
+                <div class="comparison-box">
+                    <h4>📊 Hidden Layer Choice</h4>
+                    <p><strong>Modern standard:</strong> ReLU or Leaky ReLU</p>
+                    <p><strong>Why:</strong> Fast, prevents vanishing gradients, trains efficiently</p>
+                    <p style="margin-top: 1rem; color: var(--success); font-weight: 600;">90% of the time, use ReLU!</p>
+                </div>
+                <div class="comparison-box">
+                    <h4>🎯 Output Layer Choice</h4>
+                    <p><strong>Binary (2 classes):</strong> Sigmoid</p>
+                    <p><strong>Multi-class (3+ classes):</strong> Softmax</p>
+                    <p><strong>Regression (continuous):</strong> Linear (no activation)</p>
+                    <p style="margin-top: 1rem; color: var(--secondary); font-weight: 600;">Match activation to your task!</p>
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-language">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <span>📋 Copy</span>
+                    </button>
+                </div>
+                <div class="code-content">
+                    <code>import tensorflow as tf
+from tensorflow.keras import layers
+
+# Binary Classification Network
+binary_model = tf.keras.Sequential([
+    layers.Dense(128, activation='relu', input_shape=(20,)),
+    layers.Dense(64, activation='relu'),
+    layers.Dense(32, activation='relu'),
+    layers.Dense(1, activation='sigmoid')  # Binary: 0-1
+])
+
+# Multi-class Classification Network (10 classes)
+multiclass_model = tf.keras.Sequential([
+    layers.Dense(256, activation='relu', input_shape=(784,)),  # MNIST 28x28
+    layers.Dense(128, activation='relu'),
+    layers.Dense(64, activation='relu'),
+    layers.Dense(10, activation='softmax')  # 10 classes: outputs sum to 1
+])
+
+# Regression Network
+regression_model = tf.keras.Sequential([
+    layers.Dense(64, activation='relu', input_shape=(8,)),
+    layers.Dense(32, activation='relu'),
+    layers.Dense(16, activation='relu'),
+    layers.Dense(1)  # Regression: no activation, continuous output
+])
+
+# Compile with appropriate loss functions
+binary_model.compile(loss='binary_crossentropy', 
+                     optimizer='adam', metrics=['accuracy'])
+
+multiclass_model.compile(loss='categorical_crossentropy', 
+                         optimizer='adam', metrics=['accuracy'])
+
+regression_model.compile(loss='mse',  # Mean squared error
+                         optimizer='adam', metrics=['mae'])  # Mean absolute error</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORWARD PROPAGATION SECTION -->
+        <div id="forward" class="section">
+            <h2>Forward Propagation</h2>
+            
+            <p>Forward propagation is the process of pushing data through the network from input to output. Each neuron takes inputs, multiplies them by weights, adds a bias, and applies an activation function.</p>
+
+            <h3>Step-by-Step Process</h3>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h4>Input Layer</h4>
+                    <p>Raw data enters the network. For example: pixel values of an image, or features of a house (price, size, rooms).</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h4>Multiply by Weights</h4>
+                    <p>Each input is multiplied by a weight. Weights determine how important each input is to the final decision.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h4>Add Bias</h4>
+                    <p>A bias is added to shift the output. This gives the neuron more flexibility in learning patterns.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h4>Apply Activation Function</h4>
+                    <p>The result goes through an activation function (like ReLU) to add non-linearity, allowing the network to learn complex patterns.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <h4>Repeat Through Hidden Layers</h4>
+                    <p>The output becomes input for the next layer, repeating the process multiple times.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">6</div>
+                    <h4>Output Layer</h4>
+                    <p>Final layer produces the prediction (classification probability, regression value, etc.).</p>
+                </div>
+            </div>
+
+            <h3>The Math Behind It</h3>
+            <div class="card">
+                <p><strong>For a single neuron:</strong></p>
+                <p style="margin: 1rem 0; font-family: 'Courier New', monospace; color: var(--primary);">
+                    z = (input × weight) + bias<br>
+                    output = activation(z)
+                </p>
+                <p><strong>For an entire layer:</strong></p>
+                <p style="margin: 1rem 0; font-family: 'Courier New', monospace; color: var(--primary);">
+                    Z = (X · W) + b<br>
+                    A = activation(Z)
+                </p>
+                <p style="margin-top: 1.5rem; color: var(--text-muted);">Where X = input matrix, W = weight matrix, b = bias vector, A = activated output</p>
+            </div>
+
+            <h3>Activation Functions</h3>
+            <div class="comparison">
+                <div class="comparison-box">
+                    <h4>ReLU (Rectified Linear)</h4>
+                    <p>f(x) = max(0, x)</p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Most popular. Fast and works great in deep networks.</p>
+                </div>
+                <div class="comparison-box">
+                    <h4>Sigmoid</h4>
+                    <p>f(x) = 1 / (1 + e^-x)</p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Outputs 0-1, good for binary classification.</p>
+                </div>
+            </div>
+
+            <div class="nn-canvas-container">
+                <canvas id="forwardNN"></canvas>
+            </div>
+        </div>
+
+        <!-- BACKWARD PROPAGATION SECTION -->
+        <div id="backward" class="section">
+            <h2>Backpropagation</h2>
+            
+            <p>Backpropagation is how neural networks learn. After getting a prediction wrong, we calculate the error and send it backwards through the network, adjusting each weight to reduce that error. This happens through the chain rule of calculus.</p>
+
+            <h3>The Learning Process</h3>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h4>Forward Pass</h4>
+                    <p>Data flows forward through the network to get a prediction.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h4>Calculate Loss</h4>
+                    <p>Compare prediction to actual answer: Loss = (prediction - actual)²</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h4>Backward Pass</h4>
+                    <p>Calculate how much each weight contributed to the error using calculus (gradients).</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h4>Update Weights</h4>
+                    <p>Adjust weights in the direction that reduces the error.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <h4>Repeat</h4>
+                    <p>Do this thousands of times until the network gets good at predicting.</p>
+                </div>
+            </div>
+
+            <h3>Gradient Descent</h3>
+            <div class="card">
+                <p>Think of it like walking down a hill blindfolded. You can't see the path, but you can feel which direction is downhill. Gradient descent does the same—it calculates gradients (slopes) and takes small steps in the direction that reduces error.</p>
+                <p style="margin-top: 1rem; font-family: 'Courier New', monospace; color: var(--primary);">
+                    new_weight = old_weight - (learning_rate × gradient)
+                </p>
+                <p style="color: var(--text-muted); margin-top: 1rem;"><strong>Learning rate:</strong> Controls step size. Too high = overshooting. Too low = slow learning.</p>
+            </div>
+
+            <h3>Key Differences: Forward vs Backward</h3>
+            <div class="comparison">
+                <div class="comparison-box">
+                    <h4>Forward Propagation</h4>
+                    <p>📊 <strong>Purpose:</strong> Get predictions</p>
+                    <p>📊 <strong>Direction:</strong> Input → Output</p>
+                    <p>📊 <strong>Uses:</strong> Weights, activation functions</p>
+                </div>
+                <div class="comparison-box">
+                    <h4>Backpropagation</h4>
+                    <p>📊 <strong>Purpose:</strong> Learn and improve</p>
+                    <p>📊 <strong>Direction:</strong> Output → Input</p>
+                    <p>📊 <strong>Uses:</strong> Gradients, chain rule</p>
+                </div>
+            </div>
+
+            <div class="nn-canvas-container">
+                <canvas id="backwardNN"></canvas>
+            </div>
+        </div>
+
+        <!-- EXAMPLES SECTION -->
+        <div id="examples" class="section">
+            <h2>Real-Life Examples</h2>
+
+            <h3>1. Image Recognition (Computer Vision)</h3>
+            <div class="example-box">
+                <h4>🖼️ Use Case: Identifying Objects in Photos</h4>
+                <p><strong>Input:</strong> Pixel values (RGB) of an image</p>
+                <p><strong>Process:</strong> Early layers detect edges, middle layers detect shapes, deep layers recognize objects</p>
+                <p><strong>Output:</strong> Probability of each object class (dog: 95%, cat: 3%, bird: 2%)</p>
+                <p><strong>Applications:</strong> Medical imaging diagnosis, autonomous vehicle navigation, facial recognition</p>
+                <p style="color: var(--success); margin-top: 1rem;"><strong>Why it works:</strong> Convolutional neural networks exploit the structure of images—nearby pixels are related.</p>
+            </div>
+
+            <h3>2. Natural Language Processing (NLP)</h3>
+            <div class="example-box">
+                <h4>💬 Use Case: Sentiment Analysis</h4>
+                <p><strong>Input:</strong> Text like "This movie was amazing! I loved it"</p>
+                <p><strong>Process:</strong> Convert words to vectors → Process through layers → Learn semantic meaning</p>
+                <p><strong>Output:</strong> Sentiment score (positive: 0.92, negative: 0.08)</p>
+                <p><strong>Applications:</strong> Twitter sentiment tracking, product review analysis, chatbot responses</p>
+                <p style="color: var(--success); margin-top: 1rem;"><strong>Why it works:</strong> Neural networks can learn word relationships and context through embedding layers.</p>
+            </div>
+
+            <h3>3. Predictive Analytics (Time Series)</h3>
+            <div class="example-box">
+                <h4>📈 Use Case: Stock Price Prediction</h4>
+                <p><strong>Input:</strong> Historical prices, volume, indicators from last 30 days</p>
+                <p><strong>Process:</strong> LSTM/RNN processes sequential data → Learns temporal patterns</p>
+                <p><strong>Output:</strong> Predicted next-day price or probability of price increase</p>
+                <p><strong>Applications:</strong> Weather forecasting, traffic prediction, energy demand forecasting</p>
+                <p style="color: var(--success); margin-top: 1rem;"><strong>Why it works:</strong> RNNs have memory of previous inputs, perfect for sequences.</p>
+            </div>
+
+            <h3>4. Recommendation Systems</h3>
+            <div class="example-box">
+                <h4>🎬 Use Case: Netflix Movie Recommendations</h4>
+                <p><strong>Input:</strong> User watch history, ratings, time watched, genre preferences</p>
+                <p><strong>Process:</strong> Embed users and movies → Learn latent factors → Match similar users</p>
+                <p><strong>Output:</strong> Movies you'll probably like: "Stranger Things" (90%), "Dark" (87%)</p>
+                <p><strong>Applications:</strong> Music recommendations, book suggestions, friend recommendations</p>
+                <p style="color: var(--success); margin-top: 1rem;"><strong>Why it works:</strong> Neural networks find hidden patterns in user-item interactions.</p>
+            </div>
+
+            <h3>5. Regression (Continuous Prediction)</h3>
+            <div class="example-box">
+                <h4>🏠 Use Case: House Price Prediction</h4>
+                <p><strong>Input:</strong> Square footage, bedrooms, bathrooms, location, age</p>
+                <p><strong>Process:</strong> Multiple hidden layers → Learn complex price relationships</p>
+                <p><strong>Output:</strong> Predicted price (e.g., $487,200)</p>
+                <p><strong>Applications:</strong> Car valuation, medical cost prediction, real estate appraisal</p>
+                <p style="color: var(--success); margin-top: 1rem;"><strong>Why it works:</strong> Neural networks handle non-linear relationships better than linear models.</p>
+            </div>
+        </div>
+
+        <!-- PYTHON CODE SECTION -->
+        <div id="code" class="section">
+            <h2>Python Implementation</h2>
+
+            <h3>Building a Simple Neural Network from Scratch</h3>
+            <p>Let's build a basic neural network to understand how everything works:</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-language">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <span>📋 Copy</span>
+                    </button>
+                </div>
+                <div class="code-content">
+                    <code>import numpy as np
+
+# Activation Functions
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+def sigmoid_derivative(x):
+    return x * (1 - x)
+
+def relu(x):
+    return np.maximum(0, x)
+
+def relu_derivative(x):
+    return (x > 0).astype(float)
+
+# Simple Neural Network Class
+class NeuralNetwork:
+    def __init__(self, layer_sizes):
+        """
+        layer_sizes: list of sizes for each layer
+        Example: [2, 4, 1] = input(2) -> hidden(4) -> output(1)
+        """
+        self.weights = []
+        self.biases = []
+        
+        # Initialize weights and biases randomly
+        for i in range(len(layer_sizes) - 1):
+            w = np.random.randn(layer_sizes[i], layer_sizes[i+1]) * 0.01
+            b = np.zeros((1, layer_sizes[i+1]))
+            self.weights.append(w)
+            self.biases.append(b)
+    
+    def forward(self, X):
+        """Forward propagation"""
+        self.activations = [X]
+        self.z_values = []
+        
+        current = X
+        for i in range(len(self.weights) - 1):
+            z = np.dot(current, self.weights[i]) + self.biases[i]
+            self.z_values.append(z)
+            current = relu(z)  # ReLU for hidden layers
+            self.activations.append(current)
+        
+        # Output layer with sigmoid
+        z = np.dot(current, self.weights[-1]) + self.biases[-1]
+        self.z_values.append(z)
+        output = sigmoid(z)
+        self.activations.append(output)
+        
+        return output
+    
+    def backward(self, y, learning_rate=0.01):
+        """Backpropagation - calculate gradients and update weights"""
+        m = y.shape[0]  # number of samples
+        
+        # Calculate output layer error
+        delta = self.activations[-1] - y
+        
+        # Backpropagate through layers
+        for i in range(len(self.weights) - 1, -1, -1):
+            # Calculate gradients
+            dW = np.dot(self.activations[i].T, delta) / m
+            dB = np.sum(delta, axis=0, keepdims=True) / m
+            
+            # Update weights and biases
+            self.weights[i] -= learning_rate * dW
+            self.biases[i] -= learning_rate * dB
+            
+            # Prepare delta for next layer
+            if i > 0:
+                delta = np.dot(delta, self.weights[i].T)
+                # Apply derivative of ReLU
+                delta *= (self.z_values[i-1] > 0).astype(float)
+    
+    def train(self, X, y, epochs=100, learning_rate=0.01):
+        """Train the network"""
+        for epoch in range(epochs):
+            # Forward pass
+            output = self.forward(X)
+            
+            # Backward pass
+            self.backward(y, learning_rate)
+            
+            # Calculate loss (optional)
+            if epoch % 20 == 0:
+                loss = -np.mean(y * np.log(output + 1e-8) + 
+                              (1-y) * np.log(1-output + 1e-8))
+                print(f"Epoch {epoch}, Loss: {loss:.4f}")
+    
+    def predict(self, X):
+        """Make predictions"""
+        return self.forward(X)
+
+
+# Example: Training on simple data
+if __name__ == "__main__":
+    # Create sample data (XOR problem)
+    X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+    y = np.array([[0], [1], [1], [0]])
+    
+    # Create and train network
+    nn = NeuralNetwork([2, 4, 1])
+    nn.train(X, y, epochs=1000, learning_rate=0.5)
+    
+    # Make predictions
+    predictions = nn.predict(X)
+    print("\nPredictions:")
+    for i, pred in enumerate(predictions):
+        print(f"Input: {X[i]}, Prediction: {pred[0]:.4f}")</code>
+                </div>
+            </div>
+
+            <h3>Using TensorFlow/Keras (Production-Ready)</h3>
+            <p>In practice, we use libraries like TensorFlow for efficiency and advanced features:</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-language">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <span>📋 Copy</span>
+                    </button>
+                </div>
+                <div class="code-content">
+                    <code>from tensorflow import keras
+from tensorflow.keras import layers
+import numpy as np
+
+# Build a neural network with Keras
+model = keras.Sequential([
+    layers.Input(shape=(10,)),  # Input layer with 10 features
+    layers.Dense(64, activation='relu'),  # Hidden layer 1
+    layers.Dropout(0.2),  # Prevent overfitting
+    layers.Dense(32, activation='relu'),  # Hidden layer 2
+    layers.Dense(16, activation='relu'),  # Hidden layer 3
+    layers.Dense(1, activation='sigmoid')  # Output layer (binary classification)
+])
+
+# Compile the model
+model.compile(
+    optimizer='adam',  # Uses gradient descent with momentum
+    loss='binary_crossentropy',
+    metrics=['accuracy']
+)
+
+# Train the model
+history = model.fit(
+    X_train, y_train,
+    epochs=20,
+    batch_size=32,
+    validation_split=0.2,
+    verbose=1
+)
+
+# Make predictions
+predictions = model.predict(X_test)
+
+# Save the model
+model.save('my_neural_network.h5')</code>
+                </div>
+            </div>
+
+            <h3>Complete Example: House Price Prediction</h3>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-language">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <span>📋 Copy</span>
+                    </button>
+                </div>
+                <div class="code-content">
+                    <code>import pandas as pd
+from sklearn.preprocessing import StandardScaler
+from tensorflow.keras import layers, models
+
+# Load data
+data = pd.read_csv('houses.csv')
+X = data[['sqft', 'bedrooms', 'bathrooms', 'age']].values
+y = data[['price']].values
+
+# Normalize features (important for neural networks!)
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Create model
+model = models.Sequential([
+    layers.Dense(64, activation='relu', input_shape=(4,)),
+    layers.Dense(32, activation='relu'),
+    layers.Dense(16, activation='relu'),
+    layers.Dense(1)  # Regression: no activation on output
+])
+
+# Compile for regression (not classification)
+model.compile(
+    optimizer='adam',
+    loss='mse',  # Mean squared error for regression
+    metrics=['mae']  # Mean absolute error
+)
+
+# Train
+model.fit(X_scaled, y, epochs=50, batch_size=16, validation_split=0.2)
+
+# Predict new house price
+new_house = scaler.transform([[2000, 3, 2, 10]])  # 2000 sqft, 3 bed, 2 bath, 10 years old
+predicted_price = model.predict(new_house)
+print(f"Predicted price: ${predicted_price[0][0]:,.2f}")</code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>Key Takeaways for Implementation</h4>
+                <p>✅ <strong>Normalize data:</strong> Scale features to 0-1 or -1 to 1 range</p>
+                <p>✅ <strong>Choose optimizer:</strong> Adam is usually great starting point</p>
+                <p>✅ <strong>Pick loss function:</strong> CrossEntropy for classification, MSE for regression</p>
+                <p>✅ <strong>Use validation set:</strong> Monitor overfitting during training</p>
+                <p>✅ <strong>Start simple:</strong> 1-2 hidden layers first, add complexity if needed</p>
+                <p>✅ <strong>Batch size matters:</strong> Larger batches = faster, smaller = better generalization</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>🚀 Created to help you understand Neural Networks | Keep learning, keep growing!</p>
+    </footer>
+
+    <script>
+        // Copy Code Functionality
+        function copyCode(button) {
+            // Find the code content within the closest code-block
+            const codeBlock = button.closest('.code-block');
+            const codeContent = codeBlock.querySelector('code').innerText;
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(codeContent).then(() => {
+                // Change button text
+                const originalText = button.innerHTML;
+                button.innerHTML = '<span>✓ Copied!</span>';
+                button.classList.add('copied');
+                
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy code');
+            });
+        }
+
+        // Section Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(s => {
+                s.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+            
+            // Draw canvas if needed
+            setTimeout(() => {
+                if (sectionId === 'concepts') drawBasicNN();
+                else if (sectionId === 'forward') drawForwardNN();
+                else if (sectionId === 'backward') drawBackwardNN();
+            }, 100);
+        }
+
+        // Neural Network Visualizations
+        function drawBasicNN() {
+            const canvas = document.getElementById('basicNN');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            canvas.width = 600;
+            canvas.height = 400;
+            
+            // Clear canvas
+            ctx.fillStyle = '#FAFBFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw basic 3-layer network
+            const layers = [
+                {x: 100, nodes: 3, label: 'Input'},
+                {x: 300, nodes: 4, label: 'Hidden'},
+                {x: 500, nodes: 2, label: 'Output'}
+            ];
+            
+            // Draw connections
+            ctx.strokeStyle = 'rgba(99, 102, 241, 0.3)';
+            ctx.lineWidth = 2;
+            
+            for (let i = 0; i < layers.length - 1; i++) {
+                for (let j = 0; j < layers[i].nodes; j++) {
+                    for (let k = 0; k < layers[i+1].nodes; k++) {
+                        const y1 = 60 + j * (canvas.height - 120) / (layers[i].nodes - 1);
+                        const y2 = 60 + k * (canvas.height - 120) / (layers[i+1].nodes - 1);
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(layers[i].x, y1);
+                        ctx.lineTo(layers[i+1].x, y2);
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            // Draw neurons
+            for (let layer of layers) {
+                for (let i = 0; i < layer.nodes; i++) {
+                    const y = 60 + i * (canvas.height - 120) / (layer.nodes - 1);
+                    
+                    // Draw circle
+                    ctx.fillStyle = 'rgba(99, 102, 241, 0.9)';
+                    ctx.beginPath();
+                    ctx.arc(layer.x, y, 13, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Highlight
+                    ctx.strokeStyle = 'rgba(6, 182, 212, 0.8)';
+                    ctx.lineWidth = 2.5;
+                    ctx.stroke();
+                }
+                
+                // Label
+                ctx.fillStyle = 'rgba(15, 23, 42, 1)';
+                ctx.font = 'bold 14px system-ui';
+                ctx.textAlign = 'center';
+                ctx.fillText(layer.label, layer.x, 30);
+            }
+        }
+
+        function drawForwardNN() {
+            const canvas = document.getElementById('forwardNN');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            canvas.width = 600;
+            canvas.height = 350;
+            
+            // Clear
+            ctx.fillStyle = '#FAFBFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Title
+            ctx.fillStyle = 'rgba(15, 23, 42, 1)';
+            ctx.font = 'bold 18px system-ui';
+            ctx.textAlign = 'center';
+            ctx.fillText('Forward Propagation Flow: Input → Hidden → Output', canvas.width / 2, 30);
+            
+            // Step boxes
+            const steps = [
+                {x: 50, text: 'INPUT\nData enters'},
+                {x: 180, text: 'WEIGHTS\n× w + b'},
+                {x: 310, text: 'ACTIVATION\nReLU/Sigmoid'},
+                {x: 440, text: 'OUTPUT\nPrediction'}
+            ];
+            
+            for (let i = 0; i < steps.length; i++) {
+                const step = steps[i];
+                
+                // Draw box
+                ctx.fillStyle = i === 0 ? 'rgba(99, 102, 241, 0.12)' : 'rgba(6, 182, 212, 0.12)';
+                ctx.fillRect(step.x, 80, 100, 100);
+                
+                ctx.strokeStyle = i === 0 ? 'rgba(99, 102, 241, 0.7)' : 'rgba(6, 182, 212, 0.6)';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(step.x, 80, 100, 100);
+                
+                // Text
+                ctx.fillStyle = i === 0 ? 'rgba(99, 102, 241, 1)' : 'rgba(6, 182, 212, 1)';
+                ctx.font = 'bold 12px system-ui';
+                ctx.textAlign = 'center';
+                ctx.fillText(step.text, step.x + 50, 130);
+                
+                // Arrow
+                if (i < steps.length - 1) {
+                    ctx.strokeStyle = 'rgba(99, 102, 241, 0.5)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(step.x + 105, 130);
+                    ctx.lineTo(steps[i+1].x - 5, 130);
+                    ctx.stroke();
+                    
+                    // Arrowhead
+                    ctx.fillStyle = 'rgba(99, 102, 241, 0.5)';
+                    ctx.beginPath();
+                    ctx.moveTo(steps[i+1].x - 5, 130);
+                    ctx.lineTo(steps[i+1].x - 12, 125);
+                    ctx.lineTo(steps[i+1].x - 12, 135);
+                    ctx.fill();
+                }
+            }
+            
+            // Formula at bottom
+            ctx.fillStyle = 'rgba(99, 102, 241, 0.8)';
+            ctx.font = '13px Fira Code, monospace';
+            ctx.textAlign = 'left';
+            ctx.fillText('Formula: output = activation((input × weight) + bias)', 50, 280);
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.6)';
+            ctx.font = '13px system-ui';
+            ctx.fillText('Happens: ONCE per prediction (during inference)', 50, 310);
+        }
+
+        function drawBackwardNN() {
+            const canvas = document.getElementById('backwardNN');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            canvas.width = 600;
+            canvas.height = 350;
+            
+            // Clear
+            ctx.fillStyle = '#FAFBFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Title
+            ctx.fillStyle = 'rgba(139, 92, 246, 1)';
+            ctx.font = 'bold 18px system-ui';
+            ctx.textAlign = 'center';
+            ctx.fillText('Backpropagation Flow: Calculate Error & Update Weights', canvas.width / 2, 30);
+            
+            // Step boxes (reversed direction)
+            const steps = [
+                {x: 440, text: 'OUTPUT\nCompare to\nactual'},
+                {x: 310, text: 'LOSS\nHow wrong?'},
+                {x: 180, text: 'GRADIENTS\nCalculate'},
+                {x: 50, text: 'UPDATE\nWeights'}
+            ];
+            
+            for (let i = 0; i < steps.length; i++) {
+                const step = steps[i];
+                
+                // Draw box
+                ctx.fillStyle = 'rgba(139, 92, 246, 0.12)';
+                ctx.fillRect(step.x, 80, 100, 100);
+                
+                ctx.strokeStyle = i === 0 ? 'rgba(139, 92, 246, 0.7)' : 'rgba(139, 92, 246, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(step.x, 80, 100, 100);
+                
+                // Text
+                ctx.fillStyle = 'rgba(139, 92, 246, 1)';
+                ctx.font = 'bold 12px system-ui';
+                ctx.textAlign = 'center';
+                ctx.fillText(step.text, step.x + 50, 130);
+                
+                // Arrow (pointing left/backward)
+                if (i < steps.length - 1) {
+                    ctx.strokeStyle = 'rgba(99, 102, 241, 0.5)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(step.x - 5, 130);
+                    ctx.lineTo(steps[i+1].x + 105, 130);
+                    ctx.stroke();
+                    
+                    // Arrowhead
+                    ctx.fillStyle = 'rgba(99, 102, 241, 0.5)';
+                    ctx.beginPath();
+                    ctx.moveTo(step.x - 5, 130);
+                    ctx.lineTo(step.x + 2, 125);
+                    ctx.lineTo(step.x + 2, 135);
+                    ctx.fill();
+                }
+            }
+            
+            // Formula at bottom
+            ctx.fillStyle = 'rgba(139, 92, 246, 0.8)';
+            ctx.font = '13px Fira Code, monospace';
+            ctx.textAlign = 'left';
+            ctx.fillText('Formula: new_weight = old_weight - (learning_rate × gradient)', 50, 280);
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.6)';
+            ctx.font = '13px system-ui';
+            ctx.fillText('Happens: REPEATEDLY during training (thousands of times)', 50, 310);
+        }
+
+        // Draw initial visualizations
+        window.addEventListener('load', () => {
+            drawBasicNN();
+        });
+    </script>
+
+<footer id="sph-footer">
+  <div>Curated by <strong>Shrinivasa PH</strong> &nbsp;·&nbsp; Data Science &amp; Analytics Trainer</div>
+  <a href="index.html">← Back to All Topics</a>
+</footer>
+
+</body>
+</html>

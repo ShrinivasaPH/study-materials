@@ -1,0 +1,1816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Engineering — A Complete Field Guide | Shrinivasa PH</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --bg2: #13151c;
+    --bg3: #1a1d27;
+    --surface: #1e2130;
+    --border: #2a2f42;
+    --amber: #f0a500;
+    --amber-dim: #c07f00;
+    --amber-glow: rgba(240,165,0,0.12);
+    --teal: #2ec4b6;
+    --rose: #e84855;
+    --violet: #9b72cf;
+    --text: #e8e4d9;
+    --text-muted: #8b8878;
+    --text-dim: #5c5a52;
+    --code-bg: #0a0c10;
+    --mono: 'JetBrains Mono', monospace;
+    --serif: 'Source Serif 4', Georgia, serif;
+    --display: 'DM Serif Display', Georgia, serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+  ::selection { background: var(--amber); color: #000; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ─── HEADER ─── */
+  header {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+    padding: 4rem 2rem;
+  }
+  .header-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.25;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 40%, transparent 100%);
+  }
+  .header-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(240,165,0,0.08) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    animation: pulseGlow 4s ease-in-out infinite;
+  }
+  @keyframes pulseGlow {
+    0%, 100% { transform: translate(-50%,-50%) scale(1); opacity: 0.5; }
+    50% { transform: translate(-50%,-50%) scale(1.15); opacity: 1; }
+  }
+  .header-label {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.25em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.2s forwards;
+  }
+  header h1 {
+    font-family: var(--display);
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    opacity: 0;
+    animation: fadeUp 0.7s ease 0.4s forwards;
+    max-width: 900px;
+  }
+  header h1 em {
+    font-style: italic;
+    color: var(--amber);
+  }
+  header p.subtitle {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    max-width: 580px;
+    margin: 1.5rem auto 0;
+    opacity: 0;
+    animation: fadeUp 0.7s ease 0.6s forwards;
+    font-weight: 300;
+  }
+  .header-cta {
+    display: flex; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap; justify-content: center;
+    opacity: 0; animation: fadeUp 0.7s ease 0.8s forwards;
+  }
+  .btn {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 2px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+  .btn-primary {
+    background: var(--amber);
+    color: #000;
+    font-weight: 700;
+  }
+  .btn-primary:hover { background: #ffc62b; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(240,165,0,0.3); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { border-color: var(--amber); color: var(--amber); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: sticky;
+    top: 0; z-index: 100;
+    background: rgba(13,15,20,0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+  }
+  nav ul {
+    display: flex;
+    list-style: none;
+    gap: 0;
+    max-width: 1100px;
+    margin: 0 auto;
+    overflow-x: auto;
+  }
+  nav ul::-webkit-scrollbar { display: none; }
+  nav a {
+    display: block;
+    padding: 1rem 1.1rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    text-decoration: none;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  nav a:hover, nav a.active { color: var(--amber); border-color: var(--amber); }
+
+  /* ─── LAYOUT ─── */
+  main { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+  section { padding: 5rem 0; border-bottom: 1px solid var(--border); }
+  section:last-child { border-bottom: none; }
+
+  .section-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .section-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 24px; height: 1px;
+    background: var(--amber);
+  }
+  h2 {
+    font-family: var(--display);
+    font-size: clamp(1.9rem, 4vw, 2.8rem);
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 1.25rem;
+  }
+  h3 {
+    font-family: var(--display);
+    font-size: 1.45rem;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    margin-top: 2rem;
+  }
+  h3:first-child { margin-top: 0; }
+  p { color: var(--text-muted); margin-bottom: 1rem; }
+  p strong { color: var(--text); font-weight: 600; }
+  a { color: var(--amber); text-decoration: underline; text-decoration-color: transparent; transition: text-decoration-color 0.2s; }
+  a:hover { text-decoration-color: var(--amber); }
+
+  /* ─── FORMULA BOX ─── */
+  .formula-box {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--amber);
+    border-radius: 4px;
+    padding: 1.5rem 2rem;
+    margin: 2rem 0;
+    font-family: var(--mono);
+    overflow-x: auto;
+  }
+  .formula-box .formula-title {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.75rem;
+  }
+  .formula-main {
+    font-size: 1.05rem;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+  .formula-legend {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+  .formula-legend span { color: var(--teal); }
+
+  /* ─── CODE BLOCK ─── */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 1.5rem 0;
+  }
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 1rem;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-lang {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    color: var(--amber);
+    text-transform: uppercase;
+  }
+  .copy-btn {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    background: none;
+    border: 1px solid var(--border);
+    padding: 0.25rem 0.6rem;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { color: var(--amber); border-color: var(--amber); }
+  .code-block pre {
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.84rem;
+    line-height: 1.7;
+  }
+  .code-block code { font-family: var(--mono); }
+  .kw { color: #c792ea; }
+  .str { color: #c3e88d; }
+  .cm { color: var(--text-dim); font-style: italic; }
+  .fn { color: #82aaff; }
+  .var { color: #f78c6c; }
+  .op { color: var(--amber); }
+  .num { color: #f78c6c; }
+
+  /* ─── PROMPT ANATOMY ─── */
+  .anatomy-wrapper {
+    display: grid;
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+  .anatomy-part {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 1rem;
+    align-items: start;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    transition: border-color 0.2s;
+  }
+  .anatomy-part:hover { border-color: var(--amber); }
+  .anatomy-label {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--amber);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding-top: 0.15rem;
+  }
+  .anatomy-desc { font-size: 0.92rem; color: var(--text-muted); }
+  .anatomy-desc strong { color: var(--text); }
+  .anatomy-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 2px;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+  }
+  .badge-req { background: rgba(232,72,85,0.15); color: var(--rose); }
+  .badge-opt { background: rgba(46,196,182,0.12); color: var(--teal); }
+
+  /* ─── TECHNIQUE CARDS ─── */
+  .technique-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+    margin: 2rem 0;
+  }
+  .technique-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .technique-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 0;
+    background: var(--amber);
+    transition: height 0.3s;
+  }
+  .technique-card:hover::before { height: 100%; }
+  .technique-card:hover { border-color: rgba(240,165,0,0.3); transform: translateY(-2px); }
+  .tc-number {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+  }
+  .tc-title {
+    font-family: var(--display);
+    font-size: 1.2rem;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+  .tc-subtitle {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--amber);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+  }
+  .tc-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
+
+  /* ─── EXAMPLE CARDS (Before/After) ─── */
+  .example-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  @media (max-width: 680px) { .example-pair { grid-template-columns: 1fr; } }
+  .ex-card {
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .ex-card-header {
+    padding: 0.6rem 1rem;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .ex-bad .ex-card-header { background: rgba(232,72,85,0.1); color: var(--rose); border-bottom: 1px solid rgba(232,72,85,0.2); }
+  .ex-good .ex-card-header { background: rgba(46,196,182,0.08); color: var(--teal); border-bottom: 1px solid rgba(46,196,182,0.2); }
+  .ex-card-body {
+    padding: 1rem 1.25rem;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.65;
+    color: var(--text-muted);
+    background: var(--code-bg);
+  }
+  .ex-result {
+    background: var(--bg3);
+    border-top: 1px solid var(--border);
+    padding: 0.75rem 1.25rem;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  /* ─── TABS ─── */
+  .tabs { margin: 2rem 0; }
+  .tab-list {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    gap: 0;
+    overflow-x: auto;
+  }
+  .tab-btn {
+    font-family: var(--mono);
+    font-size: 0.73rem;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    margin-bottom: -1px;
+  }
+  .tab-btn.active { color: var(--amber); border-color: var(--amber); }
+  .tab-btn:hover:not(.active) { color: var(--text-muted); }
+  .tab-panel { display: none; padding: 1.5rem 0; }
+  .tab-panel.active { display: block; }
+
+  /* ─── USE CASE BLOCK ─── */
+  .usecase {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin: 1.5rem 0;
+    overflow: hidden;
+  }
+  .usecase-head {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+  .usecase-icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--amber-glow);
+    border: 1px solid rgba(240,165,0,0.3);
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .usecase-title { font-family: var(--display); font-size: 1.1rem; color: var(--text); flex: 1; }
+  .usecase-toggle {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    transition: transform 0.3s;
+  }
+  .usecase.open .usecase-toggle { transform: rotate(180deg); }
+  .usecase-body {
+    display: none;
+    padding: 1.5rem;
+  }
+  .usecase.open .usecase-body { display: block; }
+  .problem-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .problem-label.pl-prob { color: var(--rose); }
+  .problem-label.pl-sol { color: var(--teal); }
+  .problem-label.pl-res { color: var(--violet); }
+
+  /* ─── NOTATION TABLE ─── */
+  .notation-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.88rem;
+  }
+  .notation-table th {
+    text-align: left;
+    padding: 0.6rem 1rem;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+    text-transform: uppercase;
+  }
+  .notation-table td {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    vertical-align: top;
+  }
+  .notation-table tr:hover td { background: var(--bg3); }
+  .notation-table td:first-child {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--teal);
+    white-space: nowrap;
+  }
+
+  /* ─── INTERACTIVE PROMPT BUILDER ─── */
+  .builder {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 2rem 0;
+  }
+  .builder-header {
+    padding: 1rem 1.5rem;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+  .builder-header h3 {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin: 0;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-r { background: var(--rose); }
+  .dot-y { background: var(--amber); }
+  .dot-g { background: var(--teal); }
+  .builder-body { display: grid; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 720px) { .builder-body { grid-template-columns: 1fr; } }
+  .builder-inputs { padding: 1.5rem; border-right: 1px solid var(--border); }
+  .builder-output { padding: 1.5rem; }
+  .form-group { margin-bottom: 1.25rem; }
+  .form-label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.4rem;
+  }
+  .form-select, .form-textarea, .form-input {
+    width: 100%;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    padding: 0.5rem 0.75rem;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-select:focus, .form-textarea:focus, .form-input:focus { border-color: var(--amber); }
+  .form-textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+  .output-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+  }
+  #prompt-output {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1rem;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: var(--text);
+    min-height: 200px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .score-bar {
+    margin-top: 1rem;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.75rem 1rem;
+  }
+  .score-label { font-family: var(--mono); font-size: 0.65rem; color: var(--text-dim); margin-bottom: 0.5rem; }
+  .score-track { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .score-fill { height: 100%; background: var(--amber); border-radius: 2px; transition: width 0.5s ease; }
+
+  /* ─── CALLOUT ─── */
+  .callout {
+    border-left: 3px solid var(--amber);
+    background: var(--amber-glow);
+    padding: 1rem 1.25rem;
+    border-radius: 0 4px 4px 0;
+    margin: 1.5rem 0;
+    font-size: 0.92rem;
+  }
+  .callout-title { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.35rem; }
+  .callout-info { border-color: var(--teal); background: rgba(46,196,182,0.06); }
+  .callout-info .callout-title { color: var(--teal); }
+  .callout-warn { border-color: var(--rose); background: rgba(232,72,85,0.06); }
+  .callout-warn .callout-title { color: var(--rose); }
+
+  /* ─── DATASET LINKS ─── */
+  .dataset-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+  .dataset-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 1.25rem;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: all 0.2s;
+  }
+  .dataset-card:hover {
+    border-color: var(--amber);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    text-decoration: none;
+  }
+  .ds-tag {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 0.5rem;
+  }
+  .ds-name { font-family: var(--display); font-size: 1.05rem; color: var(--text); margin-bottom: 0.4rem; }
+  .ds-desc { font-size: 0.82rem; color: var(--text-dim); line-height: 1.5; }
+  .ds-link { font-family: var(--mono); font-size: 0.7rem; color: var(--amber); margin-top: 0.5rem; }
+
+  /* ─── CHEAT SHEET ─── */
+  .cheat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.75rem;
+    margin: 2rem 0;
+  }
+  .cheat-item {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.85rem 1rem;
+  }
+  .cheat-pattern {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--teal);
+    margin-bottom: 0.3rem;
+  }
+  .cheat-meaning { font-size: 0.82rem; color: var(--text-dim); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 2rem;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  /* ─── MISC ─── */
+  .highlight { color: var(--amber); font-weight: 600; }
+  .hl-teal { color: var(--teal); }
+  .hl-rose { color: var(--rose); }
+  .hl-violet { color: var(--violet); }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  .fade-in {
+    opacity: 0; transform: translateY(16px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .fade-in.visible { opacity: 1; transform: none; }
+  kbd {
+    font-family: var(--mono);
+    font-size: 0.8em;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.1em 0.45em;
+    color: var(--text);
+  }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+  .step-list { list-style: none; counter-reset: steps; }
+  .step-list li { counter-increment: steps; display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1rem; }
+  .step-list li::before {
+    content: counter(steps, decimal-leading-zero);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--amber);
+    background: var(--amber-glow);
+    border: 1px solid rgba(240,165,0,0.25);
+    border-radius: 2px;
+    padding: 0.2rem 0.4rem;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+  .step-list .step-content { font-size: 0.92rem; color: var(--text-muted); }
+  .step-list strong { color: var(--text); }
+</style>
+
+
+
+
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── SPH Unified Nav (Sleek theme) ── */
+#sph-nav {
+  position: fixed; top: 0; left: 0; right: 0; height: 54px;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid #E4E4E7;
+  display: flex; align-items: center; padding: 0 28px; z-index: 999999;
+  font-family: 'Geist', system-ui, sans-serif; gap: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+#sph-nav a { text-decoration: none; }
+#sph-nav .sph-logo {
+  display: flex; align-items: center; gap: 10px;
+}
+#sph-nav .sph-badge {
+  background: #18181B; color: #FAFAFA;
+  width: 30px; height: 30px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Geist Mono', monospace;
+  font-size: 9px; font-weight: 500; letter-spacing: 0.08em; flex-shrink: 0;
+  transition: background 0.15s;
+}
+#sph-nav .sph-badge:hover { background: #3F3F46; }
+#sph-nav .sph-spacer { flex: 1; }
+#sph-nav .sph-home {
+  color: #71717A; font-size: 12.5px;
+  font-family: 'Geist', sans-serif;
+  display: flex; align-items: center; gap: 5px;
+  transition: color 0.15s;
+}
+#sph-nav .sph-home:hover { color: #18181B; }
+#sph-nav .sph-cat {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px; font-weight: 500; padding: 4px 12px;
+  border-radius: 4px; border: 1px solid; white-space: nowrap;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+#sph-footer {
+  background: #18181B;
+  border-top: 1px solid #1A1A1D;
+  padding: 36px 28px; text-align: center;
+  font-family: 'Geist', sans-serif; color: #52525B;
+  font-size: 13px; line-height: 2;
+}
+#sph-footer strong { color: #A1A1AA; font-style: italic; font-family: 'Instrument Serif', serif; font-weight: 400; }
+#sph-footer a {
+  color: #52525B; text-decoration: none; font-size: 12px;
+  border: 1px solid #2E2E32; padding: 6px 18px; border-radius: 5px;
+  display: inline-block; margin-top: 10px; transition: all 0.15s;
+  font-family: 'Geist', sans-serif;
+}
+#sph-footer a:hover { color: #A1A1AA; border-color: #52525B; }
+</style>
+
+</head>
+<body>
+
+<nav id="sph-nav">
+  <a class="sph-logo" href="index.html">
+    <div class="sph-badge">SPH</div>
+  </a>
+  <span class="sph-spacer"></span>
+  <a class="sph-home" href="index.html">← All Topics</a>
+  <span class="sph-cat" style="color:#7C2D12; border-color:#FDBA74; background:#FFEDD5;">Generative AI</span>
+</nav>
+<div style="height:54px"></div>
+
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header>
+  <div class="header-grid"></div>
+  <div class="header-glow"></div>
+  <div class="header-label">Field Guide · v2025</div>
+  <h1>The Art & Science of<br><em>Prompt Engineering</em></h1>
+  <p class="subtitle">A structured, hands-on guide to writing prompts that consistently produce accurate, useful, and predictable outputs from large language models.</p>
+  <div class="header-cta">
+    <a href="#fundamentals" class="btn btn-primary">Start Learning</a>
+    <a href="#builder" class="btn btn-ghost">Try the Builder →</a>
+  </div>
+</header>
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<nav>
+  <ul>
+    <li><a href="#fundamentals">Fundamentals</a></li>
+    <li><a href="#anatomy">Anatomy</a></li>
+    <li><a href="#techniques">Techniques</a></li>
+    <li><a href="#usecases">Use Cases</a></li>
+    <li><a href="#patterns">Patterns</a></li>
+    <li><a href="#builder">Builder</a></li>
+    <li><a href="#pitfalls">Pitfalls</a></li>
+    <li><a href="#datasets">Datasets</a></li>
+    <li><a href="#cheatsheet">Cheat Sheet</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- ═══════════════ FUNDAMENTALS ═══════════════ -->
+<section id="fundamentals" class="fade-in">
+  <div class="section-eyebrow">Chapter 01</div>
+  <h2>What Is Prompt Engineering?</h2>
+  <p>Prompt engineering is the practice of designing and refining inputs to a large language model (LLM) to produce a desired output. It is the interface between human <em>intent</em> and model <em>capability</em> — a discipline that blends linguistics, logic, domain expertise, and empirical testing.</p>
+  <p>Think of an LLM as a <strong>very powerful function</strong>. The quality of its output is proportional to the quality of its input.</p>
+
+  <div class="formula-box">
+    <div class="formula-title">Core Principle — Input/Output Mapping</div>
+    <div class="formula-main">Output = f(Prompt, Model, Temperature, Context)</div>
+    <div class="formula-legend">
+      <span>f</span> = the LLM's internal function (parameters, weights) &nbsp;·&nbsp;
+      <span>Prompt</span> = your textual instruction &nbsp;·&nbsp;
+      <span>Temperature</span> ∈ [0, 2] = creativity/randomness &nbsp;·&nbsp;
+      <span>Context</span> = conversation history, injected documents
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h3>Why It Matters</h3>
+      <ul class="step-list">
+        <li><div class="step-content"><strong>Consistency:</strong> Identical tasks, identical format — every time.</div></li>
+        <li><div class="step-content"><strong>Accuracy:</strong> Reduce hallucination by anchoring the model with precise constraints.</div></li>
+        <li><div class="step-content"><strong>Efficiency:</strong> Fewer back-and-forth iterations. First-shot quality outputs.</div></li>
+        <li><div class="step-content"><strong>Safety:</strong> Guard-rails that prevent misuse or off-topic drift.</div></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Mental Model</h3>
+      <p>An LLM is a <strong>next-token predictor</strong> trained on a vast corpus of text. When you write a prompt, you are sculpting a probability distribution over possible continuations. A well-engineered prompt narrows that distribution toward the desired output.</p>
+      <div class="formula-box" style="margin-top:1rem">
+        <div class="formula-title">Token Prediction</div>
+        <div class="formula-main">P(token<sub>n+1</sub> | token<sub>1..n</sub>, prompt)</div>
+        <div class="formula-legend">The model assigns probability to every possible next token. Your prompt shifts this distribution.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-title">💡 Key Insight</div>
+    Prompt engineering is not about "tricking" the model. It is about <strong>communicating clearly</strong> — the same skill that makes a good manager, teacher, or technical writer.
+  </div>
+</section>
+
+<!-- ═══════════════ ANATOMY ═══════════════ -->
+<section id="anatomy" class="fade-in">
+  <div class="section-eyebrow">Chapter 02</div>
+  <h2>Anatomy of a Prompt</h2>
+  <p>Most effective prompts are composed of up to six distinct components. You don't always need all of them — but knowing each one lets you consciously choose when to include it.</p>
+
+  <div class="formula-box">
+    <div class="formula-title">Full Prompt Formula</div>
+    <div class="formula-main">Prompt = [Role] + [Task] + [Context] + [Format] + [Constraints] + [Examples]</div>
+    <div class="formula-legend">
+      <span>[ ]</span> = optional component &nbsp;·&nbsp; order can vary &nbsp;·&nbsp; Task is the only truly required element
+    </div>
+  </div>
+
+  <div class="anatomy-wrapper">
+    <div class="anatomy-part">
+      <div class="anatomy-label">Role <span class="anatomy-badge badge-opt">optional</span></div>
+      <div class="anatomy-desc"><strong>Who should the model act as?</strong> Setting a persona primes the model's vocabulary, tone, and domain knowledge. Example: <kbd>You are a senior data analyst at a Fortune 500 company.</kbd></div>
+    </div>
+    <div class="anatomy-part">
+      <div class="anatomy-label">Task <span class="anatomy-badge badge-req">required</span></div>
+      <div class="anatomy-desc"><strong>What should the model do?</strong> Start with a clear action verb. Be specific. Example: <kbd>Summarize the following customer review into three bullet points.</kbd></div>
+    </div>
+    <div class="anatomy-part">
+      <div class="anatomy-label">Context <span class="anatomy-badge badge-opt">optional</span></div>
+      <div class="anatomy-desc"><strong>What background does the model need?</strong> Inject data, documents, or situational info the model can't infer. Example: <kbd>The user is a first-year medical student with no coding background.</kbd></div>
+    </div>
+    <div class="anatomy-part">
+      <div class="anatomy-label">Format <span class="anatomy-badge badge-opt">optional</span></div>
+      <div class="anatomy-desc"><strong>How should the output look?</strong> Specify structure, length, tone, or medium. Example: <kbd>Respond in a JSON object with keys: title, summary, sentiment.</kbd></div>
+    </div>
+    <div class="anatomy-part">
+      <div class="anatomy-label">Constraints <span class="anatomy-badge badge-opt">optional</span></div>
+      <div class="anatomy-desc"><strong>What are the guardrails?</strong> Define what to avoid, word limits, language, etc. Example: <kbd>Do not use technical jargon. Keep your answer under 100 words.</kbd></div>
+    </div>
+    <div class="anatomy-part">
+      <div class="anatomy-label">Examples <span class="anatomy-badge badge-opt">optional</span></div>
+      <div class="anatomy-desc"><strong>Show, don't just tell.</strong> Concrete examples are the fastest way to align model output with your expectation. This is called <em>few-shot prompting</em>. Example: <kbd>Input: "I hate this product!" → Output: {"sentiment":"negative"}</kbd></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ NOTATION ═══════════════ -->
+<section id="notation" class="fade-in" style="padding-top:0; border-bottom:none;">
+  <div class="section-eyebrow">Chapter 02b</div>
+  <h2>Notations & Nomenclature</h2>
+  <p>These symbols and terms appear across research papers, API docs, and engineering discussions. Know them fluently.</p>
+
+  <table class="notation-table">
+    <thead>
+      <tr><th>Symbol / Term</th><th>Meaning</th><th>Example in Practice</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>P(y|x)</td><td>Probability of output y given input x (the prompt)</td><td>P("Paris" | "Capital of France is")</td></tr>
+      <tr><td>T (Temperature)</td><td>Randomness scalar. T→0: deterministic. T→2: very creative/chaotic.</td><td>Use T=0 for code/facts; T=0.8 for creative writing</td></tr>
+      <tr><td>top_p</td><td>Nucleus sampling: only sample from top-p% probability mass</td><td>top_p=0.9 ignores low-probability tokens</td></tr>
+      <tr><td>k-shot</td><td>Number of examples (shots) given in the prompt</td><td>0-shot: no examples; 3-shot: 3 examples</td></tr>
+      <tr><td>CoT</td><td>Chain of Thought — ask the model to reason step-by-step</td><td>"Let's think step by step…"</td></tr>
+      <tr><td>System Prompt</td><td>Hidden pre-prompt from the developer, before the user's message</td><td>Used to set persona, policies, output format</td></tr>
+      <tr><td>Context Window</td><td>Maximum tokens the model can see at once (prompt + response)</td><td>GPT-4o: 128k tokens ≈ 96,000 words</td></tr>
+      <tr><td>RAG</td><td>Retrieval-Augmented Generation: inject external documents into prompt</td><td>Attach a PDF, then ask "summarize section 3"</td></tr>
+      <tr><td>Hallucination</td><td>The model confidently generates false information</td><td>Fake citations, made-up statistics</td></tr>
+      <tr><td>Grounding</td><td>Tethering the model's output to verifiable facts/documents</td><td>Include source text, ask "only use information above"</td></tr>
+      <tr><td>Instruction-tuned</td><td>A model fine-tuned to follow natural-language instructions</td><td>GPT-4, Claude, Gemini vs. base GPT-3</td></tr>
+      <tr><td>Stop sequence</td><td>Token(s) that signal the model to stop generating</td><td>stop=["###", "---"]</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════════════ TECHNIQUES ═══════════════ -->
+<section id="techniques" class="fade-in">
+  <div class="section-eyebrow">Chapter 03</div>
+  <h2>Core Prompting Techniques</h2>
+  <p>Each technique is a pattern that solves a specific class of problem. Master each one, then know when to combine them.</p>
+
+  <div class="technique-grid">
+    <div class="technique-card">
+      <div class="tc-number">01</div>
+      <div class="tc-title">Zero-Shot Prompting</div>
+      <div class="tc-subtitle">No examples given</div>
+      <div class="tc-desc">Ask the model to perform a task it has never seen in this session. Relies entirely on pre-trained knowledge. Best for simple, well-defined tasks.</div>
+    </div>
+    <div class="technique-card">
+      <div class="tc-number">02</div>
+      <div class="tc-title">Few-Shot Prompting</div>
+      <div class="tc-subtitle">k examples (k ≥ 1)</div>
+      <div class="tc-desc">Provide 1–8 input/output examples before the real task. Dramatically improves format adherence and accuracy for specialized outputs.</div>
+    </div>
+    <div class="technique-card">
+      <div class="tc-number">03</div>
+      <div class="tc-title">Chain of Thought</div>
+      <div class="tc-subtitle">Step-by-step reasoning</div>
+      <div class="tc-desc">Instruct the model to "think aloud" before giving the final answer. Reduces errors on multi-step math, logic, and planning tasks.</div>
+    </div>
+    <div class="technique-card">
+      <div class="tc-number">04</div>
+      <div class="tc-title">Role Prompting</div>
+      <div class="tc-subtitle">Persona assignment</div>
+      <div class="tc-desc">Assign a professional identity to prime domain vocabulary, tone, and response depth. "You are a…" is your scalpel.</div>
+    </div>
+    <div class="technique-card">
+      <div class="tc-number">05</div>
+      <div class="tc-title">Self-Consistency</div>
+      <div class="tc-subtitle">Sample, vote, aggregate</div>
+      <div class="tc-desc">Generate the same prompt N times with temperature>0, then take the majority answer. Increases reliability on reasoning-heavy tasks.</div>
+    </div>
+    <div class="technique-card">
+      <div class="tc-number">06</div>
+      <div class="tc-title">ReAct Prompting</div>
+      <div class="tc-subtitle">Reason + Act</div>
+      <div class="tc-desc">Interleave reasoning steps with external actions (search, code execution, API calls). Foundation of modern AI agents and tool-use architectures.</div>
+    </div>
+    <div class="technique-card">
+      <div class="tc-number">07</div>
+      <div class="tc-title">Instruction Chaining</div>
+      <div class="tc-subtitle">Multi-step pipelines</div>
+      <div class="tc-desc">Break complex tasks into sequential sub-prompts, where the output of one becomes the input of the next. Reduces single-prompt overload.</div>
+    </div>
+    <div class="technique-card">
+      <div class="tc-number">08</div>
+      <div class="tc-title">Constraint-Based</div>
+      <div class="tc-subtitle">Negative + positive rules</div>
+      <div class="tc-desc">Define both what to DO and what NOT to do. Negative constraints often do more work: "Do not include personal opinions."</div>
+    </div>
+    <div class="technique-card">
+      <div class="tc-number">09</div>
+      <div class="tc-title">Tree of Thought</div>
+      <div class="tc-subtitle">Branching exploration</div>
+      <div class="tc-desc">Ask the model to explore multiple solution paths simultaneously, evaluate each, and select the best. Inspired by deliberate problem-solving.</div>
+    </div>
+  </div>
+
+  <!-- Technique Deep Dives with Tabs -->
+  <div class="tabs">
+    <div class="tab-list">
+      <button class="tab-btn active" onclick="switchTab(event,'tab-zeroshot')">Zero-Shot</button>
+      <button class="tab-btn" onclick="switchTab(event,'tab-fewshot')">Few-Shot</button>
+      <button class="tab-btn" onclick="switchTab(event,'tab-cot')">Chain of Thought</button>
+      <button class="tab-btn" onclick="switchTab(event,'tab-role')">Role Prompting</button>
+      <button class="tab-btn" onclick="switchTab(event,'tab-react')">ReAct</button>
+    </div>
+
+    <div id="tab-zeroshot" class="tab-panel active">
+      <h3>Zero-Shot: Direct Instructions Only</h3>
+      <p>No examples needed. The model relies on instruction-tuning and pre-training.</p>
+      <div class="example-pair">
+        <div class="ex-card ex-bad">
+          <div class="ex-card-header">✗ Weak Zero-Shot</div>
+          <div class="ex-card-body">Translate this.</div>
+          <div class="ex-result">⚠ Translate to what language? What text? Ambiguous.</div>
+        </div>
+        <div class="ex-card ex-good">
+          <div class="ex-card-header">✓ Strong Zero-Shot</div>
+          <div class="ex-card-body">Translate the following English sentence to French. Return only the translated text, nothing else.
+
+Text: "The quarterly report shows a 12% increase in revenue."</div>
+          <div class="ex-result">✓ Le rapport trimestriel montre une augmentation de 12% des revenus.</div>
+        </div>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Python</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><code><span class="kw">import</span> anthropic
+
+client = anthropic.Anthropic()
+
+prompt = <span class="str">"""Translate the following English sentence to French.
+Return only the translated text, nothing else.
+
+Text: The quarterly report shows a 12% increase in revenue."""</span>
+
+message = client.messages.create(
+    model=<span class="str">"claude-opus-4-5"</span>,
+    max_tokens=<span class="num">256</span>,
+    messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: prompt}]
+)
+<span class="fn">print</span>(message.content[<span class="num">0</span>].text)</code></pre>
+      </div>
+    </div>
+
+    <div id="tab-fewshot" class="tab-panel">
+      <h3>Few-Shot: Learning by Example</h3>
+      <p>Provide input→output pairs that demonstrate the pattern. The model generalizes from these to your actual task.</p>
+      <div class="formula-box">
+        <div class="formula-title">Few-Shot Structure</div>
+        <div class="formula-main">Prompt = Instruction + [Example₁ (input→output)] + ... + [Exampleₖ] + Actual_Input</div>
+        <div class="formula-legend">
+          Optimal k is usually 3–5. More than 8 rarely helps and wastes context tokens.
+        </div>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Few-Shot Prompt Template</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><code><span class="cm"># Task: Extract product sentiment from reviews</span>
+<span class="cm"># Format: JSON {"product": ..., "sentiment": positive|negative|neutral, "score": 1-5}</span>
+
+<span class="cm">### Examples ###</span>
+<span class="var">Review:</span> "This blender is amazing! Makes perfect smoothies every morning."
+<span class="var">Output:</span> {"product": "blender", "sentiment": "positive", "score": 5}
+
+<span class="var">Review:</span> "Arrived broken, packaging was terrible."
+<span class="var">Output:</span> {"product": "unknown", "sentiment": "negative", "score": 1}
+
+<span class="var">Review:</span> "It works. Nothing special."
+<span class="var">Output:</span> {"product": "unknown", "sentiment": "neutral", "score": 3}
+
+<span class="cm">### Your Task ###</span>
+<span class="var">Review:</span> "The laptop runs fast but the battery dies after 2 hours."
+<span class="var">Output:</span></code></pre>
+      </div>
+      <div class="callout callout-info">
+        <div class="callout-title">Research Finding</div>
+        Brown et al. (2020) — the GPT-3 paper — showed that 4 examples in the prompt can match fine-tuned performance on classification tasks. Quality of examples > quantity.
+      </div>
+    </div>
+
+    <div id="tab-cot" class="tab-panel">
+      <h3>Chain of Thought (CoT): Reasoning Out Loud</h3>
+      <p>Instruct the model to produce intermediate reasoning steps before the final answer. This dramatically improves performance on math, logic, and multi-step inference.</p>
+      <div class="formula-box">
+        <div class="formula-title">CoT Pattern</div>
+        <div class="formula-main">Answer = f(Problem + "Let's think step by step")</div>
+        <div class="formula-legend">Wei et al. (2022) showed this single phrase improves accuracy on arithmetic benchmarks by 40–70%.</div>
+      </div>
+      <div class="example-pair">
+        <div class="ex-card ex-bad">
+          <div class="ex-card-header">✗ Without CoT</div>
+          <div class="ex-card-body">A shop sells 3 types of apples: Red (₹5/kg), Green (₹7/kg), Yellow (₹6/kg). I buy 2kg Red, 1.5kg Green, and 3kg Yellow. What is my total bill?</div>
+          <div class="ex-result">⚠ Model might just output ₹38 (wrong) by miscalculating</div>
+        </div>
+        <div class="ex-card ex-good">
+          <div class="ex-card-header">✓ With CoT</div>
+          <div class="ex-card-body">A shop sells apples: Red (₹5/kg), Green (₹7/kg), Yellow (₹6/kg). I buy 2kg Red, 1.5kg Green, 3kg Yellow. Think step by step, then give the total.</div>
+          <div class="ex-result">✓ Red: 2×5=₹10 → Green: 1.5×7=₹10.5 → Yellow: 3×6=₹18 → Total: ₹38.50</div>
+        </div>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">CoT Prompt — Structured Reasoning</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><code>You are a careful reasoning assistant. When given a problem:
+1. Break it into steps labeled [Step 1], [Step 2], etc.
+2. Show your working at each step.
+3. State your final answer clearly after [Final Answer].
+
+Problem: A data pipeline processes 50,000 records/hour.
+After an upgrade, throughput increased by 35%.
+If we run it for 8 hours, how many records are processed total?</code></pre>
+      </div>
+    </div>
+
+    <div id="tab-role" class="tab-panel">
+      <h3>Role Prompting: Activating Domain Expertise</h3>
+      <p>Assigning a role shifts vocabulary, reasoning style, and domain-specific heuristics. It works because instruction-tuned models encode different "modes" associated with different professional contexts.</p>
+      <table class="notation-table" style="margin-top:1rem">
+        <thead><tr><th>Role</th><th>Effect on Output</th><th>Best For</th></tr></thead>
+        <tbody>
+          <tr><td>Senior Software Engineer</td><td>Formal, DRY code, comments, edge cases</td><td>Code review, architecture design</td></tr>
+          <tr><td>Data Scientist</td><td>Statistical rigor, caveats, methodology</td><td>Analysis, model evaluation</td></tr>
+          <tr><td>Legal Expert</td><td>Formal language, hedging, precedent references</td><td>Contract review (with caution)</td></tr>
+          <tr><td>Friendly Teacher</td><td>Analogies, simple language, encouraging tone</td><td>Explanations for beginners</td></tr>
+          <tr><td>Devil's Advocate</td><td>Counter-arguments, risks, stress testing ideas</td><td>Strategy, decision-making</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="tab-react" class="tab-panel">
+      <h3>ReAct: Reason + Act</h3>
+      <p>ReAct prompts the model to interleave <strong>thought</strong> (reasoning) with <strong>action</strong> (tool calls, searches). This is the foundation of modern AI agents.</p>
+      <div class="formula-box">
+        <div class="formula-title">ReAct Loop</div>
+        <div class="formula-main">While not done: Thought → Action → Observation → next Thought</div>
+        <div class="formula-legend">Yao et al. (2022): ReAct outperforms CoT alone on knowledge-intensive QA by 11%.</div>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">ReAct Prompt Template</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><code>You have access to: [Search(query), Calculator(expression), ReadFile(path)]
+
+Use this format:
+  Thought: [your reasoning]
+  Action: [tool_name]([args])
+  Observation: [result of action]
+  ... (repeat as needed)
+  Final Answer: [your answer]
+
+Question: What is the current population of Bengaluru, and how many
+times larger is it than Pune?
+
+Thought: I need current population data for both cities.
+Action: Search("Bengaluru population 2025")
+Observation: Bengaluru population is approximately 14.2 million (2025).
+Thought: Now I need Pune's population.
+Action: Search("Pune population 2025")
+Observation: Pune population is approximately 7.7 million (2025).
+Thought: Now calculate the ratio.
+Action: Calculator(14.2 / 7.7)
+Observation: 1.844
+Final Answer: Bengaluru (~14.2M) is approximately 1.84× larger than Pune (~7.7M).</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ USE CASES ═══════════════ -->
+<section id="usecases" class="fade-in">
+  <div class="section-eyebrow">Chapter 04</div>
+  <h2>Real-Life Use Cases</h2>
+  <p>Each use case follows the <strong>Problem → Prompt Solution → Expected Output</strong> pattern with complete, copy-pasteable prompts.</p>
+
+  <!-- Use Case 1 -->
+  <div class="usecase open">
+    <div class="usecase-head" onclick="toggleUsecase(this)">
+      <div class="usecase-icon">📊</div>
+      <div class="usecase-title">Data Analysis — Explain a CSV to a Non-Technical Manager</div>
+      <div class="usecase-toggle">▼</div>
+    </div>
+    <div class="usecase-body">
+      <div class="problem-label pl-prob">⚡ Problem</div>
+      <p>You have a sales CSV with 12 columns. Your manager wants a written summary — no code, no jargon — sent before the 9am meeting.</p>
+      <hr class="divider">
+      <div class="problem-label pl-sol">✦ Prompt Solution</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Prompt</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><code>You are a business analyst writing for a non-technical audience.
+
+Below is a summary of our Q2 sales data:
+
+[PASTE CSV SUMMARY OR KEY STATS HERE]
+
+Task:
+1. Write a 3-paragraph executive summary (max 150 words total).
+2. Highlight the single most important trend.
+3. Suggest one concrete action based on the data.
+
+Rules:
+- No technical terms, no code, no statistics notation.
+- Use plain English. Active voice only.
+- Format: Paragraph 1 (Overview), Paragraph 2 (Key Insight), Paragraph 3 (Recommendation).</code></pre>
+      </div>
+      <div class="problem-label pl-res">→ Expected Output Shape</div>
+      <p>Three clear paragraphs. The model will translate numbers into human narratives like <em>"Sales in the South region grew faster than any other territory…"</em></p>
+    </div>
+  </div>
+
+  <!-- Use Case 2 -->
+  <div class="usecase">
+    <div class="usecase-head" onclick="toggleUsecase(this)">
+      <div class="usecase-icon">🐛</div>
+      <div class="usecase-title">Code Debugging — Root Cause Analysis with Fix</div>
+      <div class="usecase-toggle">▼</div>
+    </div>
+    <div class="usecase-body">
+      <div class="problem-label pl-prob">⚡ Problem</div>
+      <p>Your Python script crashes with a cryptic error. You need a root cause explanation + a corrected version.</p>
+      <hr class="divider">
+      <div class="problem-label pl-sol">✦ Prompt Solution</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Prompt</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><code>You are a senior Python developer doing code review.
+
+Here is a buggy script:
+```python
+[PASTE YOUR CODE HERE]
+```
+
+Error message received:
+```
+[PASTE ERROR TRACEBACK HERE]
+```
+
+Please:
+1. Identify the root cause of the bug in one sentence.
+2. Explain WHY this error occurs (concisely, 2-3 sentences).
+3. Provide the corrected code with inline comments marking your changes.
+4. List any other potential issues you spot (even if not causing the current error).
+
+Format your response with headers: ## Root Cause, ## Explanation, ## Fixed Code, ## Other Issues</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Use Case 3 -->
+  <div class="usecase">
+    <div class="usecase-head" onclick="toggleUsecase(this)">
+      <div class="usecase-icon">✉️</div>
+      <div class="usecase-title">Email Writing — Difficult Professional Email</div>
+      <div class="usecase-toggle">▼</div>
+    </div>
+    <div class="usecase-body">
+      <div class="problem-label pl-prob">⚡ Problem</div>
+      <p>You need to tell a client their project will be delayed by 2 weeks. The email must be professional, honest, but not panicky.</p>
+      <hr class="divider">
+      <div class="problem-label pl-sol">✦ Prompt Solution</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Prompt</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><code>Write a professional email to a client informing them of a 2-week project delay.
+
+Context:
+- Client: Ravi Sharma, Director at TechCorp (senior, formal relationship)
+- Project: Custom CRM integration, originally due: March 15
+- Reason for delay: Third-party API vendor took longer than expected
+- New deadline: March 29
+- We are offering: A free 1-month post-delivery support extension as compensation
+
+Tone: Professional, apologetic but confident, solution-focused.
+Length: 150-200 words.
+Do NOT use: Passive voice, vague language, excessive apologies (max 1 apology).
+DO include: Specific new date, specific compensation, next steps.</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Use Case 4 -->
+  <div class="usecase">
+    <div class="usecase-head" onclick="toggleUsecase(this)">
+      <div class="usecase-icon">🧪</div>
+      <div class="usecase-title">Data Cleaning — Generate Pandas Code from Plain English</div>
+      <div class="usecase-toggle">▼</div>
+    </div>
+    <div class="usecase-body">
+      <div class="problem-label pl-prob">⚡ Problem</div>
+      <p>You have a messy CSV with missing values, mixed date formats, and duplicate rows. You need a Python cleaning script.</p>
+      <hr class="divider">
+      <div class="problem-label pl-sol">✦ Prompt Solution</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Prompt</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><code>You are a data engineer. Write a Python script using pandas to clean a CSV file.
+
+Dataset description:
+- File: sales_data.csv
+- Columns: order_id, customer_name, order_date, amount, region, status
+- Known issues:
+  1. order_date has mixed formats: "DD/MM/YYYY" and "YYYY-MM-DD"
+  2. amount column has some entries like "₹1,200.50" (string with currency symbol)
+  3. ~5% of rows are exact duplicates
+  4. region has values: "North", "north", "NORTH" (case inconsistency)
+  5. status has blank strings ("") which should be NaN
+
+Requirements:
+- Add clear comments explaining each cleaning step
+- Print a before/after row count
+- Save cleaned file as sales_data_clean.csv
+- Use only pandas (no external libraries)</code></pre>
+      </div>
+      <div class="callout callout-info" style="margin-top:1rem">
+        <div class="callout-title">💡 Dataset for Practice</div>
+        Try this with the <a href="https://www.kaggle.com/datasets/kyanyoga/sample-sales-data" target="_blank">Kaggle Sample Sales Data</a> — a real-world messy dataset perfect for cleaning exercises.
+      </div>
+    </div>
+  </div>
+
+  <!-- Use Case 5 -->
+  <div class="usecase">
+    <div class="usecase-head" onclick="toggleUsecase(this)">
+      <div class="usecase-icon">📚</div>
+      <div class="usecase-title">Teaching — Generate Tiered Explanations (Feynman Technique)</div>
+      <div class="usecase-toggle">▼</div>
+    </div>
+    <div class="usecase-body">
+      <div class="problem-label pl-prob">⚡ Problem</div>
+      <p>You're creating educational content for mixed audiences — some beginners, some advanced. One explanation doesn't fit all.</p>
+      <hr class="divider">
+      <div class="problem-label pl-sol">✦ Prompt Solution</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Prompt</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><code>Explain "machine learning overfitting" at three different levels.
+
+Level 1 — ELI5 (Explain Like I'm 5):
+Use a simple real-world analogy. Max 3 sentences. No technical terms.
+
+Level 2 — Undergraduate Student:
+Define it properly. Explain causes and consequences. Mention train/test split.
+Use a simple formula or visual description if helpful. ~100 words.
+
+Level 3 — Practitioner / ML Engineer:
+Cover bias-variance tradeoff, regularization techniques (L1/L2, dropout),
+cross-validation, and early stopping. Include code snippet showing
+train_loss vs val_loss plotting. ~200 words.
+
+Format each level with a clear header.</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ PATTERNS ═══════════════ -->
+<section id="patterns" class="fade-in">
+  <div class="section-eyebrow">Chapter 05</div>
+  <h2>Advanced Patterns & Formulas</h2>
+
+  <h3>The RFTF Framework</h3>
+  <p>A reliable mental checklist for any prompt:</p>
+  <div class="formula-box">
+    <div class="formula-title">RFTF Formula</div>
+    <div class="formula-main">Prompt = Role + Frame the Task + Task Specifics + Format</div>
+    <div class="formula-legend">
+      <span>Role:</span> "You are a…" &nbsp;·&nbsp;
+      <span>Frame:</span> Why/context &nbsp;·&nbsp;
+      <span>Task:</span> Verb + object + constraints &nbsp;·&nbsp;
+      <span>Format:</span> Output structure
+    </div>
+  </div>
+
+  <h3>The Escalating Constraint Pattern</h3>
+  <p>Start broad, then progressively add constraints until output quality plateaus. This is how you calibrate prompts empirically.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Escalating Constraints</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre><code><span class="cm"># Iteration 1 (baseline)</span>
+<span class="str">"Summarize this article."</span>
+
+<span class="cm"># Iteration 2 (add length)</span>
+<span class="str">"Summarize this article in under 80 words."</span>
+
+<span class="cm"># Iteration 3 (add audience)</span>
+<span class="str">"Summarize this article in under 80 words for a high school student."</span>
+
+<span class="cm"># Iteration 4 (add format)</span>
+<span class="str">"Summarize this article in under 80 words for a high school student.
+Use: 1 sentence overview + 3 bullet points."</span>
+
+<span class="cm"># Iteration 5 (add negative constraint)</span>
+<span class="str">"Summarize this article in under 80 words for a high school student.
+Use: 1 sentence overview + 3 bullet points.
+Do not use jargon. Do not editorialize."</span></code></pre>
+  </div>
+
+  <h3>Output Format Schemas</h3>
+  <p>Forcing JSON/YAML output makes downstream processing reliable and eliminates parsing guesswork.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">JSON Schema Pattern</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre><code>Extract the following information from the job posting below.
+Respond ONLY with valid JSON. No explanation, no markdown fences.
+
+Schema:
+{
+  "job_title": "string",
+  "company": "string",
+  "location": "string or null",
+  "remote": "boolean",
+  "required_skills": ["string"],
+  "salary_range": {"min": number_or_null, "max": number_or_null, "currency": "string"},
+  "experience_years": number_or_null
+}
+
+Job Posting:
+[PASTE JOB DESCRIPTION HERE]</code></pre>
+  </div>
+
+  <h3>The Anchor Pattern (Preventing Hallucination)</h3>
+  <p>When accuracy matters, <strong>anchor</strong> the model to a specific document and forbid inference outside it.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Grounding / RAG Prompt</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre><code>You are a document Q&A assistant. Your ONLY job is to answer questions
+using information from the document below.
+
+Rules:
+- If the answer is in the document: quote the relevant line, then explain.
+- If the answer is NOT in the document: respond exactly with "Not found in document."
+- Never use outside knowledge. Never guess.
+
+DOCUMENT:
+===
+[PASTE YOUR DOCUMENT HERE]
+===
+
+QUESTION: [USER'S QUESTION]</code></pre>
+  </div>
+
+  <h3>Self-Evaluation / Critic Pattern</h3>
+  <p>Ask the model to critique its own output. This is a meta-cognitive pattern that surfaces errors the model made in step 1.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Self-Critique Prompt</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre><code>Step 1: [Perform the task]
+Write a Python function to find the largest prime factor of a number.
+
+Step 2: Critique your solution.
+- Is it correct for edge cases (0, 1, negative numbers, primes)?
+- Is the time complexity optimal?
+- What would you change if this ran on a number with 20 digits?
+
+Step 3: Rewrite the function incorporating your critique.</code></pre>
+  </div>
+</section>
+
+<!-- ═══════════════ INTERACTIVE BUILDER ═══════════════ -->
+<section id="builder" class="fade-in">
+  <div class="section-eyebrow">Chapter 06</div>
+  <h2>Interactive Prompt Builder</h2>
+  <p>Compose a structured prompt using the anatomy components. See the assembled result in real time.</p>
+
+  <div class="builder">
+    <div class="builder-header">
+      <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+      <h3>Prompt Composer</h3>
+    </div>
+    <div class="builder-body">
+      <div class="builder-inputs">
+        <div class="form-group">
+          <label class="form-label">Role (optional)</label>
+          <input class="form-input" id="b-role" placeholder="e.g. You are a senior data scientist…" oninput="buildPrompt()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Task ✦ required</label>
+          <textarea class="form-textarea" id="b-task" placeholder="e.g. Analyze the following sales data and identify the top 3 trends…" oninput="buildPrompt()" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Context (optional)</label>
+          <textarea class="form-textarea" id="b-context" placeholder="e.g. The audience is a non-technical marketing team…" oninput="buildPrompt()" rows="2"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Output Format (optional)</label>
+          <input class="form-input" id="b-format" placeholder="e.g. JSON, bullet points, 3 paragraphs…" oninput="buildPrompt()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Constraints (optional)</label>
+          <input class="form-input" id="b-constraints" placeholder="e.g. Max 100 words, no jargon, use active voice…" oninput="buildPrompt()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Example (optional)</label>
+          <textarea class="form-textarea" id="b-example" placeholder="Input: … → Output: …" oninput="buildPrompt()" rows="2"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Technique</label>
+          <select class="form-select" id="b-technique" onchange="buildPrompt()">
+            <option value="">— None —</option>
+            <option value="cot">Chain of Thought (add "think step by step")</option>
+            <option value="selfcheck">Self-Check (add critique step)</option>
+            <option value="anchor">Grounding (add "only use context above")</option>
+          </select>
+        </div>
+      </div>
+      <div class="builder-output">
+        <div class="output-label">▸ Assembled Prompt</div>
+        <div id="prompt-output">Fill in the fields on the left to build your prompt…</div>
+        <div class="score-bar">
+          <div class="score-label">Prompt Completeness Score</div>
+          <div class="score-track"><div class="score-fill" id="score-fill" style="width:0%"></div></div>
+          <div style="font-family:var(--mono);font-size:0.7rem;color:var(--text-dim);margin-top:0.35rem;" id="score-text">0 / 6 components</div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:1rem;width:100%;" onclick="copyPrompt()">Copy Assembled Prompt</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ PITFALLS ═══════════════ -->
+<section id="pitfalls" class="fade-in">
+  <div class="section-eyebrow">Chapter 07</div>
+  <h2>Common Pitfalls & How to Fix Them</h2>
+
+  <div class="usecase open">
+    <div class="usecase-head" onclick="toggleUsecase(this)">
+      <div class="usecase-icon">⚠️</div>
+      <div class="usecase-title">Pitfall 1: Ambiguous Task Verbs</div>
+      <div class="usecase-toggle">▼</div>
+    </div>
+    <div class="usecase-body">
+      <div class="example-pair">
+        <div class="ex-card ex-bad">
+          <div class="ex-card-header">✗ Vague</div>
+          <div class="ex-card-body">"Process this data." / "Handle this text." / "Do something with the list."</div>
+          <div class="ex-result">⚠ "Process" could mean filter, transform, summarize, sort — or all of the above.</div>
+        </div>
+        <div class="ex-card ex-good">
+          <div class="ex-card-header">✓ Precise Verbs</div>
+          <div class="ex-card-body">Use: Extract / Classify / Summarize / Translate / Generate / Compare / List / Calculate / Format / Rewrite</div>
+          <div class="ex-result">✓ Each verb has an unambiguous meaning. The model knows exactly what to do.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="usecase">
+    <div class="usecase-head" onclick="toggleUsecase(this)">
+      <div class="usecase-icon">⚠️</div>
+      <div class="usecase-title">Pitfall 2: Overloaded Single Prompt</div>
+      <div class="usecase-toggle">▼</div>
+    </div>
+    <div class="usecase-body">
+      <p>Asking for 10 different things in one prompt degrades quality. The model treats it as a multi-objective function — and satisfices rather than optimizes.</p>
+      <div class="callout callout-warn">
+        <div class="callout-title">⚠ Rule of Thumb</div>
+        If your prompt has more than 3–4 distinct deliverables, split it into a <strong>prompt chain</strong>: output of step 1 becomes input of step 2.
+      </div>
+    </div>
+  </div>
+
+  <div class="usecase">
+    <div class="usecase-head" onclick="toggleUsecase(this)">
+      <div class="usecase-icon">⚠️</div>
+      <div class="usecase-title">Pitfall 3: Trusting Numbers Without Grounding</div>
+      <div class="usecase-toggle">▼</div>
+    </div>
+    <div class="usecase-body">
+      <p>LLMs confidently fabricate statistics, citations, and figures. Never ask "what is the revenue of Company X?" without providing the data.</p>
+      <div class="callout callout-warn">
+        <div class="callout-title">⚠ Fix</div>
+        For any factual output: use the <strong>Anchor Pattern</strong> (inject the source) or explicitly add <kbd>If you don't know, say "I don't know" — do not guess.</kbd>
+      </div>
+    </div>
+  </div>
+
+  <div class="usecase">
+    <div class="usecase-head" onclick="toggleUsecase(this)">
+      <div class="usecase-icon">⚠️</div>
+      <div class="usecase-title">Pitfall 4: Ignoring Temperature for the Task Type</div>
+      <div class="usecase-toggle">▼</div>
+    </div>
+    <div class="usecase-body">
+      <table class="notation-table">
+        <thead><tr><th>Task Type</th><th>Recommended Temperature</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Factual Q&A, Code</td><td>T = 0.0 – 0.2</td><td>Deterministic, accurate</td></tr>
+          <tr><td>Summarization, Classification</td><td>T = 0.3 – 0.5</td><td>Balanced</td></tr>
+          <tr><td>Creative Writing, Brainstorming</td><td>T = 0.7 – 1.0</td><td>Diverse, surprising</td></tr>
+          <tr><td>Poetry, Experimental</td><td>T = 1.0 – 1.5</td><td>High variance, wild outputs</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ DATASETS ═══════════════ -->
+<section id="datasets" class="fade-in">
+  <div class="section-eyebrow">Chapter 08</div>
+  <h2>Datasets for Experimentation</h2>
+  <p>The best way to develop prompt engineering intuition is through repetition on real data. These free datasets map directly to the techniques above.</p>
+
+  <div class="dataset-grid">
+    <a href="https://www.kaggle.com/datasets/snap/amazon-fine-food-reviews" target="_blank" class="dataset-card">
+      <div class="ds-tag">NLP · Sentiment</div>
+      <div class="ds-name">Amazon Fine Food Reviews</div>
+      <div class="ds-desc">568,454 reviews from Amazon. Perfect for sentiment analysis, summarization, and classification prompts.</div>
+      <div class="ds-link">kaggle.com →</div>
+    </a>
+    <a href="https://huggingface.co/datasets/samsum" target="_blank" class="dataset-card">
+      <div class="ds-tag">NLP · Summarization</div>
+      <div class="ds-name">SAMSum Dialogue</div>
+      <div class="ds-desc">16,000 messenger-style conversations with human summaries. Ideal for testing summarization prompts.</div>
+      <div class="ds-link">huggingface.co →</div>
+    </a>
+    <a href="https://www.kaggle.com/datasets/kyanyoga/sample-sales-data" target="_blank" class="dataset-card">
+      <div class="ds-tag">Analytics · Business</div>
+      <div class="ds-name">Sample Sales Data</div>
+      <div class="ds-desc">Clean sales CSV with orders, regions, products. Great for data analysis and code generation prompts.</div>
+      <div class="ds-link">kaggle.com →</div>
+    </a>
+    <a href="https://huggingface.co/datasets/gsm8k" target="_blank" class="dataset-card">
+      <div class="ds-tag">Reasoning · Math</div>
+      <div class="ds-name">GSM8K</div>
+      <div class="ds-desc">8,500 grade-school math problems. The standard benchmark for Chain-of-Thought evaluation.</div>
+      <div class="ds-link">huggingface.co →</div>
+    </a>
+    <a href="https://www.kaggle.com/datasets/nicapotato/womens-ecommerce-clothing-reviews" target="_blank" class="dataset-card">
+      <div class="ds-tag">NLP · E-Commerce</div>
+      <div class="ds-name">Women's Clothing Reviews</div>
+      <div class="ds-desc">23,486 product reviews with titles, text, ratings. Great for few-shot classification practice.</div>
+      <div class="ds-link">kaggle.com →</div>
+    </a>
+    <a href="https://huggingface.co/datasets/squad" target="_blank" class="dataset-card">
+      <div class="ds-tag">QA · Reading Comprehension</div>
+      <div class="ds-name">SQuAD 2.0</div>
+      <div class="ds-desc">100,000+ question-answer pairs from Wikipedia. Perfect for RAG and document grounding experiments.</div>
+      <div class="ds-link">huggingface.co →</div>
+    </a>
+    <a href="https://www.kaggle.com/datasets/shivamb/real-or-fake-fake-jobposting-prediction" target="_blank" class="dataset-card">
+      <div class="ds-tag">Classification</div>
+      <div class="ds-name">Fake Job Postings</div>
+      <div class="ds-desc">17,880 job postings (real + fake). Test information extraction and structured output prompts.</div>
+      <div class="ds-link">kaggle.com →</div>
+    </a>
+    <a href="https://huggingface.co/datasets/code_search_net" target="_blank" class="dataset-card">
+      <div class="ds-tag">Code · Generation</div>
+      <div class="ds-name">CodeSearchNet</div>
+      <div class="ds-desc">2M function/docstring pairs across 6 languages. Great for code generation and explanation prompts.</div>
+      <div class="ds-link">huggingface.co →</div>
+    </a>
+  </div>
+</section>
+
+<!-- ═══════════════ CHEAT SHEET ═══════════════ -->
+<section id="cheatsheet" class="fade-in">
+  <div class="section-eyebrow">Reference</div>
+  <h2>Prompt Engineering Cheat Sheet</h2>
+  <p>The most important patterns and their one-line descriptions. Bookmark this.</p>
+
+  <div class="cheat-grid">
+    <div class="cheat-item"><div class="cheat-pattern">You are a [ROLE].</div><div class="cheat-meaning">Sets persona, domain vocabulary, tone</div></div>
+    <div class="cheat-item"><div class="cheat-pattern">Think step by step.</div><div class="cheat-meaning">Activates Chain-of-Thought reasoning</div></div>
+    <div class="cheat-item"><div class="cheat-pattern">Respond ONLY in JSON.</div><div class="cheat-meaning">Forces structured, parseable output</div></div>
+    <div class="cheat-item"><div class="cheat-pattern">Do not guess. If unsure, say "I don't know."</div><div class="cheat-meaning">Reduces hallucination</div></div>
+    <div class="cheat-item"><div class="cheat-pattern">Only use information from the document above.</div><div class="cheat-meaning">Grounds response in source material</div></div>
+    <div class="cheat-item"><div class="cheat-pattern">Input: X → Output: Y [×3]</div><div class="cheat-meaning">Few-shot pattern for format alignment</div></div>
+    <div class="cheat-item"><div class="cheat-pattern">Max [N] words/sentences/items.</div><div class="cheat-meaning">Hard length constraint</div></div>
+    <div class="cheat-item"><div class="cheat-pattern">Now critique the above. Then rewrite.</div><div class="cheat-meaning">Self-evaluation / critic pattern</div></div>
+    <div class="cheat-item"><div class="cheat-pattern">Audience: [WHO]. Write for them.</div><div class="cheat-meaning">Adjusts vocabulary and depth</div></div>
+    <div class="cheat-item"><div class="cheat-pattern">Use active voice. Avoid passive constructions.</div><div class="cheat-meaning">Style constraint for writing tasks</div></div>
+    <div class="cheat-item"><div class="cheat-pattern">### Instruction ### ... ### Data ###</div><div class="cheat-meaning">Delimiter pattern — separates instruction from data</div></div>
+    <div class="cheat-item"><div class="cheat-pattern">List 3 options. Then recommend the best.</div><div class="cheat-meaning">Forces deliberation before conclusion</div></div>
+    <div class="cheat-item"><div class="cheat-pattern">Temperature = 0</div><div class="cheat-meaning">Deterministic output for code/facts</div></div>
+    <div class="cheat-item"><div class="cheat-pattern">Explain to a [5 yr old / expert].</div><div class="cheat-meaning">Feynman technique for level-tuned output</div></div>
+    <div class="cheat-item"><div class="cheat-pattern">What are you uncertain about?</div><div class="cheat-meaning">Forces epistemic honesty / calibration</div></div>
+    <div class="cheat-item"><div class="cheat-pattern">Thought → Action → Observation</div><div class="cheat-meaning">ReAct agent loop format</div></div>
+  </div>
+
+  <div class="callout" style="margin-top:2rem;">
+    <div class="callout-title">📖 Further Reading</div>
+    <p style="margin:0.3rem 0 0;font-size:0.9rem;">
+      <strong>Papers:</strong>
+      <a href="https://arxiv.org/abs/2201.11903" target="_blank">Chain-of-Thought Prompting (Wei et al. 2022)</a> ·
+      <a href="https://arxiv.org/abs/2210.11610" target="_blank">ReAct (Yao et al. 2022)</a> ·
+      <a href="https://arxiv.org/abs/2005.14165" target="_blank">GPT-3 / Few-Shot (Brown et al. 2020)</a><br>
+      <strong>Guides:</strong>
+      <a href="https://www.promptingguide.ai" target="_blank">promptingguide.ai</a> ·
+      <a href="https://learnprompting.org" target="_blank">learnprompting.org</a> ·
+      <a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank">Anthropic Prompt Engineering Docs</a>
+    </p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>Prompt Engineering Field Guide · Built with curiosity · All examples use real, reproducible patterns</p>
+  <p style="margin-top:0.5rem; color:var(--text-dim);">Temperature: 0.0 · Model: claude-sonnet-4-6 · Context: ∞ curiosity</p>
+</footer>
+
+<script>
+  // ─── FADE IN ON SCROLL ───
+  const fadeEls = document.querySelectorAll('.fade-in');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.06 });
+  fadeEls.forEach(el => observer.observe(el));
+
+  // ─── ACTIVE NAV ───
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 120) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  });
+
+  // ─── TABS ───
+  function switchTab(e, panelId) {
+    const tabs = e.target.closest('.tabs');
+    tabs.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    tabs.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    e.target.classList.add('active');
+    tabs.querySelector('#' + panelId).classList.add('active');
+  }
+
+  // ─── USE CASE ACCORDION ───
+  function toggleUsecase(el) {
+    const uc = el.closest('.usecase');
+    uc.classList.toggle('open');
+  }
+
+  // ─── COPY CODE ───
+  function copyCode(btn) {
+    const code = btn.closest('.code-block').querySelector('pre').innerText;
+    navigator.clipboard.writeText(code).then(() => {
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    });
+  }
+
+  // ─── PROMPT BUILDER ───
+  function buildPrompt() {
+    const role = document.getElementById('b-role').value.trim();
+    const task = document.getElementById('b-task').value.trim();
+    const context = document.getElementById('b-context').value.trim();
+    const format = document.getElementById('b-format').value.trim();
+    const constraints = document.getElementById('b-constraints').value.trim();
+    const example = document.getElementById('b-example').value.trim();
+    const technique = document.getElementById('b-technique').value;
+
+    let parts = [];
+    let count = 0;
+
+    if (role) { parts.push(role + '\n'); count++; }
+    if (context) { parts.push('Context:\n' + context + '\n'); count++; }
+    if (task) { parts.push('Task:\n' + task); count++; }
+    if (example) { parts.push('\nExample:\n' + example); count++; }
+    if (format) { parts.push('\nOutput Format:\n' + format); count++; }
+    if (constraints) { parts.push('\nConstraints:\n' + constraints); count++; }
+
+    if (technique === 'cot') parts.push('\nThink step by step before giving your final answer.');
+    if (technique === 'selfcheck') parts.push('\n\nAfter your answer, critique it: What could be wrong or improved? Then provide a revised answer.');
+    if (technique === 'anchor') parts.push('\n\nIMPORTANT: Only use information from the context provided above. If the answer is not there, say "Not found in context."');
+
+    const output = document.getElementById('prompt-output');
+    if (!task && !role) {
+      output.textContent = 'Fill in the fields on the left to build your prompt…';
+    } else {
+      output.textContent = parts.join('\n');
+    }
+
+    const pct = Math.round((count / 6) * 100);
+    document.getElementById('score-fill').style.width = pct + '%';
+    document.getElementById('score-text').textContent = count + ' / 6 components · ' + pct + '% complete';
+    document.getElementById('score-fill').style.background =
+      count <= 1 ? '#e84855' : count <= 3 ? '#f0a500' : '#2ec4b6';
+  }
+
+  function copyPrompt() {
+    const text = document.getElementById('prompt-output').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('#builder .btn-primary');
+      btn.textContent = '✓ Copied to Clipboard!';
+      setTimeout(() => btn.textContent = 'Copy Assembled Prompt', 2000);
+    });
+  }
+</script>
+
+<footer id="sph-footer">
+  <div>Curated by <strong>Shrinivasa PH</strong> &nbsp;·&nbsp; Data Science &amp; Analytics Trainer</div>
+  <a href="index.html">← Back to All Topics</a>
+</footer>
+
+</body>
+</html>

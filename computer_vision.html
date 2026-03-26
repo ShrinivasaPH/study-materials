@@ -1770,6 +1770,497 @@ gradient = cv2.morphologyEx(binary,
     <div class="dyk" style="margin-top:16px"><div class="dyk-ico">💡</div><p><strong>Early stopping</strong> is one of the best regularisers: monitor validation loss every epoch. If it hasn't improved for N epochs (patience), stop training and restore the best checkpoint. This prevents the model from continuing to overfit after the optimal point.</p></div>
   </div>
 
+  <!-- ══════════════════════════════════════════════════════
+       PYTORCH LAYER REFERENCE
+  ═══════════════════════════════════════════════════════ -->
+  <h3 style="margin-top:60px">PyTorch Layer Reference — Every Building Block Explained</h3>
+  <p>Every CNN you'll ever build is assembled from the same small set of layers. Here is what each one does, why it exists, and exactly how to use it in code.</p>
+
+  <!-- Tab bar for layer categories -->
+  <div class="tab-bar" id="layer-ref-tabs" style="margin:24px 0 28px">
+    <button class="tab-btn on" onclick="swTab('lr1','layer-ref-tabs')">🔲 Conv2d</button>
+    <button class="tab-btn" onclick="swTab('lr2','layer-ref-tabs')">📏 Pooling</button>
+    <button class="tab-btn" onclick="swTab('lr3','layer-ref-tabs')">📦 BatchNorm</button>
+    <button class="tab-btn" onclick="swTab('lr4','layer-ref-tabs')">💧 Dropout</button>
+    <button class="tab-btn" onclick="swTab('lr5','layer-ref-tabs')">➡️ Flatten</button>
+    <button class="tab-btn" onclick="swTab('lr6','layer-ref-tabs')">🔗 Linear</button>
+    <button class="tab-btn" onclick="swTab('lr7','layer-ref-tabs')">⚡ Activations</button>
+    <button class="tab-btn" onclick="swTab('lr8','layer-ref-tabs')">🔁 Sequential</button>
+  </div>
+
+  <!-- ── Conv2d ── -->
+  <div id="tab-lr1" class="tab-pane on">
+    <div class="grid-2">
+      <div>
+        <h4 style="color:var(--blue)">nn.Conv2d — The Core of Every CNN</h4>
+        <p style="font-size:14px;margin-bottom:16px"><strong>What it does:</strong> slides a small learnable filter (kernel) across the image and computes a dot product at every position. Each filter learns to detect one specific pattern — an edge, a curve, a colour gradient. Stack many filters and the layer learns many patterns in parallel.</p>
+        <div class="formula">
+          <div class="f" style="font-size:12px">nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0, bias=True)</div>
+          <div class="fl">
+            in_channels  — depth of the input (3 for RGB, 1 for grayscale, or N from previous layer)<br>
+            out_channels — number of filters to learn = number of output feature maps<br>
+            kernel_size  — spatial size of each filter (3 = 3×3, 5 = 5×5, etc.)<br>
+            stride       — how many pixels the filter jumps per step (default 1 = overlapping)<br>
+            padding      — zero-rows added around the border (use padding=1 with kernel=3 to keep size)<br>
+            bias         — set False when followed by BatchNorm (BN has its own shift parameter β)
+          </div>
+        </div>
+        <div class="formula" style="margin-top:12px">
+          <div class="f" style="font-size:12px">Output size = ⌊(H + 2·pad − kernel) / stride⌋ + 1</div>
+          <div class="fl">Example: H=32, kernel=3, pad=1, stride=1 → ⌊(32+2−3)/1⌋+1 = 32 (same size)<br>Example: H=32, kernel=3, pad=0, stride=2 → ⌊(32+0−3)/2⌋+1 = 15 (downsampled)</div>
+        </div>
+        <div class="dyk dyk-tip" style="margin-top:16px">
+          <div class="dyk-ico">💡</div>
+          <p><strong>Why bias=False with BatchNorm?</strong> BatchNorm subtracts the mean and adds its own learned shift parameter β. The Conv bias would be immediately cancelled out — it's dead weight that just wastes memory.</p>
+        </div>
+      </div>
+      <div>
+        <div class="analogy">
+          <div class="analogy-icon">🔍</div>
+          <div class="analogy-inner">
+            <div class="analogy-title">Analogy — A Sliding Magnifying Glass</div>
+            <p>Imagine a small stamp with a pattern drawn on it. You press it onto every position of the image and record how strongly the image matches the pattern. One Conv2d layer runs <strong>many different stamps simultaneously</strong>, each learning a different pattern.</p>
+          </div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <h4 style="color:var(--blue)">Common Conv2d Recipes</h4>
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;font-family:var(--mono)">
+            <div style="background:var(--blue-soft);border-radius:8px;padding:10px 14px">
+              <div style="color:var(--blue);font-weight:700;margin-bottom:4px">Same-size output (most common)</div>
+              <code>Conv2d(C_in, C_out, 3, padding=1)</code>
+              <div style="color:var(--ink3);font-size:11px;margin-top:4px">kernel=3, pad=1 → output H,W unchanged</div>
+            </div>
+            <div style="background:var(--green-soft);border-radius:8px;padding:10px 14px">
+              <div style="color:var(--green);font-weight:700;margin-bottom:4px">Halve spatial size (downsampling)</div>
+              <code>Conv2d(C_in, C_out, 3, stride=2, padding=1)</code>
+              <div style="color:var(--ink3);font-size:11px;margin-top:4px">stride=2 → H,W halved; replaces MaxPool</div>
+            </div>
+            <div style="background:var(--amber-soft);border-radius:8px;padding:10px 14px">
+              <div style="color:var(--amber);font-weight:700;margin-bottom:4px">1×1 conv (channel mixer / bottleneck)</div>
+              <code>Conv2d(C_in, C_out, 1)</code>
+              <div style="color:var(--ink3);font-size:11px;margin-top:4px">no spatial mixing, just mixes channels; used in ResNet, Inception, MobileNet</div>
+            </div>
+            <div style="background:var(--violet-soft);border-radius:8px;padding:10px 14px">
+              <div style="color:var(--violet);font-weight:700;margin-bottom:4px">Depthwise conv (MobileNet)</div>
+              <code>Conv2d(C, C, 3, padding=1, groups=C)</code>
+              <div style="color:var(--ink3);font-size:11px;margin-top:4px">groups=C means each channel has its OWN filter; 8–9× cheaper</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Pooling ── -->
+  <div id="tab-lr2" class="tab-pane">
+    <div class="grid-2">
+      <div>
+        <h4 style="color:var(--orange)">MaxPool2d &amp; AdaptiveAvgPool2d</h4>
+        <p style="font-size:14px;margin-bottom:16px">Pooling layers <strong>reduce spatial size without any learned parameters</strong>. They discard redundant detail and make the representation smaller (cheaper) and more translation-invariant (a cat shifted 2 pixels still produces the same pooled output).</p>
+
+        <div class="card card-accent-top" style="border-color:var(--orange);margin-bottom:16px">
+          <h4 style="color:var(--orange)">MaxPool2d — Keep the Strongest Signal</h4>
+          <div class="formula">
+            <div class="f" style="font-size:12px">nn.MaxPool2d(kernel_size, stride=None, padding=0)</div>
+            <div class="fl">
+              kernel_size — window size (2 or 3 most common)<br>
+              stride      — default = kernel_size (non-overlapping windows)<br>
+              MaxPool2d(2) → halves H and W, keeps the max value in each 2×2 patch
+            </div>
+          </div>
+          <div class="analogy" style="margin-top:10px;padding:10px 14px">
+            <div class="analogy-icon" style="font-size:18px">🏆</div>
+            <div class="analogy-inner"><p style="font-size:13px">Like a tournament bracket — only the strongest activation in each region advances. If a 3×3 patch contains an edge anywhere, MaxPool keeps that signal and discards the nine values around it.</p></div>
+          </div>
+        </div>
+
+        <div class="card card-accent-top" style="border-color:var(--teal)">
+          <h4 style="color:var(--teal)">AdaptiveAvgPool2d — Force Any Size to a Fixed Output</h4>
+          <div class="formula">
+            <div class="f" style="font-size:12px">nn.AdaptiveAvgPool2d(output_size)</div>
+            <div class="fl">
+              output_size — the exact H×W you want out, e.g. (1,1) or (7,7)<br>
+              PyTorch automatically figures out kernel and stride to achieve it<br>
+              AdaptiveAvgPool2d((1,1)) → global average pool → collapses any spatial size to 1×1
+            </div>
+          </div>
+          <p style="font-size:13px;margin-top:10px;color:var(--ink2)"><strong>Why it's everywhere:</strong> If you feed a 224×224 image to a model trained on 128×128, the spatial size before the FC layers will differ — and the model breaks. <code style="font-family:var(--mono);font-size:11px">AdaptiveAvgPool2d((1,1))</code> collapses <em>any</em> spatial size down to a single value per channel, making your model input-size-agnostic. This is the standard way to connect any conv body to a Linear head.</p>
+          <div class="analogy" style="margin-top:10px;padding:10px 14px">
+            <div class="analogy-icon" style="font-size:18px">🗜️</div>
+            <div class="analogy-inner"><p style="font-size:13px">Like summarising a book into one sentence per chapter, regardless of how long the chapter is. The global average pool reads the entire feature map and produces one number — the <em>average activation strength</em> for that feature across the whole image.</p></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:16px">
+          <h4 style="color:var(--orange)">MaxPool vs. AdaptiveAvgPool — When to Use Which</h4>
+          <table class="tbl" style="font-size:13px;margin-top:8px">
+            <thead><tr><th></th><th>MaxPool2d</th><th>AdaptiveAvgPool2d</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Position</strong></td><td>After conv blocks, middle of network</td><td>Just before the Linear head</td></tr>
+              <tr><td><strong>Purpose</strong></td><td>Downsample + translation invariance</td><td>Collapse spatial dims to fixed size</td></tr>
+              <tr><td><strong>Parameters</strong></td><td>0 (not learned)</td><td>0 (not learned)</td></tr>
+              <tr><td><strong>Output size</strong></td><td>Depends on input size</td><td>Always exactly output_size</td></tr>
+              <tr><td><strong>Typical use</strong></td><td>MaxPool2d(2) → halve size</td><td>AdaptiveAvgPool2d((1,1))</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="dyk" style="margin-top:0">
+          <div class="dyk-ico">💡</div>
+          <p><strong>Global Average Pooling replaced Flatten+FC in modern nets.</strong> ResNet and MobileNet do <code style="font-family:var(--mono)">AdaptiveAvgPool2d((1,1)) → Flatten → one Linear</code> instead of <code style="font-family:var(--mono)">Flatten → FC(4096) → FC(4096) → FC(1000)</code>. This cuts 90%+ of parameters and actually generalises better.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BatchNorm ── -->
+  <div id="tab-lr3" class="tab-pane">
+    <div class="grid-2">
+      <div>
+        <h4 style="color:var(--amber)">nn.BatchNorm2d — Stabilise Training Layer by Layer</h4>
+        <p style="font-size:14px;margin-bottom:14px"><strong>The problem it solves:</strong> As training proceeds, the distribution of each layer's output keeps shifting because the weights before it keep changing. The next layer has to constantly adapt to a moving target — this is called <em>internal covariate shift</em> and it makes training slow and unstable. BatchNorm normalises each layer's output back to a predictable distribution after every mini-batch.</p>
+        <div class="formula">
+          <div class="f" style="font-size:12px">nn.BatchNorm2d(num_features, eps=1e-5, momentum=0.1)</div>
+          <div class="fl">
+            num_features — number of channels (= out_channels of the preceding Conv2d)<br>
+            eps          — small constant for numerical stability (avoid division by zero)<br>
+            momentum     — how fast the running mean/var updates during training
+          </div>
+        </div>
+        <div class="formula" style="margin-top:12px">
+          <div class="f" style="font-size:12px">BN(x) = γ · (x − μ_batch) / √(σ²_batch + ε) + β</div>
+          <div class="fl">
+            μ_batch, σ²_batch — mean and variance computed across the current mini-batch<br>
+            γ (gamma) — learned scale parameter (initialised to 1)<br>
+            β (beta)  — learned shift parameter (initialised to 0, replaces Conv bias)<br>
+            At inference: μ and σ² come from running averages tracked during training
+          </div>
+        </div>
+        <div class="dyk dyk-warn" style="margin-top:14px">
+          <div class="dyk-ico">⚠️</div>
+          <p><strong>model.train() vs model.eval() matters here.</strong> In training mode, BatchNorm uses the current batch's stats. In eval mode, it uses the running averages accumulated during training. Forgetting to call <code style="font-family:var(--mono)">model.eval()</code> at inference gives different (wrong) results on single images.</p>
+        </div>
+      </div>
+      <div>
+        <div class="analogy">
+          <div class="analogy-icon">⚖️</div>
+          <div class="analogy-inner">
+            <div class="analogy-title">Analogy — Standardising Exam Scores</div>
+            <p>Imagine every student's raw score is converted to a percentile before passing to the next teacher. It doesn't matter if one exam was easy or hard — the next teacher always receives a consistent, normalised distribution. <strong>BatchNorm does this for neural network activations.</strong></p>
+          </div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <h4 style="color:var(--amber)">Where to Place BatchNorm</h4>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
+            <div style="background:var(--green-soft);border-radius:8px;padding:10px 14px">
+              <strong style="color:var(--green)">Standard placement (after Conv, before ReLU):</strong>
+              <div style="font-family:var(--mono);font-size:11px;margin-top:6px;color:var(--ink2)">Conv2d → BatchNorm2d → ReLU</div>
+              <div style="font-size:11px;color:var(--ink3);margin-top:4px">Original paper recommendation. Most widely used.</div>
+            </div>
+            <div style="background:var(--blue-soft);border-radius:8px;padding:10px 14px">
+              <strong style="color:var(--blue)">Pre-activation (after ReLU, before Conv):</strong>
+              <div style="font-family:var(--mono);font-size:11px;margin-top:6px;color:var(--ink2)">BatchNorm2d → ReLU → Conv2d</div>
+              <div style="font-size:11px;color:var(--ink3);margin-top:4px">Used in ResNet v2. Slightly better for very deep nets.</div>
+            </div>
+            <div style="background:var(--rose-soft);border-radius:8px;padding:10px 14px">
+              <strong style="color:var(--rose)">Never use after Dropout</strong>
+              <div style="font-size:11px;color:var(--ink3);margin-top:4px">Dropout changes the variance — BN stats become unreliable. Use one or the other, not both in sequence.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Dropout ── -->
+  <div id="tab-lr4" class="tab-pane">
+    <div class="grid-2">
+      <div>
+        <h4 style="color:var(--violet)">nn.Dropout &amp; nn.Dropout2d — Force Robust Learning</h4>
+        <p style="font-size:14px;margin-bottom:14px"><strong>The problem it solves:</strong> Left unchecked, neurons in a network start to <em>co-adapt</em> — neuron A always corrects neuron B's mistakes, so neither ever needs to learn the full pattern independently. Dropout breaks this by randomly silencing neurons during training, forcing every neuron to be independently useful.</p>
+        <div class="formula">
+          <div class="f" style="font-size:12px">nn.Dropout(p=0.5)</div>
+          <div class="fl">
+            p — probability of setting a neuron to zero (default 0.5 = 50%)<br>
+            At training: each neuron independently zeroed with probability p<br>
+            At inference (model.eval()): Dropout is completely disabled — all neurons active<br>
+            Outputs are scaled by 1/(1−p) during training to keep expected values the same
+          </div>
+        </div>
+        <div class="formula" style="margin-top:12px">
+          <div class="f" style="font-size:12px">nn.Dropout2d(p=0.5)</div>
+          <div class="fl">
+            Same idea but zeroes entire feature maps (channels), not individual pixels.<br>
+            Appropriate after Conv layers — spatially correlated features should be dropped together.<br>
+            nn.Dropout (plain) is for after Flatten, before Linear layers.
+          </div>
+        </div>
+        <div class="dyk dyk-warn" style="margin-top:14px">
+          <div class="dyk-ico">⚠️</div>
+          <p><strong>The #1 Dropout mistake:</strong> forgetting <code style="font-family:var(--mono)">model.eval()</code> at inference. In training mode, Dropout randomly zeros neurons — your model will give a different prediction every time you run the same image. Always call <code style="font-family:var(--mono)">model.eval()</code> before inference and <code style="font-family:var(--mono)">model.train()</code> before your training loop.</p>
+        </div>
+      </div>
+      <div>
+        <div class="analogy">
+          <div class="analogy-icon">🎲</div>
+          <div class="analogy-inner">
+            <div class="analogy-title">Analogy — A Sports Team with Random Absences</div>
+            <p>If a star player is randomly absent at unpredictable practices, every other player must learn to cover every role. The team becomes more robust. On match day (inference), everyone shows up — but now <em>everyone</em> is capable, not just the stars.</p>
+          </div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <h4 style="color:var(--violet)">Choosing the Right p Value</h4>
+          <table class="tbl" style="font-size:13px;margin-top:8px">
+            <thead><tr><th>p value</th><th>Effect</th><th>When to use</th></tr></thead>
+            <tbody>
+              <tr><td><span class="badge bb">p=0.1–0.2</span></td><td>Mild regularisation</td><td>Small datasets, shallow nets</td></tr>
+              <tr><td><span class="badge bg">p=0.3–0.5</span></td><td>Standard — most common</td><td>FC layers in classifiers (AlexNet, VGG used p=0.5)</td></tr>
+              <tr><td><span class="badge br">p=0.7+</span></td><td>Aggressive regularisation</td><td>Rarely useful — slows learning severely</td></tr>
+            </tbody>
+          </table>
+          <div class="dyk dyk-tip" style="margin-top:12px">
+            <div class="dyk-ico">💡</div>
+            <p><strong>Modern trend:</strong> BatchNorm has largely replaced Dropout in conv layers of modern architectures (ResNet, EfficientNet). Dropout is still used in FC heads and Transformers.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Flatten ── -->
+  <div id="tab-lr5" class="tab-pane">
+    <div class="grid-2">
+      <div>
+        <h4 style="color:var(--teal)">nn.Flatten — Bridge from Spatial to Vector</h4>
+        <p style="font-size:14px;margin-bottom:14px"><strong>What it does:</strong> takes a multi-dimensional tensor (e.g. a feature map of shape <code style="font-family:var(--mono)">[B, C, H, W]</code>) and reshapes it into a flat 2D tensor <code style="font-family:var(--mono)">[B, C×H×W]</code>. This is the bridge between the convolutional feature extractor and the fully-connected classification head.</p>
+        <div class="formula">
+          <div class="f" style="font-size:12px">nn.Flatten(start_dim=1, end_dim=-1)</div>
+          <div class="fl">
+            start_dim — first dimension to flatten (default 1 = keep batch dim, flatten the rest)<br>
+            end_dim   — last dimension to flatten (default -1 = all remaining dims)<br><br>
+            Input:  [B, 256, 4, 4]  →  B×(256×4×4) = B×4096<br>
+            Output: [B, 4096]       →  ready for nn.Linear
+          </div>
+        </div>
+        <div class="formula" style="margin-top:12px">
+          <div class="f" style="font-size:12px">Equivalent to: x.view(x.size(0), -1)</div>
+          <div class="fl">nn.Flatten() is preferred in nn.Sequential because it's a proper Module — it appears in model.summary() and is saved/loaded correctly with state_dict.</div>
+        </div>
+        <div class="analogy" style="margin-top:16px">
+          <div class="analogy-icon">📄</div>
+          <div class="analogy-inner">
+            <div class="analogy-title">Analogy — Unrolling a Chessboard</div>
+            <p>A chessboard is an 8×8 grid. Flatten unrolls it into a single row of 64 squares. The spatial arrangement is gone — but all the information is preserved. The FC layers that follow don't need to know <em>where</em> each value was, only <em>what</em> it was.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h4 style="color:var(--teal)">The Flatten Moment — Before vs. After</h4>
+          <div style="display:flex;flex-direction:column;gap:12px;font-size:13px;font-family:var(--mono)">
+            <div style="background:var(--blue-soft);border-radius:8px;padding:12px 14px">
+              <div style="color:var(--blue);font-weight:700;margin-bottom:6px">Before Flatten</div>
+              <div style="color:var(--ink2)">shape: [<span style="color:var(--blue)">4</span>, <span style="color:var(--orange)">256</span>, <span style="color:var(--green)">4</span>, <span style="color:var(--green)">4</span>]</div>
+              <div style="color:var(--ink4);font-size:11px;margin-top:4px">[batch=4, channels=256, height=4, width=4]</div>
+              <div style="color:var(--ink4);font-size:11px">4×4 spatial grid of feature maps — spatial structure intact</div>
+            </div>
+            <div style="text-align:center;color:var(--teal);font-size:18px">↓ nn.Flatten()</div>
+            <div style="background:var(--teal-soft);border-radius:8px;padding:12px 14px">
+              <div style="color:var(--teal);font-weight:700;margin-bottom:6px">After Flatten</div>
+              <div style="color:var(--ink2)">shape: [<span style="color:var(--blue)">4</span>, <span style="color:var(--teal)">4096</span>]</div>
+              <div style="color:var(--ink4);font-size:11px;margin-top:4px">[batch=4, features=256×4×4=4096]</div>
+              <div style="color:var(--ink4);font-size:11px">flat vector — ready for nn.Linear</div>
+            </div>
+          </div>
+          <div class="dyk dyk-tip" style="margin-top:14px">
+            <div class="dyk-ico">💡</div>
+            <p><strong>AdaptiveAvgPool2d((1,1)) before Flatten</strong> is the modern pattern. It collapses [B,C,H,W] → [B,C,1,1] first, so Flatten gives [B,C] — a tiny C-dimensional vector. This avoids the huge C×H×W flattened size (e.g. 25,088 in VGG) and all the parameters that come with it.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Linear ── -->
+  <div id="tab-lr6" class="tab-pane">
+    <div class="grid-2">
+      <div>
+        <h4 style="color:var(--rose)">nn.Linear — Fully-Connected Layer</h4>
+        <p style="font-size:14px;margin-bottom:14px"><strong>What it does:</strong> connects every input neuron to every output neuron with a learned weight. It applies the transformation <strong>y = xWᵀ + b</strong> — a matrix multiply plus a bias. This is where the final classification decision is made: the network combines all the features extracted by the conv layers and votes on the class.</p>
+        <div class="formula">
+          <div class="f" style="font-size:12px">nn.Linear(in_features, out_features, bias=True)</div>
+          <div class="fl">
+            in_features  — size of each input vector (must match the Flatten output)<br>
+            out_features — number of output neurons<br>
+            bias         — adds a learnable bias term b (default True)<br><br>
+            Weight matrix: shape [out_features, in_features]<br>
+            Bias vector:   shape [out_features]<br>
+            Parameters = in_features × out_features + out_features
+          </div>
+        </div>
+        <div class="formula" style="margin-top:12px">
+          <div class="f" style="font-size:12px">y = x @ W.T + b</div>
+          <div class="fl">
+            Input  x: [B, in_features]<br>
+            Weight W: [out_features, in_features]<br>
+            Output y: [B, out_features]<br>
+            For the final classification layer: out_features = num_classes (e.g. 1000 for ImageNet)
+          </div>
+        </div>
+        <div class="dyk dyk-warn" style="margin-top:14px">
+          <div class="dyk-ico">⚠️</div>
+          <p><strong>in_features must match exactly.</strong> If your conv backbone outputs [B, 256, 4, 4] and you Flatten to [B, 4096], your first Linear must be <code style="font-family:var(--mono)">nn.Linear(4096, ...)</code>. If you change the input image size, the flattened size changes and your Linear breaks. This is why AdaptiveAvgPool2d → Flatten → Linear is preferred — the pool fixes the size.</p>
+        </div>
+      </div>
+      <div>
+        <div class="analogy">
+          <div class="analogy-icon">🗳️</div>
+          <div class="analogy-inner">
+            <div class="analogy-title">Analogy — A Voting Committee</div>
+            <p>Each input feature (e.g. "roundness detected", "fur texture detected") casts a weighted vote for each output class. nn.Linear learns the voting weights. The class with the highest total vote wins. The bias term gives each class a head start (or handicap) before any votes are cast.</p>
+          </div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <h4 style="color:var(--rose)">Parameter Count — Why FC Layers Are Expensive</h4>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
+            <div style="background:var(--green-soft);border-radius:8px;padding:10px 14px">
+              <strong style="color:var(--green)">Modern (GAP approach):</strong>
+              <div style="font-family:var(--mono);font-size:11px;margin-top:4px">AdaptiveAvgPool2d(1,1) → Flatten → Linear(2048, 1000)</div>
+              <div style="color:var(--ink3);font-size:11px;margin-top:2px">Params: 2048×1000 = <strong>2.05M</strong></div>
+            </div>
+            <div style="background:var(--rose-soft);border-radius:8px;padding:10px 14px">
+              <strong style="color:var(--rose)">Old VGG-style (FC approach):</strong>
+              <div style="font-family:var(--mono);font-size:11px;margin-top:4px">Flatten → Linear(25088, 4096) → Linear(4096, 4096) → Linear(4096, 1000)</div>
+              <div style="color:var(--ink3);font-size:11px;margin-top:2px">Params: 25088×4096 + 4096×4096 + 4096×1000 = <strong>122M</strong> — just in the head!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Activations ── -->
+  <div id="tab-lr7" class="tab-pane">
+    <h4 style="color:var(--green);margin-bottom:16px">Activation Functions as nn.Module Layers</h4>
+    <p style="font-size:14px;margin-bottom:20px">Activations introduce non-linearity. Without them, stacking linear layers is mathematically equivalent to a single linear layer — no depth benefit at all. PyTorch provides activations both as functions (<code style="font-family:var(--mono)">F.relu</code>) and as proper modules that can live inside <code style="font-family:var(--mono)">nn.Sequential</code>.</p>
+    <div class="grid-3">
+      <div class="card card-accent-top" style="border-color:var(--blue)">
+        <h4 style="color:var(--blue)">nn.ReLU</h4>
+        <div class="formula" style="padding:10px"><div class="f">f(x) = max(0, x)</div></div>
+        <div style="font-size:13px;margin-top:10px;display:flex;flex-direction:column;gap:6px">
+          <div><strong>inplace=True</strong> — modifies input tensor in-place, saves memory. Safe to use in most cases.</div>
+          <div style="background:var(--green-soft);border-radius:6px;padding:8px;font-family:var(--mono);font-size:11px">nn.ReLU(inplace=True)</div>
+          <div style="color:var(--ink3)">✓ Fast, simple, no saturation for positive inputs<br>⚠️ "Dead ReLU" — if a neuron always gets negative input, it permanently outputs 0 and stops learning</div>
+        </div>
+      </div>
+      <div class="card card-accent-top" style="border-color:var(--teal)">
+        <h4 style="color:var(--teal)">nn.ReLU6</h4>
+        <div class="formula" style="padding:10px"><div class="f">f(x) = min(max(0, x), 6)</div></div>
+        <div style="font-size:13px;margin-top:10px;display:flex;flex-direction:column;gap:6px">
+          <div><strong>ReLU clipped at 6.</strong> Used in MobileNet. The cap at 6 ensures activations fit in low-precision (fp16/int8) arithmetic without overflow — critical for mobile/edge deployment.</div>
+          <div style="background:var(--teal-soft);border-radius:6px;padding:8px;font-family:var(--mono);font-size:11px">nn.ReLU6(inplace=True)</div>
+          <div style="color:var(--ink3)">Identical to ReLU for values 0–6. Only clips rare very large activations.</div>
+        </div>
+      </div>
+      <div class="card card-accent-top" style="border-color:var(--violet)">
+        <h4 style="color:var(--violet)">nn.GELU</h4>
+        <div class="formula" style="padding:10px"><div class="f" style="font-size:11px">f(x) = x·Φ(x)</div><div class="fl">Φ = Gaussian CDF ≈ 0.5·x·(1+tanh(√(2/π)·(x+0.044715x³)))</div></div>
+        <div style="font-size:13px;margin-top:10px;display:flex;flex-direction:column;gap:6px">
+          <div>Used in Transformers (BERT, ViT, GPT). Smooth, differentiable everywhere — no hard zero for negative inputs. Slightly better than ReLU for attention-based architectures.</div>
+          <div style="background:var(--violet-soft);border-radius:6px;padding:8px;font-family:var(--mono);font-size:11px">nn.GELU()</div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:16px">
+      <div class="card card-accent-top" style="border-color:var(--orange)">
+        <h4 style="color:var(--orange)">nn.Sigmoid</h4>
+        <div class="formula" style="padding:10px"><div class="f">σ(x) = 1 / (1 + e⁻ˣ)</div></div>
+        <div style="font-size:13px;margin-top:10px;display:flex;flex-direction:column;gap:6px">
+          <div>Squashes output to (0, 1). Used for <strong>binary classification</strong> output (one neuron = probability of class). Not used in hidden layers of deep nets — causes vanishing gradients.</div>
+          <div style="background:var(--orange-soft);border-radius:6px;padding:8px;font-family:var(--mono);font-size:11px">nn.Sigmoid()  # output layer for binary problems</div>
+        </div>
+      </div>
+      <div class="card card-accent-top" style="border-color:var(--green)">
+        <h4 style="color:var(--green)">nn.Softmax / CrossEntropyLoss</h4>
+        <div class="formula" style="padding:10px"><div class="f" style="font-size:11px">P(yᵢ) = eˣⁱ / Σⱼ eˣʲ</div></div>
+        <div style="font-size:13px;margin-top:10px;display:flex;flex-direction:column;gap:6px">
+          <div>Turns logits into probabilities summing to 1. Used for <strong>multi-class</strong> output. <strong>Important:</strong> PyTorch's <code style="font-family:var(--mono)">nn.CrossEntropyLoss</code> applies log-softmax internally — do NOT add a Softmax layer before it during training, or your gradients will be wrong.</div>
+          <div style="background:var(--green-soft);border-radius:6px;padding:8px;font-family:var(--mono);font-size:11px">
+            # During training: raw logits → CrossEntropyLoss ✓<br>
+            # At inference: logits → F.softmax(x, dim=1) ✓
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Sequential ── -->
+  <div id="tab-lr8" class="tab-pane">
+    <div class="grid-2">
+      <div>
+        <h4 style="color:var(--ink)">nn.Sequential — Wiring Layers Together</h4>
+        <p style="font-size:14px;margin-bottom:14px"><strong>What it does:</strong> wraps a list of layers into a single module that calls them in order. The output of each layer is passed directly as input to the next. It's the most common way to assemble a stack of layers into a reusable block.</p>
+        <div class="formula">
+          <div class="f" style="font-size:12px">nn.Sequential(*layers)</div>
+          <div class="fl">
+            Takes any number of nn.Module layers as arguments.<br>
+            forward(x) automatically calls each layer in order.<br>
+            Can be nested — a Sequential can contain other Sequentials.<br>
+            Named layers: nn.Sequential(OrderedDict([('conv1', ...), ('bn1', ...)]))
+          </div>
+        </div>
+        <div class="dyk dyk-tip" style="margin-top:14px">
+          <div class="dyk-ico">💡</div>
+          <p><strong>When to use nn.Sequential vs explicit forward():</strong> Use Sequential for straight pipelines with no branches. Write an explicit <code style="font-family:var(--mono)">forward()</code> method when you have skip connections, multiple inputs/outputs, or conditional logic — like in ResNet's Bottleneck block where <code style="font-family:var(--mono)">out += shortcut(x)</code> must be written explicitly.</p>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h4 style="color:var(--ink)">Sequential vs. Explicit forward() — Side by Side</h4>
+          <div style="display:flex;flex-direction:column;gap:12px;font-size:12px;font-family:var(--mono)">
+            <div style="background:var(--green-soft);border-radius:8px;padding:12px 14px">
+              <div style="color:var(--green);font-weight:700;margin-bottom:6px;font-family:var(--sans)">✓ Sequential (simple pipeline)</div>
+              <div style="color:var(--ink2);line-height:1.9">
+                self.block = nn.Sequential(<br>
+                &nbsp;&nbsp;nn.Conv2d(64, 64, 3, padding=1, bias=False),<br>
+                &nbsp;&nbsp;nn.BatchNorm2d(64),<br>
+                &nbsp;&nbsp;nn.ReLU(inplace=True),<br>
+                )
+              </div>
+            </div>
+            <div style="background:var(--blue-soft);border-radius:8px;padding:12px 14px">
+              <div style="color:var(--blue);font-weight:700;margin-bottom:6px;font-family:var(--sans)">✓ Explicit forward (with skip connection)</div>
+              <div style="color:var(--ink2);line-height:1.9">
+                def forward(self, x):<br>
+                &nbsp;&nbsp;identity = self.shortcut(x)<br>
+                &nbsp;&nbsp;out = self.relu(self.bn1(self.conv1(x)))<br>
+                &nbsp;&nbsp;out = self.bn2(self.conv2(out))<br>
+                &nbsp;&nbsp;out += identity&nbsp;&nbsp;<span style="color:var(--ink3)"># skip!</span><br>
+                &nbsp;&nbsp;return self.relu(out)
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:14px">
+          <h4 style="color:var(--ink)">Complete Standard Conv Block Pattern</h4>
+          <p style="font-size:12px;color:var(--ink3);margin-bottom:8px">The most repeated pattern in all of modern CV:</p>
+          <div style="background:var(--ink);border-radius:8px;padding:14px;font-family:var(--mono);font-size:12px;color:#CBD5E1;line-height:1.9">
+            <span style="color:#F472B6">def</span> <span style="color:#86EFAC">conv_block</span>(in_c, out_c, stride=1):<br>
+            &nbsp;&nbsp;<span style="color:#F472B6">return</span> nn.Sequential(<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;nn.Conv2d(in_c, out_c, <span style="color:#C4B5FD">3</span>,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stride=stride, padding=<span style="color:#C4B5FD">1</span>, bias=<span style="color:#F472B6">False</span>),<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;nn.BatchNorm2d(out_c),<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;nn.ReLU(inplace=<span style="color:#F472B6">True</span>),<br>
+            &nbsp;&nbsp;)<br>
+            <span style="color:#6B7280"># Conv2d(bias=False) because BN has its own β</span><br>
+            <span style="color:#6B7280"># BN before ReLU: standard placement</span><br>
+            <span style="color:#6B7280"># ReLU(inplace): saves memory, safe here</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <h3 style="margin-top:48px">How the Layers Stack Up</h3>
   <p>Shallow layers capture simple, general features. Deep layers capture complex, specific features. This hierarchy is what makes CNNs so powerful.</p>
   <div class="arch-box">
@@ -1937,6 +2428,12 @@ gradient = cv2.morphologyEx(binary,
   <!-- Architecture display -->
   <div id="arch-display" style="margin-top:0">
     <!-- content injected by JS -->
+  </div>
+
+  <!-- Build-it-yourself callout -->
+  <div class="dyk dyk-tip" style="margin-top:28px">
+    <div class="dyk-ico">🛠️</div>
+    <p><strong>Want to build every one of these architectures yourself?</strong> Head to <a href="#code" style="color:var(--green);font-weight:700">Code Labs → Tab 6 "Build From Scratch"</a> for complete, heavily annotated PyTorch implementations of LeNet-5, AlexNet, VGG-16, ResNet-50 (Bottleneck block explained line-by-line), and MobileNetV2 (depthwise separable convolutions). Each includes parameter count + layer-shape trace.</p>
   </div>
 
   <!-- Architecture comparison table -->
@@ -2551,6 +3048,7 @@ plt.<span class="fn">tight_layout</span>(); plt.<span class="fn">show</span>()</
     <button class="tab-btn" onclick="swTab('c3','code-tabs')">3 · CNN Training</button>
     <button class="tab-btn" onclick="swTab('c4','code-tabs')">4 · YOLO Inference</button>
     <button class="tab-btn" onclick="swTab('c5','code-tabs')">5 · Transfer Learning</button>
+    <button class="tab-btn" onclick="swTab('c6','code-tabs')">6 · Build From Scratch</button>
   </div>
 
   <div id="tab-c1" class="tab-pane on">
@@ -3121,6 +3619,584 @@ val_root   = <span class="st">'data/val'</span>
 </div>
 
 <!-- ════════════════════════════════════════════════════════
+     CODE LAB 6 — BUILD CLASSIC ARCHITECTURES FROM SCRATCH
+═════════════════════════════════════════════════════════ -->
+  <div id="tab-c6" class="tab-pane">
+    <div class="card" style="margin-bottom:24px">
+      <h4 style="color:var(--violet)">Lab 6 · Classic CNN Architectures — Built From Scratch</h4>
+      <p>The best way to truly understand how CNNs work is to implement each landmark architecture yourself. Below are five complete PyTorch implementations — from the 1998 LeNet-5 to the efficient MobileNetV2. Every model ends with a <code style="font-family:var(--mono);font-size:12px">summary()</code> call so you can see the exact parameter count and layer shapes.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        <span class="badge bv">PyTorch</span><span class="badge bb">From Scratch</span><span class="badge bg">5 Models</span><span class="badge ba">Annotated</span>
+      </div>
+    </div>
+
+    <!-- Sub-tabs for each architecture -->
+    <div class="tab-bar" id="arch-scratch-tabs" style="margin-bottom:28px">
+      <button class="tab-btn on" onclick="swTab('as1','arch-scratch-tabs')">LeNet-5 (1998)</button>
+      <button class="tab-btn" onclick="swTab('as2','arch-scratch-tabs')">AlexNet (2012)</button>
+      <button class="tab-btn" onclick="swTab('as3','arch-scratch-tabs')">VGG-16 (2014)</button>
+      <button class="tab-btn" onclick="swTab('as4','arch-scratch-tabs')">ResNet-50 (2015)</button>
+      <button class="tab-btn" onclick="swTab('as5','arch-scratch-tabs')">MobileNetV2 (2018)</button>
+    </div>
+
+    <!-- ── LeNet-5 ─────────────────────────────────────── -->
+    <div id="tab-as1" class="tab-pane on">
+      <div class="dyk" style="margin-bottom:16px">
+        <div class="dyk-ico">💡</div>
+        <p><strong>Why LeNet-5?</strong> It's the simplest real CNN ever published — 60K parameters, two conv blocks, two fully-connected layers. Perfect first implementation. Yann LeCun used it to read ZIP codes on envelopes for the US Postal Service in 1998.</p>
+      </div>
+      <div class="code-wrap">
+        <div class="code-head">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="code-traffic"><span style="background:#FF5F57"></span><span style="background:#FEBC2E"></span><span style="background:#28C840"></span></div>
+            <span class="code-lang-tag">PYTHON  ·  LENET-5  ·  1998  ·  60K PARAMS</span>
+          </div>
+          <div class="code-acts">
+            <button class="btn-copy" onclick="cpCode(this)">📋 Copy</button>
+          </div>
+        </div>
+<pre id="raw-as1"><span class="cm"># ══════════════════════════════════════════════════════════
+# LeNet-5 from Scratch  (LeCun et al., 1998)
+# Original: trained on 32×32 greyscale MNIST / postal codes
+# Here: extended to accept 1-channel OR 3-channel images
+# pip install torch torchvision
+# ══════════════════════════════════════════════════════════</span>
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+
+<span class="kw">class</span> <span class="cl">LeNet5</span>(nn.<span class="cl">Module</span>):
+    <span class="cm">"""
+    Original LeNet-5 topology (slightly modernised):
+      INPUT  →  C1(6)  → pool → C3(16) → pool → FC(120) → FC(84) → FC(num_classes)
+    Original used tanh; we use ReLU (strictly better in practice).
+    Original used average pooling; we use max pooling (sharper features).
+    """</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, in_channels=<span class="nm">1</span>, num_classes=<span class="nm">10</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+
+        <span class="cm"># ── Feature Extractor ─────────────────────────────────
+        # Two conv blocks, each followed by pooling.
+        # After block 2: spatial size = (32-4)/2/2 = 4×4 for 32×32 input</span>
+        self.features = nn.<span class="fn">Sequential</span>(
+            <span class="cm"># Conv Block 1  →  output: [B, 6, 14, 14] for 32×32 input</span>
+            nn.<span class="fn">Conv2d</span>(in_channels, <span class="nm">6</span>, kernel_size=<span class="nm">5</span>),   <span class="cm"># 32→28  (no padding, stride=1)</span>
+            nn.<span class="fn">ReLU</span>(),
+            nn.<span class="fn">MaxPool2d</span>(kernel_size=<span class="nm">2</span>, stride=<span class="nm">2</span>),       <span class="cm"># 28→14</span>
+
+            <span class="cm"># Conv Block 2  →  output: [B, 16, 5, 5] for 14×14 input</span>
+            nn.<span class="fn">Conv2d</span>(<span class="nm">6</span>, <span class="nm">16</span>, kernel_size=<span class="nm">5</span>),             <span class="cm"># 14→10</span>
+            nn.<span class="fn">ReLU</span>(),
+            nn.<span class="fn">MaxPool2d</span>(kernel_size=<span class="nm">2</span>, stride=<span class="nm">2</span>),       <span class="cm"># 10→5</span>
+        )
+
+        <span class="cm"># ── Classifier (Fully-Connected Head) ─────────────────
+        # Input size: 16 channels × 5×5 spatial = 400 neurons</span>
+        self.classifier = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">Flatten</span>(),                                   <span class="cm"># 16×5×5 → 400</span>
+            nn.<span class="fn">Linear</span>(<span class="nm">16</span> * <span class="nm">5</span> * <span class="nm">5</span>, <span class="nm">120</span>),
+            nn.<span class="fn">ReLU</span>(),
+            nn.<span class="fn">Linear</span>(<span class="nm">120</span>, <span class="nm">84</span>),
+            nn.<span class="fn">ReLU</span>(),
+            nn.<span class="fn">Linear</span>(<span class="nm">84</span>, num_classes),                    <span class="cm"># raw logits → CrossEntropyLoss</span>
+        )
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        x = self.features(x)
+        <span class="kw">return</span> self.classifier(x)
+
+
+<span class="cm"># ── Verify the architecture ────────────────────────────────</span>
+model = <span class="cl">LeNet5</span>(in_channels=<span class="nm">1</span>, num_classes=<span class="nm">10</span>)
+
+<span class="cm"># Dry-run: pass a fake batch of 4 greyscale 32×32 images</span>
+x = torch.<span class="fn">zeros</span>(<span class="nm">4</span>, <span class="nm">1</span>, <span class="nm">32</span>, <span class="nm">32</span>)
+out = <span class="fn">model</span>(x)
+<span class="fn">print</span>(<span class="st">f"Output shape : {out.shape}"</span>)          <span class="cm"># → torch.Size([4, 10])</span>
+
+total_params = <span class="fn">sum</span>(p.<span class="fn">numel</span>() <span class="kw">for</span> p <span class="kw">in</span> model.<span class="fn">parameters</span>())
+<span class="fn">print</span>(<span class="st">f"Total params : {total_params:,}"</span>)     <span class="cm"># → 61,706</span>
+
+<span class="cm"># ── Layer-by-layer shape trace ─────────────────────────────</span>
+<span class="fn">print</span>(<span class="st">"\nLayer-by-layer trace:"</span>)
+hooks = []
+<span class="kw">def</span> <span class="fn">_hook</span>(m, i, o):
+    <span class="fn">print</span>(<span class="st">f"  {m.__class__.__name__:20s}  →  {tuple(o.shape)}"</span>)
+<span class="kw">for</span> layer <span class="kw">in</span> [*model.features, *model.classifier]:
+    hooks.<span class="fn">append</span>(layer.<span class="fn">register_forward_hook</span>(_hook))
+_ = <span class="fn">model</span>(x)
+<span class="kw">for</span> h <span class="kw">in</span> hooks: h.<span class="fn">remove</span>()</pre>
+      </div>
+    </div><!-- /as1 -->
+
+    <!-- ── AlexNet ─────────────────────────────────────── -->
+    <div id="tab-as2" class="tab-pane">
+      <div class="dyk" style="margin-bottom:16px">
+        <div class="dyk-ico">💡</div>
+        <p><strong>Why AlexNet?</strong> It started the deep learning revolution in 2012. Three key ingredients invented here: <strong>ReLU activations</strong> (5× faster training than tanh), <strong>Dropout</strong> (first use in CV), and <strong>GPU training</strong>. Every modern net inherits these ideas.</p>
+      </div>
+      <div class="code-wrap">
+        <div class="code-head">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="code-traffic"><span style="background:#FF5F57"></span><span style="background:#FEBC2E"></span><span style="background:#28C840"></span></div>
+            <span class="code-lang-tag">PYTHON  ·  ALEXNET  ·  2012  ·  61M PARAMS</span>
+          </div>
+          <div class="code-acts">
+            <button class="btn-copy" onclick="cpCode(this)">📋 Copy</button>
+          </div>
+        </div>
+<pre id="raw-as2"><span class="cm"># ══════════════════════════════════════════════════════════
+# AlexNet from Scratch  (Krizhevsky et al., 2012)
+# Won ImageNet 2012 by a 10.8% margin — sparked the DL revolution.
+# Input: 3 × 227 × 227  (original paper used 227, not 224)
+# pip install torch
+# ══════════════════════════════════════════════════════════</span>
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+
+<span class="kw">class</span> <span class="cl">AlexNet</span>(nn.<span class="cl">Module</span>):
+    <span class="cm">"""
+    AlexNet topology:
+      Conv(96,11,4) → LRN → pool
+      Conv(256,5,1,pad=2) → LRN → pool
+      Conv(384,3,1,pad=1)
+      Conv(384,3,1,pad=1)
+      Conv(256,3,1,pad=1) → pool
+      FC(4096) → Dropout
+      FC(4096) → Dropout
+      FC(num_classes)
+
+    We skip LRN (Local Response Normalisation) — superseded by BatchNorm
+    and never used in modern nets. Everything else is faithful to the paper.
+    """</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, num_classes=<span class="nm">1000</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+
+        <span class="cm"># ── 5 Convolutional Layers ────────────────────────────</span>
+        self.features = nn.<span class="fn">Sequential</span>(
+            <span class="cm"># Layer 1 — large 11×11 kernel catches coarse features</span>
+            nn.<span class="fn">Conv2d</span>(<span class="nm">3</span>, <span class="nm">96</span>, kernel_size=<span class="nm">11</span>, stride=<span class="nm">4</span>),    <span class="cm"># 227→55</span>
+            nn.<span class="fn">ReLU</span>(inplace=<span class="kw">True</span>),
+            nn.<span class="fn">MaxPool2d</span>(kernel_size=<span class="nm">3</span>, stride=<span class="nm">2</span>),           <span class="cm"># 55→27</span>
+
+            <span class="cm"># Layer 2 — medium 5×5 kernel, same-padding to keep size</span>
+            nn.<span class="fn">Conv2d</span>(<span class="nm">96</span>, <span class="nm">256</span>, kernel_size=<span class="nm">5</span>, padding=<span class="nm">2</span>),    <span class="cm"># 27→27</span>
+            nn.<span class="fn">ReLU</span>(inplace=<span class="kw">True</span>),
+            nn.<span class="fn">MaxPool2d</span>(kernel_size=<span class="nm">3</span>, stride=<span class="nm">2</span>),           <span class="cm"># 27→13</span>
+
+            <span class="cm"># Layers 3-5 — three back-to-back 3×3 convs, no pooling between</span>
+            nn.<span class="fn">Conv2d</span>(<span class="nm">256</span>, <span class="nm">384</span>, kernel_size=<span class="nm">3</span>, padding=<span class="nm">1</span>),   <span class="cm"># 13→13</span>
+            nn.<span class="fn">ReLU</span>(inplace=<span class="kw">True</span>),
+            nn.<span class="fn">Conv2d</span>(<span class="nm">384</span>, <span class="nm">384</span>, kernel_size=<span class="nm">3</span>, padding=<span class="nm">1</span>),   <span class="cm"># 13→13</span>
+            nn.<span class="fn">ReLU</span>(inplace=<span class="kw">True</span>),
+            nn.<span class="fn">Conv2d</span>(<span class="nm">384</span>, <span class="nm">256</span>, kernel_size=<span class="nm">3</span>, padding=<span class="nm">1</span>),   <span class="cm"># 13→13</span>
+            nn.<span class="fn">ReLU</span>(inplace=<span class="kw">True</span>),
+            nn.<span class="fn">MaxPool2d</span>(kernel_size=<span class="nm">3</span>, stride=<span class="nm">2</span>),           <span class="cm"># 13→6</span>
+        )
+
+        <span class="cm"># ── 3 Fully-Connected Layers ──────────────────────────
+        # AdaptiveAvgPool makes the FC layers input-size-agnostic</span>
+        self.avgpool = nn.<span class="fn">AdaptiveAvgPool2d</span>((<span class="nm">6</span>, <span class="nm">6</span>))          <span class="cm"># output always 6×6</span>
+
+        self.classifier = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">Flatten</span>(),
+            nn.<span class="fn">Dropout</span>(<span class="nm">0.5</span>),                                 <span class="cm"># 1st Dropout in CV history</span>
+            nn.<span class="fn">Linear</span>(<span class="nm">256</span> * <span class="nm">6</span> * <span class="nm">6</span>, <span class="nm">4096</span>),
+            nn.<span class="fn">ReLU</span>(inplace=<span class="kw">True</span>),
+            nn.<span class="fn">Dropout</span>(<span class="nm">0.5</span>),
+            nn.<span class="fn">Linear</span>(<span class="nm">4096</span>, <span class="nm">4096</span>),
+            nn.<span class="fn">ReLU</span>(inplace=<span class="kw">True</span>),
+            nn.<span class="fn">Linear</span>(<span class="nm">4096</span>, num_classes),
+        )
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        x = self.features(x)
+        x = self.avgpool(x)
+        <span class="kw">return</span> self.classifier(x)
+
+
+<span class="cm"># ── Verify ─────────────────────────────────────────────────</span>
+model = <span class="cl">AlexNet</span>(num_classes=<span class="nm">1000</span>)
+x = torch.<span class="fn">zeros</span>(<span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">227</span>, <span class="nm">227</span>)
+out = <span class="fn">model</span>(x)
+<span class="fn">print</span>(<span class="st">f"Output shape : {out.shape}"</span>)                          <span class="cm"># → [2, 1000]</span>
+total = <span class="fn">sum</span>(p.<span class="fn">numel</span>() <span class="kw">for</span> p <span class="kw">in</span> model.<span class="fn">parameters</span>())
+<span class="fn">print</span>(<span class="st">f"Total params : {total:,}"</span>)                           <span class="cm"># → ~61M</span></pre>
+      </div>
+    </div><!-- /as2 -->
+
+    <!-- ── VGG-16 ───────────────────────────────────────── -->
+    <div id="tab-as3" class="tab-pane">
+      <div class="dyk" style="margin-bottom:16px">
+        <div class="dyk-ico">💡</div>
+        <p><strong>Why VGG-16?</strong> VGG proved one radical idea: <em>only use 3×3 filters everywhere</em>. Two 3×3 convs have the same receptive field as one 5×5 but fewer parameters and an extra non-linearity. This uniform design makes VGG trivially easy to implement and still extremely popular for feature extraction.</p>
+      </div>
+      <div class="code-wrap">
+        <div class="code-head">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="code-traffic"><span style="background:#FF5F57"></span><span style="background:#FEBC2E"></span><span style="background:#28C840"></span></div>
+            <span class="code-lang-tag">PYTHON  ·  VGG-16  ·  2014  ·  138M PARAMS</span>
+          </div>
+          <div class="code-acts">
+            <button class="btn-copy" onclick="cpCode(this)">📋 Copy</button>
+          </div>
+        </div>
+<pre id="raw-as3"><span class="cm"># ══════════════════════════════════════════════════════════
+# VGG-16 from Scratch  (Simonyan & Zisserman, 2014)
+# The "depth-through-simplicity" architecture.
+# 13 conv layers, all 3×3 kernels, 3 FC layers.
+# Input: 3 × 224 × 224
+# pip install torch
+# ══════════════════════════════════════════════════════════</span>
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+<span class="kw">from</span> typing <span class="kw">import</span> List, Union
+
+<span class="cm"># ── Config-driven builder ──────────────────────────────────
+# Each entry = out_channels (int) or 'M' for MaxPool2d.
+# This makes it trivial to build VGG-11, VGG-13, VGG-19 too.</span>
+VGG_CONFIGS = {
+    <span class="st">'vgg11'</span>: [<span class="nm">64</span>, <span class="st">'M'</span>, <span class="nm">128</span>, <span class="st">'M'</span>, <span class="nm">256</span>, <span class="nm">256</span>, <span class="st">'M'</span>, <span class="nm">512</span>, <span class="nm">512</span>, <span class="st">'M'</span>, <span class="nm">512</span>, <span class="nm">512</span>, <span class="st">'M'</span>],
+    <span class="st">'vgg16'</span>: [<span class="nm">64</span>, <span class="nm">64</span>, <span class="st">'M'</span>,
+              <span class="nm">128</span>, <span class="nm">128</span>, <span class="st">'M'</span>,
+              <span class="nm">256</span>, <span class="nm">256</span>, <span class="nm">256</span>, <span class="st">'M'</span>,
+              <span class="nm">512</span>, <span class="nm">512</span>, <span class="nm">512</span>, <span class="st">'M'</span>,
+              <span class="nm">512</span>, <span class="nm">512</span>, <span class="nm">512</span>, <span class="st">'M'</span>],
+    <span class="st">'vgg19'</span>: [<span class="nm">64</span>, <span class="nm">64</span>, <span class="st">'M'</span>,
+              <span class="nm">128</span>, <span class="nm">128</span>, <span class="st">'M'</span>,
+              <span class="nm">256</span>, <span class="nm">256</span>, <span class="nm">256</span>, <span class="nm">256</span>, <span class="st">'M'</span>,
+              <span class="nm">512</span>, <span class="nm">512</span>, <span class="nm">512</span>, <span class="nm">512</span>, <span class="st">'M'</span>,
+              <span class="nm">512</span>, <span class="nm">512</span>, <span class="nm">512</span>, <span class="nm">512</span>, <span class="st">'M'</span>],
+}
+
+<span class="kw">def</span> <span class="fn">make_vgg_layers</span>(cfg: List[Union[int, str]], batch_norm: bool = <span class="kw">False</span>) -> nn.<span class="cl">Sequential</span>:
+    <span class="cm">"""Convert a config list into an nn.Sequential of conv/pool/bn/relu layers."""</span>
+    layers = []
+    in_channels = <span class="nm">3</span>
+    <span class="kw">for</span> v <span class="kw">in</span> cfg:
+        <span class="kw">if</span> v == <span class="st">'M'</span>:
+            layers.<span class="fn">append</span>(nn.<span class="fn">MaxPool2d</span>(kernel_size=<span class="nm">2</span>, stride=<span class="nm">2</span>))
+        <span class="kw">else</span>:
+            conv = nn.<span class="fn">Conv2d</span>(in_channels, v, kernel_size=<span class="nm">3</span>, padding=<span class="nm">1</span>)
+            <span class="kw">if</span> batch_norm:
+                layers += [conv, nn.<span class="fn">BatchNorm2d</span>(v), nn.<span class="fn">ReLU</span>(inplace=<span class="kw">True</span>)]
+            <span class="kw">else</span>:
+                layers += [conv, nn.<span class="fn">ReLU</span>(inplace=<span class="kw">True</span>)]
+            in_channels = v
+    <span class="kw">return</span> nn.<span class="fn">Sequential</span>(*layers)
+
+
+<span class="kw">class</span> <span class="cl">VGG</span>(nn.<span class="cl">Module</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, variant: str = <span class="st">'vgg16'</span>, num_classes: int = <span class="nm">1000</span>, batch_norm: bool = <span class="kw">False</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        self.features = <span class="fn">make_vgg_layers</span>(VGG_CONFIGS[variant], batch_norm)
+        self.avgpool = nn.<span class="fn">AdaptiveAvgPool2d</span>((<span class="nm">7</span>, <span class="nm">7</span>))  <span class="cm"># output always 7×7 regardless of input</span>
+        self.classifier = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">Flatten</span>(),
+            nn.<span class="fn">Linear</span>(<span class="nm">512</span> * <span class="nm">7</span> * <span class="nm">7</span>, <span class="nm">4096</span>),  <span class="cm"># 512 channels × 7×7 = 25,088 features</span>
+            nn.<span class="fn">ReLU</span>(inplace=<span class="kw">True</span>),
+            nn.<span class="fn">Dropout</span>(<span class="nm">0.5</span>),
+            nn.<span class="fn">Linear</span>(<span class="nm">4096</span>, <span class="nm">4096</span>),
+            nn.<span class="fn">ReLU</span>(inplace=<span class="kw">True</span>),
+            nn.<span class="fn">Dropout</span>(<span class="nm">0.5</span>),
+            nn.<span class="fn">Linear</span>(<span class="nm">4096</span>, num_classes),
+        )
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        x = self.features(x)
+        x = self.avgpool(x)
+        <span class="kw">return</span> self.classifier(x)
+
+
+<span class="cm"># ── Try all three variants ─────────────────────────────────</span>
+<span class="kw">for</span> name <span class="kw">in</span> [<span class="st">'vgg11'</span>, <span class="st">'vgg16'</span>, <span class="st">'vgg19'</span>]:
+    m = <span class="cl">VGG</span>(variant=name)
+    p = <span class="fn">sum</span>(x.<span class="fn">numel</span>() <span class="kw">for</span> x <span class="kw">in</span> m.<span class="fn">parameters</span>())
+    x = torch.<span class="fn">zeros</span>(<span class="nm">1</span>, <span class="nm">3</span>, <span class="nm">224</span>, <span class="nm">224</span>)
+    out = <span class="fn">m</span>(x)
+    <span class="fn">print</span>(<span class="st">f"{name.upper():6s}  params={p/1e6:.1f}M  output={tuple(out.shape)}"</span>)
+<span class="cm"># VGG11   params=132.9M  output=(1, 1000)
+# VGG16   params=138.4M  output=(1, 1000)
+# VGG19   params=143.7M  output=(1, 1000)</span></pre>
+      </div>
+    </div><!-- /as3 -->
+
+    <!-- ── ResNet-50 ────────────────────────────────────── -->
+    <div id="tab-as4" class="tab-pane">
+      <div class="dyk" style="margin-bottom:16px">
+        <div class="dyk-ico">💡</div>
+        <p><strong>Why ResNet?</strong> The <strong>skip connection</strong> is the single most important idea in modern deep learning. It lets gradients flow directly from output to any earlier layer, solving the vanishing gradient problem that made networks deeper than ~20 layers impossible to train. Understanding the <code style="font-family:var(--mono);font-size:12px">Bottleneck</code> block is essential for every CV engineer.</p>
+      </div>
+      <div class="code-wrap">
+        <div class="code-head">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="code-traffic"><span style="background:#FF5F57"></span><span style="background:#FEBC2E"></span><span style="background:#28C840"></span></div>
+            <span class="code-lang-tag">PYTHON  ·  RESNET-50  ·  2015  ·  25M PARAMS</span>
+          </div>
+          <div class="code-acts">
+            <button class="btn-copy" onclick="cpCode(this)">📋 Copy</button>
+          </div>
+        </div>
+<pre id="raw-as4"><span class="cm"># ══════════════════════════════════════════════════════════
+# ResNet-50 from Scratch  (He et al., 2015)
+# KEY CONCEPT: Residual (skip) connections let the network learn
+#   F(x) + x  instead of just F(x)
+# If F(x) ≈ 0, we get identity mapping — the network can freely
+# skip a block. This enables stable training of 100+ layer nets.
+# pip install torch
+# ══════════════════════════════════════════════════════════</span>
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+
+<span class="cm"># ── Bottleneck Block ───────────────────────────────────────
+# ResNet-50/101/152 use the "bottleneck" design for efficiency:
+#   1×1 conv  →  reduce channels (e.g. 256 → 64)
+#   3×3 conv  →  spatial processing at low cost
+#   1×1 conv  →  expand channels back (64 → 256)
+# This 3-layer block is cheaper than a single 3×3 on the full channels.</span>
+<span class="kw">class</span> <span class="cl">Bottleneck</span>(nn.<span class="cl">Module</span>):
+    expansion = <span class="nm">4</span>  <span class="cm"># output channels = planes × 4 (e.g. 64×4 = 256)</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, in_channels: int, planes: int, stride: int = <span class="nm">1</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        out_channels = planes * self.expansion
+
+        <span class="cm"># ── Main path ─────────────────────────────────────────</span>
+        self.conv1 = nn.<span class="fn">Conv2d</span>(in_channels, planes, kernel_size=<span class="nm">1</span>, bias=<span class="kw">False</span>)
+        self.bn1   = nn.<span class="fn">BatchNorm2d</span>(planes)
+
+        self.conv2 = nn.<span class="fn">Conv2d</span>(planes, planes, kernel_size=<span class="nm">3</span>,
+                               stride=stride, padding=<span class="nm">1</span>, bias=<span class="kw">False</span>)
+        self.bn2   = nn.<span class="fn">BatchNorm2d</span>(planes)
+
+        self.conv3 = nn.<span class="fn">Conv2d</span>(planes, out_channels, kernel_size=<span class="nm">1</span>, bias=<span class="kw">False</span>)
+        self.bn3   = nn.<span class="fn">BatchNorm2d</span>(out_channels)
+
+        self.relu  = nn.<span class="fn">ReLU</span>(inplace=<span class="kw">True</span>)
+
+        <span class="cm"># ── Skip connection (shortcut) ─────────────────────────
+        # Identity if shapes match, 1×1 conv to project if they don't.
+        # Shapes differ when: stride > 1  OR  channel count changes.</span>
+        self.shortcut = nn.<span class="fn">Identity</span>()
+        <span class="kw">if</span> stride != <span class="nm">1</span> <span class="kw">or</span> in_channels != out_channels:
+            self.shortcut = nn.<span class="fn">Sequential</span>(
+                nn.<span class="fn">Conv2d</span>(in_channels, out_channels, kernel_size=<span class="nm">1</span>,
+                          stride=stride, bias=<span class="kw">False</span>),
+                nn.<span class="fn">BatchNorm2d</span>(out_channels),
+            )
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        identity = self.shortcut(x)      <span class="cm"># shortcut path (possibly projected)</span>
+
+        out = self.relu(self.bn1(self.conv1(x)))    <span class="cm"># 1×1 squeeze</span>
+        out = self.relu(self.bn2(self.conv2(out)))  <span class="cm"># 3×3 spatial</span>
+        out = self.bn3(self.conv3(out))             <span class="cm"># 1×1 expand (NO relu yet)</span>
+
+        out += identity                  <span class="cm"># ← THE skip connection: F(x) + x</span>
+        out = self.relu(out)             <span class="cm"># relu AFTER add</span>
+        <span class="kw">return</span> out
+
+
+<span class="cm"># ── Full ResNet ────────────────────────────────────────────</span>
+<span class="kw">class</span> <span class="cl">ResNet</span>(nn.<span class="cl">Module</span>):
+    <span class="cm"># layer_counts: how many Bottleneck blocks in each of the 4 stages
+    # ResNet-50=[3,4,6,3]  ResNet-101=[3,4,23,3]  ResNet-152=[3,8,36,3]</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, layer_counts, num_classes=<span class="nm">1000</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        self.in_channels = <span class="nm">64</span>
+
+        <span class="cm"># ── Stem (first layer before the 4 stages) ────────────</span>
+        self.stem = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">Conv2d</span>(<span class="nm">3</span>, <span class="nm">64</span>, kernel_size=<span class="nm">7</span>, stride=<span class="nm">2</span>, padding=<span class="nm">3</span>, bias=<span class="kw">False</span>),
+            nn.<span class="fn">BatchNorm2d</span>(<span class="nm">64</span>),
+            nn.<span class="fn">ReLU</span>(inplace=<span class="kw">True</span>),
+            nn.<span class="fn">MaxPool2d</span>(kernel_size=<span class="nm">3</span>, stride=<span class="nm">2</span>, padding=<span class="nm">1</span>),
+        )   <span class="cm"># 224→112→56  (after pool)   channels: 3→64</span>
+
+        <span class="cm"># ── 4 Residual Stages ─────────────────────────────────</span>
+        self.layer1 = self.<span class="fn">_make_stage</span>(<span class="nm">64</span>,  layer_counts[<span class="nm">0</span>], stride=<span class="nm">1</span>)  <span class="cm"># 56→56  out=256ch</span>
+        self.layer2 = self.<span class="fn">_make_stage</span>(<span class="nm">128</span>, layer_counts[<span class="nm">1</span>], stride=<span class="nm">2</span>)  <span class="cm"># 56→28  out=512ch</span>
+        self.layer3 = self.<span class="fn">_make_stage</span>(<span class="nm">256</span>, layer_counts[<span class="nm">2</span>], stride=<span class="nm">2</span>)  <span class="cm"># 28→14  out=1024ch</span>
+        self.layer4 = self.<span class="fn">_make_stage</span>(<span class="nm">512</span>, layer_counts[<span class="nm">3</span>], stride=<span class="nm">2</span>)  <span class="cm"># 14→7   out=2048ch</span>
+
+        self.head = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">AdaptiveAvgPool2d</span>((<span class="nm">1</span>, <span class="nm">1</span>)),   <span class="cm"># 7×7 → 1×1  (global average pool)</span>
+            nn.<span class="fn">Flatten</span>(),
+            nn.<span class="fn">Linear</span>(<span class="nm">512</span> * <span class="nm">4</span>, num_classes),  <span class="cm"># 2048 → 1000</span>
+        )
+
+    <span class="kw">def</span> <span class="fn">_make_stage</span>(self, planes, n_blocks, stride):
+        <span class="cm">"""Build one stage: first block may downsample, rest are identity."""</span>
+        blocks = [<span class="cl">Bottleneck</span>(self.in_channels, planes, stride=stride)]
+        self.in_channels = planes * <span class="cl">Bottleneck</span>.expansion
+        <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, n_blocks):
+            blocks.<span class="fn">append</span>(<span class="cl">Bottleneck</span>(self.in_channels, planes))
+        <span class="kw">return</span> nn.<span class="fn">Sequential</span>(*blocks)
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        x = self.stem(x)
+        x = self.layer1(x); x = self.layer2(x)
+        x = self.layer3(x); x = self.layer4(x)
+        <span class="kw">return</span> self.head(x)
+
+
+<span class="cm"># ── Instantiate the three standard sizes ──────────────────</span>
+<span class="kw">def</span> <span class="fn">resnet50</span> (nc=<span class="nm">1000</span>): <span class="kw">return</span> <span class="cl">ResNet</span>([<span class="nm">3</span>, <span class="nm">4</span>,  <span class="nm">6</span>, <span class="nm">3</span>], nc)
+<span class="kw">def</span> <span class="fn">resnet101</span>(nc=<span class="nm">1000</span>): <span class="kw">return</span> <span class="cl">ResNet</span>([<span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">23</span>, <span class="nm">3</span>], nc)
+<span class="kw">def</span> <span class="fn">resnet152</span>(nc=<span class="nm">1000</span>): <span class="kw">return</span> <span class="cl">ResNet</span>([<span class="nm">3</span>, <span class="nm">8</span>, <span class="nm">36</span>, <span class="nm">3</span>], nc)
+
+x = torch.<span class="fn">zeros</span>(<span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">224</span>, <span class="nm">224</span>)
+<span class="kw">for</span> fn, name <span class="kw">in</span> [(<span class="fn">resnet50</span>, <span class="st">'ResNet-50'</span>), (<span class="fn">resnet101</span>, <span class="st">'ResNet-101'</span>), (<span class="fn">resnet152</span>, <span class="st">'ResNet-152'</span>)]:
+    m = <span class="fn">fn</span>()
+    p = <span class="fn">sum</span>(t.<span class="fn">numel</span>() <span class="kw">for</span> t <span class="kw">in</span> m.<span class="fn">parameters</span>())
+    <span class="fn">print</span>(<span class="st">f"{name}  params={p/1e6:.1f}M  out={tuple(m(x).shape)}"</span>)
+<span class="cm"># ResNet-50   params=25.6M  out=(2, 1000)
+# ResNet-101  params=44.5M  out=(2, 1000)
+# ResNet-152  params=60.2M  out=(2, 1000)</span></pre>
+      </div>
+    </div><!-- /as4 -->
+
+    <!-- ── MobileNetV2 ─────────────────────────────────── -->
+    <div id="tab-as5" class="tab-pane">
+      <div class="dyk" style="margin-bottom:16px">
+        <div class="dyk-ico">💡</div>
+        <p><strong>Why MobileNetV2?</strong> It introduces two ideas critical for on-device AI: <strong>depthwise separable convolution</strong> (split spatial + channel mixing → 8–9× cheaper than regular conv) and the <strong>inverted residual block</strong> (expand → depthwise → squeeze, opposite of ResNet's bottleneck). Understanding this block is essential for edge/mobile deployment.</p>
+      </div>
+      <div class="code-wrap">
+        <div class="code-head">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="code-traffic"><span style="background:#FF5F57"></span><span style="background:#FEBC2E"></span><span style="background:#28C840"></span></div>
+            <span class="code-lang-tag">PYTHON  ·  MOBILENETV2  ·  2018  ·  3.5M PARAMS</span>
+          </div>
+          <div class="code-acts">
+            <button class="btn-copy" onclick="cpCode(this)">📋 Copy</button>
+          </div>
+        </div>
+<pre id="raw-as5"><span class="cm"># ══════════════════════════════════════════════════════════
+# MobileNetV2 from Scratch  (Sandler et al., 2018)
+#
+# TWO KEY IDEAS:
+# 1. Depthwise Separable Conv: split a regular Conv2d into
+#    (a) depthwise — 1 filter per channel (spatial mixing)
+#    (b) pointwise — 1×1 conv (channel mixing)
+#    Cost: k²C²  →  k²C + C²  (≈8–9× cheaper for k=3)
+#
+# 2. Inverted Residual Block (IRB): expand → depthwise → squeeze
+#    Skip connection only when stride=1 and channels match.
+#    ReLU6 used instead of ReLU: clips at 6 for fp16/int8 stability.
+# pip install torch
+# ══════════════════════════════════════════════════════════</span>
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+
+<span class="kw">def</span> <span class="fn">conv_bn_relu6</span>(in_c, out_c, stride=<span class="nm">1</span>, groups=<span class="nm">1</span>):
+    <span class="cm">"""Conv → BatchNorm → ReLU6  (basic building brick)"""</span>
+    <span class="kw">return</span> nn.<span class="fn">Sequential</span>(
+        nn.<span class="fn">Conv2d</span>(in_c, out_c, kernel_size=<span class="nm">3</span>, stride=stride,
+                  padding=<span class="nm">1</span>, groups=groups, bias=<span class="kw">False</span>),
+        nn.<span class="fn">BatchNorm2d</span>(out_c),
+        nn.<span class="fn">ReLU6</span>(inplace=<span class="kw">True</span>),
+    )
+
+<span class="kw">def</span> <span class="fn">pointwise_bn_relu6</span>(in_c, out_c):
+    <span class="cm">"""1×1 Conv → BatchNorm → ReLU6  (channel mixer)"""</span>
+    <span class="kw">return</span> nn.<span class="fn">Sequential</span>(
+        nn.<span class="fn">Conv2d</span>(in_c, out_c, kernel_size=<span class="nm">1</span>, bias=<span class="kw">False</span>),
+        nn.<span class="fn">BatchNorm2d</span>(out_c),
+        nn.<span class="fn">ReLU6</span>(inplace=<span class="kw">True</span>),
+    )
+
+
+<span class="kw">class</span> <span class="cl">InvertedResidual</span>(nn.<span class="cl">Module</span>):
+    <span class="cm">"""
+    Inverted Residual Block (the core unit of MobileNetV2):
+      input(C) → expand(C*t) → depthwise 3×3 → squeeze(C') → output
+      t = expansion factor (typically 6); skip only if stride=1 & C==C'
+    """</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, in_c: int, out_c: int, stride: int, expand: int):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        hidden = in_c * expand
+        self.use_skip = (stride == <span class="nm">1</span> <span class="kw">and</span> in_c == out_c)
+
+        layers = []
+        <span class="kw">if</span> expand != <span class="nm">1</span>:
+            layers.<span class="fn">append</span>(<span class="fn">pointwise_bn_relu6</span>(in_c, hidden))   <span class="cm"># 1: expand</span>
+        layers += [
+            <span class="fn">conv_bn_relu6</span>(hidden, hidden, stride=stride, groups=hidden),  <span class="cm"># 2: depthwise</span>
+            nn.<span class="fn">Conv2d</span>(hidden, out_c, kernel_size=<span class="nm">1</span>, bias=<span class="kw">False</span>),           <span class="cm"># 3: squeeze (no relu)</span>
+            nn.<span class="fn">BatchNorm2d</span>(out_c),
+        ]
+        self.conv = nn.<span class="fn">Sequential</span>(*layers)
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        out = self.conv(x)
+        <span class="kw">if</span> self.use_skip:
+            out = out + x  <span class="cm"># skip connection (only when shape matches)</span>
+        <span class="kw">return</span> out
+
+
+<span class="kw">class</span> <span class="cl">MobileNetV2</span>(nn.<span class="cl">Module</span>):
+    <span class="cm"># Table 2 from paper: (expand_ratio, out_channels, n_repeats, stride_first)
+    # First block always has expand=1 (no expansion from input)</span>
+    SETTINGS = [
+        (  <span class="nm">1</span>,  <span class="nm">16</span>, <span class="nm">1</span>, <span class="nm">1</span>),
+        (  <span class="nm">6</span>,  <span class="nm">24</span>, <span class="nm">2</span>, <span class="nm">2</span>),
+        (  <span class="nm">6</span>,  <span class="nm">32</span>, <span class="nm">3</span>, <span class="nm">2</span>),
+        (  <span class="nm">6</span>,  <span class="nm">64</span>, <span class="nm">4</span>, <span class="nm">2</span>),
+        (  <span class="nm">6</span>,  <span class="nm">96</span>, <span class="nm">3</span>, <span class="nm">1</span>),
+        (  <span class="nm">6</span>, <span class="nm">160</span>, <span class="nm">3</span>, <span class="nm">2</span>),
+        (  <span class="nm">6</span>, <span class="nm">320</span>, <span class="nm">1</span>, <span class="nm">1</span>),
+    ]
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, num_classes=<span class="nm">1000</span>, width_mult=<span class="nm">1.0</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        first_c = <span class="fn">int</span>(<span class="nm">32</span> * width_mult)
+
+        <span class="cm"># ── Stem: single regular conv ─────────────────────────</span>
+        self.stem = <span class="fn">conv_bn_relu6</span>(<span class="nm">3</span>, first_c, stride=<span class="nm">2</span>)   <span class="cm"># 224→112</span>
+
+        <span class="cm"># ── Inverted Residual stages ──────────────────────────</span>
+        layers = []
+        in_c = first_c
+        <span class="kw">for</span> t, out_c, n, s <span class="kw">in</span> self.SETTINGS:
+            out_c = <span class="fn">int</span>(out_c * width_mult)
+            <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):
+                stride = s <span class="kw">if</span> i == <span class="nm">0</span> <span class="kw">else</span> <span class="nm">1</span>  <span class="cm"># only first block in group strides</span>
+                layers.<span class="fn">append</span>(<span class="cl">InvertedResidual</span>(in_c, out_c, stride, expand=t))
+                in_c = out_c
+        self.features = nn.<span class="fn">Sequential</span>(*layers)
+
+        <span class="cm"># ── Head ──────────────────────────────────────────────</span>
+        last_c = <span class="fn">int</span>(<span class="nm">1280</span> * width_mult)
+        self.head_conv = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">Conv2d</span>(in_c, last_c, kernel_size=<span class="nm">1</span>, bias=<span class="kw">False</span>),
+            nn.<span class="fn">BatchNorm2d</span>(last_c),
+            nn.<span class="fn">ReLU6</span>(inplace=<span class="kw">True</span>),
+            nn.<span class="fn">AdaptiveAvgPool2d</span>((<span class="nm">1</span>, <span class="nm">1</span>)),
+            nn.<span class="fn">Flatten</span>(),
+            nn.<span class="fn">Dropout</span>(<span class="nm">0.2</span>),
+            nn.<span class="fn">Linear</span>(last_c, num_classes),
+        )
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        x = self.stem(x)
+        x = self.features(x)
+        <span class="kw">return</span> self.head_conv(x)
+
+
+<span class="cm"># ── Verify ─────────────────────────────────────────────────</span>
+x = torch.<span class="fn">zeros</span>(<span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">224</span>, <span class="nm">224</span>)
+<span class="kw">for</span> wm, tag <span class="kw">in</span> [(<span class="nm">1.0</span>, <span class="st">'MobileNetV2-1.0'</span>), (<span class="nm">0.5</span>, <span class="st">'MobileNetV2-0.5'</span>)]:
+    m = <span class="cl">MobileNetV2</span>(width_mult=wm)
+    p = <span class="fn">sum</span>(t.<span class="fn">numel</span>() <span class="kw">for</span> t <span class="kw">in</span> m.<span class="fn">parameters</span>())
+    <span class="fn">print</span>(<span class="st">f"{tag}  params={p/1e6:.2f}M  out={tuple(m(x).shape)}"</span>)
+<span class="cm"># MobileNetV2-1.0  params=3.50M  out=(2, 1000)
+# MobileNetV2-0.5  params=1.97M  out=(2, 1000)  ← half-width for ultra-constrained devices</span></pre>
+      </div>
+    </div><!-- /as5 -->
+
+  </div><!-- /tab-c6 -->
+
+<!-- ════════════════════════════════════════════════════════
      SECTION 8 — METRICS
 ═════════════════════════════════════════════════════════ -->
 <div class="band-page" id="metrics">
@@ -3198,7 +4274,7 @@ val_root   = <span class="st">'data/val'</span>
         </div>
         <div class="step">
           <div class="step-num" style="background:var(--blue-soft);color:var(--blue);width:28px;height:28px;font-size:12px;border-radius:50%">3</div>
-          <div class="step-body"><span class="step-title">Pick your IoU threshold</span><p style="font-size:14px"><strong>mAP@0.5</strong>: prediction counted correct if IoU ≥ 0.5 (PASCAL VOC). <strong>mAP@0.5:0.95</strong>: averaged at 10 thresholds (COCO — much harder).</p></div>
+          <div class="step-body"><span class="step-title">Pick your IoU threshold</span><p style="font-size:14px"><strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bdd0fcedfd8d9388">[email&#160;protected]</a></strong>: prediction counted correct if IoU ≥ 0.5 (PASCAL VOC). <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="214c607161110f14">[email&#160;protected]</a>:0.95</strong>: averaged at 10 thresholds (COCO — much harder).</p></div>
         </div>
       </div>
       <div class="formula">
@@ -3207,7 +4283,7 @@ val_root   = <span class="st">'data/val'</span>
       </div>
     </div>
     <div>
-      <h4 style="color:var(--amber);margin-bottom:16px">YOLOv8 Family — COCO mAP@0.5:0.95</h4>
+      <h4 style="color:var(--amber);margin-bottom:16px">YOLOv8 Family — COCO <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e588a4b5a5d5cbd0">[email&#160;protected]</a>:0.95</h4>
       <div id="mbar"></div>
       <h3 style="margin-top:32px">Which Metric Do I Use?</h3>
       <div style="overflow-x:auto">
@@ -3216,7 +4292,7 @@ val_root   = <span class="st">'data/val'</span>
           <tbody>
             <tr><td>Image Classification</td><td><span class="badge bb">Top-1 Accuracy</span></td></tr>
             <tr><td>Imbalanced Classification</td><td><span class="badge ba">F1 / AUC-ROC</span></td></tr>
-            <tr><td>Object Detection</td><td><span class="badge bg">mAP@0.5:0.95</span></td></tr>
+            <tr><td>Object Detection</td><td><span class="badge bg"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="630e223323534d56">[email&#160;protected]</a>:0.95</span></td></tr>
             <tr><td>Medical Diagnosis</td><td><span class="badge br">Recall / Sensitivity</span></td></tr>
             <tr><td>Semantic Segmentation</td><td><span class="badge bb">mIoU</span></td></tr>
             <tr><td>Spam / Fraud Detection</td><td><span class="badge ba">F1 + Precision</span></td></tr>
@@ -3238,7 +4314,7 @@ val_root   = <span class="st">'data/val'</span>
 <!-- ════════════════════════════════════════════════════════
      JAVASCRIPT
 ═════════════════════════════════════════════════════════ -->
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ── PROGRESS BAR ───────────────────────────────────────────
 window.addEventListener('scroll', () => {
   const s = document.documentElement;
@@ -3254,9 +4330,23 @@ new IntersectionObserver(entries => {
 // ── TABS ───────────────────────────────────────────────────
 function swTab(id, groupId) {
   const grp = document.getElementById(groupId);
-  grp.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('on'));
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('on'));
+  if (!grp) return;
+  // Find only the direct sibling pane container (parent of .tab-pane siblings)
+  // by collecting pane IDs that buttons in THIS group reference, then toggling only those.
+  const siblingIds = [];
+  grp.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.remove('on');
+    const m = b.getAttribute('onclick')?.match(/'([^']+)'/);
+    if (m) siblingIds.push('tab-' + m[1]);
+  });
+  // Hide only the panes that belong to this tab group
+  siblingIds.forEach(pid => {
+    const el = document.getElementById(pid);
+    if (el) el.classList.remove('on');
+  });
+  // Show the chosen pane
   document.getElementById('tab-' + id)?.classList.add('on');
+  // Mark the active button
   grp.querySelectorAll('.tab-btn').forEach(b => {
     if (b.getAttribute('onclick')?.includes(`'${id}'`)) b.classList.add('on');
   });
@@ -4238,20 +5328,10 @@ showDet('yolo');
   wrap.innerHTML = models.map(m => `
     <div class="prog-row">
       <div class="prog-top"><span>${m.name}</span><span style="color:${m.color};font-family:var(--mono)">${m.map} mAP</span></div>
-      <div class="prog-bar"><div class="prog-fill" style="width:0%;background:${m.color}" data-w="${m.pct}%"></div></div>
+      <div class="prog-bar-bg" style="height:8px;background:var(--surface2);border-radius:6px;overflow:hidden">
+        <div style="height:100%;width:${m.pct}%;background:${m.color};border-radius:6px;transition:width .8s ease"></div>
+      </div>
     </div>`).join('');
-
-  new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.querySelectorAll('.prog-fill').forEach(bar => {
-          const w = bar.dataset.w;
-          bar.style.width = '0';
-          requestAnimationFrame(() => setTimeout(() => bar.style.width = w, 60));
-        });
-      }
-    });
-  }, { threshold: 0.3 }).observe(wrap);
 })();
 </script>
 </body>

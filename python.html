@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PyPath — Python for Data Science</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #07070a;
+    --bg2:     #0c0c10;
+    --bg3:     #111116;
+    --card:    #0f0f14;
+    --card2:   #141419;
+    --border:  #1c1c24;
+    --border2: #252530;
+    --accent:  #7c6af7;
+    --accent-dim: rgba(124,106,247,0.12);
+    --accent-glow: rgba(124,106,247,0.25);
+    --sky:     #38bdf8;
+    --sky-dim: rgba(56,189,248,0.1);
+    --amber:   #f59e0b;
+    --amber-dim: rgba(245,158,11,0.1);
+    --rose:    #fb7185;
+    --rose-dim: rgba(251,113,133,0.1);
+    --emerald: #34d399;
+    --emerald-dim: rgba(52,211,153,0.08);
+    --text:    #ededf5;
+    --text2:   #7e7e9a;
+    --text3:   #3e3e52;
+    --code-bg: #06060a;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── GRAIN TEXTURE ── */
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 999;
+    pointer-events: none;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 8px; }
+
+  /* ─────────────────────── HEADER ─────────────────────── */
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem;
+    background: rgba(7,7,10,0.8);
+    backdrop-filter: blur(24px) saturate(180%);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: -0.03em;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .logo-mark {
+    width: 26px; height: 26px;
+    background: var(--accent);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+    color: #fff;
+    font-weight: 800;
+    flex-shrink: 0;
+    box-shadow: 0 0 16px var(--accent-glow);
+  }
+  .logo-text { color: var(--text); }
+  .logo-text span { color: var(--text2); font-weight: 400; }
+
+  nav { display: flex; gap: 2px; }
+  nav button {
+    background: none; border: none;
+    color: var(--text2);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.83rem; font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  nav button:hover { color: var(--text); background: var(--bg3); }
+  nav button.active { color: var(--text); background: var(--card2); }
+
+  /* ─────────────────────── HERO ─────────────────────── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 7rem 2rem 5rem;
+    position: relative; overflow: hidden;
+  }
+
+  /* Radial gradient blobs */
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 20%; left: 50%;
+    transform: translateX(-50%);
+    width: 700px; height: 400px;
+    background: radial-gradient(ellipse, rgba(124,106,247,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-grid {
+    position: absolute; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 60% 70% at 50% 40%, black 0%, transparent 80%);
+    opacity: 0.5;
+  }
+
+  .hero-content { position: relative; z-index: 1; max-width: 780px; }
+
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    border: 1px solid var(--border2);
+    background: var(--card);
+    color: var(--text2);
+    font-size: 0.75rem; font-weight: 500;
+    padding: 5px 14px 5px 10px;
+    border-radius: 100px;
+    margin-bottom: 2rem;
+    letter-spacing: 0.02em;
+    animation: fadeUp 0.5s ease both;
+  }
+  .hero-eyebrow-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+    animation: blink 2.4s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  h1 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: clamp(3rem, 7.5vw, 5.8rem);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -0.04em;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.5s 0.08s ease both;
+  }
+
+  h1 em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--sky) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 1.05rem; font-weight: 300;
+    color: var(--text2);
+    max-width: 500px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.75;
+    animation: fadeUp 0.5s 0.16s ease both;
+  }
+
+  .hero-actions {
+    display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+    animation: fadeUp 0.5s 0.24s ease both;
+  }
+
+  .btn-p {
+    background: var(--accent);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600; font-size: 0.875rem;
+    padding: 10px 22px;
+    border-radius: 9px; border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.5), 0 0 0 1px rgba(124,106,247,0.4);
+  }
+  .btn-p:hover { background: #8b7bf8; transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-glow), 0 0 0 1px rgba(124,106,247,0.5); }
+
+  .btn-s {
+    background: var(--card2);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500; font-size: 0.875rem;
+    padding: 10px 22px;
+    border-radius: 9px;
+    border: 1px solid var(--border2);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-s:hover { background: var(--bg3); border-color: #35354a; }
+
+  .hero-stats {
+    display: flex; gap: 0; margin-top: 5rem;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    animation: fadeUp 0.5s 0.32s ease both;
+    background: var(--card);
+  }
+  .stat {
+    flex: 1; padding: 1.25rem 1.5rem;
+    text-align: center;
+    border-right: 1px solid var(--border);
+  }
+  .stat:last-child { border-right: none; }
+  .stat-n {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 1.8rem; font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--text);
+  }
+  .stat-n span { color: var(--accent); }
+  .stat-l { font-size: 0.72rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(20px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* ─────────────────────── MAIN ─────────────────────── */
+  main {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 8rem;
+    position: relative; z-index: 1;
+  }
+
+  /* ─────────────────────── LEVEL TABS ─────────────────────── */
+  .level-tabs {
+    display: flex; gap: 4px;
+    padding: 4px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 2.5rem;
+    position: sticky; top: 68px; z-index: 50;
+    backdrop-filter: blur(24px);
+    background: rgba(15,15,20,0.9);
+  }
+
+  .level-tab {
+    flex: 1; background: none; border: none;
+    color: var(--text2);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+  }
+  .level-tab:hover { color: var(--text); background: var(--bg3); }
+  .level-tab.active {
+    background: var(--card2);
+    color: var(--text);
+    border: 1px solid var(--border2);
+    box-shadow: 0 1px 8px rgba(0,0,0,0.4);
+  }
+  .level-tab .pip {
+    width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  }
+  .beginner   .pip { background: var(--emerald); }
+  .intermediate .pip { background: var(--sky); }
+  .advanced   .pip { background: var(--amber); }
+  .challenges .pip { background: var(--rose); }
+  .level-tab.active.beginner   { color: var(--emerald); border-color: rgba(52,211,153,0.2); }
+  .level-tab.active.intermediate { color: var(--sky);   border-color: rgba(56,189,248,0.2); }
+  .level-tab.active.advanced   { color: var(--amber);   border-color: rgba(245,158,11,0.2); }
+  .level-tab.active.challenges { color: var(--rose);    border-color: rgba(251,113,133,0.2); }
+
+  /* ─────────────────────── PANELS ─────────────────────── */
+  .panel { display: none; }
+  .panel.active { display: block; animation: panelIn 0.35s ease; }
+  @keyframes panelIn {
+    from { opacity:0; transform:translateY(10px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* ─────────────────────── SECTION HEADER ─────────────────────── */
+  .section-header { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+  .section-level {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    margin-bottom: 0.75rem;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-level::before {
+    content: '';
+    display: inline-block;
+    width: 20px; height: 1px;
+    background: currentColor;
+    opacity: 0.5;
+  }
+  .sh-b { color: var(--emerald); }
+  .sh-i { color: var(--sky); }
+  .sh-a { color: var(--amber); }
+  .sh-c { color: var(--rose); }
+
+  .section-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 1.9rem; font-weight: 800;
+    letter-spacing: -0.035em;
+    margin-bottom: 0.5rem;
+  }
+  .section-desc { color: var(--text2); font-size: 0.92rem; max-width: 540px; }
+
+  /* ─────────────────────── TOPIC ACCORDION ─────────────────────── */
+  .topic-list { display: flex; flex-direction: column; gap: 1px; }
+
+  .topic {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+    margin-bottom: 8px;
+  }
+  .topic:hover { border-color: var(--border2); }
+  .topic.open { border-color: var(--border2); }
+
+  .topic-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 1.25rem;
+    cursor: pointer; user-select: none; gap: 12px;
+  }
+  .topic-left { display: flex; align-items: center; gap: 12px; }
+
+  .topic-idx {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; font-weight: 500;
+    color: var(--text3);
+    min-width: 24px;
+  }
+  .topic-name {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 600; font-size: 0.95rem;
+    letter-spacing: -0.01em;
+  }
+  .topic-tag {
+    font-size: 0.68rem; font-weight: 600;
+    padding: 3px 9px; border-radius: 100px;
+    letter-spacing: 0.04em;
+  }
+  .tg-b { background: var(--emerald-dim); color: var(--emerald); }
+  .tg-i { background: var(--sky-dim);     color: var(--sky); }
+  .tg-a { background: var(--amber-dim);   color: var(--amber); }
+
+  .topic-chevron {
+    color: var(--text3); font-size: 0.75rem;
+    transition: transform 0.25s;
+    flex-shrink: 0;
+  }
+  .topic.open .topic-chevron { transform: rotate(180deg); }
+
+  .topic-body {
+    display: none;
+    padding: 0 1.25rem 1.25rem;
+    border-top: 1px solid var(--border);
+  }
+  .topic.open .topic-body { display: block; animation: bodyIn 0.25s ease; }
+  @keyframes bodyIn { from{opacity:0} to{opacity:1} }
+
+  /* ─────────────────────── THEORY ─────────────────────── */
+  .theory {
+    padding: 1rem 0 0.75rem;
+    color: var(--text2); font-size: 0.9rem; line-height: 1.8;
+  }
+  .theory h4 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700; font-size: 0.88rem;
+    color: var(--text); margin: 1rem 0 0.35rem;
+    letter-spacing: -0.01em;
+  }
+  .theory ul, .theory ol { padding-left: 1.4rem; margin: 0.4rem 0; }
+  .theory li { margin-bottom: 0.2rem; }
+  .theory code {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(124,106,247,0.1);
+    color: var(--accent); font-size: 0.82em;
+    padding: 0.1em 0.4em; border-radius: 4px;
+    border: 1px solid rgba(124,106,247,0.15);
+  }
+
+  /* ─────────────────────── CODE BLOCK ─────────────────────── */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 1rem 0;
+    overflow: hidden;
+  }
+  .code-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 14px;
+    background: #0a0a0e;
+    border-bottom: 1px solid var(--border);
+  }
+  .code-dots { display: flex; gap: 6px; }
+  .code-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .d1{background:#ff5f57} .d2{background:#ffbd2e} .d3{background:#28ca41}
+  .code-lang {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem; font-weight: 600;
+    color: var(--text3); text-transform: uppercase; letter-spacing: 0.12em;
+  }
+  .copy-btn {
+    background: none; border: 1px solid var(--border2);
+    color: var(--text3); font-family: 'DM Sans', sans-serif;
+    font-size: 0.7rem; padding: 3px 10px;
+    border-radius: 5px; cursor: pointer; transition: all 0.18s;
+  }
+  .copy-btn:hover { color: var(--text); border-color: var(--text3); }
+  .copy-btn.copied { color: var(--emerald); border-color: rgba(52,211,153,0.4); }
+
+  pre {
+    padding: 1.1rem 1.25rem;
+    overflow-x: auto;
+    font-size: 0.83rem;
+    line-height: 1.75;
+  }
+  pre code {
+    font-family: 'JetBrains Mono', monospace;
+    color: #9ca3af; background: none !important; padding: 0 !important;
+  }
+
+  /* Syntax colors — muted, professional */
+  .kw  { color: #c084fc; }     /* keywords — soft purple */
+  .fn  { color: #60a5fa; }     /* functions — soft blue */
+  .str { color: #86efac; }     /* strings — soft green */
+  .num { color: #f9a8d4; }     /* numbers — soft pink */
+  .cm  { color: #4b5563; font-style: italic; }  /* comments */
+  .cls { color: #fcd34d; }     /* classes — amber */
+  .dec { color: #c084fc; }     /* decorators */
+
+  /* ─────────────────────── OUTPUT BLOCK ─────────────────────── */
+  .output-block {
+    background: #04040a;
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 0.8rem 1.25rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem; line-height: 1.7;
+    color: #6ee7b7;
+    margin-top: -10px;
+  }
+  .output-label {
+    font-size: 0.6rem; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--text3);
+    margin-bottom: 0.4rem;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ─────────────────────── INFO BOX ─────────────────────── */
+  .info-box {
+    display: flex; gap: 10px;
+    border-radius: 8px;
+    padding: 0.875rem 1.1rem;
+    margin: 0.9rem 0;
+    font-size: 0.855rem;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+  .info-box.tip  { background: var(--emerald-dim); border: 1px solid rgba(52,211,153,0.12); }
+  .info-box.warn { background: var(--amber-dim);   border: 1px solid rgba(245,158,11,0.12); }
+  .info-box.note { background: var(--sky-dim);     border: 1px solid rgba(56,189,248,0.12); }
+  .info-box-icon { flex-shrink: 0; margin-top: 1px; }
+
+  /* ─────────────────────── CHALLENGES ─────────────────────── */
+  .challenges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+
+  .challenge-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.4rem;
+    position: relative; overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .challenge-card:hover { transform: translateY(-2px); border-color: var(--border2); }
+
+  .challenge-card::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    opacity: 0.6;
+  }
+  .challenge-card.easy::after   { background: linear-gradient(90deg, var(--emerald), transparent 60%); }
+  .challenge-card.medium::after { background: linear-gradient(90deg, var(--sky),     transparent 60%); }
+  .challenge-card.hard::after   { background: linear-gradient(90deg, var(--amber),   transparent 60%); }
+  .challenge-card.expert::after { background: linear-gradient(90deg, var(--rose),    transparent 60%); }
+
+  .ch-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+  .ch-num { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--text3); }
+  .ch-badge {
+    font-size: 0.65rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 3px 9px; border-radius: 100px;
+  }
+  .easy   .ch-badge { background: var(--emerald-dim); color: var(--emerald); }
+  .medium .ch-badge { background: var(--sky-dim);     color: var(--sky); }
+  .hard   .ch-badge { background: var(--amber-dim);   color: var(--amber); }
+  .expert .ch-badge { background: var(--rose-dim);    color: var(--rose); }
+
+  .ch-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700; font-size: 1rem;
+    letter-spacing: -0.015em; margin-bottom: 0.5rem;
+  }
+  .ch-desc { color: var(--text2); font-size: 0.855rem; line-height: 1.65; margin-bottom: 1.1rem; }
+
+  .ch-reveal {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem; font-weight: 500;
+    padding: 8px;
+    border-radius: 7px; cursor: pointer;
+    transition: all 0.18s;
+  }
+  .ch-reveal:hover { color: var(--text); border-color: #35354a; background: var(--card2); }
+
+  .ch-answer { display: none; margin-top: 1rem; animation: bodyIn 0.25s ease; }
+  .ch-answer.open { display: block; }
+
+  /* ─────────────────────── RESPONSIVE ─────────────────────── */
+  @media (max-width: 640px) {
+    h1 { font-size: 2.6rem; }
+    nav { display: none; }
+    .hero-stats { border-radius: 12px; }
+    .stat { padding: 1rem; }
+    .challenges-grid { grid-template-columns: 1fr; }
+    .level-tab .lbl { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-mark">Py</div>
+    <div class="logo-text">Path <span>/ Data Science</span></div>
+  </div>
+  <nav>
+    <button onclick="gotoMain()" class="active">Learn</button>
+    <button onclick="switchTab('challenges')">Challenges</button>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-dot"></div>
+      Structured Learning Path · Data Science Track
+    </div>
+    <h1>Python for<br><em>Data & Analytics</em></h1>
+    <p class="hero-sub">
+      From syntax to production-ready data pipelines. Theory, annotated code examples, and real challenges — all in one place.
+    </p>
+    <div class="hero-actions">
+      <button class="btn-p" onclick="gotoMain()">Start Learning</button>
+      <button class="btn-s" onclick="switchTab('challenges')">View Challenges</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-n">4<span>+</span></div><div class="stat-l">Levels</div></div>
+      <div class="stat"><div class="stat-n">20<span>+</span></div><div class="stat-l">Topics</div></div>
+      <div class="stat"><div class="stat-n">50<span>+</span></div><div class="stat-l">Examples</div></div>
+      <div class="stat"><div class="stat-n">8<span>+</span></div><div class="stat-l">Challenges</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<main id="main">
+
+  <!-- TABS -->
+  <div class="level-tabs">
+    <button class="level-tab beginner active"    onclick="switchTab('beginner')"><span class="pip"></span><span class="lbl">Beginner</span></button>
+    <button class="level-tab intermediate"       onclick="switchTab('intermediate')"><span class="pip"></span><span class="lbl">Intermediate</span></button>
+    <button class="level-tab advanced"           onclick="switchTab('advanced')"><span class="pip"></span><span class="lbl">Advanced & DS</span></button>
+    <button class="level-tab challenges"         onclick="switchTab('challenges')"><span class="pip"></span><span class="lbl">Challenges</span></button>
+  </div>
+
+  <!-- ══════════════ BEGINNER ══════════════ -->
+  <div class="panel active" id="panel-beginner">
+    <div class="section-header">
+      <div class="section-level sh-b">Level 01 · Beginner</div>
+      <div class="section-title">Python Fundamentals</div>
+      <div class="section-desc">No prior experience needed. Build a solid foundation in syntax, types, control flow, and data structures.</div>
+    </div>
+    <div class="topic-list">
+
+      <!-- 01 Variables -->
+      <div class="topic open" id="t1">
+        <div class="topic-header" onclick="tog('t1')">
+          <div class="topic-left"><span class="topic-idx">01</span><span class="topic-name">Variables & Data Types</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="topic-tag tg-b">Core</span><span class="topic-chevron">▾</span></div>
+        </div>
+        <div class="topic-body">
+          <div class="theory">
+            <p>Python is <strong>dynamically typed</strong> — no need to declare types. The interpreter infers them at runtime from the assigned value.</p>
+            <h4>Core Types</h4>
+            <ul>
+              <li><code>int</code> — whole numbers: <code>42</code>, <code>-7</code></li>
+              <li><code>float</code> — decimals: <code>3.14</code>, <code>1e-5</code></li>
+              <li><code>str</code> — text: <code>"hello"</code> or <code>'world'</code></li>
+              <li><code>bool</code> — <code>True</code> / <code>False</code></li>
+              <li><code>NoneType</code> — absence of a value: <code>None</code></li>
+            </ul>
+            <h4>Type Conversion</h4>
+            <p>Use built-in functions: <code>int()</code>, <code>float()</code>, <code>str()</code>, <code>bool()</code> to convert between types explicitly.</p>
+          </div>
+          <div class="code-block">
+            <div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="cm"># Variable assignment — no type declaration needed</span>
+name    = <span class="str">"Arjun"</span>
+age     = <span class="num">24</span>
+gpa     = <span class="num">8.9</span>
+is_ds   = <span class="kw">True</span>
+city    = <span class="kw">None</span>
+
+<span class="cm"># Inspect types at runtime</span>
+<span class="fn">print</span>(<span class="fn">type</span>(name))     <span class="cm"># &lt;class 'str'&gt;</span>
+<span class="fn">print</span>(<span class="fn">type</span>(age))      <span class="cm"># &lt;class 'int'&gt;</span>
+
+<span class="cm"># Multiple assignment in one line</span>
+x, y, z = <span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>
+
+<span class="cm"># Type conversion</span>
+score_str = <span class="str">"95"</span>
+score_int = <span class="fn">int</span>(score_str)           <span class="cm"># 95</span>
+score_flt = <span class="fn">float</span>(score_str)         <span class="cm"># 95.0</span>
+label     = <span class="fn">str</span>(score_int) + <span class="str">" pts"</span>   <span class="cm"># "95 pts"</span>
+
+<span class="fn">print</span>(score_int, score_flt, label)</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">Output</div>&lt;class 'str'&gt;<br>&lt;class 'int'&gt;<br>95  95.0  95 pts</div>
+          <div class="info-box tip"><span class="info-box-icon">💡</span><span>Use <code>type()</code> and <code>isinstance(x, int)</code> to inspect types at runtime — critical when debugging data pipelines with mixed-type columns.</span></div>
+        </div>
+      </div>
+
+      <!-- 02 Strings -->
+      <div class="topic" id="t2">
+        <div class="topic-header" onclick="tog('t2')">
+          <div class="topic-left"><span class="topic-idx">02</span><span class="topic-name">Strings & String Manipulation</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="topic-tag tg-b">Core</span><span class="topic-chevron">▾</span></div>
+        </div>
+        <div class="topic-body">
+          <div class="theory">
+            <p>Strings are <strong>immutable sequences</strong> of characters. Python provides a rich set of built-in methods for text processing — essential for data cleaning.</p>
+            <h4>f-Strings (Python 3.6+)</h4>
+            <p>The modern, preferred way to format strings. Supports inline expressions: <code>f"Value: {score:.2f}"</code></p>
+            <h4>Key Methods</h4>
+            <ul>
+              <li><code>.upper()</code>, <code>.lower()</code>, <code>.title()</code> — case</li>
+              <li><code>.strip()</code>, <code>.lstrip()</code>, <code>.rstrip()</code> — whitespace</li>
+              <li><code>.split(sep)</code>, <code>sep.join(list)</code> — split / join</li>
+              <li><code>.replace(old, new)</code>, <code>.find(sub)</code> — search</li>
+              <li><code>.startswith()</code>, <code>.endswith()</code> — prefix / suffix</li>
+            </ul>
+          </div>
+          <div class="code-block">
+            <div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code>name  = <span class="str">"  data science  "</span>
+score = <span class="num">92.5</span>
+
+<span class="cm"># f-string — embed expressions directly</span>
+msg = <span class="fn">f</span><span class="str">"Score: {score:.1f}%  →  {'Pass' if score >= 60 else 'Fail'}"</span>
+<span class="fn">print</span>(msg)
+
+<span class="cm"># Common cleaning pipeline</span>
+clean  = name.<span class="fn">strip</span>().<span class="fn">title</span>()        <span class="cm"># "Data Science"</span>
+words  = clean.<span class="fn">split</span>(<span class="str">" "</span>)             <span class="cm"># ['Data', 'Science']</span>
+slug   = <span class="str">"_"</span>.<span class="fn">join</span>(words).<span class="fn">lower</span>()     <span class="cm"># "data_science"</span>
+
+<span class="fn">print</span>(clean, words, slug, sep=<span class="str">"\n"</span>)
+
+<span class="cm"># Slicing  [start:stop:step]</span>
+s = <span class="str">"Python3.11"</span>
+<span class="fn">print</span>(s[:<span class="num">6</span>])      <span class="cm"># Python</span>
+<span class="fn">print</span>(s[::<span class="num">-1</span>])    <span class="cm"># reversed</span>
+<span class="fn">print</span>(<span class="fn">len</span>(s))     <span class="cm"># 10</span></code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">Output</div>Score: 92.5%  →  Pass<br>Data Science<br>['Data', 'Science']<br>data_science<br>Python<br>11.3nohtyP<br>10</div>
+        </div>
+      </div>
+
+      <!-- 03 Control Flow -->
+      <div class="topic" id="t3">
+        <div class="topic-header" onclick="tog('t3')">
+          <div class="topic-left"><span class="topic-idx">03</span><span class="topic-name">Control Flow — if / elif / else</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="topic-tag tg-b">Core</span><span class="topic-chevron">▾</span></div>
+        </div>
+        <div class="topic-body">
+          <div class="theory">
+            <p>Python uses <strong>indentation (4 spaces)</strong> to define code blocks — no curly braces. Comparison operators: <code>==</code> <code>!=</code> <code>&lt;</code> <code>&gt;</code> <code>&lt;=</code> <code>&gt;=</code>. Logical: <code>and</code> <code>or</code> <code>not</code>.</p>
+            <h4>Ternary Expression</h4>
+            <p><code>result = x if condition else y</code> — a concise one-liner conditional.</p>
+            <h4>Truthy / Falsy</h4>
+            <p>Falsy: <code>0</code>, <code>""</code>, <code>[]</code>, <code>{}</code>, <code>None</code>, <code>False</code>. All else is truthy — useful for quick null-checks.</p>
+          </div>
+          <div class="code-block">
+            <div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="kw">def</span> <span class="fn">grade_report</span>(score):
+    <span class="kw">if</span>   score >= <span class="num">90</span>: grade = <span class="str">"A"</span>
+    <span class="kw">elif</span> score >= <span class="num">80</span>: grade = <span class="str">"B"</span>
+    <span class="kw">elif</span> score >= <span class="num">70</span>: grade = <span class="str">"C"</span>
+    <span class="kw">else</span>:             grade = <span class="str">"F"</span>
+
+    status = <span class="str">"Pass"</span> <span class="kw">if</span> score >= <span class="num">60</span> <span class="kw">else</span> <span class="str">"Fail"</span>
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"Score {score:3d} → Grade {grade} ({status})"</span>)
+
+grade_report(<span class="num">95</span>)
+grade_report(<span class="num">72</span>)
+grade_report(<span class="num">45</span>)
+
+<span class="cm"># Membership operator</span>
+skills = [<span class="str">"Python"</span>, <span class="str">"SQL"</span>, <span class="str">"Pandas"</span>]
+<span class="kw">if</span> <span class="str">"Python"</span> <span class="kw">in</span> skills:
+    <span class="fn">print</span>(<span class="str">"Python found in skillset"</span>)</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">Output</div>Score  95 → Grade A (Pass)<br>Score  72 → Grade C (Pass)<br>Score  45 → Grade F (Fail)<br>Python found in skillset</div>
+        </div>
+      </div>
+
+      <!-- 04 Loops -->
+      <div class="topic" id="t4">
+        <div class="topic-header" onclick="tog('t4')">
+          <div class="topic-left"><span class="topic-idx">04</span><span class="topic-name">Loops — for & while</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="topic-tag tg-b">Core</span><span class="topic-chevron">▾</span></div>
+        </div>
+        <div class="topic-body">
+          <div class="theory">
+            <p><code>for</code> loops iterate over any iterable. <code>while</code> loops run while a condition holds. Control with <code>break</code>, <code>continue</code>, and the loop <code>else</code> clause.</p>
+            <h4>Power Tools</h4>
+            <ul>
+              <li><code>range(start, stop, step)</code> — integer sequences</li>
+              <li><code>enumerate(it)</code> — index + value pairs</li>
+              <li><code>zip(a, b)</code> — pair elements from two iterables</li>
+              <li><code>reversed(seq)</code>, <code>sorted(seq)</code> — order control</li>
+            </ul>
+          </div>
+          <div class="code-block">
+            <div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code>scores = [<span class="num">88</span>, <span class="num">74</span>, <span class="num">95</span>, <span class="num">61</span>, <span class="num">82</span>]
+names  = [<span class="str">"Alice"</span>, <span class="str">"Bob"</span>, <span class="str">"Carol"</span>, <span class="str">"Dave"</span>, <span class="str">"Eve"</span>]
+
+<span class="cm"># enumerate — get index AND value</span>
+<span class="kw">for</span> i, score <span class="kw">in</span> <span class="fn">enumerate</span>(scores):
+    <span class="kw">if</span> score >= <span class="num">80</span>:
+        <span class="fn">print</span>(<span class="fn">f</span><span class="str">"[{i}] {score} — top performer"</span>)
+
+<span class="cm"># zip — pair two lists together</span>
+<span class="kw">for</span> name, score <span class="kw">in</span> <span class="fn">zip</span>(names, scores):
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"{name:<8} {score}"</span>)
+
+<span class="cm"># range — sum 1 to 10</span>
+total = <span class="fn">sum</span>(<span class="fn">range</span>(<span class="num">1</span>, <span class="num">11</span>))
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"Sum 1-10 = {total}"</span>)</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">Output</div>[0] 88 — top performer<br>[2] 95 — top performer<br>[4] 82 — top performer<br>Alice    88 / Bob     74 / ...<br>Sum 1-10 = 55</div>
+        </div>
+      </div>
+
+      <!-- 05 Lists -->
+      <div class="topic" id="t5">
+        <div class="topic-header" onclick="tog('t5')">
+          <div class="topic-left"><span class="topic-idx">05</span><span class="topic-name">Lists, Tuples & Sets</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="topic-tag tg-b">Collections</span><span class="topic-chevron">▾</span></div>
+        </div>
+        <div class="topic-body">
+          <div class="theory">
+            <h4>List</h4><p><strong>Ordered, mutable, allows duplicates.</strong> The workhorse collection. Supports indexing, slicing, in-place sorting.</p>
+            <h4>Tuple</h4><p><strong>Ordered, immutable.</strong> For fixed data (coordinates, DB rows). Faster than lists; hashable so usable as dict keys.</p>
+            <h4>Set</h4><p><strong>Unordered, unique elements.</strong> O(1) membership test. Use for deduplication and set operations (union, intersection, difference).</p>
+          </div>
+          <div class="code-block">
+            <div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="cm"># LIST</span>
+features = [<span class="str">"age"</span>, <span class="str">"income"</span>, <span class="str">"score"</span>]
+features.<span class="fn">append</span>(<span class="str">"grade"</span>)
+features.<span class="fn">insert</span>(<span class="num">1</span>, <span class="str">"city"</span>)
+features.<span class="fn">remove</span>(<span class="str">"score"</span>)
+<span class="fn">print</span>(features)
+
+nums = <span class="fn">list</span>(<span class="fn">range</span>(<span class="num">10</span>))
+<span class="fn">print</span>(nums[<span class="num">2</span>:<span class="num">7</span>])        <span class="cm"># [2,3,4,5,6]</span>
+<span class="fn">print</span>(nums[::<span class="num">2</span>])        <span class="cm"># [0,2,4,6,8]</span>
+
+<span class="cm"># TUPLE — immutable record</span>
+point = (<span class="num">28.6</span>, <span class="num">77.2</span>)    <span class="cm"># lat, lon</span>
+lat, lon = point          <span class="cm"># unpacking</span>
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"Lat: {lat}, Lon: {lon}"</span>)
+
+<span class="cm"># SET — deduplicate tags</span>
+raw  = [<span class="str">"ML"</span>, <span class="str">"AI"</span>, <span class="str">"ML"</span>, <span class="str">"Python"</span>, <span class="str">"AI"</span>]
+uniq = <span class="fn">set</span>(raw)
+<span class="fn">print</span>(uniq)               <span class="cm"># {'ML','AI','Python'}</span>
+
+<span class="cm"># Set operations</span>
+a = {<span class="str">"Python"</span>, <span class="str">"SQL"</span>, <span class="str">"R"</span>}
+b = {<span class="str">"Python"</span>, <span class="str">"Spark"</span>, <span class="str">"R"</span>}
+<span class="fn">print</span>(a & b)  <span class="cm"># intersection → {'Python','R'}</span>
+<span class="fn">print</span>(a | b)  <span class="cm"># union</span>
+<span class="fn">print</span>(a - b)  <span class="cm"># difference → {'SQL'}</span></code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">Output</div>['age', 'city', 'income', 'grade']<br>[2, 3, 4, 5, 6]  /  [0, 2, 4, 6, 8]<br>Lat: 28.6, Lon: 77.2<br>{'ML', 'AI', 'Python'}<br>{'Python', 'R'}  /  {'Python','SQL','R','Spark'}  /  {'SQL'}</div>
+        </div>
+      </div>
+
+      <!-- 06 Dicts -->
+      <div class="topic" id="t6">
+        <div class="topic-header" onclick="tog('t6')">
+          <div class="topic-left"><span class="topic-idx">06</span><span class="topic-name">Dictionaries</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="topic-tag tg-b">Collections</span><span class="topic-chevron">▾</span></div>
+        </div>
+        <div class="topic-body">
+          <div class="theory">
+            <p>Dicts store <strong>key-value pairs</strong> with O(1) lookup. Since Python 3.7+ they maintain insertion order. Essential for feature engineering, counting, and grouping.</p>
+            <h4>Key Methods</h4>
+            <ul>
+              <li><code>.keys()</code>, <code>.values()</code>, <code>.items()</code> — iterate</li>
+              <li><code>.get(key, default)</code> — safe access (no KeyError)</li>
+              <li><code>.update(other)</code> — merge two dicts</li>
+              <li><code>.pop(key)</code> — remove and return</li>
+              <li><code>dict | other</code> — merge (Python 3.9+)</li>
+            </ul>
+          </div>
+          <div class="code-block">
+            <div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="cm"># A "row" of data</span>
+student = {
+    <span class="str">"name"</span>  : <span class="str">"Priya"</span>,
+    <span class="str">"age"</span>   : <span class="num">22</span>,
+    <span class="str">"scores"</span>: [<span class="num">88</span>, <span class="num">92</span>, <span class="num">79</span>],
+}
+
+<span class="fn">print</span>(student[<span class="str">"name"</span>])
+<span class="fn">print</span>(student.<span class="fn">get</span>(<span class="str">"gpa"</span>, <span class="str">"N/A"</span>))    <span class="cm"># safe default</span>
+
+<span class="kw">for</span> k, v <span class="kw">in</span> student.<span class="fn">items</span>():
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"  {k}: {v}"</span>)
+
+<span class="cm"># Word frequency — a classic DS task</span>
+text  = <span class="str">"data science data analytics data python"</span>
+count = {}
+<span class="kw">for</span> word <span class="kw">in</span> text.<span class="fn">split</span>():
+    count[word] = count.<span class="fn">get</span>(word, <span class="num">0</span>) + <span class="num">1</span>
+
+sorted_wf = <span class="fn">sorted</span>(count.<span class="fn">items</span>(), key=<span class="kw">lambda</span> x: -x[<span class="num">1</span>])
+<span class="fn">print</span>(sorted_wf)</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">Output</div>Priya<br>N/A<br>  name: Priya / age: 22 / scores: [88,92,79]<br>[('data',3),('science',1),('analytics',1),('python',1)]</div>
+        </div>
+      </div>
+
+      <!-- 07 Functions -->
+      <div class="topic" id="t7">
+        <div class="topic-header" onclick="tog('t7')">
+          <div class="topic-left"><span class="topic-idx">07</span><span class="topic-name">Functions</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="topic-tag tg-b">Core</span><span class="topic-chevron">▾</span></div>
+        </div>
+        <div class="topic-body">
+          <div class="theory">
+            <p>Functions are first-class objects in Python — they can be passed as arguments and returned from other functions. Support default args, keyword args, <code>*args</code>, and <code>**kwargs</code>.</p>
+            <h4>Best Practices</h4>
+            <ul>
+              <li>Write a <strong>docstring</strong> immediately after <code>def</code></li>
+              <li>Follow the single-responsibility principle</li>
+              <li>Return multiple values as a tuple: <code>return mean, std</code></li>
+              <li>Use type hints for clarity: <code>def fn(x: float) -> str:</code></li>
+            </ul>
+          </div>
+          <div class="code-block">
+            <div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="kw">def</span> <span class="fn">describe</span>(data: <span class="fn">list</span>, label: <span class="fn">str</span> = <span class="str">"dataset"</span>) -> <span class="fn">dict</span>:
+    <span class="str">"""Return basic statistics for a numeric list."""</span>
+    n      = <span class="fn">len</span>(data)
+    mean   = <span class="fn">sum</span>(data) / n
+    sdata  = <span class="fn">sorted</span>(data)
+    median = sdata[n // <span class="num">2</span>]
+    <span class="kw">return</span> {<span class="str">"label"</span>: label, <span class="str">"n"</span>: n, <span class="str">"mean"</span>: mean, <span class="str">"median"</span>: median}
+
+scores = [<span class="num">72</span>, <span class="num">85</span>, <span class="num">90</span>, <span class="num">64</span>, <span class="num">78</span>, <span class="num">95</span>, <span class="num">88</span>]
+stats  = <span class="fn">describe</span>(scores, <span class="str">"Test Scores"</span>)
+<span class="fn">print</span>(stats)
+
+<span class="cm"># *args — variable positional arguments</span>
+<span class="kw">def</span> <span class="fn">total</span>(*args):
+    <span class="kw">return</span> <span class="fn">sum</span>(args)
+<span class="fn">print</span>(<span class="fn">total</span>(<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>))   <span class="cm"># 100</span>
+
+<span class="cm"># **kwargs — variable keyword arguments</span>
+<span class="kw">def</span> <span class="fn">make_record</span>(**kwargs):
+    <span class="kw">return</span> kwargs
+<span class="fn">print</span>(<span class="fn">make_record</span>(name=<span class="str">"Raj"</span>, dept=<span class="str">"DS"</span>, score=<span class="num">91</span>))</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">Output</div>{'label':'Test Scores','n':7,'mean':81.71,'median':85}<br>100<br>{'name':'Raj','dept':'DS','score':91}</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════ INTERMEDIATE ══════════════ -->
+  <div class="panel" id="panel-intermediate">
+    <div class="section-header">
+      <div class="section-level sh-i">Level 02 · Intermediate</div>
+      <div class="section-title">Going Deeper</div>
+      <div class="section-desc">Comprehensions, functional tools, OOP, error handling, and file I/O — the tools of a working Python developer.</div>
+    </div>
+    <div class="topic-list">
+
+      <!-- i1 Comprehensions -->
+      <div class="topic" id="i1">
+        <div class="topic-header" onclick="tog('i1')">
+          <div class="topic-left"><span class="topic-idx">01</span><span class="topic-name">List & Dict Comprehensions</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="topic-tag tg-i">Pythonic</span><span class="topic-chevron">▾</span></div>
+        </div>
+        <div class="topic-body">
+          <div class="theory">
+            <p>Comprehensions produce collections in a single readable expression. They're faster than equivalent loops and are idiomatic Python — your code will look professional using them.</p>
+            <h4>Syntax Forms</h4>
+            <ul>
+              <li><strong>List:</strong> <code>[expr for x in iterable if cond]</code></li>
+              <li><strong>Dict:</strong> <code>{k: v for k, v in pairs if cond}</code></li>
+              <li><strong>Set:</strong> <code>{expr for x in iterable}</code></li>
+              <li><strong>Generator:</strong> <code>(expr for x in iterable)</code> — lazy / memory-safe</li>
+            </ul>
+          </div>
+          <div class="code-block">
+            <div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code>scores = [<span class="num">55</span>, <span class="num">88</span>, <span class="num">42</span>, <span class="num">95</span>, <span class="num">73</span>, <span class="num">61</span>, <span class="num">79</span>]
+
+<span class="cm"># Filter passing scores</span>
+passing = [s <span class="kw">for</span> s <span class="kw">in</span> scores <span class="kw">if</span> s >= <span class="num">60</span>]
+
+<span class="cm"># Min-max normalisation in one line</span>
+mn, mx  = <span class="fn">min</span>(scores), <span class="fn">max</span>(scores)
+norm    = [<span class="fn">round</span>((s - mn) / (mx - mn), <span class="num">2</span>) <span class="kw">for</span> s <span class="kw">in</span> scores]
+
+<span class="cm"># Ternary inside comprehension</span>
+labels  = [<span class="str">"Pass"</span> <span class="kw">if</span> s >= <span class="num">60</span> <span class="kw">else</span> <span class="str">"Fail"</span> <span class="kw">for</span> s <span class="kw">in</span> scores]
+
+<span class="fn">print</span>(<span class="str">"Passing:"</span>, passing)
+<span class="fn">print</span>(<span class="str">"Norm:   "</span>, norm)
+<span class="fn">print</span>(<span class="str">"Labels: "</span>, labels)
+
+<span class="cm"># Dict comprehension — build score lookup</span>
+names  = [<span class="str">"A"</span>, <span class="str">"B"</span>, <span class="str">"C"</span>, <span class="str">"D"</span>, <span class="str">"E"</span>, <span class="str">"F"</span>, <span class="str">"G"</span>]
+lookup = {n: s <span class="kw">for</span> n, s <span class="kw">in</span> <span class="fn">zip</span>(names, scores) <span class="kw">if</span> s >= <span class="num">60</span>}
+<span class="fn">print</span>(<span class="str">"Lookup:"</span>, lookup)</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">Output</div>Passing: [88, 95, 73, 61, 79]<br>Norm:    [0.25, 0.87, 0.0, 1.0, 0.58, 0.36, 0.69]<br>Labels:  ['Fail','Pass','Fail','Pass','Pass','Pass','Pass']<br>Lookup:  {'B':88,'D':95,'E':73,'F':61,'G':79}</div>
+        </div>
+      </div>
+
+      <!-- i2 Lambda -->
+      <div class="topic" id="i2">
+        <div class="topic-header" onclick="tog('i2')">
+          <div class="topic-left"><span class="topic-idx">02</span><span class="topic-name">Lambda, map(), filter(), sorted()</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="topic-tag tg-i">Functional</span><span class="topic-chevron">▾</span></div>
+        </div>
+        <div class="topic-body">
+          <div class="theory">
+            <p><code>lambda</code> creates anonymous single-expression functions. They're ideal as <strong>sort keys</strong> and <strong>short transformers</strong> passed to higher-order functions.</p>
+            <h4>Higher-order functions</h4>
+            <ul>
+              <li><code>map(fn, seq)</code> — apply fn to every element</li>
+              <li><code>filter(fn, seq)</code> — keep where fn is truthy</li>
+              <li><code>sorted(seq, key=fn, reverse=bool)</code> — custom sort</li>
+            </ul>
+          </div>
+          <div class="code-block">
+            <div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code>data = [
+    {<span class="str">"name"</span>: <span class="str">"Alice"</span>, <span class="str">"score"</span>: <span class="num">88</span>, <span class="str">"dept"</span>: <span class="str">"DS"</span>},
+    {<span class="str">"name"</span>: <span class="str">"Bob"</span>,   <span class="str">"score"</span>: <span class="num">55</span>, <span class="str">"dept"</span>: <span class="str">"IT"</span>},
+    {<span class="str">"name"</span>: <span class="str">"Carol"</span>, <span class="str">"score"</span>: <span class="num">91</span>, <span class="str">"dept"</span>: <span class="str">"DS"</span>},
+    {<span class="str">"name"</span>: <span class="str">"Dave"</span>,  <span class="str">"score"</span>: <span class="num">74</span>, <span class="str">"dept"</span>: <span class="str">"ML"</span>},
+]
+
+<span class="cm"># Sort by score descending</span>
+ranked = <span class="fn">sorted</span>(data, key=<span class="kw">lambda</span> x: x[<span class="str">"score"</span>], reverse=<span class="kw">True</span>)
+<span class="fn">print</span>([r[<span class="str">"name"</span>] <span class="kw">for</span> r <span class="kw">in</span> ranked])
+
+<span class="cm"># Extract scores with map</span>
+scores = <span class="fn">list</span>(<span class="fn">map</span>(<span class="kw">lambda</span> x: x[<span class="str">"score"</span>], data))
+<span class="fn">print</span>(scores)
+
+<span class="cm"># Filter DS department only</span>
+ds = <span class="fn">list</span>(<span class="fn">filter</span>(<span class="kw">lambda</span> x: x[<span class="str">"dept"</span>] == <span class="str">"DS"</span>, data))
+<span class="fn">print</span>([d[<span class="str">"name"</span>] <span class="kw">for</span> d <span class="kw">in</span> ds])
+
+<span class="cm"># Z-score normalisation via map + lambda</span>
+mean = <span class="fn">sum</span>(scores) / <span class="fn">len</span>(scores)
+std  = (<span class="fn">sum</span>((s - mean)**<span class="num">2</span> <span class="kw">for</span> s <span class="kw">in</span> scores) / <span class="fn">len</span>(scores)) ** <span class="num">0.5</span>
+z    = <span class="fn">list</span>(<span class="fn">map</span>(<span class="kw">lambda</span> s: <span class="fn">round</span>((s - mean) / std, <span class="num">2</span>), scores))
+<span class="fn">print</span>(<span class="str">"Z:"</span>, z)</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">Output</div>['Carol', 'Alice', 'Dave', 'Bob']<br>[88, 55, 91, 74]<br>['Alice', 'Carol']<br>Z: [0.64, -1.47, 0.92, -0.09]</div>
+        </div>
+      </div>
+
+      <!-- i3 OOP -->
+      <div class="topic" id="i3">
+        <div class="topic-header" onclick="tog('i3')">
+          <div class="topic-left"><span class="topic-idx">03</span><span class="topic-name">Object-Oriented Programming</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="topic-tag tg-i">OOP</span><span class="topic-chevron">▾</span></div>
+        </div>
+        <div class="topic-body">
+          <div class="theory">
+            <p>OOP organises code into <strong>classes</strong> (blueprints) and <strong>objects</strong> (instances). The four pillars: Encapsulation, Abstraction, Inheritance, Polymorphism.</p>
+            <h4>Dunder (Magic) Methods</h4>
+            <ul>
+              <li><code>__init__</code> — constructor</li>
+              <li><code>__repr__</code> — developer repr</li>
+              <li><code>__len__</code> — <code>len(obj)</code></li>
+              <li><code>__getitem__</code> — <code>obj[key]</code></li>
+            </ul>
+          </div>
+          <div class="code-block">
+            <div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="kw">class</span> <span class="cls">Dataset</span>:
+    <span class="str">"""Lightweight tabular dataset class."""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, name, data):
+        <span class="kw">self</span>.name = name
+        <span class="kw">self</span>.data = data
+
+    <span class="kw">def</span> <span class="fn">__len__</span>(<span class="kw">self</span>):
+        <span class="kw">return</span> <span class="fn">len</span>(<span class="kw">self</span>.data)
+
+    <span class="kw">def</span> <span class="fn">__repr__</span>(<span class="kw">self</span>):
+        <span class="kw">return</span> <span class="fn">f</span><span class="str">"Dataset('{self.name}', rows={len(self)})"</span>
+
+    <span class="kw">def</span> <span class="fn">head</span>(<span class="kw">self</span>, n=<span class="num">3</span>):
+        <span class="kw">return</span> <span class="kw">self</span>.data[:n]
+
+    <span class="kw">def</span> <span class="fn">mean</span>(<span class="kw">self</span>, col):
+        vals = [row[col] <span class="kw">for</span> row <span class="kw">in</span> <span class="kw">self</span>.data]
+        <span class="kw">return</span> <span class="fn">sum</span>(vals) / <span class="fn">len</span>(vals)
+
+
+records = [
+    {<span class="str">"name"</span>: <span class="str">"Alice"</span>, <span class="str">"score"</span>: <span class="num">88</span>},
+    {<span class="str">"name"</span>: <span class="str">"Bob"</span>,   <span class="str">"score"</span>: <span class="num">74</span>},
+    {<span class="str">"name"</span>: <span class="str">"Carol"</span>, <span class="str">"score"</span>: <span class="num">95</span>},
+]
+
+ds = <span class="cls">Dataset</span>(<span class="str">"Students"</span>, records)
+<span class="fn">print</span>(ds)
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"Rows: {len(ds)} | Mean: {ds.mean('score'):.2f}"</span>)
+<span class="fn">print</span>(<span class="str">"Head:"</span>, ds.<span class="fn">head</span>(<span class="num">2</span>))</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">Output</div>Dataset('Students', rows=3)<br>Rows: 3 | Mean: 85.67<br>Head: [{'name':'Alice','score':88},{'name':'Bob','score':74}]</div>
+        </div>
+      </div>
+
+      <!-- i4 Exceptions -->
+      <div class="topic" id="i4">
+        <div class="topic-header" onclick="tog('i4')">
+          <div class="topic-left"><span class="topic-idx">04</span><span class="topic-name">Exception Handling</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="topic-tag tg-i">Robustness</span><span class="topic-chevron">▾</span></div>
+        </div>
+        <div class="topic-body">
+          <div class="theory">
+            <p>In data pipelines errors are inevitable — wrong types, missing files, null values. Use <code>try / except / else / finally</code> to handle them gracefully.</p>
+            <h4>Common Exceptions</h4>
+            <ul>
+              <li><code>ValueError</code> — wrong value (e.g. <code>int("N/A")</code>)</li>
+              <li><code>KeyError</code> — missing dict key</li>
+              <li><code>IndexError</code> — list index out of bounds</li>
+              <li><code>FileNotFoundError</code> — file missing</li>
+              <li><code>ZeroDivisionError</code> — divide by zero</li>
+              <li><code>TypeError</code> — wrong type passed to operation</li>
+            </ul>
+          </div>
+          <div class="code-block">
+            <div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="kw">def</span> <span class="fn">safe_divide</span>(a, b):
+    <span class="kw">try</span>:
+        result = a / b
+    <span class="kw">except</span> <span class="cls">ZeroDivisionError</span>:
+        <span class="fn">print</span>(<span class="str">"Cannot divide by zero"</span>); <span class="kw">return</span> <span class="kw">None</span>
+    <span class="kw">except</span> <span class="cls">TypeError</span> <span class="kw">as</span> e:
+        <span class="fn">print</span>(<span class="fn">f</span><span class="str">"Type error: {e}"</span>);    <span class="kw">return</span> <span class="kw">None</span>
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="fn">f</span><span class="str">"{a} / {b} = {result:.4f}"</span>)
+        <span class="kw">return</span> result
+    <span class="kw">finally</span>:
+        <span class="fn">print</span>(<span class="str">"— attempt complete"</span>)
+
+<span class="fn">safe_divide</span>(<span class="num">10</span>, <span class="num">4</span>)
+<span class="fn">safe_divide</span>(<span class="num">5</span>,  <span class="num">0</span>)
+
+<span class="cm"># Parse messy CSV column gracefully</span>
+raw = [<span class="str">"42"</span>, <span class="str">"N/A"</span>, <span class="str">"88"</span>, <span class="str">""</span>, <span class="str">"101"</span>]
+cleaned = []
+<span class="kw">for</span> v <span class="kw">in</span> raw:
+    <span class="kw">try</span>:
+        cleaned.<span class="fn">append</span>(<span class="fn">float</span>(v))
+    <span class="kw">except</span> (<span class="cls">ValueError</span>, <span class="cls">TypeError</span>):
+        cleaned.<span class="fn">append</span>(<span class="kw">None</span>)    <span class="cm"># sentinel for missing</span>
+<span class="fn">print</span>(cleaned)</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">Output</div>10 / 4 = 2.5000<br>— attempt complete<br>Cannot divide by zero<br>— attempt complete<br>[42.0, None, 88.0, None, 101.0]</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════ ADVANCED ══════════════ -->
+  <div class="panel" id="panel-advanced">
+    <div class="section-header">
+      <div class="section-level sh-a">Level 03 · Advanced</div>
+      <div class="section-title">Advanced Python & DS Stack</div>
+      <div class="section-desc">NumPy, Pandas, visualisation, decorators, and generators — the complete production toolkit.</div>
+    </div>
+    <div class="topic-list">
+
+      <!-- a1 NumPy -->
+      <div class="topic open" id="a1">
+        <div class="topic-header" onclick="tog('a1')">
+          <div class="topic-left"><span class="topic-idx">01</span><span class="topic-name">NumPy — Numerical Computing</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="topic-tag tg-a">NumPy</span><span class="topic-chevron">▾</span></div>
+        </div>
+        <div class="topic-body">
+          <div class="theory">
+            <p>NumPy's <code>ndarray</code> enables <strong>vectorised operations</strong> — processing entire arrays at C-speed without Python loops. It's the foundation of pandas, scikit-learn, and TensorFlow.</p>
+            <h4>Key Concepts</h4>
+            <ul>
+              <li><code>shape</code>, <code>dtype</code>, <code>ndim</code> — array metadata</li>
+              <li><strong>Broadcasting</strong> — operate across different-shaped arrays</li>
+              <li><strong>Boolean indexing</strong> — filter with conditions, no loops</li>
+              <li><strong>ufuncs</strong> — <code>np.sqrt</code>, <code>np.exp</code>, <code>np.log</code>, <code>np.clip</code></li>
+            </ul>
+          </div>
+          <div class="code-block">
+            <div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+a = np.<span class="fn">array</span>([<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>, <span class="num">50</span>])
+b = np.<span class="fn">arange</span>(<span class="num">1</span>, <span class="num">6</span>)
+c = np.<span class="fn">linspace</span>(<span class="num">0</span>, <span class="num">1</span>, <span class="num">5</span>)
+
+<span class="cm"># Vectorised ops — no loop required</span>
+<span class="fn">print</span>(a + b)                   <span class="cm"># [11,22,33,44,55]</span>
+<span class="fn">print</span>(np.<span class="fn">sqrt</span>(a))             <span class="cm"># element-wise sqrt</span>
+
+<span class="cm"># Descriptive stats</span>
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"mean={a.mean()}, std={a.std():.2f}, sum={a.sum()}"</span>)
+
+<span class="cm"># Boolean indexing</span>
+scores = np.<span class="fn">array</span>([<span class="num">55</span>, <span class="num">88</span>, <span class="num">42</span>, <span class="num">95</span>, <span class="num">73</span>])
+<span class="fn">print</span>(scores[scores >= <span class="num">70</span>])   <span class="cm"># [88, 95, 73]</span>
+scores[scores < <span class="num">60</span>] = <span class="num">0</span>       <span class="cm"># in-place masking</span>
+
+<span class="cm"># 2-D arrays</span>
+M = np.<span class="fn">array</span>([[<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>],[<span class="num">4</span>,<span class="num">5</span>,<span class="num">6</span>],[<span class="num">7</span>,<span class="num">8</span>,<span class="num">9</span>]])
+<span class="fn">print</span>(M.<span class="fn">shape</span>)                 <span class="cm"># (3, 3)</span>
+<span class="fn">print</span>(M[<span class="num">1</span>, :<span class="num">2</span>])               <span class="cm"># [4, 5]</span>
+<span class="fn">print</span>(M.<span class="fn">T</span>)                    <span class="cm"># transpose</span>
+
+<span class="cm"># Reproducible random data for ML</span>
+np.<span class="fn">random</span>.<span class="fn">seed</span>(<span class="num">42</span>)
+X = np.<span class="fn">random</span>.<span class="fn">randn</span>(<span class="num">100</span>, <span class="num">3</span>)  <span class="cm"># 100 samples, 3 features</span>
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"Shape: {X.shape}, Mean: {X.mean():.3f}"</span>)</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">Output</div>[11 22 33 44 55]<br>[3.16 4.47 5.48 6.32 7.07]<br>mean=30.0, std=14.14, sum=150<br>[88 95 73]<br>(3, 3)  /  [4 5]  /  transposed matrix<br>Shape: (100, 3), Mean: 0.013</div>
+        </div>
+      </div>
+
+      <!-- a2 Pandas -->
+      <div class="topic" id="a2">
+        <div class="topic-header" onclick="tog('a2')">
+          <div class="topic-left"><span class="topic-idx">02</span><span class="topic-name">Pandas — Data Analysis</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="topic-tag tg-a">Pandas</span><span class="topic-chevron">▾</span></div>
+        </div>
+        <div class="topic-body">
+          <div class="theory">
+            <p>The <code>DataFrame</code> is Python's spreadsheet — the most important data structure for analysts. Mastering Pandas is the single highest-leverage skill in the DS toolkit.</p>
+            <h4>Core Operations</h4>
+            <ul>
+              <li><code>df.head()</code>, <code>df.info()</code>, <code>df.describe()</code> — EDA</li>
+              <li><code>df[col]</code>, <code>df.loc[rows, cols]</code>, <code>df.iloc[]</code> — selection</li>
+              <li><code>df.groupby(col).agg()</code> — split-apply-combine</li>
+              <li><code>df.merge(other, on=, how=)</code> — SQL-style joins</li>
+              <li><code>df.pivot_table()</code>, <code>df.melt()</code> — reshape</li>
+            </ul>
+          </div>
+          <div class="code-block">
+            <div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df = pd.<span class="cls">DataFrame</span>({
+    <span class="str">"name"</span>  : [<span class="str">"Alice"</span>, <span class="str">"Bob"</span>, <span class="str">"Carol"</span>, <span class="str">"Dave"</span>, <span class="str">"Eve"</span>],
+    <span class="str">"dept"</span>  : [<span class="str">"DS"</span>,    <span class="str">"ML"</span>,  <span class="str">"DS"</span>,    <span class="str">"IT"</span>,   <span class="str">"ML"</span>],
+    <span class="str">"score"</span> : [<span class="num">88</span>,      <span class="num">74</span>,    <span class="num">92</span>,      <span class="num">61</span>,     <span class="num">85</span>],
+    <span class="str">"salary"</span>: [<span class="num">72000</span>,   <span class="num">68000</span>, <span class="num">79000</span>,  <span class="num">55000</span>, <span class="num">71000</span>],
+})
+
+<span class="cm"># Boolean filter</span>
+top = df[df[<span class="str">"score"</span>] >= <span class="num">85</span>][[<span class="str">"name"</span>, <span class="str">"score"</span>]]
+<span class="fn">print</span>(top)
+
+<span class="cm"># GroupBy — mean salary by dept</span>
+grp = df.<span class="fn">groupby</span>(<span class="str">"dept"</span>)[<span class="str">"salary"</span>].<span class="fn">mean</span>().<span class="fn">reset_index</span>()
+<span class="fn">print</span>(grp)
+
+<span class="cm"># Derived column via .apply</span>
+df[<span class="str">"grade"</span>] = df[<span class="str">"score"</span>].<span class="fn">apply</span>(
+    <span class="kw">lambda</span> s: <span class="str">"A"</span> <span class="kw">if</span> s >= <span class="num">90</span> <span class="kw">else</span> (<span class="str">"B"</span> <span class="kw">if</span> s >= <span class="num">80</span> <span class="kw">else</span> <span class="str">"C"</span>)
+)
+
+<span class="cm"># Pivot table</span>
+pt = df.<span class="fn">pivot_table</span>(values=<span class="str">"score"</span>, index=<span class="str">"dept"</span>, aggfunc=<span class="str">"mean"</span>)
+<span class="fn">print</span>(pt)</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">Output</div>   name  score<br>0 Alice    88<br>2 Carol    92<br>4   Eve    85<br><br>  dept   salary<br>0   DS  75500.0<br>1   IT  55000.0<br>2   ML  69500.0</div>
+        </div>
+      </div>
+
+      <!-- a3 Decorators -->
+      <div class="topic" id="a3">
+        <div class="topic-header" onclick="tog('a3')">
+          <div class="topic-left"><span class="topic-idx">03</span><span class="topic-name">Decorators & Closures</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="topic-tag tg-a">Advanced</span><span class="topic-chevron">▾</span></div>
+        </div>
+        <div class="topic-body">
+          <div class="theory">
+            <p>A <strong>decorator</strong> wraps a function to extend its behaviour without modifying its source. Used heavily for logging, timing, caching, authentication, and validation in production systems.</p>
+            <h4>How it works</h4>
+            <p><code>@my_decorator</code> above a function is syntactic sugar for <code>func = my_decorator(func)</code>. Always use <code>@functools.wraps</code> to preserve the wrapped function's metadata.</p>
+          </div>
+          <div class="code-block">
+            <div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="kw">import</span> time, functools
+
+<span class="kw">def</span> <span class="fn">timer</span>(func):
+    <span class="dec">@functools.wraps</span>(func)
+    <span class="kw">def</span> <span class="fn">wrapper</span>(*args, **kwargs):
+        t0 = time.<span class="fn">perf_counter</span>()
+        result = <span class="fn">func</span>(*args, **kwargs)
+        <span class="fn">print</span>(<span class="fn">f</span><span class="str">"⏱  {func.__name__}: {time.perf_counter()-t0:.4f}s"</span>)
+        <span class="kw">return</span> result
+    <span class="kw">return</span> wrapper
+
+<span class="kw">def</span> <span class="fn">memoize</span>(func):
+    cache = {}
+    <span class="dec">@functools.wraps</span>(func)
+    <span class="kw">def</span> <span class="fn">wrapper</span>(*args):
+        <span class="kw">if</span> args <span class="kw">not in</span> cache:
+            cache[args] = <span class="fn">func</span>(*args)
+        <span class="kw">return</span> cache[args]
+    <span class="kw">return</span> wrapper
+
+<span class="dec">@timer</span>
+<span class="dec">@memoize</span>
+<span class="kw">def</span> <span class="fn">fib</span>(n):
+    <span class="kw">return</span> n <span class="kw">if</span> n <= <span class="num">1</span> <span class="kw">else</span> <span class="fn">fib</span>(n-<span class="num">1</span>) + <span class="fn">fib</span>(n-<span class="num">2</span>)
+
+<span class="fn">print</span>(<span class="fn">fib</span>(<span class="num">35</span>))   <span class="cm"># fast — memoised</span>
+<span class="fn">print</span>(<span class="fn">fib</span>(<span class="num">35</span>))   <span class="cm"># instant — cached result</span></code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">Output</div>⏱  fib: 0.0002s<br>9227465<br>⏱  fib: 0.0000s<br>9227465</div>
+        </div>
+      </div>
+
+      <!-- a4 Generators -->
+      <div class="topic" id="a4">
+        <div class="topic-header" onclick="tog('a4')">
+          <div class="topic-left"><span class="topic-idx">04</span><span class="topic-name">Generators & Iterators</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="topic-tag tg-a">Advanced</span><span class="topic-chevron">▾</span></div>
+        </div>
+        <div class="topic-body">
+          <div class="theory">
+            <p>Generators produce values <strong>lazily</strong> — one at a time — using <code>yield</code>. They're critical for handling datasets that don't fit in RAM and for building efficient data pipelines.</p>
+            <h4>Real-world applications</h4>
+            <ul>
+              <li>Streaming multi-GB CSVs line-by-line without loading into memory</li>
+              <li>Batch generation loops for neural network training</li>
+              <li>Infinite sequences (e.g., real-time event streams)</li>
+            </ul>
+          </div>
+          <div class="code-block">
+            <div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="kw">import</span> sys
+
+<span class="kw">def</span> <span class="fn">batch_gen</span>(data, size):
+    <span class="str">"""Yield mini-batches for model training."""</span>
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">0</span>, <span class="fn">len</span>(data), size):
+        <span class="kw">yield</span> data[i : i + size]
+
+dataset = <span class="fn">list</span>(<span class="fn">range</span>(<span class="num">20</span>))
+<span class="kw">for</span> batch <span class="kw">in</span> <span class="fn">batch_gen</span>(dataset, <span class="num">5</span>):
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"Batch: {batch}"</span>)
+
+<span class="fn">print</span>(<span class="str">"---"</span>)
+
+<span class="cm"># Memory footprint comparison</span>
+big_list = [x**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1_000_000</span>)]
+big_gen  = (x**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1_000_000</span>))
+
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"List : {sys.getsizeof(big_list):>10,} bytes"</span>)
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"Gen  : {sys.getsizeof(big_gen):>10,} bytes"</span>)</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">Output</div>Batch: [0, 1, 2, 3, 4]<br>Batch: [5, 6, 7, 8, 9]<br>Batch: [10, 11, 12, 13, 14]<br>Batch: [15, 16, 17, 18, 19]<br>---<br>List :  8,697,464 bytes<br>Gen  :        208 bytes</div>
+          <div class="info-box tip"><span class="info-box-icon">💡</span><span>The generator uses only 208 bytes regardless of size — the list scales linearly. For large-scale data work, generators are indispensable.</span></div>
+        </div>
+      </div>
+
+      <!-- a5 Viz -->
+      <div class="topic" id="a5">
+        <div class="topic-header" onclick="tog('a5')">
+          <div class="topic-left"><span class="topic-idx">05</span><span class="topic-name">Matplotlib & Seaborn — Visualisation</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="topic-tag tg-a">Viz</span><span class="topic-chevron">▾</span></div>
+        </div>
+        <div class="topic-body">
+          <div class="theory">
+            <p><strong>Matplotlib</strong> is the base layer; <strong>Seaborn</strong> builds statistical visualisations on top with better defaults. Both work seamlessly with Pandas DataFrames.</p>
+            <h4>Plot Selection Guide</h4>
+            <ul>
+              <li><code>sns.histplot</code> / <code>sns.kdeplot</code> — distributions</li>
+              <li><code>sns.boxplot</code> / <code>sns.violinplot</code> — spread & outliers</li>
+              <li><code>sns.scatterplot</code> / <code>sns.regplot</code> — correlation</li>
+              <li><code>sns.heatmap</code> — correlation matrix</li>
+              <li><code>sns.barplot</code> / <code>sns.countplot</code> — categorical</li>
+              <li><code>sns.lineplot</code> — trends over time</li>
+            </ul>
+          </div>
+          <div class="code-block">
+            <div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> seaborn <span class="kw">as</span> sns
+<span class="kw">import</span> numpy <span class="kw">as</span> np, pandas <span class="kw">as</span> pd
+
+sns.<span class="fn">set_theme</span>(style=<span class="str">"darkgrid"</span>, palette=<span class="str">"muted"</span>)
+
+np.<span class="fn">random</span>.<span class="fn">seed</span>(<span class="num">0</span>)
+df = pd.<span class="cls">DataFrame</span>({
+    <span class="str">"Age"</span>   : np.<span class="fn">random</span>.<span class="fn">randint</span>(<span class="num">22</span>, <span class="num">45</span>, <span class="num">100</span>),
+    <span class="str">"Income"</span>: np.<span class="fn">random</span>.<span class="fn">normal</span>(<span class="num">60000</span>, <span class="num">12000</span>, <span class="num">100</span>),
+    <span class="str">"Score"</span> : np.<span class="fn">random</span>.<span class="fn">randint</span>(<span class="num">50</span>, <span class="num">100</span>, <span class="num">100</span>),
+})
+df[<span class="str">"Spend"</span>] = df[<span class="str">"Income"</span>] * <span class="num">0.35</span> + np.<span class="fn">random</span>.<span class="fn">normal</span>(<span class="num">0</span>, <span class="num">3000</span>, <span class="num">100</span>)
+
+fig, axes = plt.<span class="fn">subplots</span>(<span class="num">1</span>, <span class="num">2</span>, figsize=(<span class="num">12</span>, <span class="num">5</span>))
+
+<span class="cm"># Correlation heatmap</span>
+<span class="fn">sns</span>.<span class="fn">heatmap</span>(df.<span class="fn">corr</span>(), annot=<span class="kw">True</span>, fmt=<span class="str">".2f"</span>,
+            cmap=<span class="str">"coolwarm"</span>, ax=axes[<span class="num">0</span>])
+axes[<span class="num">0</span>].<span class="fn">set_title</span>(<span class="str">"Correlation Matrix"</span>)
+
+<span class="cm"># Scatter + regression line</span>
+<span class="fn">sns</span>.<span class="fn">regplot</span>(data=df, x=<span class="str">"Income"</span>, y=<span class="str">"Spend"</span>,
+            ax=axes[<span class="num">1</span>], scatter_kws={<span class="str">"alpha"</span>: <span class="num">0.5</span>})
+axes[<span class="num">1</span>].<span class="fn">set_title</span>(<span class="str">"Income vs Spend"</span>)
+
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">savefig</span>(<span class="str">"eda.png"</span>, dpi=<span class="num">150</span>, bbox_inches=<span class="str">"tight"</span>)
+plt.<span class="fn">show</span>()</code></pre>
+          </div>
+          <div class="info-box note"><span class="info-box-icon">📌</span><span>Always call <code>plt.tight_layout()</code> before saving — it prevents axes labels from clipping. Use <code>dpi=150</code> or higher for publication-quality outputs.</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════ CHALLENGES ══════════════ -->
+  <div class="panel" id="panel-challenges">
+    <div class="section-header">
+      <div class="section-level sh-c">Practice · Challenges</div>
+      <div class="section-title">Coding Challenges</div>
+      <div class="section-desc">Think before you reveal. Challenges span all four levels — try solving each one first.</div>
+    </div>
+    <div class="challenges-grid">
+
+      <div class="challenge-card easy">
+        <div class="ch-top"><span class="ch-num">#01</span><span class="ch-badge">Easy</span></div>
+        <div class="ch-title">FizzBuzz</div>
+        <div class="ch-desc">Print 1–30. Multiples of 3 → "Fizz". Multiples of 5 → "Buzz". Multiples of both → "FizzBuzz".</div>
+        <button class="ch-reveal" onclick="reveal(this)">Show solution</button>
+        <div class="ch-answer">
+          <div class="code-block"><div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="kw">for</span> n <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">31</span>):
+    <span class="kw">if</span>   n % <span class="num">15</span> == <span class="num">0</span>: <span class="fn">print</span>(<span class="str">"FizzBuzz"</span>)
+    <span class="kw">elif</span> n % <span class="num">3</span>  == <span class="num">0</span>: <span class="fn">print</span>(<span class="str">"Fizz"</span>)
+    <span class="kw">elif</span> n % <span class="num">5</span>  == <span class="num">0</span>: <span class="fn">print</span>(<span class="str">"Buzz"</span>)
+    <span class="kw">else</span>:              <span class="fn">print</span>(n)</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="challenge-card easy">
+        <div class="ch-top"><span class="ch-num">#02</span><span class="ch-badge">Easy</span></div>
+        <div class="ch-title">Palindrome Checker</div>
+        <div class="ch-desc">Write <code>is_palindrome(s)</code> that returns <code>True</code> if a string reads the same forwards and backwards — case-insensitive, ignoring spaces.</div>
+        <button class="ch-reveal" onclick="reveal(this)">Show solution</button>
+        <div class="ch-answer">
+          <div class="code-block"><div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="kw">def</span> <span class="fn">is_palindrome</span>(s):
+    clean = s.<span class="fn">lower</span>().<span class="fn">replace</span>(<span class="str">" "</span>, <span class="str">""</span>)
+    <span class="kw">return</span> clean == clean[::<span class="num">-1</span>]
+
+<span class="fn">print</span>(<span class="fn">is_palindrome</span>(<span class="str">"racecar"</span>))       <span class="cm"># True</span>
+<span class="fn">print</span>(<span class="fn">is_palindrome</span>(<span class="str">"Level"</span>))          <span class="cm"># True</span>
+<span class="fn">print</span>(<span class="fn">is_palindrome</span>(<span class="str">"hello world"</span>))    <span class="cm"># False</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="challenge-card medium">
+        <div class="ch-top"><span class="ch-num">#03</span><span class="ch-badge">Medium</span></div>
+        <div class="ch-title">Anagram Detector</div>
+        <div class="ch-desc">Write <code>are_anagrams(a, b)</code> returning <code>True</code> if both strings contain the exact same characters (case-insensitive).</div>
+        <button class="ch-reveal" onclick="reveal(this)">Show solution</button>
+        <div class="ch-answer">
+          <div class="code-block"><div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="kw">from</span> collections <span class="kw">import</span> <span class="cls">Counter</span>
+
+<span class="kw">def</span> <span class="fn">are_anagrams</span>(a, b):
+    <span class="kw">return</span> <span class="cls">Counter</span>(a.<span class="fn">lower</span>()) == <span class="cls">Counter</span>(b.<span class="fn">lower</span>())
+
+<span class="fn">print</span>(<span class="fn">are_anagrams</span>(<span class="str">"listen"</span>, <span class="str">"silent"</span>))   <span class="cm"># True</span>
+<span class="fn">print</span>(<span class="fn">are_anagrams</span>(<span class="str">"hello"</span>,  <span class="str">"world"</span>))    <span class="cm"># False</span>
+
+<span class="cm"># Alternative — sorted comparison</span>
+<span class="kw">def</span> <span class="fn">are_anagrams_v2</span>(a, b):
+    <span class="kw">return</span> <span class="fn">sorted</span>(a.<span class="fn">lower</span>()) == <span class="fn">sorted</span>(b.<span class="fn">lower</span>())</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="challenge-card medium">
+        <div class="ch-top"><span class="ch-num">#04</span><span class="ch-badge">Medium</span></div>
+        <div class="ch-title">Flatten Nested List</div>
+        <div class="ch-desc">Write a recursive function that flattens any depth of nesting. e.g. <code>[1, [2, [3, [4]]]]</code> → <code>[1, 2, 3, 4]</code>.</div>
+        <button class="ch-reveal" onclick="reveal(this)">Show solution</button>
+        <div class="ch-answer">
+          <div class="code-block"><div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="kw">def</span> <span class="fn">flatten</span>(nested):
+    result = []
+    <span class="kw">for</span> item <span class="kw">in</span> nested:
+        <span class="kw">if</span> <span class="fn">isinstance</span>(item, <span class="fn">list</span>):
+            result.<span class="fn">extend</span>(<span class="fn">flatten</span>(item))
+        <span class="kw">else</span>:
+            result.<span class="fn">append</span>(item)
+    <span class="kw">return</span> result
+
+<span class="fn">print</span>(<span class="fn">flatten</span>([<span class="num">1</span>, [<span class="num">2</span>, [<span class="num">3</span>, [<span class="num">4</span>]]], <span class="num">5</span>]))  <span class="cm"># [1,2,3,4,5]</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="challenge-card medium">
+        <div class="ch-top"><span class="ch-num">#05</span><span class="ch-badge">Medium</span></div>
+        <div class="ch-title">Group By Department</div>
+        <div class="ch-desc">Given a list of employee dicts with <code>name</code> and <code>dept</code>, group names by department (pure Python — no Pandas).</div>
+        <button class="ch-reveal" onclick="reveal(this)">Show solution</button>
+        <div class="ch-answer">
+          <div class="code-block"><div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="kw">from</span> collections <span class="kw">import</span> <span class="cls">defaultdict</span>
+
+employees = [
+    {<span class="str">"name"</span>: <span class="str">"Alice"</span>, <span class="str">"dept"</span>: <span class="str">"DS"</span>},
+    {<span class="str">"name"</span>: <span class="str">"Bob"</span>,   <span class="str">"dept"</span>: <span class="str">"IT"</span>},
+    {<span class="str">"name"</span>: <span class="str">"Carol"</span>, <span class="str">"dept"</span>: <span class="str">"DS"</span>},
+    {<span class="str">"name"</span>: <span class="str">"Dave"</span>,  <span class="str">"dept"</span>: <span class="str">"ML"</span>},
+]
+
+<span class="kw">def</span> <span class="fn">group_by</span>(records, key):
+    groups = <span class="cls">defaultdict</span>(<span class="fn">list</span>)
+    <span class="kw">for</span> r <span class="kw">in</span> records:
+        groups[r[key]].<span class="fn">append</span>(r[<span class="str">"name"</span>])
+    <span class="kw">return</span> <span class="fn">dict</span>(groups)
+
+<span class="fn">print</span>(<span class="fn">group_by</span>(employees, <span class="str">"dept"</span>))
+<span class="cm"># {'DS':['Alice','Carol'],'IT':['Bob'],'ML':['Dave']}</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="challenge-card hard">
+        <div class="ch-top"><span class="ch-num">#06</span><span class="ch-badge">Hard</span></div>
+        <div class="ch-title">Welford's Running Stats</div>
+        <div class="ch-desc">Implement <code>RunningStats</code> that tracks mean and variance incrementally without storing all values — using Welford's one-pass algorithm.</div>
+        <button class="ch-reveal" onclick="reveal(this)">Show solution</button>
+        <div class="ch-answer">
+          <div class="code-block"><div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="kw">class</span> <span class="cls">RunningStats</span>:
+    <span class="str">"""Online mean & variance (Welford's algorithm)."""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>):
+        <span class="kw">self</span>.n = <span class="kw">self</span>.mean = <span class="kw">self</span>.M2 = <span class="num">0</span>
+
+    <span class="kw">def</span> <span class="fn">update</span>(<span class="kw">self</span>, x):
+        <span class="kw">self</span>.n  += <span class="num">1</span>
+        delta    = x - <span class="kw">self</span>.mean
+        <span class="kw">self</span>.mean += delta / <span class="kw">self</span>.n
+        <span class="kw">self</span>.M2   += delta * (x - <span class="kw">self</span>.mean)
+
+    <span class="dec">@property</span>
+    <span class="kw">def</span> <span class="fn">variance</span>(<span class="kw">self</span>):
+        <span class="kw">return</span> <span class="kw">self</span>.M2 / <span class="kw">self</span>.n <span class="kw">if</span> <span class="kw">self</span>.n > <span class="num">1</span> <span class="kw">else</span> <span class="num">0</span>
+
+    <span class="dec">@property</span>
+    <span class="kw">def</span> <span class="fn">std</span>(<span class="kw">self</span>): <span class="kw">return</span> <span class="kw">self</span>.variance ** <span class="num">0.5</span>
+
+rs = <span class="cls">RunningStats</span>()
+<span class="kw">for</span> v <span class="kw">in</span> [<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>, <span class="num">50</span>]:
+    rs.<span class="fn">update</span>(v)
+
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"Mean: {rs.mean:.1f} | Std: {rs.std:.2f}"</span>)
+<span class="cm"># Mean: 30.0 | Std: 14.14</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="challenge-card hard">
+        <div class="ch-top"><span class="ch-num">#07</span><span class="ch-badge">Hard</span></div>
+        <div class="ch-title">Custom Data Pipeline</div>
+        <div class="ch-desc">Build a <code>Pipeline</code> class that chains transformation functions sequentially, similar to sklearn's Pipeline. Call <code>.fit_transform(data)</code> to apply all steps.</div>
+        <button class="ch-reveal" onclick="reveal(this)">Show solution</button>
+        <div class="ch-answer">
+          <div class="code-block"><div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="kw">from</span> functools <span class="kw">import</span> reduce
+
+<span class="kw">class</span> <span class="cls">Pipeline</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, steps):
+        <span class="kw">self</span>.steps = steps   <span class="cm"># list of (name, fn)</span>
+
+    <span class="kw">def</span> <span class="fn">fit_transform</span>(<span class="kw">self</span>, data):
+        <span class="kw">return</span> <span class="fn">reduce</span>(<span class="kw">lambda</span> d, step: step[<span class="num">1</span>](d), <span class="kw">self</span>.steps, data)
+
+<span class="kw">def</span> <span class="fn">drop_nulls</span>(data):
+    <span class="kw">return</span> [x <span class="kw">for</span> x <span class="kw">in</span> data <span class="kw">if</span> x <span class="kw">is not None</span>]
+
+<span class="kw">def</span> <span class="fn">clip</span>(data, lo=<span class="num">0</span>, hi=<span class="num">100</span>):
+    <span class="kw">return</span> [<span class="fn">max</span>(lo, <span class="fn">min</span>(hi, x)) <span class="kw">for</span> x <span class="kw">in</span> data]
+
+<span class="kw">def</span> <span class="fn">normalise</span>(data):
+    mn, mx = <span class="fn">min</span>(data), <span class="fn">max</span>(data)
+    <span class="kw">return</span> [(x - mn) / (mx - mn) <span class="kw">for</span> x <span class="kw">in</span> data]
+
+pipe = <span class="cls">Pipeline</span>([
+    (<span class="str">"drop"</span>, drop_nulls),
+    (<span class="str">"clip"</span>, <span class="kw">lambda</span> d: <span class="fn">clip</span>(d, <span class="num">0</span>, <span class="num">100</span>)),
+    (<span class="str">"norm"</span>, normalise),
+])
+
+raw = [<span class="num">50</span>, <span class="kw">None</span>, <span class="num">120</span>, <span class="num">-10</span>, <span class="num">80</span>, <span class="kw">None</span>, <span class="num">30</span>]
+<span class="fn">print</span>(pipe.<span class="fn">fit_transform</span>(raw))
+<span class="cm"># [0.5, 1.0, 0.0, 0.8, 0.3]</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="challenge-card expert">
+        <div class="ch-top"><span class="ch-num">#08</span><span class="ch-badge">Expert</span></div>
+        <div class="ch-title">Mini DataFrame from Scratch</div>
+        <div class="ch-desc">Build <code>MiniDF</code> without Pandas: support column access, <code>.filter(fn)</code>, <code>.select(*cols)</code>, and <code>.agg(col, fn)</code> for mean / sum / count.</div>
+        <button class="ch-reveal" onclick="reveal(this)">Show solution</button>
+        <div class="ch-answer">
+          <div class="code-block"><div class="code-header"><div class="code-dots"><div class="code-dot d1"></div><div class="code-dot d2"></div><div class="code-dot d3"></div></div><span class="code-lang">Python</span><button class="copy-btn" onclick="doCopy(this)">Copy</button></div>
+            <pre><code><span class="kw">class</span> <span class="cls">MiniDF</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, data): <span class="kw">self</span>.data = data
+    <span class="kw">def</span> <span class="fn">__len__</span>(<span class="kw">self</span>):      <span class="kw">return</span> <span class="fn">len</span>(<span class="kw">self</span>.data)
+    <span class="kw">def</span> <span class="fn">__getitem__</span>(<span class="kw">self</span>, col):
+        <span class="kw">return</span> [r[col] <span class="kw">for</span> r <span class="kw">in</span> <span class="kw">self</span>.data]
+
+    <span class="kw">def</span> <span class="fn">filter</span>(<span class="kw">self</span>, fn):
+        <span class="kw">return</span> <span class="cls">MiniDF</span>([r <span class="kw">for</span> r <span class="kw">in</span> <span class="kw">self</span>.data <span class="kw">if</span> <span class="fn">fn</span>(r)])
+
+    <span class="kw">def</span> <span class="fn">select</span>(<span class="kw">self</span>, *cols):
+        <span class="kw">return</span> <span class="cls">MiniDF</span>([{c: r[c] <span class="kw">for</span> c <span class="kw">in</span> cols} <span class="kw">for</span> r <span class="kw">in</span> <span class="kw">self</span>.data])
+
+    <span class="kw">def</span> <span class="fn">agg</span>(<span class="kw">self</span>, col, fn=<span class="str">"mean"</span>):
+        vals = [r[col] <span class="kw">for</span> r <span class="kw">in</span> <span class="kw">self</span>.data <span class="kw">if</span> <span class="fn">isinstance</span>(r.get(col), (<span class="fn">int</span>,<span class="fn">float</span>))]
+        <span class="kw">return</span> {<span class="str">"mean"</span>:<span class="fn">sum</span>(vals)/<span class="fn">len</span>(vals), <span class="str">"sum"</span>:<span class="fn">sum</span>(vals), <span class="str">"count"</span>:<span class="fn">len</span>(vals)}[fn]
+
+records = [
+    {<span class="str">"name"</span>:<span class="str">"Alice"</span>, <span class="str">"score"</span>:<span class="num">88</span>, <span class="str">"dept"</span>:<span class="str">"DS"</span>},
+    {<span class="str">"name"</span>:<span class="str">"Bob"</span>,   <span class="str">"score"</span>:<span class="num">55</span>, <span class="str">"dept"</span>:<span class="str">"IT"</span>},
+    {<span class="str">"name"</span>:<span class="str">"Carol"</span>, <span class="str">"score"</span>:<span class="num">91</span>, <span class="str">"dept"</span>:<span class="str">"DS"</span>},
+]
+
+mdf = <span class="cls">MiniDF</span>(records)
+top = mdf.<span class="fn">filter</span>(<span class="kw">lambda</span> r: r[<span class="str">"score"</span>] >= <span class="num">80</span>).<span class="fn">select</span>(<span class="str">"name"</span>,<span class="str">"score"</span>)
+<span class="fn">print</span>(top.data)
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"Mean: {mdf.agg('score','mean'):.1f}"</span>)</code></pre>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<script>
+  function switchTab(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.level-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    const btn = document.querySelector('.level-tab.' + name);
+    if (btn) btn.classList.add('active');
+    document.getElementById('main').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function gotoMain() {
+    document.getElementById('main').scrollIntoView({ behavior: 'smooth' });
+    document.querySelectorAll('nav button').forEach((b,i) => b.classList.toggle('active', i===0));
+  }
+
+  function tog(id) {
+    document.getElementById(id).classList.toggle('open');
+  }
+
+  function reveal(btn) {
+    const ans = btn.nextElementSibling;
+    const open = ans.classList.toggle('open');
+    btn.textContent = open ? 'Hide solution' : 'Show solution';
+  }
+
+  function doCopy(btn) {
+    const text = btn.closest('.code-block').querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1800);
+    });
+  }
+
+  // Scroll reveal
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'none';
+      }
+    });
+  }, { threshold: 0.06 });
+
+  document.querySelectorAll('.topic, .challenge-card').forEach(el => {
+    el.style.cssText += 'opacity:0;transform:translateY(16px);transition:opacity 0.45s ease,transform 0.45s ease';
+    io.observe(el);
+  });
+</script>
+</body>
+</html>

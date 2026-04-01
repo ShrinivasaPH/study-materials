@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MLOps — From Notebook to Production</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0B0C0E;
+    --surface: #111317;
+    --surface2: #181B21;
+    --surface3: #1E222A;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --text: #E8EAF0;
+    --muted: #7A8094;
+    --muted2: #4E5568;
+    --accent: #5B8AF0;
+    --accent2: #38D9A9;
+    --accent3: #F5A623;
+    --accent4: #E85D8A;
+    --accent5: #A78BFA;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+    --display: 'Syne', sans-serif;
+    --radius: 12px;
+    --radius-lg: 20px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: rgba(91,138,240,0.3); color: #fff; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--muted2); border-radius: 3px; }
+
+  /* ── NAV ─────────────────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+    height: 56px;
+    background: rgba(11,12,14,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 0.5px solid var(--border);
+    display: flex; align-items: center; padding: 0 2rem;
+    gap: 2rem;
+  }
+  .nav-logo {
+    font-family: var(--display);
+    font-weight: 800; font-size: 17px;
+    color: var(--text);
+    letter-spacing: -0.5px;
+    white-space: nowrap;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-links {
+    display: flex; gap: 0; list-style: none;
+    overflow-x: auto; scrollbar-width: none;
+    flex: 1;
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a {
+    display: block; padding: 6px 14px;
+    font-size: 12px; font-weight: 500; letter-spacing: 0.02em;
+    color: var(--muted);
+    text-decoration: none; white-space: nowrap;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); background: var(--surface2); }
+  .nav-links a.active { color: var(--accent); }
+  .nav-pill {
+    margin-left: auto;
+    font-size: 11px; font-family: var(--mono);
+    color: var(--accent2); background: rgba(56,217,169,0.1);
+    border: 0.5px solid rgba(56,217,169,0.3);
+    padding: 4px 12px; border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  /* ── LAYOUT ─────────────────────── */
+  .wrapper { display: flex; min-height: 100vh; padding-top: 56px; }
+
+  aside {
+    width: 240px; min-width: 240px;
+    position: sticky; top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto; padding: 2rem 1.5rem;
+    border-right: 0.5px solid var(--border);
+    background: var(--surface);
+    scrollbar-width: thin;
+  }
+  aside::-webkit-scrollbar { width: 4px; }
+  aside::-webkit-scrollbar-thumb { background: var(--muted2); border-radius: 2px; }
+
+  .sidebar-section {
+    margin-bottom: 2rem;
+  }
+  .sidebar-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+    color: var(--muted2); text-transform: uppercase;
+    margin-bottom: 0.5rem; padding-left: 8px;
+  }
+  .sidebar-link {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 8px; border-radius: 8px;
+    font-size: 13px; color: var(--muted);
+    text-decoration: none; cursor: pointer;
+    transition: all 0.15s; margin-bottom: 1px;
+  }
+  .sidebar-link:hover { background: var(--surface2); color: var(--text); }
+  .sidebar-link.active { background: rgba(91,138,240,0.12); color: var(--accent); }
+  .sidebar-link .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: currentColor; opacity: 0.5; flex-shrink: 0;
+  }
+  .sidebar-link.active .dot { opacity: 1; }
+
+  main { flex: 1; min-width: 0; max-width: 900px; padding: 3rem 3rem 8rem; }
+
+  /* ── HERO ───────────────────────── */
+  .hero {
+    padding-bottom: 4rem;
+    border-bottom: 0.5px solid var(--border);
+    margin-bottom: 4rem;
+    position: relative;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-family: var(--mono); font-weight: 500;
+    color: var(--accent); background: rgba(91,138,240,0.1);
+    border: 0.5px solid rgba(91,138,240,0.3);
+    padding: 5px 14px; border-radius: 100px; margin-bottom: 1.5rem;
+  }
+  .hero-badge::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); animation: blink 2s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 800; line-height: 1.1;
+    letter-spacing: -1.5px; color: #fff;
+    margin-bottom: 1.25rem;
+  }
+  h1 .hl-blue { color: var(--accent); }
+  h1 .hl-green { color: var(--accent2); }
+
+  .hero-sub {
+    font-size: 16px; color: var(--muted); max-width: 560px;
+    line-height: 1.7; margin-bottom: 2rem;
+  }
+
+  .hero-stats {
+    display: flex; gap: 2rem; flex-wrap: wrap;
+  }
+  .stat {
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .stat-n {
+    font-family: var(--display); font-size: 2rem; font-weight: 800;
+    color: #fff; letter-spacing: -1px; line-height: 1;
+  }
+  .stat-n span { color: var(--accent2); }
+  .stat-l { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; }
+
+  /* ── SECTION HEADINGS ───────────── */
+  .section { margin-bottom: 4rem; }
+  .section-header { margin-bottom: 2rem; }
+  .section-eyebrow {
+    font-size: 10px; font-family: var(--mono); font-weight: 500;
+    color: var(--accent2); letter-spacing: 0.15em; text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  h2 {
+    font-family: var(--display);
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 700; letter-spacing: -0.5px; color: #fff;
+    line-height: 1.2; margin-bottom: 0.75rem;
+  }
+  h3 {
+    font-family: var(--display);
+    font-size: 1.1rem; font-weight: 600;
+    color: #fff; margin-bottom: 0.75rem;
+  }
+  .section-desc { font-size: 15px; color: var(--muted); max-width: 620px; line-height: 1.75; }
+
+  /* ── PIPELINE DIAGRAM ───────────── */
+  .pipeline {
+    display: flex; align-items: stretch;
+    gap: 0; margin: 2rem 0; overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .pipe-step {
+    flex: 1; min-width: 100px;
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-right: none;
+    padding: 1.25rem 1rem 1rem;
+    position: relative;
+    cursor: default;
+    transition: background 0.2s;
+  }
+  .pipe-step:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+  .pipe-step:last-child { border-radius: 0 var(--radius) var(--radius) 0; border-right: 0.5px solid var(--border); }
+  .pipe-step:hover { background: var(--surface3); }
+  .pipe-step::after {
+    content: ''; position: absolute;
+    right: -10px; top: 50%; transform: translateY(-50%);
+    width: 0; height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 10px solid var(--border2);
+    z-index: 2;
+  }
+  .pipe-step:last-child::after { display: none; }
+  .pipe-icon {
+    font-size: 18px; margin-bottom: 8px; display: block;
+    filter: grayscale(0);
+  }
+  .pipe-name {
+    font-family: var(--display); font-size: 11px; font-weight: 700;
+    color: #fff; letter-spacing: 0.02em; margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .pipe-desc { font-size: 10px; color: var(--muted); line-height: 1.5; }
+  .pipe-tag {
+    display: inline-block; margin-top: 8px;
+    font-size: 9px; font-family: var(--mono);
+    padding: 2px 7px; border-radius: 100px;
+    color: inherit; border: 0.5px solid currentColor;
+    opacity: 0.6;
+  }
+
+  /* ── CARDS GRID ─────────────────── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 1px; background: var(--border); border-radius: var(--radius); overflow: hidden; margin: 1.5rem 0; }
+  .card {
+    background: var(--surface2);
+    padding: 1.5rem;
+    transition: background 0.2s;
+  }
+  .card:hover { background: var(--surface3); }
+  .card-icon { font-size: 22px; margin-bottom: 12px; display: block; }
+  .card-title { font-family: var(--display); font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; letter-spacing: -0.2px; }
+  .card-body { font-size: 13px; color: var(--muted); line-height: 1.65; }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 12px; }
+  .tag {
+    font-size: 10px; font-family: var(--mono); font-weight: 500;
+    padding: 3px 8px; border-radius: 100px;
+    border: 0.5px solid var(--border2);
+    color: var(--muted);
+  }
+  .tag.blue { color: var(--accent); border-color: rgba(91,138,240,0.3); background: rgba(91,138,240,0.08); }
+  .tag.green { color: var(--accent2); border-color: rgba(56,217,169,0.3); background: rgba(56,217,169,0.08); }
+  .tag.amber { color: var(--accent3); border-color: rgba(245,166,35,0.3); background: rgba(245,166,35,0.08); }
+  .tag.pink { color: var(--accent4); border-color: rgba(232,93,138,0.3); background: rgba(232,93,138,0.08); }
+  .tag.purple { color: var(--accent5); border-color: rgba(167,139,250,0.3); background: rgba(167,139,250,0.08); }
+
+  /* ── CODE BLOCK ─────────────────── */
+  .code-wrap {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden; margin: 1.5rem 0;
+  }
+  .code-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 0.5px solid var(--border);
+    background: var(--surface2);
+  }
+  .code-lang {
+    font-size: 11px; font-family: var(--mono); color: var(--muted);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .code-dots { display: flex; gap: 5px; }
+  .code-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #FF5F57; } .dot-y { background: #FEBC2E; } .dot-g { background: #28C840; }
+  .copy-btn {
+    font-size: 11px; font-family: var(--mono); color: var(--muted);
+    background: none; border: 0.5px solid var(--border2);
+    padding: 3px 10px; border-radius: 6px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .copy-btn:hover { color: var(--text); border-color: var(--border2); background: var(--surface3); }
+  pre {
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto; font-family: var(--mono);
+    font-size: 12.5px; line-height: 1.8;
+  }
+  .kw { color: #C792EA; }
+  .fn { color: #82AAFF; }
+  .str { color: #C3E88D; }
+  .cm { color: #546E7A; font-style: italic; }
+  .num { color: #F78C6C; }
+  .cls { color: #FFCB6B; }
+  .attr { color: var(--accent2); }
+
+  /* ── NOTATION TABLE ─────────────── */
+  .notation-table {
+    width: 100%; border-collapse: collapse;
+    margin: 1.5rem 0; font-size: 13px;
+  }
+  .notation-table th {
+    padding: 10px 14px; text-align: left;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted2); border-bottom: 0.5px solid var(--border);
+    background: var(--surface2);
+  }
+  .notation-table th:first-child { border-radius: var(--radius) 0 0 0; }
+  .notation-table th:last-child { border-radius: 0 var(--radius) 0 0; }
+  .notation-table td {
+    padding: 10px 14px; border-bottom: 0.5px solid var(--border);
+    vertical-align: top;
+  }
+  .notation-table tr:last-child td { border-bottom: none; }
+  .notation-table tr:hover td { background: var(--surface2); }
+  .sym { font-family: var(--mono); color: var(--accent3); font-size: 13px; }
+  .meaning { color: var(--muted); line-height: 1.5; }
+
+  /* ── PLATFORM CARDS ─────────────── */
+  .platform-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 12px; margin: 1.5rem 0; }
+  .platform-card {
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    transition: border-color 0.2s, background 0.2s;
+    cursor: default;
+    position: relative; overflow: hidden;
+  }
+  .platform-card:hover { border-color: var(--border2); background: var(--surface3); }
+  .platform-card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+  }
+  .platform-card.blue::before { background: var(--accent); }
+  .platform-card.green::before { background: var(--accent2); }
+  .platform-card.amber::before { background: var(--accent3); }
+  .platform-card.pink::before { background: var(--accent4); }
+  .platform-card.purple::before { background: var(--accent5); }
+  .platform-name { font-family: var(--display); font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .platform-type { font-size: 10px; font-family: var(--mono); color: var(--muted); margin-bottom: 10px; }
+  .platform-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .platform-features { margin-top: 12px; display: flex; flex-direction: column; gap: 4px; }
+  .platform-feature { display: flex; align-items: flex-start; gap: 6px; font-size: 11px; color: var(--muted); }
+  .platform-feature::before { content: '—'; color: var(--muted2); flex-shrink: 0; }
+
+  /* ── CALLOUT ────────────────────── */
+  .callout {
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+    display: flex; gap: 1rem; align-items: flex-start;
+    border: 0.5px solid;
+  }
+  .callout.info { background: rgba(91,138,240,0.07); border-color: rgba(91,138,240,0.2); }
+  .callout.tip { background: rgba(56,217,169,0.07); border-color: rgba(56,217,169,0.2); }
+  .callout.warn { background: rgba(245,166,35,0.07); border-color: rgba(245,166,35,0.2); }
+  .callout-icon { font-size: 16px; margin-top: 2px; flex-shrink: 0; }
+  .callout-body { font-size: 13.5px; line-height: 1.7; color: var(--muted); }
+  .callout-body strong { color: var(--text); font-weight: 500; }
+
+  /* ── CONCEPT ACCORDION ──────────── */
+  .concept-list { display: flex; flex-direction: column; gap: 4px; margin: 1.5rem 0; }
+  .concept-item {
+    background: var(--surface2); border-radius: var(--radius);
+    border: 0.5px solid var(--border);
+    overflow: hidden;
+  }
+  .concept-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; cursor: pointer;
+    transition: background 0.15s;
+    user-select: none;
+  }
+  .concept-header:hover { background: var(--surface3); }
+  .concept-title {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 14px; font-weight: 500; color: var(--text);
+  }
+  .concept-badge {
+    font-size: 9px; font-family: var(--mono);
+    padding: 2px 7px; border-radius: 100px;
+  }
+  .concept-chevron {
+    color: var(--muted2); transition: transform 0.2s;
+    font-size: 12px;
+  }
+  .concept-item.open .concept-chevron { transform: rotate(180deg); }
+  .concept-body {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.2s;
+    padding: 0 16px;
+  }
+  .concept-item.open .concept-body { max-height: 600px; padding: 0 16px 16px; }
+  .concept-body p { font-size: 13.5px; color: var(--muted); line-height: 1.75; margin-bottom: 0.75rem; }
+  .concept-body p:last-child { margin-bottom: 0; }
+
+  /* ── LIFECYCLE VISUAL ───────────── */
+  .lifecycle {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 12px;
+    margin: 1.5rem 0;
+  }
+  .lc-item {
+    background: var(--surface2); border: 0.5px solid var(--border);
+    border-radius: var(--radius); padding: 1.25rem;
+    position: relative;
+  }
+  .lc-num {
+    position: absolute; top: -10px; left: 16px;
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-family: var(--mono); font-weight: 700;
+    background: var(--bg); border: 0.5px solid;
+  }
+  .lc-title { font-family: var(--display); font-size: 13px; font-weight: 700; color: #fff; margin-top: 8px; margin-bottom: 6px; }
+  .lc-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  /* ── METRICS TABLE ──────────────── */
+  .metrics-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(160px,1fr)); gap: 12px; margin: 1.5rem 0; }
+  .metric-card {
+    background: var(--surface2); border: 0.5px solid var(--border);
+    border-radius: var(--radius); padding: 1.25rem 1rem;
+  }
+  .metric-sym { font-family: var(--mono); font-size: 1.4rem; font-weight: 300; color: var(--accent3); margin-bottom: 6px; letter-spacing: -1px; }
+  .metric-name { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .metric-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+  .metric-formula { font-family: var(--mono); font-size: 10px; color: var(--accent); margin-top: 8px; opacity: 0.8; }
+
+  /* ── DRIFT / MONITORING ─────────── */
+  .monitor-row {
+    display: flex; gap: 12px; margin: 1.5rem 0;
+    flex-wrap: wrap;
+  }
+  .monitor-card {
+    flex: 1; min-width: 180px;
+    background: var(--surface2); border: 0.5px solid var(--border);
+    border-radius: var(--radius); padding: 1.25rem;
+  }
+  .monitor-label {
+    font-size: 10px; font-family: var(--mono); font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted2); margin-bottom: 6px;
+  }
+  .monitor-val {
+    font-family: var(--display); font-size: 1.75rem; font-weight: 800;
+    letter-spacing: -1px; margin-bottom: 4px;
+  }
+  .monitor-sub { font-size: 11px; color: var(--muted); }
+  .progress-bar {
+    height: 4px; background: var(--surface3);
+    border-radius: 2px; margin-top: 10px; overflow: hidden;
+  }
+  .progress-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+
+  /* ── QUIZ ───────────────────────── */
+  .quiz-section { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; margin: 2rem 0; }
+  .quiz-question { font-family: var(--display); font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 1.25rem; }
+  .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
+  .quiz-opt {
+    background: var(--surface3); border: 0.5px solid var(--border);
+    border-radius: var(--radius); padding: 10px 14px;
+    font-size: 13px; color: var(--muted); cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+  }
+  .quiz-opt:hover { border-color: var(--border2); color: var(--text); }
+  .quiz-opt.correct { border-color: rgba(56,217,169,0.5); background: rgba(56,217,169,0.1); color: var(--accent2); }
+  .quiz-opt.wrong { border-color: rgba(232,93,138,0.5); background: rgba(232,93,138,0.1); color: var(--accent4); }
+  .quiz-feedback { font-size: 13px; color: var(--muted); padding: 10px 14px; background: var(--surface); border-radius: var(--radius); margin-top: 8px; display: none; }
+  .quiz-nav { display: flex; gap: 8px; margin-top: 1rem; align-items: center; }
+  .quiz-btn {
+    font-size: 12px; font-family: var(--mono);
+    padding: 7px 16px; border-radius: 8px;
+    border: 0.5px solid var(--border2); background: none;
+    color: var(--muted); cursor: pointer; transition: all 0.15s;
+  }
+  .quiz-btn:hover { background: var(--surface3); color: var(--text); }
+  .quiz-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .quiz-counter { font-size: 11px; font-family: var(--mono); color: var(--muted2); margin-left: auto; }
+
+  /* ── FOOTER ─────────────────────── */
+  .page-footer {
+    border-top: 0.5px solid var(--border);
+    padding: 2rem 3rem; text-align: center;
+    font-size: 12px; color: var(--muted2);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+
+  /* ── TABS ───────────────────────── */
+  .tabs { display: flex; gap: 0; border-bottom: 0.5px solid var(--border); margin-bottom: 1.5rem; }
+  .tab {
+    padding: 10px 18px; font-size: 13px; color: var(--muted);
+    cursor: pointer; border-bottom: 2px solid transparent;
+    margin-bottom: -0.5px; transition: all 0.15s;
+    font-weight: 500;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── RESPONSIVE ─────────────────── */
+  @media (max-width: 860px) {
+    aside { display: none; }
+    main { padding: 2rem 1.5rem 6rem; max-width: 100%; }
+    .pipeline { flex-direction: column; }
+    .pipe-step { border-right: 0.5px solid var(--border); border-bottom: none; border-radius: 0; }
+    .pipe-step:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+    .pipe-step:last-child { border-radius: 0 0 var(--radius) var(--radius); border-bottom: 0.5px solid var(--border); }
+    .pipe-step::after { display: none; }
+    .lifecycle { grid-template-columns: 1fr 1fr; }
+    .quiz-options { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    nav { padding: 0 1rem; }
+    .nav-links { display: none; }
+    h1 { font-size: 2rem; }
+    .lifecycle { grid-template-columns: 1fr; }
+  }
+
+  /* ── ANIMATIONS ─────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero { animation: fadeUp 0.6s ease both; }
+  .section { animation: fadeUp 0.5s ease both; animation-delay: 0.1s; }
+  .section:nth-child(2) { animation-delay: 0.15s; }
+  .section:nth-child(3) { animation-delay: 0.2s; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">ML<span>Ops</span></div>
+  <ul class="nav-links">
+    <li><a href="#intro" class="active">Intro</a></li>
+    <li><a href="#pipeline">Pipeline</a></li>
+    <li><a href="#lifecycle">Lifecycle</a></li>
+    <li><a href="#notation">Notation</a></li>
+    <li><a href="#concepts">Concepts</a></li>
+    <li><a href="#monitoring">Monitoring</a></li>
+    <li><a href="#platforms">Platforms</a></li>
+    <li><a href="#code">Code</a></li>
+    <li><a href="#quiz">Quiz</a></li>
+  </ul>
+  <div class="nav-pill">v2025 · Interactive</div>
+</nav>
+
+<div class="wrapper">
+
+<aside>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Getting Started</div>
+    <a class="sidebar-link active" onclick="scrollTo('intro')"><span class="dot"></span>What is MLOps?</a>
+    <a class="sidebar-link" onclick="scrollTo('pipeline')"><span class="dot"></span>The Pipeline</a>
+    <a class="sidebar-link" onclick="scrollTo('lifecycle')"><span class="dot"></span>ML Lifecycle</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Core Knowledge</div>
+    <a class="sidebar-link" onclick="scrollTo('notation')"><span class="dot"></span>Notation Reference</a>
+    <a class="sidebar-link" onclick="scrollTo('concepts')"><span class="dot"></span>Key Concepts</a>
+    <a class="sidebar-link" onclick="scrollTo('monitoring')"><span class="dot"></span>Monitoring & Drift</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Tools & Practice</div>
+    <a class="sidebar-link" onclick="scrollTo('platforms')"><span class="dot"></span>Platforms</a>
+    <a class="sidebar-link" onclick="scrollTo('code')"><span class="dot"></span>Code Examples</a>
+    <a class="sidebar-link" onclick="scrollTo('quiz')"><span class="dot"></span>Knowledge Quiz</a>
+  </div>
+</aside>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero" id="intro">
+    <div class="hero-badge">Machine Learning Operations</div>
+    <h1>From <span class="hl-blue">experiment</span><br>to <span class="hl-green">production</span>.</h1>
+    <p class="hero-sub">MLOps is the discipline of deploying, monitoring, and maintaining machine learning models at scale — bridging the gap between data science and engineering.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-n">87<span>%</span></div><div class="stat-l">of ML projects never reach production</div></div>
+      <div class="stat"><div class="stat-n">10<span>×</span></div><div class="stat-l">faster deployment with MLOps practices</div></div>
+      <div class="stat"><div class="stat-n">3<span>+</span></div><div class="stat-l">core engineering disciplines combined</div></div>
+    </div>
+
+    <div class="callout info" style="margin-top:2rem;">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body"><strong>Simple definition:</strong> MLOps = DevOps + Data Engineering + Machine Learning. It ensures your models work reliably in the real world, not just on your laptop.</div>
+    </div>
+  </section>
+
+  <!-- PIPELINE -->
+  <section class="section" id="pipeline">
+    <div class="section-header">
+      <div class="section-eyebrow">01 — Architecture</div>
+      <h2>The MLOps Pipeline</h2>
+      <p class="section-desc">Every production ML system flows through these stages. Each stage has distinct tooling, responsibilities, and failure modes.</p>
+    </div>
+
+    <div class="pipeline">
+      <div class="pipe-step">
+        <span class="pipe-icon">🗄️</span>
+        <div class="pipe-name">Data</div>
+        <div class="pipe-desc">Ingest, validate, version, and store raw data</div>
+        <span class="pipe-tag" style="color:var(--accent)">ingestion</span>
+      </div>
+      <div class="pipe-step">
+        <span class="pipe-icon">⚙️</span>
+        <div class="pipe-name">Feature</div>
+        <div class="pipe-desc">Engineer, transform, and serve features</div>
+        <span class="pipe-tag" style="color:var(--accent2)">feast · tecton</span>
+      </div>
+      <div class="pipe-step">
+        <span class="pipe-icon">🧪</span>
+        <div class="pipe-name">Train</div>
+        <div class="pipe-desc">Experiment tracking, HPO, model selection</div>
+        <span class="pipe-tag" style="color:var(--accent3)">mlflow · wandb</span>
+      </div>
+      <div class="pipe-step">
+        <span class="pipe-icon">✅</span>
+        <div class="pipe-name">Evaluate</div>
+        <div class="pipe-desc">Offline metrics, fairness, A/B testing</div>
+        <span class="pipe-tag" style="color:var(--accent4)">metrics</span>
+      </div>
+      <div class="pipe-step">
+        <span class="pipe-icon">🚀</span>
+        <div class="pipe-name">Deploy</div>
+        <div class="pipe-desc">Package model, serve via REST or batch</div>
+        <span class="pipe-tag" style="color:var(--accent5)">seldon · ray</span>
+      </div>
+      <div class="pipe-step">
+        <span class="pipe-icon">📊</span>
+        <div class="pipe-name">Monitor</div>
+        <div class="pipe-desc">Drift detection, logging, alerts, retrain</div>
+        <span class="pipe-tag" style="color:var(--accent)">evidently</span>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <span class="card-icon">🔄</span>
+        <div class="card-title">Continuous Training (CT)</div>
+        <div class="card-body">Automatically retrain models when new data arrives or performance drops below a threshold. CT closes the production feedback loop.</div>
+        <div class="card-tags"><span class="tag green">automated</span><span class="tag">trigger-based</span></div>
+      </div>
+      <div class="card">
+        <span class="card-icon">📦</span>
+        <div class="card-title">Model Registry</div>
+        <div class="card-body">A central store for versioned model artifacts, metadata, and lineage. Think of it as Git — but for models. Enables rollback and auditing.</div>
+        <div class="card-tags"><span class="tag blue">versioning</span><span class="tag">lineage</span></div>
+      </div>
+      <div class="card">
+        <span class="card-icon">🧬</span>
+        <div class="card-title">Feature Store</div>
+        <div class="card-body">Shared repository for computed features. Prevents training-serving skew by ensuring the exact same transformations are used offline and online.</div>
+        <div class="card-tags"><span class="tag amber">consistency</span><span class="tag">reusability</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIFECYCLE -->
+  <section class="section" id="lifecycle">
+    <div class="section-header">
+      <div class="section-eyebrow">02 — Process</div>
+      <h2>ML Model Lifecycle</h2>
+      <p class="section-desc">A model's life begins at conception and never truly ends — it continuously loops through evaluation and retraining.</p>
+    </div>
+
+    <div class="lifecycle">
+      <div class="lc-item">
+        <div class="lc-num" style="color:var(--accent);border-color:rgba(91,138,240,0.4)">1</div>
+        <div class="lc-title">Problem Definition</div>
+        <div class="lc-desc">Define the ML task (classification, regression, ranking). Establish success metrics aligned with business KPIs.</div>
+      </div>
+      <div class="lc-item">
+        <div class="lc-num" style="color:var(--accent2);border-color:rgba(56,217,169,0.4)">2</div>
+        <div class="lc-title">Data Collection</div>
+        <div class="lc-desc">Gather labelled and unlabelled data from multiple sources. Ensure coverage of all real-world scenarios.</div>
+      </div>
+      <div class="lc-item">
+        <div class="lc-num" style="color:var(--accent3);border-color:rgba(245,166,35,0.4)">3</div>
+        <div class="lc-title">EDA & Preparation</div>
+        <div class="lc-desc">Exploratory analysis, missing value handling, outlier detection, and schema validation.</div>
+      </div>
+      <div class="lc-item">
+        <div class="lc-num" style="color:var(--accent4);border-color:rgba(232,93,138,0.4)">4</div>
+        <div class="lc-title">Feature Engineering</div>
+        <div class="lc-desc">Transform raw data into numeric representations. Encode, normalise, and aggregate features.</div>
+      </div>
+      <div class="lc-item">
+        <div class="lc-num" style="color:var(--accent5);border-color:rgba(167,139,250,0.4)">5</div>
+        <div class="lc-title">Training & Tuning</div>
+        <div class="lc-desc">Select algorithm, optimise hyperparameters (HPO), track experiments with tools like MLflow or W&B.</div>
+      </div>
+      <div class="lc-item">
+        <div class="lc-num" style="color:var(--accent);border-color:rgba(91,138,240,0.4)">6</div>
+        <div class="lc-title">Evaluation</div>
+        <div class="lc-desc">Offline metrics, slice-based analysis, bias/fairness auditing, shadow deployment testing.</div>
+      </div>
+      <div class="lc-item">
+        <div class="lc-num" style="color:var(--accent2);border-color:rgba(56,217,169,0.4)">7</div>
+        <div class="lc-title">Deployment</div>
+        <div class="lc-desc">Package as a container, deploy to serving infrastructure. Choose canary, blue-green, or shadow strategy.</div>
+      </div>
+      <div class="lc-item">
+        <div class="lc-num" style="color:var(--accent3);border-color:rgba(245,166,35,0.4)">8</div>
+        <div class="lc-title">Monitoring</div>
+        <div class="lc-desc">Track prediction distribution, input drift, latency, error rate, and business metrics continuously.</div>
+      </div>
+      <div class="lc-item">
+        <div class="lc-num" style="color:var(--accent4);border-color:rgba(232,93,138,0.4)">9</div>
+        <div class="lc-title">Retrain / Retire</div>
+        <div class="lc-desc">Trigger retraining on drift or scheduled cadence. Retire models when replaced or deprecated.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOTATION -->
+  <section class="section" id="notation">
+    <div class="section-header">
+      <div class="section-eyebrow">03 — Reference</div>
+      <h2>Notation & Terminology</h2>
+      <p class="section-desc">Common symbols, abbreviations, and what they mean in an MLOps context.</p>
+    </div>
+
+    <table class="notation-table">
+      <thead>
+        <tr>
+          <th style="width:120px">Symbol / Term</th>
+          <th>Meaning</th>
+          <th>MLOps Context</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="sym">θ (theta)</span></td><td class="meaning">Model parameters — the weights/biases learned during training</td><td><span class="tag blue">training</span></td></tr>
+        <tr><td><span class="sym">X, y</span></td><td class="meaning">Feature matrix X and target vector y (input → output pairs)</td><td><span class="tag green">data</span></td></tr>
+        <tr><td><span class="sym">f(x; θ)</span></td><td class="meaning">Model function: given input x and params θ, produce prediction</td><td><span class="tag blue">inference</span></td></tr>
+        <tr><td><span class="sym">L(θ)</span></td><td class="meaning">Loss function — quantifies prediction error, minimised during training</td><td><span class="tag blue">training</span></td></tr>
+        <tr><td><span class="sym">∂L/∂θ</span></td><td class="meaning">Gradient of loss w.r.t. parameters — drives gradient descent</td><td><span class="tag blue">optimisation</span></td></tr>
+        <tr><td><span class="sym">η (eta)</span></td><td class="meaning">Learning rate — step size for each gradient update</td><td><span class="tag amber">HPO</span></td></tr>
+        <tr><td><span class="sym">p̂ (p-hat)</span></td><td class="meaning">Predicted probability output from a classifier</td><td><span class="tag blue">inference</span></td></tr>
+        <tr><td><span class="sym">PSI</span></td><td class="meaning">Population Stability Index — measures feature distribution shift</td><td><span class="tag pink">monitoring</span></td></tr>
+        <tr><td><span class="sym">KL(P‖Q)</span></td><td class="meaning">KL Divergence — difference between two distributions (training vs serving)</td><td><span class="tag pink">drift</span></td></tr>
+        <tr><td><span class="sym">AUC-ROC</span></td><td class="meaning">Area under ROC curve — threshold-independent classifier metric</td><td><span class="tag green">evaluation</span></td></tr>
+        <tr><td><span class="sym">CI/CD</span></td><td class="meaning">Continuous Integration / Continuous Deployment — automated build & release</td><td><span class="tag purple">engineering</span></td></tr>
+        <tr><td><span class="sym">CT</span></td><td class="meaning">Continuous Training — automatic retraining when triggered by drift or schedule</td><td><span class="tag purple">engineering</span></td></tr>
+        <tr><td><span class="sym">SLA</span></td><td class="meaning">Service Level Agreement — uptime / latency guarantees for serving endpoints</td><td><span class="tag amber">ops</span></td></tr>
+        <tr><td><span class="sym">p50/p99</span></td><td class="meaning">50th / 99th percentile latency — "median" and "worst 1% of requests"</td><td><span class="tag amber">ops</span></td></tr>
+        <tr><td><span class="sym">DAG</span></td><td class="meaning">Directed Acyclic Graph — structure representing pipeline dependencies (Airflow, Prefect)</td><td><span class="tag purple">orchestration</span></td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-header" style="margin-top:2rem;margin-bottom:1.25rem;">
+      <h3>Key Model Metrics</h3>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-sym">Acc</div>
+        <div class="metric-name">Accuracy</div>
+        <div class="metric-desc">Fraction of correct predictions. Misleading on imbalanced data.</div>
+        <div class="metric-formula">= (TP + TN) / N</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-sym">P</div>
+        <div class="metric-name">Precision</div>
+        <div class="metric-desc">Of all predicted positives, how many are truly positive?</div>
+        <div class="metric-formula">= TP / (TP + FP)</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-sym">R</div>
+        <div class="metric-name">Recall</div>
+        <div class="metric-desc">Of all actual positives, how many did we find?</div>
+        <div class="metric-formula">= TP / (TP + FN)</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-sym">F₁</div>
+        <div class="metric-name">F1 Score</div>
+        <div class="metric-desc">Harmonic mean of precision and recall. Balances both.</div>
+        <div class="metric-formula">= 2·P·R / (P + R)</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-sym">MAE</div>
+        <div class="metric-name">Mean Abs Error</div>
+        <div class="metric-desc">Average absolute difference between predicted and actual values.</div>
+        <div class="metric-formula">= Σ|yᵢ − ŷᵢ| / n</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-sym">RMSE</div>
+        <div class="metric-name">Root MSE</div>
+        <div class="metric-desc">Penalises large errors more than MAE. Sensitive to outliers.</div>
+        <div class="metric-formula">= √(Σ(y−ŷ)²/n)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONCEPTS -->
+  <section class="section" id="concepts">
+    <div class="section-header">
+      <div class="section-eyebrow">04 — Deep Dive</div>
+      <h2>Key Concepts Explained</h2>
+      <p class="section-desc">Click any concept to expand the full explanation.</p>
+    </div>
+
+    <div class="concept-list">
+
+      <div class="concept-item" onclick="toggleConcept(this)">
+        <div class="concept-header">
+          <div class="concept-title">
+            <span>Data & Concept Drift</span>
+            <span class="concept-badge tag pink">monitoring</span>
+          </div>
+          <span class="concept-chevron">▾</span>
+        </div>
+        <div class="concept-body">
+          <p><strong>Data drift</strong> (a.k.a. covariate shift) occurs when the statistical distribution of input features X changes between training and production. Example: a loan model trained on pre-COVID income data faces very different distributions post-COVID.</p>
+          <p><strong>Concept drift</strong> is more subtle — the relationship between X and y itself changes. A spam filter may need retraining as spammers adapt tactics, even if email distributions look similar.</p>
+          <p>Detection methods: Population Stability Index (PSI), Kolmogorov-Smirnov test, Jensen-Shannon divergence. A PSI > 0.2 typically triggers retraining.</p>
+        </div>
+      </div>
+
+      <div class="concept-item" onclick="toggleConcept(this)">
+        <div class="concept-header">
+          <div class="concept-title">
+            <span>Training-Serving Skew</span>
+            <span class="concept-badge tag amber">data</span>
+          </div>
+          <span class="concept-chevron">▾</span>
+        </div>
+        <div class="concept-body">
+          <p>Skew happens when the features computed during training differ from those computed at serving time. A classic cause: using <code>mean(user_purchases_last_30d)</code> in training via a historical batch join, but computing it differently in production code.</p>
+          <p>The solution is a <strong>Feature Store</strong> — a shared layer that ensures the exact same transformation logic runs offline and online. Feast, Tecton, and Hopsworks are popular options.</p>
+        </div>
+      </div>
+
+      <div class="concept-item" onclick="toggleConcept(this)">
+        <div class="concept-header">
+          <div class="concept-title">
+            <span>Experiment Tracking</span>
+            <span class="concept-badge tag blue">training</span>
+          </div>
+          <span class="concept-chevron">▾</span>
+        </div>
+        <div class="concept-body">
+          <p>Every training run generates parameters, metrics, code versions, and artefacts. Without tracking, reproducing your best model becomes impossible. Experiment tracking tools log: hyperparameters (learning rate, batch size), metrics (loss, AUC), code commits, data versions, and output artefacts.</p>
+          <p>MLflow uses <strong>runs</strong> grouped into <strong>experiments</strong>. Each run captures: params, metrics (logged per step), tags, and artefacts (model files). Weights & Biases (W&B) adds collaborative dashboards and sweep-based HPO on top of this.</p>
+        </div>
+      </div>
+
+      <div class="concept-item" onclick="toggleConcept(this)">
+        <div class="concept-header">
+          <div class="concept-title">
+            <span>Deployment Strategies</span>
+            <span class="concept-badge tag purple">deploy</span>
+          </div>
+          <span class="concept-chevron">▾</span>
+        </div>
+        <div class="concept-body">
+          <p><strong>Blue-Green:</strong> Run two identical environments (blue = old, green = new). Switch traffic instantly. Easy rollback by redirecting back to blue.</p>
+          <p><strong>Canary:</strong> Route a small percentage (e.g. 5%) of traffic to the new model, monitor metrics, then gradually increase. Safer for high-traffic systems.</p>
+          <p><strong>Shadow (Dark launch):</strong> New model receives all requests but its predictions are not served to users. Used to compare output distributions before going live — zero risk.</p>
+          <p><strong>A/B Testing:</strong> Split users into control (model A) and treatment (model B) groups. Measure business outcomes (CTR, conversion) to determine the winner statistically.</p>
+        </div>
+      </div>
+
+      <div class="concept-item" onclick="toggleConcept(this)">
+        <div class="concept-header">
+          <div class="concept-title">
+            <span>Hyperparameter Optimisation (HPO)</span>
+            <span class="concept-badge tag amber">training</span>
+          </div>
+          <span class="concept-chevron">▾</span>
+        </div>
+        <div class="concept-body">
+          <p>Hyperparameters (η, batch size, tree depth, dropout rate) are not learned from data — they're set before training. HPO automates their search.</p>
+          <p><strong>Grid Search:</strong> Exhaustively try every combination. Expensive. <strong>Random Search:</strong> Sample randomly — often finds good results 60× faster than grid for the same budget. <strong>Bayesian Optimisation:</strong> Model the loss surface with a surrogate (Gaussian Process), suggest next point intelligently. Optuna, Ray Tune, and W&B Sweeps all implement this.</p>
+        </div>
+      </div>
+
+      <div class="concept-item" onclick="toggleConcept(this)">
+        <div class="concept-header">
+          <div class="concept-title">
+            <span>Model Serving Patterns</span>
+            <span class="concept-badge tag blue">deploy</span>
+          </div>
+          <span class="concept-chevron">▾</span>
+        </div>
+        <div class="concept-body">
+          <p><strong>Online (real-time) serving:</strong> Model runs behind a REST or gRPC endpoint. Predictions returned synchronously in &lt;100ms. Used for recommendations, fraud detection, chatbots.</p>
+          <p><strong>Batch serving:</strong> Run predictions offline on a large dataset, store results in a database. Users query pre-computed scores. Simpler and cheaper. Used for churn prediction, marketing segmentation.</p>
+          <p><strong>Streaming serving:</strong> Model runs on a stream (Kafka, Kinesis). Events trigger inference as they arrive. Used for IoT anomaly detection, real-time fraud.</p>
+          <p>Model packaging formats: <strong>ONNX</strong> (cross-framework), <strong>TorchScript</strong> (PyTorch), <strong>SavedModel</strong> (TensorFlow), <strong>Pickle/Joblib</strong> (sklearn). TorchScript and ONNX remove the Python runtime dependency for production.</p>
+        </div>
+      </div>
+
+      <div class="concept-item" onclick="toggleConcept(this)">
+        <div class="concept-header">
+          <div class="concept-title">
+            <span>Data Versioning & Lineage</span>
+            <span class="concept-badge tag green">data</span>
+          </div>
+          <span class="concept-chevron">▾</span>
+        </div>
+        <div class="concept-body">
+          <p>Reproducing a model result requires knowing exactly which data was used. Data versioning tools (DVC, Delta Lake, Iceberg) snapshot datasets and track how they evolve.</p>
+          <p><strong>Lineage</strong> maps: raw source → transformation → training dataset → model → prediction. This audit trail is critical for debugging ("why did the model behaviour change?") and regulation (GDPR right-to-explanation).</p>
+        </div>
+      </div>
+
+      <div class="concept-item" onclick="toggleConcept(this)">
+        <div class="concept-header">
+          <div class="concept-title">
+            <span>ML Pipeline Orchestration</span>
+            <span class="concept-badge tag purple">engineering</span>
+          </div>
+          <span class="concept-chevron">▾</span>
+        </div>
+        <div class="concept-body">
+          <p>Orchestrators schedule, retry, and monitor multi-step pipelines expressed as <strong>DAGs</strong> (Directed Acyclic Graphs). Each node is a task (data load, feature compute, train, evaluate, push) with defined inputs and outputs.</p>
+          <p>Popular orchestrators: <strong>Apache Airflow</strong> (mature, Python-based DAGs, widely used), <strong>Prefect</strong> (better error handling and dynamic flows), <strong>ZenML / Kubeflow Pipelines</strong> (ML-native, runs on Kubernetes), <strong>Metaflow</strong> (Netflix, great for data scientists).</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- MONITORING -->
+  <section class="section" id="monitoring">
+    <div class="section-header">
+      <div class="section-eyebrow">05 — Observability</div>
+      <h2>Monitoring & Drift Detection</h2>
+      <p class="section-desc">Production models degrade silently. These are the signals to watch.</p>
+    </div>
+
+    <div class="monitor-row">
+      <div class="monitor-card">
+        <div class="monitor-label">Model Accuracy</div>
+        <div class="monitor-val" style="color:var(--accent2)">94.2<span style="font-size:1rem">%</span></div>
+        <div class="monitor-sub">vs baseline 95.1% ↓</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:94%;background:var(--accent2)"></div></div>
+      </div>
+      <div class="monitor-card">
+        <div class="monitor-label">Data Drift (PSI)</div>
+        <div class="monitor-val" style="color:var(--accent3)">0.18</div>
+        <div class="monitor-sub">threshold: 0.20 ⚠ near alert</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:90%;background:var(--accent3)"></div></div>
+      </div>
+      <div class="monitor-card">
+        <div class="monitor-label">p99 Latency</div>
+        <div class="monitor-val" style="color:var(--accent)">82<span style="font-size:1rem">ms</span></div>
+        <div class="monitor-sub">SLA: &lt;100ms ✓</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:82%;background:var(--accent)"></div></div>
+      </div>
+      <div class="monitor-card">
+        <div class="monitor-label">Error Rate</div>
+        <div class="monitor-val" style="color:var(--accent4)">0.3<span style="font-size:1rem">%</span></div>
+        <div class="monitor-sub">last 1h, 12k requests</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:3%;background:var(--accent4)"></div></div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body"><strong>PSI Thresholds:</strong> PSI &lt; 0.1 → no significant change. 0.1–0.2 → moderate shift, investigate. &gt; 0.2 → major shift, retrain immediately.</div>
+    </div>
+
+    <div class="cards" style="margin-top:1.5rem;">
+      <div class="card">
+        <span class="card-icon">📉</span>
+        <div class="card-title">Input Drift</div>
+        <div class="card-body">Distribution of features X<sub>serving</sub> diverges from X<sub>training</sub>. Detectable even without labels. Use PSI, KS test, or Wasserstein distance.</div>
+        <div class="card-tags"><span class="tag pink">detectable early</span></div>
+      </div>
+      <div class="card">
+        <span class="card-icon">🎯</span>
+        <div class="card-title">Prediction Drift</div>
+        <div class="card-body">Distribution of model outputs changes. A healthy indicator: even if inputs look fine, if predictions shift, something changed in the data pipeline.</div>
+        <div class="card-tags"><span class="tag pink">early warning</span></div>
+      </div>
+      <div class="card">
+        <span class="card-icon">🔮</span>
+        <div class="card-title">Label Drift</div>
+        <div class="card-body">Ground truth labels shift. Requires a label collection pipeline (human annotation, delayed feedback, business events). Confirms concept drift directly.</div>
+        <div class="card-tags"><span class="tag amber">requires labels</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLATFORMS -->
+  <section class="section" id="platforms">
+    <div class="section-header">
+      <div class="section-eyebrow">06 — Tooling</div>
+      <h2>Platforms & Tools</h2>
+      <p class="section-desc">The MLOps ecosystem is large. Here's an opinionated map of the landscape.</p>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab(this,'managed')">Managed Platforms</div>
+      <div class="tab" onclick="switchTab(this,'open')">Open Source</div>
+      <div class="tab" onclick="switchTab(this,'infra')">Infrastructure</div>
+      <div class="tab" onclick="switchTab(this,'monitor')">Monitoring</div>
+    </div>
+
+    <div class="tab-panel active" id="tab-managed">
+      <div class="platform-grid">
+        <div class="platform-card blue">
+          <div class="platform-name">AWS SageMaker</div>
+          <div class="platform-type">End-to-End · AWS</div>
+          <div class="platform-desc">Amazon's all-in-one ML platform. Deep AWS ecosystem integration.</div>
+          <div class="platform-features">
+            <div class="platform-feature">Managed training clusters with auto-scaling</div>
+            <div class="platform-feature">SageMaker Pipelines for CI/CD</div>
+            <div class="platform-feature">Model Monitor for drift detection</div>
+            <div class="platform-feature">Feature Store (online + offline)</div>
+          </div>
+        </div>
+        <div class="platform-card green">
+          <div class="platform-name">Vertex AI</div>
+          <div class="platform-type">End-to-End · GCP</div>
+          <div class="platform-desc">Google Cloud's unified ML platform built on Kubeflow foundations.</div>
+          <div class="platform-features">
+            <div class="platform-feature">AutoML + custom training</div>
+            <div class="platform-feature">Vertex Pipelines (Kubeflow-based)</div>
+            <div class="platform-feature">Model Registry & Explainable AI</div>
+            <div class="platform-feature">Batch + online prediction endpoints</div>
+          </div>
+        </div>
+        <div class="platform-card amber">
+          <div class="platform-name">Azure ML</div>
+          <div class="platform-type">End-to-End · Azure</div>
+          <div class="platform-desc">Microsoft's enterprise-focused ML platform with strong MLOps tooling.</div>
+          <div class="platform-features">
+            <div class="platform-feature">Azure ML Pipelines + Designer</div>
+            <div class="platform-feature">Responsible AI dashboard built-in</div>
+            <div class="platform-feature">Model catalog and deployment</div>
+            <div class="platform-feature">Git-based CI/CD integration</div>
+          </div>
+        </div>
+        <div class="platform-card purple">
+          <div class="platform-name">Databricks</div>
+          <div class="platform-type">Lakehouse · Multi-cloud</div>
+          <div class="platform-desc">Spark-native platform unifying data engineering and ML on the lakehouse.</div>
+          <div class="platform-features">
+            <div class="platform-feature">MLflow (open source, built-in)</div>
+            <div class="platform-feature">Unity Catalog for governance</div>
+            <div class="platform-feature">Model Serving with serverless endpoints</div>
+            <div class="platform-feature">Delta Lake for data versioning</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-open">
+      <div class="platform-grid">
+        <div class="platform-card blue">
+          <div class="platform-name">MLflow</div>
+          <div class="platform-type">Experiment Tracking · Model Registry</div>
+          <div class="platform-desc">The de facto standard for ML experiment tracking. Open source, language-agnostic.</div>
+          <div class="platform-features">
+            <div class="platform-feature">Log params, metrics, artefacts</div>
+            <div class="platform-feature">Model registry with stage transitions</div>
+            <div class="platform-feature">Projects for reproducible runs</div>
+          </div>
+        </div>
+        <div class="platform-card green">
+          <div class="platform-name">Kubeflow</div>
+          <div class="platform-type">Orchestration · Kubernetes</div>
+          <div class="platform-desc">ML toolkit for Kubernetes. Complex but highly scalable for enterprise teams.</div>
+          <div class="platform-features">
+            <div class="platform-feature">Pipelines (KFP) for DAG workflows</div>
+            <div class="platform-feature">KServe for model serving</div>
+            <div class="platform-feature">Katib for AutoML / HPO</div>
+          </div>
+        </div>
+        <div class="platform-card amber">
+          <div class="platform-name">DVC</div>
+          <div class="platform-type">Data Versioning · Pipelines</div>
+          <div class="platform-desc">Git for data. Version datasets and models alongside code in any git repo.</div>
+          <div class="platform-features">
+            <div class="platform-feature">Stage-based ML pipelines</div>
+            <div class="platform-feature">Remote storage (S3, GCS, Azure)</div>
+            <div class="platform-feature">Experiment comparison</div>
+          </div>
+        </div>
+        <div class="platform-card pink">
+          <div class="platform-name">ZenML</div>
+          <div class="platform-type">Pipelines · Infra Agnostic</div>
+          <div class="platform-desc">Open-source MLOps framework that lets you write pipelines once, run anywhere.</div>
+          <div class="platform-features">
+            <div class="platform-feature">Stack-based infrastructure abstraction</div>
+            <div class="platform-feature">Built-in experiment tracking</div>
+            <div class="platform-feature">Integrates with 50+ tools</div>
+          </div>
+        </div>
+        <div class="platform-card purple">
+          <div class="platform-name">Weights & Biases</div>
+          <div class="platform-type">Experiment Tracking · Evaluation</div>
+          <div class="platform-desc">Beautiful, collaborative experiment dashboard with deep integration for LLM eval.</div>
+          <div class="platform-features">
+            <div class="platform-feature">W&B Sweeps for HPO</div>
+            <div class="platform-feature">Artefact versioning</div>
+            <div class="platform-feature">Reports for team sharing</div>
+          </div>
+        </div>
+        <div class="platform-card blue">
+          <div class="platform-name">Prefect</div>
+          <div class="platform-type">Orchestration · Workflow</div>
+          <div class="platform-desc">Modern Python-native workflow orchestrator. Better developer experience than Airflow.</div>
+          <div class="platform-features">
+            <div class="platform-feature">Flows & tasks with decorators</div>
+            <div class="platform-feature">Dynamic runtime workflows</div>
+            <div class="platform-feature">Built-in observability</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-infra">
+      <div class="platform-grid">
+        <div class="platform-card blue">
+          <div class="platform-name">Docker</div>
+          <div class="platform-type">Containerisation</div>
+          <div class="platform-desc">Package model + dependencies into a portable container. Foundation of all modern ML deployment.</div>
+          <div class="platform-features">
+            <div class="platform-feature">Reproducible environments</div>
+            <div class="platform-feature">Base: python:3.11-slim or nvidia/cuda</div>
+          </div>
+        </div>
+        <div class="platform-card green">
+          <div class="platform-name">Kubernetes</div>
+          <div class="platform-type">Container Orchestration</div>
+          <div class="platform-desc">Manages containerised model serving at scale. Auto-scaling, health checks, rolling updates.</div>
+          <div class="platform-features">
+            <div class="platform-feature">HPA for traffic-based scaling</div>
+            <div class="platform-feature">GPU node pools for inference</div>
+          </div>
+        </div>
+        <div class="platform-card amber">
+          <div class="platform-name">Ray Serve</div>
+          <div class="platform-type">Distributed Inference</div>
+          <div class="platform-desc">Python-native inference framework. Great for complex model graphs and LLM serving.</div>
+          <div class="platform-features">
+            <div class="platform-feature">Deployment graphs (chains)</div>
+            <div class="platform-feature">Auto-scaling & batching</div>
+          </div>
+        </div>
+        <div class="platform-card purple">
+          <div class="platform-name">Triton Inference</div>
+          <div class="platform-type">High-Performance Serving</div>
+          <div class="platform-desc">NVIDIA's inference server. Handles ONNX, TensorRT, PyTorch, TF with GPU optimisation.</div>
+          <div class="platform-features">
+            <div class="platform-feature">Dynamic batching</div>
+            <div class="platform-feature">Model ensembles</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-monitor">
+      <div class="platform-grid">
+        <div class="platform-card pink">
+          <div class="platform-name">Evidently AI</div>
+          <div class="platform-type">Monitoring · Open Source</div>
+          <div class="platform-desc">Open-source library for data and model monitoring. Beautiful HTML reports and dashboards.</div>
+          <div class="platform-features">
+            <div class="platform-feature">Drift detection for all feature types</div>
+            <div class="platform-feature">Data quality metrics</div>
+            <div class="platform-feature">Embeds into Grafana / Prometheus</div>
+          </div>
+        </div>
+        <div class="platform-card blue">
+          <div class="platform-name">WhyLabs</div>
+          <div class="platform-type">Monitoring · Managed</div>
+          <div class="platform-desc">Managed observability for ML models. Built on the open-source whylogs library.</div>
+          <div class="platform-features">
+            <div class="platform-feature">Real-time statistical profiles</div>
+            <div class="platform-feature">Anomaly alerting</div>
+          </div>
+        </div>
+        <div class="platform-card amber">
+          <div class="platform-name">Prometheus + Grafana</div>
+          <div class="platform-type">Infra Metrics · Open Source</div>
+          <div class="platform-desc">Classic observability stack. Instrument your model server with custom metrics and visualise.</div>
+          <div class="platform-features">
+            <div class="platform-feature">Latency histograms</div>
+            <div class="platform-feature">Custom prediction drift gauges</div>
+          </div>
+        </div>
+        <div class="platform-card green">
+          <div class="platform-name">Arize AI</div>
+          <div class="platform-type">Observability · Managed</div>
+          <div class="platform-desc">Enterprise ML observability with strong LLM tracing and embedding drift support.</div>
+          <div class="platform-features">
+            <div class="platform-feature">Embedding drift visualisation</div>
+            <div class="platform-feature">Slice-based analysis</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CODE -->
+  <section class="section" id="code">
+    <div class="section-header">
+      <div class="section-eyebrow">07 — Hands On</div>
+      <h2>Code Examples</h2>
+      <p class="section-desc">Production-ready patterns for the most common MLOps tasks.</p>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab(this,'c-mlflow')">MLflow Tracking</div>
+      <div class="tab" onclick="switchTab(this,'c-pipe')">ZenML Pipeline</div>
+      <div class="tab" onclick="switchTab(this,'c-serve')">FastAPI Serving</div>
+      <div class="tab" onclick="switchTab(this,'c-drift')">Drift Detection</div>
+    </div>
+
+    <div class="tab-panel active" id="tab-c-mlflow">
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+          <span class="code-lang">python — experiment_tracking.py</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="kw">import</span> mlflow
+<span class="kw">import</span> mlflow.sklearn
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> accuracy_score, f1_score
+
+<span class="cm"># Set tracking URI (local or remote server)</span>
+mlflow.<span class="fn">set_tracking_uri</span>(<span class="str">"http://mlflow-server:5000"</span>)
+mlflow.<span class="fn">set_experiment</span>(<span class="str">"churn-prediction-v2"</span>)
+
+<span class="kw">with</span> mlflow.<span class="fn">start_run</span>(run_name=<span class="str">"rf-baseline"</span>) <span class="kw">as</span> run:
+
+    <span class="cm"># Log hyperparameters</span>
+    params = {<span class="str">"n_estimators"</span>: <span class="num">200</span>, <span class="str">"max_depth"</span>: <span class="num">8</span>, <span class="str">"random_state"</span>: <span class="num">42</span>}
+    mlflow.<span class="fn">log_params</span>(params)
+
+    <span class="cm"># Train model</span>
+    model = <span class="cls">RandomForestClassifier</span>(**params)
+    model.<span class="fn">fit</span>(X_train, y_train)
+
+    <span class="cm"># Evaluate</span>
+    preds = model.<span class="fn">predict</span>(X_val)
+    metrics = {
+        <span class="str">"accuracy"</span>: <span class="fn">accuracy_score</span>(y_val, preds),
+        <span class="str">"f1"</span>: <span class="fn">f1_score</span>(y_val, preds, average=<span class="str">"weighted"</span>)
+    }
+    mlflow.<span class="fn">log_metrics</span>(metrics)
+
+    <span class="cm"># Log model with signature (schema enforcement)</span>
+    signature = mlflow.models.<span class="fn">infer_signature</span>(X_train, preds)
+    mlflow.sklearn.<span class="fn">log_model</span>(
+        model, <span class="str">"model"</span>,
+        signature=signature,
+        registered_model_name=<span class="str">"ChurnClassifier"</span>
+    )
+
+    <span class="fn">print</span>(<span class="str">f"Run ID: {run.info.run_id}"</span>)
+    <span class="fn">print</span>(<span class="str">f"AUC: {metrics['f1']:.4f}"</span>)</pre>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-c-pipe">
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+          <span class="code-lang">python — ml_pipeline.py (ZenML)</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="kw">from</span> zenml <span class="kw">import</span> step, pipeline
+<span class="kw">from</span> zenml.integrations.mlflow.flavors <span class="kw">import</span> mlflow_experiment_tracker_settings
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># Each @step is a node in the pipeline DAG</span>
+
+<span class="attr">@step</span>
+<span class="kw">def</span> <span class="fn">load_data</span>() -> pd.<span class="cls">DataFrame</span>:
+    <span class="str">"""Ingest and validate raw training data."""</span>
+    df = pd.<span class="fn">read_parquet</span>(<span class="str">"s3://my-bucket/data/train.parquet"</span>)
+    <span class="kw">assert</span> df.<span class="fn">isnull</span>().<span class="fn">sum</span>().<span class="fn">max</span>() == <span class="num">0</span>, <span class="str">"Nulls detected!"</span>
+    <span class="kw">return</span> df
+
+<span class="attr">@step</span>
+<span class="kw">def</span> <span class="fn">feature_engineer</span>(df: pd.<span class="cls">DataFrame</span>) -> pd.<span class="cls">DataFrame</span>:
+    <span class="str">"""Transform raw data into model-ready features."""</span>
+    df[<span class="str">"tenure_months"</span>] = df[<span class="str">"tenure_days"</span>] // <span class="num">30</span>
+    df[<span class="str">"spend_per_month"</span>] = df[<span class="str">"total_spend"</span>] / (df[<span class="str">"tenure_months"</span>] + <span class="num">1</span>)
+    <span class="kw">return</span> df
+
+<span class="attr">@step</span>(experiment_tracker=<span class="str">"mlflow_tracker"</span>)
+<span class="kw">def</span> <span class="fn">train_model</span>(df: pd.<span class="cls">DataFrame</span>):
+    <span class="str">"""Train, evaluate, and register the model."""</span>
+    <span class="cm"># ... training logic, auto-logged to MLflow</span>
+    <span class="kw">pass</span>
+
+<span class="cm"># Wire steps into a pipeline</span>
+<span class="attr">@pipeline</span>
+<span class="kw">def</span> <span class="fn">churn_training_pipeline</span>():
+    df = <span class="fn">load_data</span>()
+    features = <span class="fn">feature_engineer</span>(df)
+    <span class="fn">train_model</span>(features)
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    <span class="fn">churn_training_pipeline</span>()</pre>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-c-serve">
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+          <span class="code-lang">python — serve.py (FastAPI + MLflow)</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, HTTPException
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
+<span class="kw">import</span> mlflow.pyfunc
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> time
+
+app = <span class="cls">FastAPI</span>(title=<span class="str">"Churn Prediction API"</span>, version=<span class="str">"2.1.0"</span>)
+
+<span class="cm"># Load model once at startup (not per request)</span>
+MODEL_URI = <span class="str">"models:/ChurnClassifier/Production"</span>
+model = mlflow.pyfunc.<span class="fn">load_model</span>(MODEL_URI)
+
+<span class="kw">class</span> <span class="cls">PredictRequest</span>(<span class="cls">BaseModel</span>):
+    tenure_months: <span class="cls">int</span>
+    spend_per_month: <span class="cls">float</span>
+    num_products: <span class="cls">int</span>
+    is_active: <span class="cls">bool</span>
+
+<span class="kw">class</span> <span class="cls">PredictResponse</span>(<span class="cls">BaseModel</span>):
+    churn_probability: <span class="cls">float</span>
+    prediction: <span class="cls">str</span>
+    latency_ms: <span class="cls">float</span>
+
+<span class="attr">@app.post</span>(<span class="str">"/predict"</span>, response_model=<span class="cls">PredictResponse</span>)
+<span class="kw">def</span> <span class="fn">predict</span>(req: <span class="cls">PredictRequest</span>):
+    t0 = time.<span class="fn">time</span>()
+    df = pd.<span class="cls">DataFrame</span>([req.<span class="fn">dict</span>()])
+
+    <span class="kw">try</span>:
+        proba = model.<span class="fn">predict</span>(df)[<span class="num">0</span>]
+    <span class="kw">except</span> <span class="cls">Exception</span> <span class="kw">as</span> e:
+        <span class="kw">raise</span> <span class="cls">HTTPException</span>(status_code=<span class="num">500</span>, detail=<span class="fn">str</span>(e))
+
+    <span class="kw">return</span> <span class="cls">PredictResponse</span>(
+        churn_probability=<span class="fn">round</span>(<span class="cls">float</span>(proba), <span class="num">4</span>),
+        prediction=<span class="str">"churn"</span> <span class="kw">if</span> proba > <span class="num">0.5</span> <span class="kw">else</span> <span class="str">"retain"</span>,
+        latency_ms=<span class="fn">round</span>((time.<span class="fn">time</span>() - t0) * <span class="num">1000</span>, <span class="num">2</span>)
+    )
+
+<span class="attr">@app.get</span>(<span class="str">"/health"</span>)
+<span class="kw">def</span> <span class="fn">health</span>(): <span class="kw">return</span> {<span class="str">"status"</span>: <span class="str">"ok"</span>, <span class="str">"model"</span>: MODEL_URI}</pre>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-c-drift">
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+          <span class="code-lang">python — drift_detection.py (Evidently)</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="kw">from</span> evidently <span class="kw">import</span> Report
+<span class="kw">from</span> evidently.metric_preset <span class="kw">import</span> DataDriftPreset, DataQualityPreset
+<span class="kw">from</span> evidently.metrics <span class="kw">import</span> ColumnDriftMetric
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># Reference: training data. Current: last 7 days of production data</span>
+reference = pd.<span class="fn">read_parquet</span>(<span class="str">"data/train_reference.parquet"</span>)
+current = pd.<span class="fn">read_parquet</span>(<span class="str">"data/production_last7d.parquet"</span>)
+
+<span class="cm"># Build a drift report</span>
+report = <span class="cls">Report</span>(metrics=[
+    <span class="cls">DataDriftPreset</span>(),
+    <span class="cls">DataQualityPreset</span>(),
+    <span class="cls">ColumnDriftMetric</span>(column_name=<span class="str">"spend_per_month"</span>),
+])
+
+report.<span class="fn">run</span>(reference_data=reference, current_data=current)
+
+<span class="cm"># Export HTML report + extract PSI for alerting</span>
+report.<span class="fn">save_html</span>(<span class="str">"drift_report.html"</span>)
+result = report.<span class="fn">as_dict</span>()
+
+psi = result[<span class="str">"metrics"</span>][<span class="num">0</span>][<span class="str">"result"</span>][<span class="str">"dataset_drift"</span>]
+
+<span class="kw">if</span> psi:
+    <span class="fn">print</span>(<span class="str">"⚠ Dataset drift detected — triggering retraining pipeline"</span>)
+    <span class="cm"># Trigger Airflow/Prefect DAG or GitHub Actions workflow</span>
+    <span class="fn">trigger_retraining</span>(reason=<span class="str">"data_drift"</span>)</pre>
+      </div>
+    </div>
+
+    <div class="callout tip" style="margin-top:1.5rem;">
+      <span class="callout-icon">🟢</span>
+      <div class="callout-body"><strong>Tip:</strong> Wrap your serving endpoint in a Dockerfile and push to ECR/GCR/ACR. Then deploy to Kubernetes with a Deployment + Service + HPA for production-grade, auto-scaling inference.</div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="section" id="quiz">
+    <div class="section-header">
+      <div class="section-eyebrow">08 — Test Yourself</div>
+      <h2>Knowledge Quiz</h2>
+      <p class="section-desc">Ten questions across the MLOps spectrum. Click an answer to reveal the explanation.</p>
+    </div>
+
+    <div class="quiz-section" id="quiz-box">
+      <div class="quiz-question" id="q-text"></div>
+      <div class="quiz-options" id="q-opts"></div>
+      <div class="quiz-feedback" id="q-feedback"></div>
+      <div class="quiz-nav">
+        <button class="quiz-btn" id="q-prev" onclick="prevQ()">← Prev</button>
+        <button class="quiz-btn primary" id="q-next" onclick="nextQ()">Next →</button>
+        <span class="quiz-counter" id="q-counter">1 / 10</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<div class="page-footer">
+  <span>MLOps Learning Guide</span>
+  <span>·</span>
+  <span>Built for engineers and data scientists</span>
+  <span>·</span>
+  <span style="font-family:var(--mono);font-size:11px;color:var(--muted2)">v2025</span>
+</div>
+
+<script>
+  // ── Sidebar scroll + active nav
+  function scrollTo(id) {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  const sections = ['intro','pipeline','lifecycle','notation','concepts','monitoring','platforms','code','quiz'];
+  const sideLinks = document.querySelectorAll('.sidebar-link');
+  const navLinks = document.querySelectorAll('.nav-links a');
+
+  window.addEventListener('scroll', () => {
+    let current = sections[0];
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top < 120) current = id;
+    });
+    sideLinks.forEach((l,i) => l.classList.toggle('active', i < 3 ? current === sections[i] : i < 6 ? current === sections[i] : current === sections[i]));
+    navLinks.forEach(l => {
+      const href = l.getAttribute('href')?.slice(1);
+      l.classList.toggle('active', href === current);
+    });
+  }, { passive: true });
+
+  // ── Concept accordion
+  function toggleConcept(el) {
+    el.classList.toggle('open');
+  }
+
+  // ── Tabs
+  function switchTab(btn, tabId) {
+    const parent = btn.closest('.section, main');
+    parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    parent.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById('tab-' + tabId);
+    if (panel) panel.classList.add('active');
+  }
+
+  // ── Copy code
+  function copyCode(btn) {
+    const pre = btn.closest('.code-wrap').querySelector('pre');
+    navigator.clipboard.writeText(pre.innerText).then(() => {
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    });
+  }
+
+  // ── Quiz
+  const QUIZ = [
+    { q: "What does PSI stand for in ML monitoring?", opts: ["Pipeline Stability Index","Population Stability Index","Prediction Score Index","Percentile Shift Indicator"], ans: 1, exp: "Population Stability Index (PSI) measures how much the distribution of a feature has shifted between training and production. PSI > 0.2 typically triggers retraining." },
+    { q: "Which deployment strategy sends 100% of traffic to the new model but discards its predictions?", opts: ["Blue-Green","Canary","Shadow (Dark Launch)","A/B Testing"], ans: 2, exp: "Shadow deployment runs the new model on real traffic without serving its predictions to users. This allows safe comparison of outputs with zero user impact." },
+    { q: "Training-serving skew is best prevented by which MLOps component?", opts: ["Model Registry","Feature Store","Experiment Tracker","Orchestrator"], ans: 1, exp: "A Feature Store ensures identical transformation logic is used during training and serving, preventing skew caused by independently reimplemented feature code." },
+    { q: "What does the notation f(x; θ) represent?", opts: ["Loss function with parameter θ","Model output for input x with learned parameters θ","The gradient of x","Feature extraction function"], ans: 1, exp: "f(x; θ) is standard notation for a model function — given input x and learned parameters θ (weights), produce a prediction. The semicolon separates inputs from parameters." },
+    { q: "Which HPO strategy is most sample-efficient for high-dimensional search spaces?", opts: ["Grid Search","Random Search","Bayesian Optimisation","Manual Tuning"], ans: 2, exp: "Bayesian Optimisation models the loss surface with a surrogate (e.g. Gaussian Process) and intelligently selects the next point to evaluate, making it far more efficient than grid or random search." },
+    { q: "What is a DAG in the context of ML pipelines?", opts: ["A type of neural network","Directed Acyclic Graph — defines task dependencies","Data Annotation Guidelines","Default Accuracy Gauge"], ans: 1, exp: "A DAG (Directed Acyclic Graph) represents pipeline steps as nodes and their dependencies as directed edges. Tools like Airflow and Kubeflow Pipelines execute ML workflows as DAGs." },
+    { q: "Concept drift differs from data drift because:", opts: ["It only affects neural networks","The input distribution changes","The relationship between X and y changes","It is always detectable without labels"], ans: 2, exp: "Concept drift means the mapping f(X) → y changes over time — even if the input distribution stays the same. For example, user fraud patterns evolving. It requires labels to detect directly." },
+    { q: "Which format allows ML models to be served without Python?", opts: ["Pickle","Joblib","ONNX","CSV"], ans: 2, exp: "ONNX (Open Neural Network Exchange) is a cross-framework format that allows models to be serialised and served using optimised runtimes (e.g. ONNX Runtime) without requiring Python or the original training framework." },
+    { q: "Recall is defined as:", opts: ["TP / (TP + FP)","TN / (TN + FN)","TP / (TP + FN)","(TP + TN) / N"], ans: 2, exp: "Recall = TP / (TP + FN). Of all actual positive cases, how many did the model correctly identify? High recall means few positives were missed. Use when false negatives are costly (e.g. disease detection)." },
+    { q: "MLflow's 'runs' are grouped into:", opts: ["Projects","Experiments","Registries","Artefacts"], ans: 1, exp: "In MLflow, an Experiment is the top-level grouping for related runs. Each run captures params, metrics, tags, and artefacts for a single training execution." }
+  ];
+
+  let qIdx = 0, answered = Array(QUIZ.length).fill(null);
+
+  function renderQ() {
+    const q = QUIZ[qIdx];
+    document.getElementById('q-text').textContent = q.q;
+    document.getElementById('q-counter').textContent = `${qIdx+1} / ${QUIZ.length}`;
+    const optsEl = document.getElementById('q-opts');
+    optsEl.innerHTML = '';
+    q.opts.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'quiz-opt';
+      btn.textContent = opt;
+      if (answered[qIdx] !== null) {
+        btn.disabled = true;
+        if (i === q.ans) btn.classList.add('correct');
+        else if (i === answered[qIdx]) btn.classList.add('wrong');
+      } else {
+        btn.onclick = () => answerQ(i);
+      }
+      optsEl.appendChild(btn);
+    });
+    const fb = document.getElementById('q-feedback');
+    if (answered[qIdx] !== null) {
+      fb.style.display = 'block';
+      fb.innerHTML = (answered[qIdx] === q.ans ? '✓ Correct — ' : '✗ Incorrect — ') + q.exp;
+      fb.style.color = answered[qIdx] === q.ans ? 'var(--accent2)' : 'var(--accent4)';
+    } else {
+      fb.style.display = 'none';
+    }
+    document.getElementById('q-prev').disabled = qIdx === 0;
+    document.getElementById('q-next').textContent = qIdx === QUIZ.length-1 ? 'Restart' : 'Next →';
+  }
+
+  function answerQ(i) {
+    answered[qIdx] = i;
+    renderQ();
+  }
+
+  function nextQ() {
+    if (qIdx === QUIZ.length-1) { qIdx = 0; answered = Array(QUIZ.length).fill(null); }
+    else qIdx++;
+    renderQ();
+  }
+
+  function prevQ() { if (qIdx > 0) { qIdx--; renderQ(); } }
+
+  renderQ();
+</script>
+</body>
+</html>

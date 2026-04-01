@@ -1,0 +1,1903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Statistics Masterclass — Learn Intuitively</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #0b0e17;
+    --bg2:       #111520;
+    --bg3:       #161b2e;
+    --card:      #1a2035;
+    --border:    #2a3354;
+    --gold:      #e8b84b;
+    --gold2:     #f5d080;
+    --teal:      #38c9c0;
+    --pink:      #e05c8a;
+    --blue:      #4f8ef7;
+    --green:     #56d899;
+    --orange:    #f07b3f;
+    --text:      #d8dff0;
+    --text2:     #8a95b5;
+    --text3:     #5a637a;
+    --white:     #f0f4ff;
+    --formula-bg:#0d1528;
+    --code-bg:   #090d1a;
+    --sidebar-w: 270px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    display: flex;
+  }
+
+  /* ── Sidebar ── */
+  #sidebar {
+    width: var(--sidebar-w);
+    min-height: 100vh;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    top: 0; left: 0;
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    transition: transform .3s ease;
+  }
+  #sidebar-header {
+    padding: 28px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  #sidebar-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    color: var(--gold);
+    letter-spacing: .03em;
+  }
+  #sidebar-header p { font-size: .75rem; color: var(--text3); margin-top: 4px; }
+  nav { flex: 1; padding: 16px 0; }
+  .nav-section-title {
+    font-size: .65rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 12px 20px 4px;
+  }
+  nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    color: var(--text2);
+    text-decoration: none;
+    font-size: .83rem;
+    font-weight: 400;
+    transition: all .2s;
+    border-left: 2px solid transparent;
+  }
+  nav a:hover, nav a.active {
+    color: var(--gold);
+    background: rgba(232,184,75,.06);
+    border-left-color: var(--gold);
+  }
+  nav a .nav-icon { font-size: .9rem; width: 18px; text-align: center; }
+  .progress-bar {
+    height: 2px;
+    background: var(--border);
+    margin: 0 20px;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--teal));
+    width: 0%;
+    transition: width .4s ease;
+    border-radius: 2px;
+  }
+  #sidebar-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    font-size: .72rem;
+    color: var(--text3);
+  }
+
+  /* ── Main Content ── */
+  main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    max-width: calc(100vw - var(--sidebar-w));
+    padding: 0;
+  }
+
+  /* Hero */
+  #hero {
+    background: linear-gradient(135deg, #0b0e17 0%, #111a2e 50%, #0b1520 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 80px 60px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  #hero::before {
+    content: 'Σ μ σ² P(A) n! C(n,k) z N(μ,σ)';
+    position: absolute;
+    top: -10px; right: -20px;
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    color: rgba(232,184,75,.05);
+    white-space: nowrap;
+    pointer-events: none;
+    letter-spacing: .2em;
+  }
+  #hero::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56,201,192,.08) 0%, transparent 70%);
+    top: -100px; right: 100px;
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(232,184,75,.12);
+    border: 1px solid rgba(232,184,75,.3);
+    color: var(--gold);
+    font-size: .72rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  #hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.2rem;
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  #hero h1 em { color: var(--gold); font-style: italic; }
+  #hero p { font-size: 1.05rem; color: var(--text2); max-width: 560px; }
+  .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+  .hero-tag {
+    background: rgba(255,255,255,.05);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-size: .75rem;
+    padding: 4px 12px;
+    border-radius: 12px;
+  }
+
+  /* Sections */
+  .section {
+    padding: 64px 60px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section:nth-child(even) { background: rgba(255,255,255,.012); }
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 36px;
+  }
+  .section-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .75rem;
+    color: var(--text3);
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    margin-top: 6px;
+  }
+  .section-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.2;
+  }
+  .section-header h2 span { color: var(--gold); }
+  .section-intro {
+    color: var(--text2);
+    font-size: .95rem;
+    max-width: 720px;
+    margin-bottom: 32px;
+    line-height: 1.8;
+  }
+
+  /* Concept Cards */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    transition: border-color .2s, transform .2s;
+  }
+  .card:hover { border-color: var(--gold); transform: translateY(-2px); }
+  .card-accent { width: 32px; height: 3px; border-radius: 2px; margin-bottom: 14px; }
+  .card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .card p { font-size: .85rem; color: var(--text2); }
+
+  /* Formula Box */
+  .formula-box {
+    background: var(--formula-bg);
+    border: 1px solid rgba(232,184,75,.25);
+    border-left: 3px solid var(--gold);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin: 24px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .formula-box::before {
+    content: 'FORMULA';
+    position: absolute;
+    top: 8px; right: 12px;
+    font-size: .6rem;
+    letter-spacing: .15em;
+    color: var(--gold);
+    opacity: .5;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .formula {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    color: var(--gold2);
+    text-align: center;
+    padding: 8px 0 16px;
+    letter-spacing: .04em;
+  }
+  .formula sub, .formula sup {
+    font-size: .65em;
+    vertical-align: baseline;
+    position: relative;
+  }
+  .formula sup { top: -.5em; }
+  .formula sub { bottom: -.2em; }
+  .nomenclature-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: .82rem;
+  }
+  .nomenclature-table th {
+    text-align: left;
+    color: var(--text3);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .65rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .nomenclature-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid rgba(42,51,84,.5);
+    vertical-align: top;
+  }
+  .nomenclature-table td:first-child {
+    font-family: 'Playfair Display', serif;
+    color: var(--gold2);
+    font-size: 1rem;
+    white-space: nowrap;
+    width: 60px;
+  }
+  .nomenclature-table td:nth-child(2) {
+    color: var(--teal);
+    font-weight: 500;
+    white-space: nowrap;
+    padding-right: 16px;
+  }
+  .nomenclature-table td:last-child { color: var(--text2); }
+
+  /* Real-life example */
+  .example-box {
+    background: rgba(56,201,192,.06);
+    border: 1px solid rgba(56,201,192,.2);
+    border-left: 3px solid var(--teal);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 20px 0;
+  }
+  .example-box .ex-label {
+    font-size: .65rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--teal);
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 8px;
+  }
+  .example-box p { color: var(--text); font-size: .88rem; margin: 6px 0; }
+  .example-box strong { color: var(--white); }
+  .solution-step {
+    background: rgba(255,255,255,.03);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 8px 0;
+    font-size: .85rem;
+    color: var(--text2);
+    border-left: 2px solid var(--border);
+  }
+  .solution-step .step-num {
+    display: inline-block;
+    color: var(--gold);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .75rem;
+    margin-right: 8px;
+  }
+  .highlight { color: var(--gold2); font-weight: 600; }
+  .teal { color: var(--teal); }
+  .pink { color: var(--pink); }
+  .green { color: var(--green); }
+  .blue { color: var(--blue); }
+  .orange { color: var(--orange); }
+
+  /* Code Block */
+  .code-wrapper {
+    margin: 20px 0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .code-header {
+    background: rgba(255,255,255,.05);
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .code-lang {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .7rem;
+    color: var(--text3);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .code-label { font-size: .75rem; color: var(--text2); }
+  .copy-btn {
+    background: rgba(232,184,75,.1);
+    border: 1px solid rgba(232,184,75,.2);
+    color: var(--gold);
+    font-size: .75rem;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 4px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: .04em;
+  }
+  .copy-btn:hover { background: rgba(232,184,75,.2); }
+  .copy-btn.copied { color: var(--green); border-color: rgba(86,216,153,.3); background: rgba(86,216,153,.08); }
+  pre {
+    background: var(--code-bg);
+    padding: 20px 24px;
+    overflow-x: auto;
+    margin: 0;
+  }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .8rem;
+    line-height: 1.8;
+    color: #c9d1e8;
+  }
+  .k { color: #c792ea; }   /* keyword */
+  .f { color: #82aaff; }   /* function */
+  .s { color: #c3e88d; }   /* string */
+  .n { color: var(--teal); } /* number */
+  .c { color: #546e7a; font-style: italic; } /* comment */
+  .i { color: var(--gold2); } /* import */
+
+  /* Interactive Demo */
+  .demo-box {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 24px 0;
+  }
+  .demo-box h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    color: var(--white);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .demo-badge {
+    font-size: .6rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    background: rgba(80,130,247,.15);
+    border: 1px solid rgba(80,130,247,.3);
+    color: var(--blue);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .input-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .demo-label { font-size: .8rem; color: var(--text2); }
+  .demo-input {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .82rem;
+    padding: 7px 12px;
+    flex: 1;
+    min-width: 160px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .demo-input:focus { border-color: var(--gold); }
+  .demo-btn {
+    background: linear-gradient(135deg, var(--gold), #c89030);
+    color: #0b0e17;
+    font-size: .8rem;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: opacity .2s;
+  }
+  .demo-btn:hover { opacity: .85; }
+  .demo-result {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .82rem;
+    min-height: 44px;
+    color: var(--green);
+  }
+  .stat-result { color: var(--gold2); margin-bottom: 4px; }
+  canvas { display: block; max-width: 100%; border-radius: 8px; }
+  .canvas-wrap {
+    background: var(--code-bg);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 12px;
+    border: 1px solid var(--border);
+  }
+
+  /* Tip & Warning */
+  .tip-box {
+    background: rgba(245,208,128,.06);
+    border: 1px solid rgba(245,208,128,.2);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: .85rem;
+    color: var(--text2);
+    display: flex;
+    gap: 10px;
+  }
+  .tip-box .tip-icon { color: var(--gold2); font-size: 1rem; flex-shrink: 0; }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+  h4.sub-head {
+    font-family: 'Lora', serif;
+    font-size: 1.08rem;
+    color: var(--white);
+    margin: 28px 0 12px;
+    padding-left: 12px;
+    border-left: 3px solid var(--gold);
+  }
+
+  /* Table */
+  .data-table { width: 100%; border-collapse: collapse; font-size: .83rem; margin: 12px 0; }
+  .data-table th {
+    background: rgba(232,184,75,.1);
+    color: var(--gold2);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .7rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 9px 12px;
+    text-align: left;
+  }
+  .data-table td { padding: 8px 12px; border-bottom: 1px solid rgba(42,51,84,.5); color: var(--text); }
+  .data-table tr:hover td { background: rgba(255,255,255,.02); }
+
+  /* Pill tags */
+  .pill {
+    display: inline-block;
+    font-size: .7rem;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    margin: 2px;
+  }
+  .pill-gold  { background: rgba(232,184,75,.15); color: var(--gold2); border: 1px solid rgba(232,184,75,.3); }
+  .pill-teal  { background: rgba(56,201,192,.12); color: var(--teal);  border: 1px solid rgba(56,201,192,.25); }
+  .pill-pink  { background: rgba(224,92,138,.12); color: var(--pink);  border: 1px solid rgba(224,92,138,.25); }
+  .pill-blue  { background: rgba(79,142,247,.12); color: var(--blue);  border: 1px solid rgba(79,142,247,.25); }
+  .pill-green { background: rgba(86,216,153,.12); color: var(--green); border: 1px solid rgba(86,216,153,.25); }
+
+  /* Hamburger for mobile */
+  #ham { display: none; position: fixed; top: 14px; left: 14px; z-index: 200; background: var(--card); border: 1px solid var(--border); border-radius: 7px; padding: 8px 10px; cursor: pointer; color: var(--text); font-size: 1.1rem; }
+  @media (max-width: 900px) {
+    #ham { display: flex; }
+    #sidebar { transform: translateX(-100%); }
+    #sidebar.open { transform: translateX(0); }
+    main { margin-left: 0; max-width: 100vw; }
+    .section { padding: 40px 22px; }
+    #hero { padding: 60px 22px 40px; }
+    #hero h1 { font-size: 2rem; }
+    .formula { font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<button id="ham" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+<!-- Sidebar -->
+<aside id="sidebar">
+  <div id="sidebar-header">
+    <h1>📐 Statistics Masterclass</h1>
+    <p>Build genuine intuition, then formalism.</p>
+  </div>
+  <div class="progress-bar" style="margin: 12px 20px;">
+    <div class="progress-fill" id="progress"></div>
+  </div>
+  <nav>
+    <div class="nav-section-title">Foundations</div>
+    <a href="#s1" class="nav-link"><span class="nav-icon">∑</span> Central Tendency</a>
+    <a href="#s2" class="nav-link"><span class="nav-icon">σ</span> Measures of Spread</a>
+    <div class="nav-section-title">Probability</div>
+    <a href="#s3" class="nav-link"><span class="nav-icon">P</span> Probability Basics</a>
+    <a href="#s4" class="nav-link"><span class="nav-icon">🔀</span> Conditional & Bayes</a>
+    <a href="#s5" class="nav-link"><span class="nav-icon">🎲</span> Combinatorics</a>
+    <div class="nav-section-title">Distributions</div>
+    <a href="#s6" class="nav-link"><span class="nav-icon">🔔</span> Normal Distribution</a>
+    <a href="#s7" class="nav-link"><span class="nav-icon">📊</span> Binomial & Poisson</a>
+    <div class="nav-section-title">Inference</div>
+    <a href="#s8" class="nav-link"><span class="nav-icon">⚖️</span> Central Limit Theorem</a>
+    <a href="#s9" class="nav-link"><span class="nav-icon">🧪</span> Hypothesis Testing</a>
+    <a href="#s10" class="nav-link"><span class="nav-icon">📈</span> Correlation & Regression</a>
+  </nav>
+  <div id="sidebar-footer">
+    <p>All code is Python 3 · Google Colab ready</p>
+  </div>
+</aside>
+
+<!-- Main -->
+<main>
+
+<!-- Hero -->
+<section id="hero">
+  <div class="hero-badge">Interactive Learning Guide</div>
+  <h1>Statistics — <em>Intuitively</em><br>Understood.</h1>
+  <p>From the arithmetic mean to regression lines, every concept explained with real-world intuition, clean formulas, and ready-to-run Python code.</p>
+  <div class="hero-tags">
+    <span class="hero-tag">📐 Formulas & Notation</span>
+    <span class="hero-tag">🏙️ Real-Life Examples</span>
+    <span class="hero-tag">🐍 Python Code</span>
+    <span class="hero-tag">🎮 Interactive Demos</span>
+    <span class="hero-tag">📓 Colab Ready</span>
+  </div>
+</section>
+
+<!-- ═══════════════ SECTION 1: Central Tendency ═══════════════ -->
+<section class="section" id="s1">
+  <div class="section-header">
+    <div class="section-number">01</div>
+    <div>
+      <h2>Measures of <span>Central Tendency</span></h2>
+    </div>
+  </div>
+  <p class="section-intro">The simplest question in statistics: <em>"Where is the data centred?"</em> Central tendency gives us a single representative value for a dataset — a summary that captures the <em>typical</em> observation.</p>
+
+  <div class="concept-grid">
+    <div class="card">
+      <div class="card-accent" style="background:var(--gold)"></div>
+      <h3>Mean (Arithmetic Average)</h3>
+      <p>Sum all values and divide by the count. Sensitive to outliers. The "balance point" of your data.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent" style="background:var(--teal)"></div>
+      <h3>Median</h3>
+      <p>The middle value when data is sorted. Robust to extreme outliers. Best for skewed data like income.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent" style="background:var(--pink)"></div>
+      <h3>Mode</h3>
+      <p>The most frequently occurring value. Useful for categorical data (e.g. most common shoe size sold).</p>
+    </div>
+  </div>
+
+  <h4 class="sub-head">Mean</h4>
+  <div class="formula-box">
+    <div class="formula">
+      x̄ = (1/n) · Σ<sub>i=1</sub><sup>n</sup> x<sub>i</sub>
+      &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+      μ = (1/N) · Σ<sub>i=1</sub><sup>N</sup> x<sub>i</sub>
+    </div>
+    <table class="nomenclature-table">
+      <tr><th>Symbol</th><th>Name</th><th>What it represents</th></tr>
+      <tr><td>x̄</td><td>x-bar (sample mean)</td><td>Average of a <em>sample</em> drawn from a population</td></tr>
+      <tr><td>μ</td><td>mu (population mean)</td><td>True average of the <em>entire population</em> (usually unknown)</td></tr>
+      <tr><td>n</td><td>sample size</td><td>Number of observations in your sample</td></tr>
+      <tr><td>N</td><td>population size</td><td>Total number of elements in the whole population</td></tr>
+      <tr><td>Σ</td><td>sigma (summation)</td><td>Sum all values from i=1 to n</td></tr>
+      <tr><td>x<sub>i</sub></td><td>x sub-i</td><td>The i-th individual data point</td></tr>
+    </table>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-label">📍 Real-Life Example — Employee Salaries</div>
+    <p><strong>Scenario:</strong> A startup has 5 employees with monthly salaries (₹): 30,000 · 35,000 · 40,000 · 42,000 · 5,00,000 (CEO)</p>
+    <div class="solution-step"><span class="step-num">Step 1.</span> Sum = 30,000 + 35,000 + 40,000 + 42,000 + 5,00,000 = <span class="highlight">6,47,000</span></div>
+    <div class="solution-step"><span class="step-num">Step 2.</span> Mean = 6,47,000 ÷ 5 = <span class="highlight">₹1,29,400</span></div>
+    <div class="solution-step"><span class="step-num">Insight.</span> The mean is <span class="pink">₹1,29,400</span> — but 4 out of 5 employees earn far less! The CEO's salary <strong>pulled the mean up drastically</strong>. This is why median is better for skewed distributions like income.</div>
+  </div>
+
+  <h4 class="sub-head">Median</h4>
+  <div class="formula-box">
+    <div class="formula">
+      Median = x<sub>(n+1)/2</sub> &nbsp;[odd n]&nbsp;&nbsp;|&nbsp;&nbsp;
+      Median = (x<sub>n/2</sub> + x<sub>(n/2)+1</sub>) / 2 &nbsp;[even n]
+    </div>
+    <table class="nomenclature-table">
+      <tr><th>Symbol</th><th>Name</th><th>Meaning</th></tr>
+      <tr><td>x<sub>(k)</sub></td><td>order statistic</td><td>The k-th value after sorting the data in ascending order</td></tr>
+      <tr><td>n</td><td>sample size</td><td>Total count of observations</td></tr>
+    </table>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-label">📍 Same Salaries — Median</div>
+    <p><strong>Sorted:</strong> 30,000 · 35,000 · <span class="highlight">40,000</span> · 42,000 · 5,00,000</p>
+    <p>n = 5 (odd) → Median = x<sub>(5+1)/2</sub> = x<sub>3</sub> = <span class="highlight">₹40,000</span></p>
+    <p>The median of <span class="teal">₹40,000</span> is a much more <em>representative</em> salary here!</p>
+  </div>
+
+  <div class="tip-box">
+    <span class="tip-icon">💡</span>
+    <span><strong>Rule of thumb:</strong> Use <span class="highlight">mean</span> when data is symmetric (no extreme outliers). Use <span class="teal">median</span> when data is skewed or has outliers (income, house prices, wait times). Use <span class="pink">mode</span> for categorical data.</span>
+  </div>
+
+  <!-- Interactive Demo -->
+  <div class="demo-box">
+    <h4>🎮 Interactive Calculator <span class="demo-badge">LIVE</span></h4>
+    <div class="input-row">
+      <span class="demo-label">Enter numbers (comma-separated):</span>
+      <input type="text" class="demo-input" id="ct-input" value="12, 15, 13, 18, 100, 14, 15"/>
+      <button class="demo-btn" onclick="calcCT()">Calculate</button>
+    </div>
+    <div class="demo-result" id="ct-result">→ Results will appear here</div>
+    <div class="canvas-wrap" style="margin-top:12px;">
+      <canvas id="ct-canvas" height="80"></canvas>
+    </div>
+  </div>
+
+  <!-- Code Block -->
+  <div class="code-wrapper">
+    <div class="code-header">
+      <div>
+        <span class="code-lang">Python</span>
+        <span class="code-label" style="margin-left:10px;">Central Tendency — Colab Ready</span>
+      </div>
+      <button class="copy-btn" onclick="copyCode(this, 'code-ct')">Copy</button>
+    </div>
+    <pre><code id="code-ct"><span class="i">import</span> numpy <span class="k">as</span> np
+<span class="i">from</span> scipy <span class="k">import</span> stats
+<span class="i">import</span> matplotlib.pyplot <span class="k">as</span> plt
+
+<span class="c"># Sample dataset: monthly salaries (₹)</span>
+data = [<span class="n">30000</span>, <span class="n">35000</span>, <span class="n">40000</span>, <span class="n">42000</span>, <span class="n">500000</span>]
+
+<span class="c"># --- Central Tendency ---</span>
+mean   = np.<span class="f">mean</span>(data)
+median = np.<span class="f">median</span>(data)
+mode   = stats.<span class="f">mode</span>(data, keepdims=<span class="k">True</span>).mode[<span class="n">0</span>]
+
+<span class="f">print</span>(<span class="s">f"Mean   : ₹{mean:,.0f}"</span>)
+<span class="f">print</span>(<span class="s">f"Median : ₹{median:,.0f}"</span>)
+<span class="f">print</span>(<span class="s">f"Mode   : ₹{mode:,.0f}"</span>)
+
+<span class="c"># --- Visualisation ---</span>
+fig, ax = plt.<span class="f">subplots</span>(figsize=(<span class="n">9</span>, <span class="n">4</span>))
+ax.<span class="f">hist</span>(data, bins=<span class="n">10</span>, color=<span class="s">'#4f8ef7'</span>, alpha=<span class="n">0.7</span>, edgecolor=<span class="s">'white'</span>)
+ax.<span class="f">axvline</span>(mean,   color=<span class="s">'#e8b84b'</span>, lw=<span class="n">2</span>, label=<span class="s">f'Mean={mean:,.0f}'</span>)
+ax.<span class="f">axvline</span>(median, color=<span class="s">'#38c9c0'</span>, lw=<span class="n">2</span>, label=<span class="s">f'Median={median:,.0f}'</span>)
+ax.<span class="f">legend</span>()
+plt.<span class="f">tight_layout</span>()
+plt.<span class="f">show</span>()</code></pre>
+  </div>
+</section>
+
+<!-- ═══════════════ SECTION 2: Measures of Spread ═══════════════ -->
+<section class="section" id="s2">
+  <div class="section-header">
+    <div class="section-number">02</div>
+    <div><h2>Measures of <span>Spread (Dispersion)</span></h2></div>
+  </div>
+  <p class="section-intro">Central tendency tells us <em>where</em> data is centred. Spread tells us <em>how scattered</em> it is. Two datasets can have the same mean but wildly different spreads — dispersion is what distinguishes them.</p>
+
+  <div class="concept-grid">
+    <div class="card"><div class="card-accent" style="background:var(--gold)"></div><h3>Range</h3><p>Max − Min. Simple but fragile; one outlier breaks it.</p></div>
+    <div class="card"><div class="card-accent" style="background:var(--teal)"></div><h3>Variance (σ², s²)</h3><p>Average squared deviation from the mean. Penalises large deviations heavily.</p></div>
+    <div class="card"><div class="card-accent" style="background:var(--pink)"></div><h3>Std Deviation (σ, s)</h3><p>Square root of variance. Same units as data — most interpretable spread measure.</p></div>
+    <div class="card"><div class="card-accent" style="background:var(--blue)"></div><h3>IQR</h3><p>Q3 − Q1. Middle 50% spread. Resistant to outliers — used in box plots.</p></div>
+  </div>
+
+  <h4 class="sub-head">Variance & Standard Deviation</h4>
+  <div class="formula-box">
+    <div class="formula">
+      s² = Σ(x<sub>i</sub> − x̄)² / (n−1) &nbsp;[Sample]
+      &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+      σ² = Σ(x<sub>i</sub> − μ)² / N &nbsp;[Population]
+    </div>
+    <div class="formula" style="font-size:1.1rem; padding-top:0;">
+      s = √s² &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; σ = √σ²
+    </div>
+    <table class="nomenclature-table">
+      <tr><th>Symbol</th><th>Name</th><th>Meaning</th></tr>
+      <tr><td>s²</td><td>sample variance</td><td>Estimated spread of a sample; uses n−1 (Bessel's correction) to be unbiased</td></tr>
+      <tr><td>σ²</td><td>population variance</td><td>True spread of the entire population; divides by N</td></tr>
+      <tr><td>n−1</td><td>degrees of freedom</td><td>We lose 1 degree of freedom because x̄ is estimated from the same data</td></tr>
+      <tr><td>(x<sub>i</sub>−x̄)²</td><td>squared deviation</td><td>Squaring makes all deviations positive and penalises large errors more</td></tr>
+      <tr><td>s</td><td>sample std dev</td><td>Spread in original units — "on average, data is ±s from the mean"</td></tr>
+    </table>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-label">📍 Real-Life Example — Two Coffee Shops</div>
+    <p><strong>Shop A</strong> wait times (min): 5, 5, 5, 5, 5 &nbsp; → Mean = 5 min</p>
+    <p><strong>Shop B</strong> wait times (min): 1, 3, 5, 7, 9 &nbsp; → Mean = 5 min</p>
+    <div class="solution-step"><span class="step-num">Shop A.</span> All times = 5 → deviations = 0 → s² = 0 → s = <span class="highlight">0</span>. Perfectly consistent!</div>
+    <div class="solution-step"><span class="step-num">Shop B.</span> Deviations: (1−5)²+(3−5)²+(5−5)²+(7−5)²+(9−5)² = 16+4+0+4+16 = 40 → s² = 40/(5−1) = 10 → s = <span class="pink">3.16 min</span></div>
+    <div class="solution-step"><span class="step-num">Insight.</span> Same average wait, but Shop B has <strong>3× more unpredictability</strong>. If you hate uncertainty, choose Shop A.</div>
+  </div>
+
+  <h4 class="sub-head">IQR & Five-Number Summary</h4>
+  <div class="formula-box">
+    <div class="formula">
+      IQR = Q<sub>3</sub> − Q<sub>1</sub>
+      &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+      Outlier if: x &lt; Q<sub>1</sub> − 1.5·IQR &nbsp;or&nbsp; x &gt; Q<sub>3</sub> + 1.5·IQR
+    </div>
+    <table class="nomenclature-table">
+      <tr><th>Symbol</th><th>Name</th><th>Meaning</th></tr>
+      <tr><td>Q<sub>1</sub></td><td>1st quartile (P25)</td><td>25th percentile — 25% of data falls below this value</td></tr>
+      <tr><td>Q<sub>2</sub></td><td>Median (P50)</td><td>50th percentile — the middle of the dataset</td></tr>
+      <tr><td>Q<sub>3</sub></td><td>3rd quartile (P75)</td><td>75th percentile — 75% of data falls below this value</td></tr>
+      <tr><td>IQR</td><td>Inter-Quartile Range</td><td>The range of the central 50% of data — robust to outliers</td></tr>
+      <tr><td>1.5·IQR</td><td>Tukey fence</td><td>Standard rule for classifying extreme outliers in box plots</td></tr>
+    </table>
+  </div>
+
+  <!-- Interactive -->
+  <div class="demo-box">
+    <h4>🎮 Spread Calculator <span class="demo-badge">LIVE</span></h4>
+    <div class="input-row">
+      <span class="demo-label">Enter numbers:</span>
+      <input type="text" class="demo-input" id="sp-input" value="4, 8, 15, 16, 23, 42, 100"/>
+      <button class="demo-btn" onclick="calcSpread()">Calculate</button>
+    </div>
+    <div class="demo-result" id="sp-result">→ Results will appear here</div>
+    <div class="canvas-wrap"><canvas id="sp-canvas" height="60"></canvas></div>
+  </div>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <span class="code-lang">Python</span>
+      <button class="copy-btn" onclick="copyCode(this, 'code-sp')">Copy</button>
+    </div>
+    <pre><code id="code-sp"><span class="i">import</span> numpy <span class="k">as</span> np
+
+data = [<span class="n">4</span>, <span class="n">8</span>, <span class="n">15</span>, <span class="n">16</span>, <span class="n">23</span>, <span class="n">42</span>, <span class="n">100</span>]
+
+rng      = np.<span class="f">ptp</span>(data)                    <span class="c"># Range = max - min</span>
+variance = np.<span class="f">var</span>(data, ddof=<span class="n">1</span>)           <span class="c"># Sample variance (ddof=1 = Bessel)</span>
+std_dev  = np.<span class="f">std</span>(data, ddof=<span class="n">1</span>)           <span class="c"># Sample standard deviation</span>
+q1, q3   = np.<span class="f">percentile</span>(data, [<span class="n">25</span>, <span class="n">75</span>])
+iqr      = q3 - q1
+
+<span class="f">print</span>(<span class="s">f"Range    : {rng}"</span>)
+<span class="f">print</span>(<span class="s">f"Variance : {variance:.2f}"</span>)
+<span class="f">print</span>(<span class="s">f"Std Dev  : {std_dev:.2f}"</span>)
+<span class="f">print</span>(<span class="s">f"Q1={q1}, Q3={q3}, IQR={iqr}"</span>)
+
+<span class="c"># Outlier detection (Tukey's fences)</span>
+lower, upper = q1 - <span class="n">1.5</span>*iqr, q3 + <span class="n">1.5</span>*iqr
+outliers = [x <span class="k">for</span> x <span class="k">in</span> data <span class="k">if</span> x &lt; lower <span class="k">or</span> x &gt; upper]
+<span class="f">print</span>(<span class="s">f"Outliers : {outliers}"</span>)</code></pre>
+  </div>
+</section>
+
+<!-- ═══════════════ SECTION 3: Probability Basics ═══════════════ -->
+<section class="section" id="s3">
+  <div class="section-header">
+    <div class="section-number">03</div>
+    <div><h2><span>Probability</span> Basics</h2></div>
+  </div>
+  <p class="section-intro">Probability is the language of uncertainty. It quantifies how <em>likely</em> an event is to occur on a scale from 0 (impossible) to 1 (certain). Everything in statistics — inference, prediction, machine learning — is built on probability.</p>
+
+  <h4 class="sub-head">Core Definitions</h4>
+  <div class="formula-box">
+    <div class="formula">
+      P(A) = |A| / |S| &nbsp;&nbsp;[Classical]
+      &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+      0 ≤ P(A) ≤ 1
+      &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+      P(S) = 1
+    </div>
+    <table class="nomenclature-table">
+      <tr><th>Symbol</th><th>Name</th><th>Meaning</th></tr>
+      <tr><td>P(A)</td><td>Probability of A</td><td>Likelihood of event A occurring (between 0 and 1)</td></tr>
+      <tr><td>|A|</td><td>cardinality of A</td><td>Number of outcomes favourable to event A</td></tr>
+      <tr><td>|S|</td><td>cardinality of S</td><td>Total number of equally likely outcomes in sample space S</td></tr>
+      <tr><td>S</td><td>sample space (Ω)</td><td>Set of ALL possible outcomes of an experiment</td></tr>
+      <tr><td>A'or Aᶜ</td><td>complement of A</td><td>All outcomes NOT in A; P(Aᶜ) = 1 − P(A)</td></tr>
+    </table>
+  </div>
+
+  <h4 class="sub-head">Addition & Multiplication Rules</h4>
+  <div class="formula-box">
+    <div class="formula">
+      P(A ∪ B) = P(A) + P(B) − P(A ∩ B)
+    </div>
+    <div class="formula" style="font-size:1.1rem; padding-top:0; padding-bottom:8px;">
+      P(A ∩ B) = P(A) · P(B) &nbsp;[if A, B independent]
+    </div>
+    <table class="nomenclature-table">
+      <tr><th>Symbol</th><th>Name</th><th>Meaning</th></tr>
+      <tr><td>A ∪ B</td><td>Union (OR)</td><td>Event A or event B (or both) occur</td></tr>
+      <tr><td>A ∩ B</td><td>Intersection (AND)</td><td>Both event A and event B occur simultaneously</td></tr>
+      <tr><td>P(A ∩ B)</td><td>Joint probability</td><td>For independent events: simply multiply their probabilities</td></tr>
+    </table>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-label">📍 Real-Life Example — Quality Control</div>
+    <p><strong>Scenario:</strong> In a factory, 5% of products are defective. You pick 2 products at random (with replacement). What is the probability that <em>at least one</em> is defective?</p>
+    <div class="solution-step"><span class="step-num">Step 1.</span> P(defective) = 0.05 → P(not defective) = 0.95</div>
+    <div class="solution-step"><span class="step-num">Step 2.</span> P(both OK) = 0.95 × 0.95 = <span class="highlight">0.9025</span> &nbsp;(independent events)</div>
+    <div class="solution-step"><span class="step-num">Step 3.</span> P(at least 1 defective) = 1 − P(both OK) = 1 − 0.9025 = <span class="pink">0.0975 ≈ 9.75%</span></div>
+    <div class="solution-step"><span class="step-num">Insight.</span> Using the <strong>complement rule</strong> (1 − P(none)) is often easier than adding individual cases.</div>
+  </div>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <span class="code-lang">Python</span>
+      <button class="copy-btn" onclick="copyCode(this, 'code-prob')">Copy</button>
+    </div>
+    <pre><code id="code-prob"><span class="i">import</span> random
+
+<span class="c"># Simulate the factory quality control problem</span>
+p_defective = <span class="n">0.05</span>
+trials = <span class="n">100_000</span>
+at_least_one = <span class="n">0</span>
+
+<span class="k">for</span> _ <span class="k">in</span> <span class="f">range</span>(trials):
+    p1 = random.<span class="f">random</span>() &lt; p_defective
+    p2 = random.<span class="f">random</span>() &lt; p_defective
+    <span class="k">if</span> p1 <span class="k">or</span> p2:
+        at_least_one += <span class="n">1</span>
+
+simulated = at_least_one / trials
+analytical = <span class="n">1</span> - (<span class="n">1</span> - p_defective)**<span class="n">2</span>
+
+<span class="f">print</span>(<span class="s">f"Simulated  : {simulated:.4f}"</span>)
+<span class="f">print</span>(<span class="s">f"Analytical : {analytical:.4f}"</span>)
+<span class="c"># Both ≈ 0.0975</span></code></pre>
+  </div>
+</section>
+
+<!-- ═══════════════ SECTION 4: Conditional & Bayes ═══════════════ -->
+<section class="section" id="s4">
+  <div class="section-header">
+    <div class="section-number">04</div>
+    <div><h2>Conditional Probability <span>&</span> Bayes' Theorem</h2></div>
+  </div>
+  <p class="section-intro">Conditional probability asks: <em>"Given that something has already happened, how does that change the probability of another event?"</em> Bayes' theorem is its most powerful application — updating beliefs with new evidence.</p>
+
+  <h4 class="sub-head">Conditional Probability</h4>
+  <div class="formula-box">
+    <div class="formula">
+      P(A | B) = P(A ∩ B) / P(B)
+    </div>
+    <table class="nomenclature-table">
+      <tr><th>Symbol</th><th>Name</th><th>Meaning</th></tr>
+      <tr><td>P(A|B)</td><td>"P of A given B"</td><td>Probability of A, knowing that B has already occurred</td></tr>
+      <tr><td>P(A ∩ B)</td><td>joint probability</td><td>Probability that both A and B occur</td></tr>
+      <tr><td>P(B)</td><td>marginal probability</td><td>Probability of B (must be > 0 to condition on it)</td></tr>
+    </table>
+  </div>
+
+  <h4 class="sub-head">Bayes' Theorem</h4>
+  <div class="formula-box">
+    <div class="formula">
+      P(H | E) = P(E | H) · P(H) / P(E)
+    </div>
+    <table class="nomenclature-table">
+      <tr><th>Symbol</th><th>Name</th><th>Meaning</th></tr>
+      <tr><td>P(H|E)</td><td>Posterior</td><td>Updated belief about hypothesis H after seeing evidence E</td></tr>
+      <tr><td>P(E|H)</td><td>Likelihood</td><td>How likely is evidence E if hypothesis H were true?</td></tr>
+      <tr><td>P(H)</td><td>Prior</td><td>Initial belief about H before seeing any evidence</td></tr>
+      <tr><td>P(E)</td><td>Marginal likelihood</td><td>Total probability of evidence E across all hypotheses</td></tr>
+    </table>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-label">📍 Real-Life Example — Medical Test</div>
+    <p><strong>Disease prevalence:</strong> 1% of population has disease D</p>
+    <p><strong>Test accuracy:</strong> 99% sensitivity (true positive), 95% specificity (true negative)</p>
+    <p><strong>Question:</strong> If you test positive, what is the probability you actually have the disease?</p>
+    <div class="solution-step"><span class="step-num">Given.</span> P(D) = 0.01 | P(+|D) = 0.99 | P(+|no D) = 0.05</div>
+    <div class="solution-step"><span class="step-num">P(+).</span> P(+) = P(+|D)·P(D) + P(+|no D)·P(no D) = 0.99×0.01 + 0.05×0.99 = 0.0099 + 0.0495 = <span class="highlight">0.0594</span></div>
+    <div class="solution-step"><span class="step-num">Bayes.</span> P(D|+) = (0.99 × 0.01) / 0.0594 = 0.0099 / 0.0594 ≈ <span class="pink">16.7%</span></div>
+    <div class="solution-step"><span class="step-num">Insight.</span> Even with a 99% accurate test, a positive result only means a <strong>16.7% chance</strong> of actually being sick — because the disease is rare! This is the <em>base rate fallacy</em>.</div>
+  </div>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <span class="code-lang">Python</span>
+      <button class="copy-btn" onclick="copyCode(this, 'code-bayes')">Copy</button>
+    </div>
+    <pre><code id="code-bayes"><span class="c"># Bayes' Theorem — Medical Test Example</span>
+p_disease   = <span class="n">0.01</span>   <span class="c"># Prior: 1% prevalence</span>
+sensitivity = <span class="n">0.99</span>   <span class="c"># P(+ | disease)</span>
+fpr         = <span class="n">0.05</span>   <span class="c"># False positive rate P(+ | no disease)</span>
+
+p_no_disease = <span class="n">1</span> - p_disease
+
+<span class="c"># Total probability of testing positive (law of total probability)</span>
+p_positive = (sensitivity * p_disease) + (fpr * p_no_disease)
+
+<span class="c"># Bayes: P(disease | positive)</span>
+p_disease_given_pos = (sensitivity * p_disease) / p_positive
+
+<span class="f">print</span>(<span class="s">f"P(+) = {p_positive:.4f}"</span>)
+<span class="f">print</span>(<span class="s">f"P(disease | positive test) = {p_disease_given_pos:.4f} = {p_disease_given_pos*100:.1f}%"</span>)
+<span class="c"># ≈ 16.7% — surprisingly low!</span></code></pre>
+  </div>
+</section>
+
+<!-- ═══════════════ SECTION 5: Combinatorics ═══════════════ -->
+<section class="section" id="s5">
+  <div class="section-header">
+    <div class="section-number">05</div>
+    <div><h2><span>Combinatorics</span> — Counting Methods</h2></div>
+  </div>
+  <p class="section-intro">Combinatorics is the art of counting without listing. Whether it's lottery odds, password strength, or A/B test arrangements — being able to count possibilities is the backbone of probability calculations.</p>
+
+  <div class="concept-grid">
+    <div class="card"><div class="card-accent" style="background:var(--gold)"></div><h3>Permutations</h3><p><strong>Order matters.</strong> How many ways to arrange r items from n? (e.g. medals: gold, silver, bronze)</p></div>
+    <div class="card"><div class="card-accent" style="background:var(--teal)"></div><h3>Combinations</h3><p><strong>Order doesn't matter.</strong> How many ways to choose r items from n? (e.g. lottery numbers)</p></div>
+    <div class="card"><div class="card-accent" style="background:var(--pink)"></div><h3>Multiplication Rule</h3><p>If one task has m ways and another has n ways, together they have m × n ways.</p></div>
+  </div>
+
+  <h4 class="sub-head">Factorial, Permutations, Combinations</h4>
+  <div class="formula-box">
+    <div class="formula">
+      n! = n × (n−1) × ... × 2 × 1
+    </div>
+    <div class="formula" style="padding-top:0; font-size:1.2rem;">
+      P(n,r) = n! / (n−r)!
+      &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+      C(n,r) = n! / (r! · (n−r)!)
+    </div>
+    <table class="nomenclature-table">
+      <tr><th>Symbol</th><th>Name</th><th>Meaning</th></tr>
+      <tr><td>n!</td><td>n factorial</td><td>Total arrangements of n distinct items; 0! = 1 by definition</td></tr>
+      <tr><td>P(n,r)</td><td>nPr, permutation</td><td>Ordered selections of r items from n (order matters)</td></tr>
+      <tr><td>C(n,r)</td><td>nCr, "n choose r"</td><td>Unordered subsets of r items from n (order doesn't matter)</td></tr>
+      <tr><td>n</td><td>total items</td><td>Pool size — total number of items to choose from</td></tr>
+      <tr><td>r</td><td>chosen items</td><td>How many items are selected at once</td></tr>
+      <tr><td>(n−r)!</td><td>discarded arrangements</td><td>Removes the ordering of items not chosen (permutation)</td></tr>
+      <tr><td>r!</td><td>r factorial</td><td>Removes duplicate orderings of chosen items (combination)</td></tr>
+    </table>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-label">📍 Real-Life Example — Password Strength & Lottery</div>
+    <p><strong>Problem 1:</strong> A 4-digit PIN from digits 0–9. How many unique PINs?</p>
+    <div class="solution-step"><span class="step-num">Answer.</span> Repetition allowed → 10 × 10 × 10 × 10 = <span class="highlight">10,000</span> (Multiplication Rule)</div>
+    <p style="margin-top:12px;"><strong>Problem 2:</strong> Lottery: Pick 6 numbers from 1–49. How many possible tickets?</p>
+    <div class="solution-step"><span class="step-num">Answer.</span> C(49,6) = 49! / (6! × 43!) = <span class="pink">13,983,816</span> possible tickets!</div>
+    <p style="margin-top:12px;"><strong>Problem 3:</strong> A team of 3 wins gold, silver, bronze from 10 athletes. How many outcomes?</p>
+    <div class="solution-step"><span class="step-num">Answer.</span> P(10,3) = 10! / 7! = 10 × 9 × 8 = <span class="teal">720</span> ordered outcomes</div>
+  </div>
+
+  <div class="demo-box">
+    <h4>🎮 Permutation & Combination Calculator <span class="demo-badge">LIVE</span></h4>
+    <div class="input-row">
+      <span class="demo-label">n (total):</span>
+      <input type="number" class="demo-input" id="comb-n" value="10" style="max-width:80px;"/>
+      <span class="demo-label">r (choose):</span>
+      <input type="number" class="demo-input" id="comb-r" value="3" style="max-width:80px;"/>
+      <button class="demo-btn" onclick="calcComb()">Calculate</button>
+    </div>
+    <div class="demo-result" id="comb-result">→ Results will appear here</div>
+  </div>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <span class="code-lang">Python</span>
+      <button class="copy-btn" onclick="copyCode(this, 'code-comb')">Copy</button>
+    </div>
+    <pre><code id="code-comb"><span class="i">from</span> math <span class="k">import</span> factorial, comb, perm
+
+n, r = <span class="n">10</span>, <span class="n">3</span>
+
+<span class="c"># Manual calculations</span>
+permutation = factorial(n) // factorial(n - r)
+combination = factorial(n) // (factorial(r) * factorial(n - r))
+
+<span class="c"># Using math module shortcuts</span>
+<span class="f">print</span>(<span class="s">f"P({n},{r}) = {perm(n, r)}"</span>)    <span class="c"># 720</span>
+<span class="f">print</span>(<span class="s">f"C({n},{r}) = {comb(n, r)}"</span>)    <span class="c"># 120</span>
+
+<span class="c"># Lottery odds</span>
+lottery_combos = <span class="f">comb</span>(<span class="n">49</span>, <span class="n">6</span>)
+<span class="f">print</span>(<span class="s">f"Lottery C(49,6) = {lottery_combos:,}"</span>)
+<span class="f">print</span>(<span class="s">f"Odds of winning = 1 in {lottery_combos:,}"</span>)</code></pre>
+  </div>
+</section>
+
+<!-- ═══════════════ SECTION 6: Normal Distribution ═══════════════ -->
+<section class="section" id="s6">
+  <div class="section-header">
+    <div class="section-number">06</div>
+    <div><h2>The <span>Normal Distribution</span></h2></div>
+  </div>
+  <p class="section-intro">The bell curve. The most important distribution in all of statistics. Heights, blood pressure, exam scores, measurement errors — nature loves the normal distribution. Understanding it unlocks most of classical statistics.</p>
+
+  <div class="formula-box">
+    <div class="formula">
+      f(x) = (1 / (σ√(2π))) · e<sup>−½((x−μ)/σ)²</sup>
+    </div>
+    <table class="nomenclature-table">
+      <tr><th>Symbol</th><th>Name</th><th>Meaning</th></tr>
+      <tr><td>f(x)</td><td>PDF value</td><td>Probability Density Function — height of the curve at x (not a probability itself)</td></tr>
+      <tr><td>μ</td><td>mean</td><td>Centre of the bell curve — the peak is always at x = μ</td></tr>
+      <tr><td>σ</td><td>standard deviation</td><td>Controls the spread (width) of the bell; larger σ = flatter/wider curve</td></tr>
+      <tr><td>e</td><td>Euler's number</td><td>≈ 2.71828 — the base of natural logarithm</td></tr>
+      <tr><td>π</td><td>pi</td><td>≈ 3.14159 — appears in the normalising constant √(2π)</td></tr>
+      <tr><td>N(μ, σ²)</td><td>normal notation</td><td>Shorthand: "X follows a Normal distribution with mean μ and variance σ²"</td></tr>
+    </table>
+  </div>
+
+  <h4 class="sub-head">The Standard Normal & Z-Score</h4>
+  <div class="formula-box">
+    <div class="formula">
+      z = (x − μ) / σ &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; Z ~ N(0, 1)
+    </div>
+    <table class="nomenclature-table">
+      <tr><th>Symbol</th><th>Name</th><th>Meaning</th></tr>
+      <tr><td>z</td><td>z-score (standard score)</td><td>How many standard deviations x is above/below the mean</td></tr>
+      <tr><td>Z ~ N(0,1)</td><td>standard normal</td><td>Special case: mean=0, variance=1; all normal problems reduce to this</td></tr>
+      <tr><td>Φ(z)</td><td>CDF of standard normal</td><td>P(Z ≤ z) — area under the curve to the left of z</td></tr>
+    </table>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-label">📍 Empirical Rule (68-95-99.7)</div>
+    <p><strong>Exam scores</strong> follow N(μ=70, σ=10).</p>
+    <div class="solution-step"><span class="step-num">68%.</span> P(60 ≤ X ≤ 80) = P(μ−σ ≤ X ≤ μ+σ) ≈ <span class="highlight">68.27%</span></div>
+    <div class="solution-step"><span class="step-num">95%.</span> P(50 ≤ X ≤ 90) = P(μ−2σ ≤ X ≤ μ+2σ) ≈ <span class="teal">95.45%</span></div>
+    <div class="solution-step"><span class="step-num">99.7%.</span> P(40 ≤ X ≤ 100) = P(μ−3σ ≤ X ≤ μ+3σ) ≈ <span class="pink">99.73%</span></div>
+    <div class="solution-step"><span class="step-num">Z-score.</span> What percentile is a score of 85? z = (85−70)/10 = 1.5 → Φ(1.5) ≈ <span class="green">93.3rd percentile</span></div>
+  </div>
+
+  <div class="demo-box">
+    <h4>🎮 Normal Distribution Visualiser <span class="demo-badge">LIVE</span></h4>
+    <div class="input-row">
+      <span class="demo-label">μ:</span>
+      <input type="number" class="demo-input" id="nd-mu" value="70" style="max-width:70px;"/>
+      <span class="demo-label">σ:</span>
+      <input type="number" class="demo-input" id="nd-sigma" value="10" style="max-width:70px;"/>
+      <span class="demo-label">x:</span>
+      <input type="number" class="demo-input" id="nd-x" value="85" style="max-width:70px;"/>
+      <button class="demo-btn" onclick="drawNormal()">Draw</button>
+    </div>
+    <div class="demo-result" id="nd-result">→ Enter values and click Draw</div>
+    <div class="canvas-wrap"><canvas id="nd-canvas" height="160"></canvas></div>
+  </div>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <span class="code-lang">Python</span>
+      <button class="copy-btn" onclick="copyCode(this, 'code-nd')">Copy</button>
+    </div>
+    <pre><code id="code-nd"><span class="i">import</span> numpy <span class="k">as</span> np
+<span class="i">from</span> scipy.stats <span class="k">import</span> norm
+<span class="i">import</span> matplotlib.pyplot <span class="k">as</span> plt
+
+mu, sigma = <span class="n">70</span>, <span class="n">10</span>
+x = np.<span class="f">linspace</span>(mu - <span class="n">4</span>*sigma, mu + <span class="n">4</span>*sigma, <span class="n">200</span>)
+y = norm.<span class="f">pdf</span>(x, mu, sigma)
+
+fig, axes = plt.<span class="f">subplots</span>(<span class="n">1</span>, <span class="n">2</span>, figsize=(<span class="n">12</span>, <span class="n">4</span>))
+
+<span class="c"># PDF Plot</span>
+axes[<span class="n">0</span>].<span class="f">plot</span>(x, y, color=<span class="s">'#4f8ef7'</span>, lw=<span class="n">2</span>)
+axes[<span class="n">0</span>].<span class="f">fill_between</span>(x, y, <span class="k">where</span>=(x >= mu-sigma) & (x <= mu+sigma),
+                    color=<span class="s">'#e8b84b'</span>, alpha=<span class="n">0.4</span>, label=<span class="s">'68% (±1σ)'</span>)
+axes[<span class="n">0</span>].<span class="f">set_title</span>(<span class="s">'Normal PDF — N(70, 10²)'</span>)
+axes[<span class="n">0</span>].<span class="f">legend</span>()
+
+<span class="c"># Z-score of 85</span>
+score = <span class="n">85</span>
+z = (score - mu) / sigma
+percentile = norm.<span class="f">cdf</span>(z) * <span class="n">100</span>
+<span class="f">print</span>(<span class="s">f"Score {score}: z = {z:.2f}, Percentile = {percentile:.1f}%"</span>)
+
+plt.<span class="f">tight_layout</span>()
+plt.<span class="f">show</span>()</code></pre>
+  </div>
+</section>
+
+<!-- ═══════════════ SECTION 7: Binomial & Poisson ═══════════════ -->
+<section class="section" id="s7">
+  <div class="section-header">
+    <div class="section-number">07</div>
+    <div><h2><span>Binomial</span> & <span>Poisson</span> Distributions</h2></div>
+  </div>
+  <p class="section-intro">Not all data is continuous. Sometimes we count — number of successes, number of arrivals. Binomial models binary outcomes (success/fail); Poisson models rare events in a fixed interval.</p>
+
+  <h4 class="sub-head">Binomial Distribution</h4>
+  <div class="formula-box">
+    <div class="formula">
+      P(X = k) = C(n,k) · p<sup>k</sup> · (1−p)<sup>n−k</sup>
+    </div>
+    <div class="formula" style="font-size:1.1rem; padding-top:0; padding-bottom:8px;">
+      E[X] = np &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; Var(X) = np(1−p)
+    </div>
+    <table class="nomenclature-table">
+      <tr><th>Symbol</th><th>Name</th><th>Meaning</th></tr>
+      <tr><td>n</td><td>trials</td><td>Fixed number of independent binary trials</td></tr>
+      <tr><td>k</td><td>successes</td><td>Number of successful outcomes we're calculating probability for</td></tr>
+      <tr><td>p</td><td>success probability</td><td>Probability of success on any single trial (constant)</td></tr>
+      <tr><td>(1−p) = q</td><td>failure probability</td><td>Probability of failure on each trial</td></tr>
+      <tr><td>C(n,k)</td><td>binomial coefficient</td><td>Number of ways to arrange k successes in n trials</td></tr>
+      <tr><td>np</td><td>expected value E[X]</td><td>Average number of successes over many experiments</td></tr>
+    </table>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-label">📍 Real-Life Example — Marketing Email Campaign</div>
+    <p><strong>Scenario:</strong> An email has a 20% open rate. You send 10 emails. What's P(exactly 3 opens)?</p>
+    <div class="solution-step"><span class="step-num">Given.</span> n=10, k=3, p=0.20</div>
+    <div class="solution-step"><span class="step-num">Calc.</span> P(X=3) = C(10,3) × 0.20³ × 0.80⁷ = 120 × 0.008 × 0.2097 = <span class="highlight">0.2013 ≈ 20.1%</span></div>
+    <div class="solution-step"><span class="step-num">Mean.</span> E[X] = 10 × 0.20 = <span class="teal">2 opens expected</span></div>
+  </div>
+
+  <h4 class="sub-head">Poisson Distribution</h4>
+  <div class="formula-box">
+    <div class="formula">
+      P(X = k) = (λ<sup>k</sup> · e<sup>−λ</sup>) / k!
+    </div>
+    <div class="formula" style="font-size:1.1rem; padding-top:0; padding-bottom:8px;">
+      E[X] = λ &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; Var(X) = λ
+    </div>
+    <table class="nomenclature-table">
+      <tr><th>Symbol</th><th>Name</th><th>Meaning</th></tr>
+      <tr><td>λ</td><td>lambda (rate)</td><td>Average number of events per interval (mean = variance = λ)</td></tr>
+      <tr><td>k</td><td>observed events</td><td>The specific count whose probability we're calculating (k = 0,1,2,...)</td></tr>
+      <tr><td>e<sup>−λ</sup></td><td>Poisson kernel</td><td>Normalising factor ensuring all probabilities sum to 1</td></tr>
+    </table>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-label">📍 Real-Life Example — Customer Arrivals</div>
+    <p><strong>Scenario:</strong> A coffee shop gets an average of λ=3 customers per minute. What's P(exactly 5 arrive in 1 minute)?</p>
+    <div class="solution-step"><span class="step-num">Calc.</span> P(X=5) = (3⁵ × e⁻³) / 5! = (243 × 0.0498) / 120 = <span class="highlight">0.1008 ≈ 10.1%</span></div>
+    <div class="solution-step"><span class="step-num">P(≥1).</span> P(X≥1) = 1 − P(X=0) = 1 − e⁻³ = 1 − 0.0498 = <span class="teal">95%</span></div>
+  </div>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <span class="code-lang">Python</span>
+      <button class="copy-btn" onclick="copyCode(this, 'code-dist')">Copy</button>
+    </div>
+    <pre><code id="code-dist"><span class="i">from</span> scipy.stats <span class="k">import</span> binom, poisson
+<span class="i">import</span> matplotlib.pyplot <span class="k">as</span> plt
+<span class="i">import</span> numpy <span class="k">as</span> np
+
+fig, axes = plt.<span class="f">subplots</span>(<span class="n">1</span>, <span class="n">2</span>, figsize=(<span class="n">12</span>, <span class="n">4</span>))
+
+<span class="c"># --- Binomial: email opens ---</span>
+n, p = <span class="n">10</span>, <span class="n">0.20</span>
+k_vals = np.<span class="f">arange</span>(<span class="n">0</span>, n+<span class="n">1</span>)
+binom_pmf = binom.<span class="f">pmf</span>(k_vals, n, p)
+axes[<span class="n">0</span>].<span class="f">bar</span>(k_vals, binom_pmf, color=<span class="s">'#4f8ef7'</span>, edgecolor=<span class="s">'white'</span>)
+axes[<span class="n">0</span>].<span class="f">set_title</span>(<span class="s">f'Binomial B(n={n}, p={p})'</span>)
+axes[<span class="n">0</span>].<span class="f">set_xlabel</span>(<span class="s">'k (successes)'</span>)
+<span class="f">print</span>(<span class="s">f"P(X=3) = {binom.pmf(3, n, p):.4f}"</span>)   <span class="c"># ≈ 0.2013</span>
+
+<span class="c"># --- Poisson: customer arrivals ---</span>
+lam = <span class="n">3</span>
+k_vals2 = np.<span class="f">arange</span>(<span class="n">0</span>, <span class="n">12</span>)
+pois_pmf = poisson.<span class="f">pmf</span>(k_vals2, lam)
+axes[<span class="n">1</span>].<span class="f">bar</span>(k_vals2, pois_pmf, color=<span class="s">'#38c9c0'</span>, edgecolor=<span class="s">'white'</span>)
+axes[<span class="n">1</span>].<span class="f">set_title</span>(<span class="s">f'Poisson(λ={lam})'</span>)
+<span class="f">print</span>(<span class="s">f"P(X=5) = {poisson.pmf(5, lam):.4f}"</span>)   <span class="c"># ≈ 0.1008</span>
+
+plt.<span class="f">tight_layout</span>()
+plt.<span class="f">show</span>()</code></pre>
+  </div>
+</section>
+
+<!-- ═══════════════ SECTION 8: Central Limit Theorem ═══════════════ -->
+<section class="section" id="s8">
+  <div class="section-header">
+    <div class="section-number">08</div>
+    <div><h2>Central <span>Limit Theorem</span></h2></div>
+  </div>
+  <p class="section-intro">The most remarkable result in statistics: regardless of the shape of the original population distribution, the distribution of <em>sample means</em> approaches a normal distribution as the sample size grows. This is why normal distributions appear everywhere in practice.</p>
+
+  <div class="formula-box">
+    <div class="formula">
+      x̄ ~ N(μ, σ²/n) &nbsp;&nbsp;&nbsp;as n → ∞
+    </div>
+    <div class="formula" style="font-size:1.1rem; padding-top:0; padding-bottom:8px;">
+      SE = σ / √n &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; z = (x̄ − μ) / (σ/√n)
+    </div>
+    <table class="nomenclature-table">
+      <tr><th>Symbol</th><th>Name</th><th>Meaning</th></tr>
+      <tr><td>x̄</td><td>sample mean</td><td>Mean calculated from one sample of size n</td></tr>
+      <tr><td>μ</td><td>population mean</td><td>True mean of the population we're sampling from</td></tr>
+      <tr><td>σ²/n</td><td>variance of x̄</td><td>Variance shrinks by factor n — larger samples → more precise estimate</td></tr>
+      <tr><td>SE</td><td>Standard Error</td><td>Standard deviation of the sampling distribution of x̄; SE = σ/√n</td></tr>
+      <tr><td>n → ∞</td><td>as n grows large</td><td>Rule of thumb: n ≥ 30 is usually sufficient for CLT to kick in</td></tr>
+    </table>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-label">📍 Real-Life Example — Delivery Times</div>
+    <p><strong>Population:</strong> Delivery times follow a skewed distribution with μ=45 min, σ=20 min</p>
+    <p><strong>Question:</strong> Take samples of n=36. What's P(sample mean ≤ 42 min)?</p>
+    <div class="solution-step"><span class="step-num">SE.</span> SE = σ/√n = 20/√36 = 20/6 = <span class="highlight">3.33 min</span></div>
+    <div class="solution-step"><span class="step-num">Z-score.</span> z = (42 − 45) / 3.33 = −3/3.33 = <span class="highlight">−0.9</span></div>
+    <div class="solution-step"><span class="step-num">P.</span> P(x̄ ≤ 42) = Φ(−0.9) ≈ <span class="teal">18.4%</span></div>
+    <div class="solution-step"><span class="step-num">Key Insight.</span> Even though individual times are <strong>skewed</strong>, the distribution of sample means is approximately <span class="pink">normal</span> because n=36 ≥ 30!</div>
+  </div>
+
+  <div class="demo-box">
+    <h4>🎮 CLT Simulation <span class="demo-badge">LIVE</span></h4>
+    <div class="input-row">
+      <span class="demo-label">Population shape:</span>
+      <select class="demo-input" id="clt-dist" style="max-width:140px;">
+        <option value="uniform">Uniform</option>
+        <option value="exponential">Exponential (skewed)</option>
+        <option value="bimodal">Bimodal</option>
+      </select>
+      <span class="demo-label">Sample size n:</span>
+      <input type="number" class="demo-input" id="clt-n" value="30" style="max-width:70px;"/>
+      <button class="demo-btn" onclick="runCLT()">Simulate</button>
+    </div>
+    <div class="demo-result" id="clt-result">→ Click Simulate to run 2000 samples</div>
+    <div class="canvas-wrap"><canvas id="clt-canvas" height="140"></canvas></div>
+  </div>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <span class="code-lang">Python</span>
+      <button class="copy-btn" onclick="copyCode(this, 'code-clt')">Copy</button>
+    </div>
+    <pre><code id="code-clt"><span class="i">import</span> numpy <span class="k">as</span> np
+<span class="i">import</span> matplotlib.pyplot <span class="k">as</span> plt
+<span class="i">from</span> scipy.stats <span class="k">import</span> norm
+
+np.random.<span class="f">seed</span>(<span class="n">42</span>)
+n_samples, n = <span class="n">2000</span>, <span class="n">30</span>   <span class="c"># 2000 experiments, each with n=30</span>
+
+<span class="c"># Population: right-skewed exponential (like delivery times)</span>
+population = np.random.<span class="f">exponential</span>(scale=<span class="n">45</span>, size=<span class="n">100_000</span>)
+
+<span class="c"># Draw many samples and compute each mean</span>
+sample_means = [np.<span class="f">mean</span>(np.random.<span class="f">choice</span>(population, n)) <span class="k">for</span> _ <span class="k">in</span> <span class="f">range</span>(n_samples)]
+
+fig, (ax1, ax2) = plt.<span class="f">subplots</span>(<span class="n">1</span>, <span class="n">2</span>, figsize=(<span class="n">12</span>, <span class="n">4</span>))
+
+ax1.<span class="f">hist</span>(population[:<span class="n">1000</span>], bins=<span class="n">40</span>, color=<span class="s">'#e05c8a'</span>, alpha=<span class="n">0.7</span>)
+ax1.<span class="f">set_title</span>(<span class="s">'Population (Exponential — Skewed)'</span>)
+
+ax2.<span class="f">hist</span>(sample_means, bins=<span class="n">40</span>, density=<span class="k">True</span>, color=<span class="s">'#38c9c0'</span>, alpha=<span class="n">0.7</span>)
+mu_sm  = np.<span class="f">mean</span>(sample_means)
+std_sm = np.<span class="f">std</span>(sample_means)
+xs = np.<span class="f">linspace</span>(mu_sm - <span class="n">4</span>*std_sm, mu_sm + <span class="n">4</span>*std_sm, <span class="n">200</span>)
+ax2.<span class="f">plot</span>(xs, norm.<span class="f">pdf</span>(xs, mu_sm, std_sm), <span class="s">'#e8b84b'</span>, lw=<span class="n">2</span>, label=<span class="s">'Normal fit'</span>)
+ax2.<span class="f">set_title</span>(<span class="s">f'Sample Means (n={n}) — CLT kicks in!'</span>)
+ax2.<span class="f">legend</span>()
+
+plt.<span class="f">tight_layout</span>()
+plt.<span class="f">show</span>()</code></pre>
+  </div>
+</section>
+
+<!-- ═══════════════ SECTION 9: Hypothesis Testing ═══════════════ -->
+<section class="section" id="s9">
+  <div class="section-header">
+    <div class="section-number">09</div>
+    <div><h2><span>Hypothesis</span> Testing</h2></div>
+  </div>
+  <p class="section-intro">The scientific method for data: start with a null hypothesis (status quo), collect data, and decide whether the evidence is strong enough to reject it. Used everywhere from clinical trials to A/B tests.</p>
+
+  <div class="formula-box">
+    <div class="formula">
+      H<sub>0</sub>: μ = μ<sub>0</sub> &nbsp;&nbsp;&nbsp;(Null)
+      &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+      H<sub>a</sub>: μ ≠ μ<sub>0</sub> or μ &gt; μ<sub>0</sub> or μ &lt; μ<sub>0</sub> &nbsp;&nbsp;&nbsp;(Alternative)
+    </div>
+    <div class="formula" style="font-size:1.1rem; padding-top:0; padding-bottom:8px;">
+      t = (x̄ − μ<sub>0</sub>) / (s / √n) &nbsp;&nbsp;&nbsp;&nbsp; z = (x̄ − μ<sub>0</sub>) / (σ / √n)
+    </div>
+    <table class="nomenclature-table">
+      <tr><th>Symbol</th><th>Name</th><th>Meaning</th></tr>
+      <tr><td>H<sub>0</sub></td><td>Null hypothesis</td><td>The "no effect / no difference" claim we're trying to disprove</td></tr>
+      <tr><td>H<sub>a</sub></td><td>Alternative hypothesis</td><td>What we suspect is actually true (our scientific claim)</td></tr>
+      <tr><td>α</td><td>significance level</td><td>Threshold for rejection; typically 0.05 (5% chance of false positive)</td></tr>
+      <tr><td>p-value</td><td>probability value</td><td>P(observing this data or more extreme | H₀ is true) — NOT P(H₀ is true)</td></tr>
+      <tr><td>t</td><td>test statistic</td><td>How many standard errors x̄ is from the hypothesised μ₀</td></tr>
+      <tr><td>Type I error</td><td>False positive</td><td>Rejecting H₀ when it's actually true; rate = α</td></tr>
+      <tr><td>Type II error</td><td>False negative</td><td>Failing to reject H₀ when H₀ is actually false; rate = β</td></tr>
+    </table>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-label">📍 Real-Life Example — A/B Test (Website CTR)</div>
+    <p><strong>Scenario:</strong> Old button (Control): average CTR = 5%. New button (Treatment): 50 users tested, sample mean CTR = 7%, s = 3%. Is the improvement real or just noise?</p>
+    <div class="solution-step"><span class="step-num">H₀.</span> μ = 5% (no change)</div>
+    <div class="solution-step"><span class="step-num">Hₐ.</span> μ > 5% (one-tailed — we only care if it improved)</div>
+    <div class="solution-step"><span class="step-num">t-stat.</span> t = (7 − 5) / (3 / √50) = 2 / 0.424 = <span class="highlight">4.72</span></div>
+    <div class="solution-step"><span class="step-num">p-value.</span> t(4.72, df=49) → p ≈ <span class="teal">0.000012</span> (extremely small!)</div>
+    <div class="solution-step"><span class="step-num">Decision.</span> p &lt; α=0.05 → <span class="pink">Reject H₀</span>. The new button's CTR is significantly higher!</div>
+  </div>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <span class="code-lang">Python</span>
+      <button class="copy-btn" onclick="copyCode(this, 'code-ht')">Copy</button>
+    </div>
+    <pre><code id="code-ht"><span class="i">import</span> numpy <span class="k">as</span> np
+<span class="i">from</span> scipy.stats <span class="k">import</span> ttest_1samp, ttest_ind
+
+<span class="c"># One-sample t-test: is new CTR > 5%?</span>
+np.random.<span class="f">seed</span>(<span class="n">42</span>)
+n, mu0, sample_mean, sample_std = <span class="n">50</span>, <span class="n">5.0</span>, <span class="n">7.0</span>, <span class="n">3.0</span>
+
+<span class="c"># Simulate sample data matching our statistics</span>
+sample = np.random.<span class="f">normal</span>(sample_mean, sample_std, n)
+
+t_stat, p_value = <span class="f">ttest_1samp</span>(sample, mu0)
+p_one_tail = p_value / <span class="n">2</span>   <span class="c"># Convert to one-tailed</span>
+
+<span class="f">print</span>(<span class="s">f"t-statistic : {t_stat:.4f}"</span>)
+<span class="f">print</span>(<span class="s">f"p-value (one-tailed) : {p_one_tail:.6f}"</span>)
+<span class="f">print</span>(<span class="s">f"Decision : {'Reject H0 ✓' if p_one_tail < 0.05 else 'Fail to reject H0'}"</span>)
+
+<span class="c"># --- Two-sample t-test (compare two groups) ---</span>
+group_a = np.random.<span class="f">normal</span>(<span class="n">5.0</span>, <span class="n">3.0</span>, <span class="n">50</span>)   <span class="c"># Control</span>
+group_b = np.random.<span class="f">normal</span>(<span class="n">7.0</span>, <span class="n">3.0</span>, <span class="n">50</span>)   <span class="c"># Treatment</span>
+t2, p2 = <span class="f">ttest_ind</span>(group_a, group_b)
+<span class="f">print</span>(<span class="s">f"\nTwo-sample t-test p = {p2:.6f}"</span>)</code></pre>
+  </div>
+</section>
+
+<!-- ═══════════════ SECTION 10: Correlation & Regression ═══════════════ -->
+<section class="section" id="s10">
+  <div class="section-header">
+    <div class="section-number">10</div>
+    <div><h2><span>Correlation</span> & <span>Linear Regression</span></h2></div>
+  </div>
+  <p class="section-intro">Correlation asks <em>"are two variables related?"</em> Regression asks <em>"if X changes, how much does Y change?"</em> One of the most widely used tools in data science, economics, and science.</p>
+
+  <h4 class="sub-head">Pearson Correlation Coefficient</h4>
+  <div class="formula-box">
+    <div class="formula">
+      r = Σ[(x<sub>i</sub>−x̄)(y<sub>i</sub>−ȳ)] / √[Σ(x<sub>i</sub>−x̄)² · Σ(y<sub>i</sub>−ȳ)²]
+    </div>
+    <table class="nomenclature-table">
+      <tr><th>Symbol</th><th>Name</th><th>Meaning</th></tr>
+      <tr><td>r</td><td>Pearson r</td><td>Correlation coefficient: −1 ≤ r ≤ 1. r=1 perfect positive, r=−1 perfect negative, r=0 no linear relation</td></tr>
+      <tr><td>ȳ</td><td>y-bar</td><td>Mean of the Y variable</td></tr>
+      <tr><td>r²</td><td>R-squared</td><td>Proportion of variance in Y explained by X (coefficient of determination)</td></tr>
+    </table>
+  </div>
+
+  <h4 class="sub-head">Simple Linear Regression</h4>
+  <div class="formula-box">
+    <div class="formula">
+      Ŷ = β<sub>0</sub> + β<sub>1</sub>X
+      &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+      β<sub>1</sub> = Σ(x<sub>i</sub>−x̄)(y<sub>i</sub>−ȳ) / Σ(x<sub>i</sub>−x̄)²
+      &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+      β<sub>0</sub> = ȳ − β<sub>1</sub>x̄
+    </div>
+    <table class="nomenclature-table">
+      <tr><th>Symbol</th><th>Name</th><th>Meaning</th></tr>
+      <tr><td>Ŷ</td><td>Y-hat (predicted)</td><td>Model's predicted value of Y for a given X</td></tr>
+      <tr><td>β<sub>0</sub></td><td>intercept</td><td>Predicted Y when X = 0 (y-intercept of the regression line)</td></tr>
+      <tr><td>β<sub>1</sub></td><td>slope (coefficient)</td><td>Change in Y for a 1-unit increase in X</td></tr>
+      <tr><td>ε</td><td>residual / error</td><td>ε = Y − Ŷ — the difference between actual and predicted values</td></tr>
+      <tr><td>MSE</td><td>Mean Squared Error</td><td>Σε²/n — OLS minimises this to find the best-fit line</td></tr>
+    </table>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-label">📍 Real-Life Example — Study Hours vs Exam Score</div>
+    <p><strong>Data:</strong> Hours studied: [2,3,4,5,6,7,8] | Scores: [55,60,65,70,75,80,85]</p>
+    <div class="solution-step"><span class="step-num">β₁.</span> Each extra hour of study → score increases by <span class="highlight">5 points</span></div>
+    <div class="solution-step"><span class="step-num">β₀.</span> Intercept = 45 (predicted score with 0 hours — starting baseline)</div>
+    <div class="solution-step"><span class="step-num">Model.</span> Ŷ = 45 + 5·X</div>
+    <div class="solution-step"><span class="step-num">Prediction.</span> Studying 9 hours → Ŷ = 45 + 5×9 = <span class="teal">90 points</span></div>
+    <div class="solution-step"><span class="step-num">R².</span> = 1.0 (perfect linear relationship in this toy example)</div>
+  </div>
+
+  <div class="demo-box">
+    <h4>🎮 Correlation & Regression Explorer <span class="demo-badge">LIVE</span></h4>
+    <div class="input-row">
+      <span class="demo-label">Correlation strength:</span>
+      <input type="range" id="corr-slider" min="-1" max="1" step="0.05" value="0.8" style="flex:1; min-width:120px; accent-color:var(--gold);"/>
+      <span class="demo-label" id="corr-val">r = 0.80</span>
+      <button class="demo-btn" onclick="drawRegression()">Update</button>
+    </div>
+    <div class="canvas-wrap"><canvas id="reg-canvas" height="180"></canvas></div>
+    <div class="demo-result" id="reg-result" style="margin-top:10px;">→ Drag slider to change correlation</div>
+  </div>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <span class="code-lang">Python</span>
+      <button class="copy-btn" onclick="copyCode(this, 'code-reg')">Copy</button>
+    </div>
+    <pre><code id="code-reg"><span class="i">import</span> numpy <span class="k">as</span> np
+<span class="i">from</span> sklearn.linear_model <span class="k">import</span> LinearRegression
+<span class="i">from</span> sklearn.metrics <span class="k">import</span> r2_score
+<span class="i">import</span> matplotlib.pyplot <span class="k">as</span> plt
+
+<span class="c"># Dataset: study hours vs exam score</span>
+hours  = np.<span class="f">array</span>([<span class="n">2</span>,<span class="n">3</span>,<span class="n">4</span>,<span class="n">5</span>,<span class="n">6</span>,<span class="n">7</span>,<span class="n">8</span>]).reshape(-<span class="n">1</span>,<span class="n">1</span>)
+scores = np.<span class="f">array</span>([<span class="n">55</span>,<span class="n">60</span>,<span class="n">65</span>,<span class="n">70</span>,<span class="n">75</span>,<span class="n">80</span>,<span class="n">85</span>])
+
+model = LinearRegression().<span class="f">fit</span>(hours, scores)
+
+beta0 = model.intercept_
+beta1 = model.coef_[<span class="n">0</span>]
+r2    = <span class="f">r2_score</span>(scores, model.<span class="f">predict</span>(hours))
+
+<span class="f">print</span>(<span class="s">f"β₀ (intercept) = {beta0:.2f}"</span>)
+<span class="f">print</span>(<span class="s">f"β₁ (slope)     = {beta1:.2f}"</span>)
+<span class="f">print</span>(<span class="s">f"R²             = {r2:.4f}"</span>)
+<span class="f">print</span>(<span class="s">f"Prediction(9h) = {model.predict([[9]])[0]:.1f}"</span>)
+
+<span class="c"># Plot</span>
+x_line = np.<span class="f">linspace</span>(<span class="n">0</span>, <span class="n">10</span>, <span class="n">50</span>).reshape(-<span class="n">1</span>,<span class="n">1</span>)
+plt.<span class="f">scatter</span>(hours, scores, color=<span class="s">'#4f8ef7'</span>, zorder=<span class="n">5</span>, label=<span class="s">'Data'</span>)
+plt.<span class="f">plot</span>(x_line, model.<span class="f">predict</span>(x_line), <span class="s">'#e8b84b'</span>, lw=<span class="n">2</span>, label=<span class="s">f'Ŷ={beta0:.1f}+{beta1:.1f}X'</span>)
+plt.<span class="f">legend</span>()
+plt.<span class="f">show</span>()</code></pre>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer style="background:var(--bg2); border-top:1px solid var(--border); padding:36px 60px; color:var(--text3); font-size:.82rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+  <div>
+    <p style="color:var(--text2); margin-bottom:4px; font-family:'Playfair Display',serif;">Statistics Masterclass</p>
+    <p>All Python examples are compatible with Google Colab · numpy · scipy · matplotlib · scikit-learn</p>
+  </div>
+  <div style="text-align:right;">
+    <p style="color:var(--gold); margin-bottom:4px;">Build intuition first, then formalism.</p>
+    <p>10 Topics · 20+ Formulas · Fully Interactive</p>
+  </div>
+</footer>
+
+</main>
+
+<script>
+// ─── Utility ───────────────────────────────────────────────────────────
+function parseNums(id) {
+  return document.getElementById(id).value
+    .split(',').map(s => parseFloat(s.trim())).filter(x => !isNaN(x));
+}
+function copyCode(btn, id) {
+  const text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied!'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ─── Sidebar active nav ────────────────────────────────────────────────
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('.nav-link');
+const progressEl = document.getElementById('progress');
+
+function updateNav() {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY + 200 >= s.offsetTop) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#'+current);
+  });
+  const pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+  progressEl.style.width = Math.min(pct, 100) + '%';
+}
+window.addEventListener('scroll', updateNav);
+updateNav();
+
+// ─── SECTION 1: Central Tendency ─────────────────────────────────────
+function calcCT() {
+  const data = parseNums('ct-input');
+  if (!data.length) return;
+  const mean = data.reduce((a,b)=>a+b,0)/data.length;
+  const sorted = [...data].sort((a,b)=>a-b);
+  const mid = Math.floor(sorted.length/2);
+  const median = sorted.length%2 ? sorted[mid] : (sorted[mid-1]+sorted[mid])/2;
+  const freq = {}; data.forEach(x=>{freq[x]=(freq[x]||0)+1;});
+  const maxF = Math.max(...Object.values(freq));
+  const modes = Object.keys(freq).filter(k=>freq[k]===maxF).join(', ');
+  document.getElementById('ct-result').innerHTML =
+    `<span class="stat-result">Mean   : ${mean.toFixed(3)}</span>` +
+    `<span class="stat-result">Median : ${median}</span>` +
+    `<span class="stat-result">Mode   : ${modes} (appears ${maxF}x)</span>`;
+  drawCTChart(data, mean, median);
+}
+
+function drawCTChart(data, mean, median) {
+  const canvas = document.getElementById('ct-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.parentElement.offsetWidth - 24;
+  canvas.height = 80;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const min = Math.min(...data), max = Math.max(...data);
+  const range = max-min || 1;
+  const W = canvas.width, H = canvas.height;
+  const toX = v => 20 + ((v-min)/range)*(W-40);
+  // axis
+  ctx.strokeStyle = '#2a3354'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(20,H-20); ctx.lineTo(W-20,H-20); ctx.stroke();
+  // data dots
+  data.forEach(v => {
+    const x = toX(v);
+    ctx.fillStyle = '#4f8ef7';
+    ctx.beginPath(); ctx.arc(x,H-20,5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#5a637a'; ctx.font='10px JetBrains Mono';
+    ctx.textAlign='center'; ctx.fillText(v,x,H-28);
+  });
+  // mean line
+  ctx.strokeStyle='#e8b84b'; ctx.lineWidth=2;
+  const mx = toX(mean);
+  ctx.beginPath(); ctx.moveTo(mx,10); ctx.lineTo(mx,H-20); ctx.stroke();
+  ctx.fillStyle='#e8b84b'; ctx.font='bold 10px DM Sans';
+  ctx.fillText('μ='+mean.toFixed(1), mx, 8);
+  // median line
+  const medX = toX(median);
+  ctx.strokeStyle='#38c9c0'; ctx.lineWidth=2;
+  ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(medX,10); ctx.lineTo(medX,H-20); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#38c9c0'; ctx.textAlign='center';
+  ctx.fillText('M='+median, medX+20, 8);
+}
+
+// ─── SECTION 2: Spread ────────────────────────────────────────────────
+function calcSpread() {
+  const data = parseNums('sp-input');
+  if(!data.length) return;
+  const n = data.length;
+  const mean = data.reduce((a,b)=>a+b,0)/n;
+  const variance = data.reduce((a,b)=>a+(b-mean)**2,0)/(n-1);
+  const std = Math.sqrt(variance);
+  const sorted = [...data].sort((a,b)=>a-b);
+  const q1 = percentile(sorted,25), q3 = percentile(sorted,75);
+  const iqr = q3-q1;
+  const outliers = data.filter(x => x < q1-1.5*iqr || x > q3+1.5*iqr);
+  document.getElementById('sp-result').innerHTML =
+    `<span class="stat-result">Range    : ${Math.max(...data)-Math.min(...data)}</span>` +
+    `<span class="stat-result">Variance : ${variance.toFixed(3)} &nbsp;&nbsp; Std Dev : ${std.toFixed(3)}</span>` +
+    `<span class="stat-result">Q1=${q1.toFixed(1)}, Q3=${q3.toFixed(1)}, IQR=${iqr.toFixed(1)}</span>` +
+    `<span class="stat-result" style="color:var(--pink)">Outliers : [${outliers.join(', ')}]</span>`;
+  drawBoxPlot(sorted, q1, q3, mean, iqr);
+}
+
+function percentile(sorted, p) {
+  const idx = (p/100)*(sorted.length-1);
+  const lo = Math.floor(idx), hi = Math.ceil(idx);
+  return sorted[lo]+(sorted[hi]-sorted[lo])*(idx-lo);
+}
+
+function drawBoxPlot(sorted, q1, q3, mean, iqr) {
+  const canvas = document.getElementById('sp-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.parentElement.offsetWidth - 24;
+  canvas.height = 60;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const min=sorted[0], max=sorted[sorted.length-1];
+  const rng=max-min||1, W=canvas.width, H=canvas.height;
+  const toX = v => 20+((v-min)/rng)*(W-40);
+  const whisLo = Math.max(min, q1-1.5*iqr);
+  const whisHi = Math.min(max, q3+1.5*iqr);
+  const midY = H/2;
+  // whisker
+  ctx.strokeStyle='#5a637a'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(toX(whisLo),midY); ctx.lineTo(toX(q1),midY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(toX(q3),midY); ctx.lineTo(toX(whisHi),midY); ctx.stroke();
+  // box
+  ctx.fillStyle='rgba(79,142,247,.25)'; ctx.strokeStyle='#4f8ef7'; ctx.lineWidth=2;
+  ctx.fillRect(toX(q1),midY-12,toX(q3)-toX(q1),24);
+  ctx.strokeRect(toX(q1),midY-12,toX(q3)-toX(q1),24);
+  // median
+  const med = percentile(sorted,50);
+  ctx.strokeStyle='#38c9c0'; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.moveTo(toX(med),midY-12); ctx.lineTo(toX(med),midY+12); ctx.stroke();
+  // mean dot
+  ctx.fillStyle='#e8b84b';
+  ctx.beginPath(); ctx.arc(toX(mean),midY,5,0,Math.PI*2); ctx.fill();
+  // outliers
+  sorted.forEach(v => {
+    if(v < whisLo || v > whisHi) {
+      ctx.fillStyle='var(--pink)';
+      ctx.beginPath(); ctx.arc(toX(v),midY,4,0,Math.PI*2); ctx.fill();
+    }
+  });
+  // labels
+  ctx.fillStyle='#5a637a'; ctx.font='9px JetBrains Mono'; ctx.textAlign='center';
+  ctx.fillText('Q1',toX(q1),midY+22); ctx.fillText('Q3',toX(q3),midY+22);
+  ctx.fillStyle='#38c9c0'; ctx.fillText('Med',toX(med),midY-16);
+  ctx.fillStyle='#e8b84b'; ctx.fillText('μ',toX(mean),midY-16);
+}
+
+// ─── SECTION 5: Combinatorics ─────────────────────────────────────────
+function factorial(n) { let r=1; for(let i=2;i<=n;i++) r*=i; return r; }
+function calcComb() {
+  const n=+document.getElementById('comb-n').value;
+  const r=+document.getElementById('comb-r').value;
+  if(r>n||r<0||n<0){document.getElementById('comb-result').innerHTML='<span style="color:var(--pink)">r must be ≤ n and both ≥ 0</span>';return;}
+  const P = factorial(n)/factorial(n-r);
+  const C = factorial(n)/(factorial(r)*factorial(n-r));
+  document.getElementById('comb-result').innerHTML =
+    `<span class="stat-result">P(${n},${r}) [Permutation, order matters]  = ${P.toLocaleString()}</span>` +
+    `<span class="stat-result">C(${n},${r}) [Combination, order doesn't] = ${C.toLocaleString()}</span>` +
+    `<span class="stat-result" style="color:var(--text2)">Note: P/C = r! = ${factorial(r)} (the redundant orderings removed)</span>`;
+}
+
+// ─── SECTION 6: Normal Distribution ──────────────────────────────────
+function normalPDF(x,mu,sigma){
+  return (1/(sigma*Math.sqrt(2*Math.PI)))*Math.exp(-0.5*((x-mu)/sigma)**2);
+}
+function erf(x) {
+  const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
+  const sign=x<0?-1:1; x=Math.abs(x);
+  const t=1/(1+p*x);
+  const y=1-((((a5*t+a4)*t+a3)*t+a2)*t+a1)*t*Math.exp(-x*x);
+  return sign*y;
+}
+function normalCDF(x,mu,sigma){ return 0.5*(1+erf((x-mu)/(sigma*Math.sqrt(2)))); }
+
+function drawNormal() {
+  const mu=+document.getElementById('nd-mu').value;
+  const sigma=+document.getElementById('nd-sigma').value;
+  const xVal=+document.getElementById('nd-x').value;
+  const z=(xVal-mu)/sigma;
+  const pct=(normalCDF(xVal,mu,sigma)*100).toFixed(1);
+  document.getElementById('nd-result').innerHTML =
+    `<span class="stat-result">z-score: z = (${xVal}−${mu})/${sigma} = ${z.toFixed(3)}</span>` +
+    `<span class="stat-result">P(X ≤ ${xVal}) = Φ(${z.toFixed(2)}) = ${pct}th percentile</span>` +
+    `<span class="stat-result" style="color:var(--text2)">68-95-99.7: ±1σ=[${mu-sigma},${mu+sigma}], ±2σ=[${mu-2*sigma},${mu+2*sigma}]</span>`;
+
+  const canvas=document.getElementById('nd-canvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.parentElement.offsetWidth-24; canvas.height=160;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const W=canvas.width, H=canvas.height, pad=20;
+  const xMin=mu-4*sigma, xMax=mu+4*sigma;
+  const toX=v=>pad+((v-xMin)/(xMax-xMin))*(W-2*pad);
+  const toY=v=>H-pad-(v/(normalPDF(mu,mu,sigma)))*(H-2*pad-20);
+
+  // Shaded area
+  ctx.fillStyle='rgba(232,184,75,0.2)';
+  ctx.beginPath(); ctx.moveTo(toX(xMin),toY(0));
+  for(let v=xMin;v<=xVal;v+=(xMax-xMin)/200){
+    ctx.lineTo(toX(v), toY(normalPDF(v,mu,sigma)));
+  }
+  ctx.lineTo(toX(xVal),toY(0)); ctx.closePath(); ctx.fill();
+
+  // Curve
+  ctx.strokeStyle='#4f8ef7'; ctx.lineWidth=2.5;
+  ctx.beginPath();
+  for(let v=xMin;v<=xMax;v+=(xMax-xMin)/200){
+    const x=toX(v), y=toY(normalPDF(v,mu,sigma));
+    v===xMin?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // xVal line
+  ctx.strokeStyle='#e8b84b'; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(toX(xVal),pad); ctx.lineTo(toX(xVal),H-pad); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#e8b84b'; ctx.font='bold 11px DM Sans'; ctx.textAlign='center';
+  ctx.fillText(`x=${xVal} (z=${z.toFixed(2)})`,toX(xVal),pad-4);
+
+  // mu line
+  ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(toX(mu),pad+10); ctx.lineTo(toX(mu),H-pad); ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.fillText('μ',toX(mu),H-4);
+}
+
+// ─── SECTION 8: CLT Simulation ────────────────────────────────────────
+function runCLT() {
+  const n=+document.getElementById('clt-n').value;
+  const distType=document.getElementById('clt-dist').value;
+  const N_SAMPLES=2000;
+
+  function samplePop(){
+    switch(distType){
+      case 'uniform': return Math.random()*10;
+      case 'exponential': return -Math.log(1-Math.random())*5;
+      case 'bimodal': return Math.random()<0.5 ? (Math.random()*2+1) : (Math.random()*2+7);
+    }
+  }
+
+  const means=[];
+  for(let i=0;i<N_SAMPLES;i++){
+    let sum=0; for(let j=0;j<n;j++) sum+=samplePop();
+    means.push(sum/n);
+  }
+  const mu=means.reduce((a,b)=>a+b,0)/means.length;
+  const std=Math.sqrt(means.reduce((a,b)=>a+(b-mu)**2,0)/means.length);
+
+  document.getElementById('clt-result').innerHTML =
+    `<span class="stat-result">Population: ${distType} | Sample size: n=${n}</span>` +
+    `<span class="stat-result">Sampling distribution: mean=${mu.toFixed(3)}, SE=${std.toFixed(3)}</span>` +
+    `<span class="stat-result" style="color:var(--teal)">→ Distribution of sample means looks ${n>=25?'Normal ✓ (CLT verified!)':'not quite Normal yet — try n≥30'}</span>`;
+
+  const canvas=document.getElementById('clt-canvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.parentElement.offsetWidth-24; canvas.height=140;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const W=canvas.width, H=canvas.height;
+  const bins=30;
+  const minV=Math.min(...means), maxV=Math.max(...means);
+  const binW=(maxV-minV)/bins;
+  const counts=new Array(bins).fill(0);
+  means.forEach(v=>{
+    const bi=Math.min(bins-1,Math.floor((v-minV)/binW));
+    counts[bi]++;
+  });
+  const maxC=Math.max(...counts);
+  const bw=(W-40)/bins;
+  counts.forEach((c,i)=>{
+    const bh=(c/maxC)*(H-30);
+    const x=20+i*bw;
+    const hue=200+i*5;
+    ctx.fillStyle=`hsl(${hue},70%,60%)`;
+    ctx.fillRect(x,H-20-bh,bw-1,bh);
+  });
+  // overlay normal curve
+  ctx.strokeStyle='#e8b84b'; ctx.lineWidth=2;
+  ctx.beginPath();
+  for(let i=0;i<=100;i++){
+    const v=minV+(maxV-minV)*i/100;
+    const x=20+((v-minV)/(maxV-minV))*(W-40);
+    const density=normalPDF(v,mu,std);
+    const scale=(H-30)*(N_SAMPLES*binW/N_SAMPLES)/(1/(std*Math.sqrt(2*Math.PI)));
+    const y=H-20-density*(H-30)*std*2.5;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+}
+
+// ─── SECTION 10: Regression ────────────────────────────────────────────
+document.getElementById('corr-slider').addEventListener('input', function(){
+  document.getElementById('corr-val').textContent = 'r = ' + parseFloat(this.value).toFixed(2);
+});
+
+function drawRegression() {
+  const r=+document.getElementById('corr-slider').value;
+  const n=80;
+  const xs=[],ys=[];
+  for(let i=0;i<n;i++){
+    const x=(Math.random()-0.5)*6;
+    const noise=Math.sqrt(1-r*r)*(Math.random()-0.5)*4;
+    xs.push(x); ys.push(r*x+noise);
+  }
+  const mx=xs.reduce((a,b)=>a+b,0)/n;
+  const my=ys.reduce((a,b)=>a+b,0)/n;
+  const ssxy=xs.reduce((a,b,i)=>a+(b-mx)*(ys[i]-my),0);
+  const ssx=xs.reduce((a,b)=>a+(b-mx)**2,0);
+  const b1=ssxy/ssx, b0=my-b1*mx;
+  const yhat=xs.map(x=>b0+b1*x);
+  const sstot=ys.reduce((a,b)=>a+(b-my)**2,0);
+  const ssres=ys.reduce((a,b,i)=>a+(b-yhat[i])**2,0);
+  const r2=1-ssres/sstot;
+
+  const canvas=document.getElementById('reg-canvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.parentElement.offsetWidth-24; canvas.height=180;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const W=canvas.width, H=canvas.height, pad=20;
+  const allX=xs, allY=ys;
+  const xMin=Math.min(...allX)-0.5, xMax=Math.max(...allX)+0.5;
+  const yMin=Math.min(...allY)-0.5, yMax=Math.max(...allY)+0.5;
+  const toX=v=>pad+((v-xMin)/(xMax-xMin))*(W-2*pad);
+  const toY=v=>H-pad-((v-yMin)/(yMax-yMin))*(H-2*pad);
+
+  // axes
+  ctx.strokeStyle='#2a3354'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pad,H-pad); ctx.lineTo(W-pad,H-pad); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pad,pad); ctx.lineTo(pad,H-pad); ctx.stroke();
+
+  // scatter
+  xs.forEach((x,i)=>{
+    ctx.fillStyle='rgba(79,142,247,0.65)';
+    ctx.beginPath(); ctx.arc(toX(x),toY(ys[i]),3.5,0,Math.PI*2); ctx.fill();
+  });
+
+  // regression line
+  const x1v=xMin, x2v=xMax;
+  ctx.strokeStyle='#e8b84b'; ctx.lineWidth=2.5;
+  ctx.beginPath();
+  ctx.moveTo(toX(x1v),toY(b0+b1*x1v));
+  ctx.lineTo(toX(x2v),toY(b0+b1*x2v));
+  ctx.stroke();
+
+  // labels
+  ctx.fillStyle='#e8b84b'; ctx.font='12px JetBrains Mono'; ctx.textAlign='left';
+  ctx.fillText(`Ŷ = ${b0.toFixed(2)} + ${b1.toFixed(2)}X`, pad+8, pad+18);
+  ctx.fillStyle='#38c9c0';
+  ctx.fillText(`r = ${r.toFixed(2)}, R² = ${r2.toFixed(3)}`, pad+8, pad+34);
+
+  document.getElementById('reg-result').innerHTML =
+    `<span class="stat-result">Regression: Ŷ = ${b0.toFixed(3)} + ${b1.toFixed(3)}·X</span>` +
+    `<span class="stat-result">r = ${r.toFixed(2)} | R² = ${r2.toFixed(3)} (${(r2*100).toFixed(1)}% variance explained)</span>`;
+}
+
+// ─── Init all demos ────────────────────────────────────────────────────
+window.addEventListener('load', ()=>{
+  calcCT(); calcSpread(); calcComb(); drawNormal(); runCLT(); drawRegression();
+});
+window.addEventListener('resize', ()=>{
+  drawNormal(); runCLT(); drawRegression();
+  const d1=parseNums('ct-input'); if(d1.length) drawCTChart(d1,d1.reduce((a,b)=>a+b,0)/d1.length,d1.sort((a,b)=>a-b)[Math.floor(d1.length/2)]);
+  const d2=parseNums('sp-input'); if(d2.length) calcSpread();
+});
+</script>
+</body>
+</html>

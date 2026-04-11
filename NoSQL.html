@@ -1,0 +1,2369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NoSQL — The Complete Visual Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #141414;
+    --surface2: #1c1c1c;
+    --border: #2a2a2a;
+    --accent: #f59e0b;
+    --accent2: #ef4444;
+    --accent3: #10b981;
+    --accent4: #6366f1;
+    --accent5: #ec4899;
+    --text: #e8e0d0;
+    --muted: #8a8070;
+    --code-bg: #0a0a0a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── GRAIN OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(13,13,13,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    height: 56px;
+  }
+
+  .nav-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin-right: auto;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 0;
+    list-style: none;
+    overflow-x: auto;
+  }
+
+  .nav-links a {
+    display: block;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+    white-space: nowrap;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8rem 4rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(245,158,11,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245,158,11,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 70%);
+    top: 50%; left: 10%;
+    transform: translate(-50%,-50%);
+    pointer-events: none;
+  }
+
+  .hero-tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 8vw, 8rem);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    max-width: 560px;
+    font-size: 1.05rem;
+    color: var(--muted);
+    line-height: 1.8;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+    margin-bottom: 3rem;
+  }
+
+  .hero-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+
+  .pill {
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border: 1px solid;
+  }
+
+  .pill-doc   { color: var(--accent);  border-color: rgba(245,158,11,0.3);  background: rgba(245,158,11,0.07); }
+  .pill-kv    { color: var(--accent3); border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.07); }
+  .pill-col   { color: var(--accent4); border-color: rgba(99,102,241,0.3); background: rgba(99,102,241,0.07); }
+  .pill-graph { color: var(--accent5); border-color: rgba(236,72,153,0.3); background: rgba(236,72,153,0.07); }
+  .pill-ts    { color: var(--accent2); border-color: rgba(239,68,68,0.3);  background: rgba(239,68,68,0.07); }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 6rem 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.8rem;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+
+  h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+  }
+
+  p { color: #b8b0a0; margin-bottom: 1rem; }
+
+  hr.divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+  }
+
+  /* ── CARDS ── */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 3rem;
+  }
+
+  .card {
+    background: var(--surface);
+    padding: 2rem;
+    transition: background 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .card:hover { background: var(--surface2); }
+  .card:hover::before { opacity: 1; }
+
+  .card-doc::before   { background: var(--accent); }
+  .card-kv::before    { background: var(--accent3); }
+  .card-col::before   { background: var(--accent4); }
+  .card-graph::before { background: var(--accent5); }
+  .card-ts::before    { background: var(--accent2); }
+
+  .card-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .card-doc   .card-icon { background: rgba(245,158,11,0.12); }
+  .card-kv    .card-icon { background: rgba(16,185,129,0.12); }
+  .card-col   .card-icon { background: rgba(99,102,241,0.12); }
+  .card-graph .card-icon { background: rgba(236,72,153,0.12); }
+  .card-ts    .card-icon { background: rgba(239,68,68,0.12);  }
+
+  .card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+  .card p  { font-size: 0.88rem; color: var(--muted); margin-bottom: 1rem; }
+
+  .card-example {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.7rem;
+    line-height: 1.6;
+  }
+
+  .card-examples-list {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 0.8rem;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .card-examples-list li {
+    background: rgba(255,255,255,0.04);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.72rem;
+  }
+
+  /* ── SQL vs NoSQL comparison ── */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 3rem;
+  }
+
+  .compare-col {
+    background: var(--surface);
+    padding: 2rem;
+  }
+
+  .compare-col.nosql-col {
+    background: var(--surface2);
+  }
+
+  .compare-header {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sql-col .compare-header { color: #60a5fa; }
+  .nosql-col .compare-header { color: var(--accent); }
+
+  .compare-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+    font-size: 0.88rem;
+  }
+
+  .compare-row .icon { font-size: 1rem; flex-shrink: 0; margin-top: 0.1rem; }
+  .compare-row .label { color: var(--muted); line-height: 1.5; }
+  .compare-row strong { color: var(--text); display: block; font-size: 0.8rem; }
+
+  /* ── FORMULA BOX ── */
+  .formula-box {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+    position: relative;
+  }
+
+  .formula-box .formula-label {
+    position: absolute;
+    top: -0.6rem;
+    left: 1.5rem;
+    background: var(--surface);
+    padding: 0 0.6rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .formula {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--accent);
+    text-align: center;
+    padding: 1rem 0;
+    letter-spacing: 0.05em;
+  }
+
+  .formula-explain {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1.5rem;
+  }
+
+  .formula-term {
+    font-size: 0.85rem;
+  }
+
+  .formula-term code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    background: rgba(245,158,11,0.1);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+  }
+
+  .formula-term p {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+    margin-bottom: 0;
+  }
+
+  /* ── CAP THEOREM ── */
+  .cap-triangle {
+    margin: 3rem auto;
+    max-width: 500px;
+    position: relative;
+  }
+
+  .cap-svg { width: 100%; }
+
+  .cap-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 2rem;
+  }
+
+  .cap-card {
+    background: var(--surface);
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  .cap-card .cap-letter {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .cap-card .cap-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .cap-card .cap-desc  { font-size: 0.78rem; color: var(--muted); }
+
+  /* ── CODE BLOCKS ── */
+  .code-section { margin: 3rem 0; }
+
+  .code-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+
+  .code-tab {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+
+  .code-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .code-panel {
+    display: none;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-top: none;
+  }
+
+  .code-panel.active { display: block; }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 1.2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .code-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-r { background: #ef4444; }
+  .dot-y { background: #f59e0b; }
+  .dot-g { background: #10b981; }
+
+  .copy-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(245,158,11,0.1);
+    border: 1px solid rgba(245,158,11,0.25);
+    border-radius: 6px;
+    color: var(--accent);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .copy-btn:hover { background: rgba(245,158,11,0.2); }
+  .copy-btn:active { transform: scale(0.97); }
+  .copy-btn.copied { background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.3); color: var(--accent3); }
+
+  .colab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(245,158,11,0.07);
+    border: 1px solid rgba(245,158,11,0.15);
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    font-family: 'DM Sans', sans-serif;
+    margin-left: 0.4rem;
+  }
+
+  .colab-btn:hover { color: var(--accent); background: rgba(245,158,11,0.12); }
+
+  pre {
+    padding: 1.5rem;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.8;
+    color: #c9d1d9;
+  }
+
+  /* Syntax colors */
+  .kw  { color: #f97316; }   /* keywords */
+  .st  { color: #a3e635; }   /* strings */
+  .cm  { color: #6b7280; font-style: italic; }   /* comments */
+  .fn  { color: #60a5fa; }   /* function names */
+  .nu  { color: #fb923c; }   /* numbers */
+  .ty  { color: #c084fc; }   /* types */
+  .op  { color: #e2e8f0; }   /* operators */
+  .va  { color: #94e2d5; }   /* variables */
+  .hl  { background: rgba(245,158,11,0.08); display: block; margin: 0 -1.5rem; padding: 0 1.5rem; }
+
+  /* ── USE CASE CARDS ── */
+  .usecase-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 2rem;
+  }
+
+  .usecase-card {
+    background: var(--surface);
+    padding: 2rem;
+    position: relative;
+  }
+
+  .usecase-card:hover { background: var(--surface2); }
+
+  .usecase-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .usecase-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+  }
+
+  .badge-doc   { color: var(--accent);  background: rgba(245,158,11,0.12); }
+  .badge-kv    { color: var(--accent3); background: rgba(16,185,129,0.12); }
+  .badge-col   { color: var(--accent4); background: rgba(99,102,241,0.12); }
+  .badge-graph { color: var(--accent5); background: rgba(236,72,153,0.12); }
+
+  .usecase-icon { font-size: 1.5rem; }
+  .usecase-card h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+  .usecase-card p  { font-size: 0.84rem; color: var(--muted); margin-bottom: 1rem; }
+
+  .problem-solution {
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+    margin-top: 1rem;
+  }
+
+  .ps-row {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 0.6rem;
+    font-size: 0.82rem;
+  }
+
+  .ps-label {
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+
+  .ps-prob { background: rgba(239,68,68,0.12); color: var(--accent2); }
+  .ps-sol  { background: rgba(16,185,129,0.12); color: var(--accent3); }
+
+  .ps-text { color: var(--muted); line-height: 1.5; }
+
+  /* ── ANIMATED TABS (Use Cases detail) ── */
+  .tab-container { margin-top: 3rem; }
+
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    padding: 0.7rem 1.4rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+
+  .tab-btn.active { color: var(--text); border-bottom-color: var(--accent); }
+
+  .tab-content { display: none; padding: 2rem 0; }
+  .tab-content.active { display: block; }
+
+  /* ── NOTATIONS TABLE ── */
+  .notation-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2rem;
+    font-size: 0.85rem;
+  }
+
+  .notation-table th {
+    background: var(--surface2);
+    color: var(--accent);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.8rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .notation-table td {
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .notation-table tr:last-child td { border-bottom: none; }
+  .notation-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .notation-table td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+
+  .notation-table td:nth-child(2) { color: var(--text); font-weight: 500; }
+  .notation-table td:nth-child(3) { color: var(--muted); font-size: 0.82rem; }
+  .notation-table td:nth-child(4) {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: #60a5fa;
+  }
+
+  /* ── PROGRESS / TIMELINE ── */
+  .timeline {
+    position: relative;
+    padding-left: 2.5rem;
+    margin-top: 2rem;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .tl-item {
+    position: relative;
+    margin-bottom: 2rem;
+  }
+
+  .tl-dot {
+    position: absolute;
+    left: -1.9rem;
+    top: 0.3rem;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  .tl-item h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .tl-item p { font-size: 0.84rem; color: var(--muted); }
+  .tl-item .tl-year {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+
+  /* ── QUIZ ── */
+  .quiz-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: 2rem;
+  }
+
+  .quiz-q {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+  }
+
+  .quiz-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .quiz-opt {
+    padding: 0.9rem 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    transition: all 0.2s;
+    text-align: left;
+    background: var(--surface2);
+    color: var(--text);
+  }
+
+  .quiz-opt:hover { border-color: var(--accent); background: rgba(245,158,11,0.07); }
+  .quiz-opt.correct { border-color: var(--accent3); background: rgba(16,185,129,0.1); color: var(--accent3); }
+  .quiz-opt.wrong   { border-color: var(--accent2); background: rgba(239,68,68,0.1); color: var(--accent2); }
+
+  .quiz-result {
+    display: none;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+
+  .quiz-result.show { display: block; }
+  .quiz-result.success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); color: var(--accent3); }
+  .quiz-result.fail    { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.2);  color: var(--accent2); }
+
+  .quiz-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+  }
+
+  .quiz-counter { font-size: 0.78rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+  .btn {
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0d0d0d;
+    border: none;
+  }
+
+  .btn-primary:hover { background: #fbbf24; transform: translateY(-1px); }
+  .btn-ghost {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── SEARCH/FILTER ── */
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .search-bar input {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 0.88rem;
+    font-family: 'DM Sans', sans-serif;
+    width: 100%;
+  }
+
+  .search-bar input::placeholder { color: var(--muted); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s, transform 0.6s;
+  }
+
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  footer span em {
+    font-style: normal;
+    font-family: 'Playfair Display', serif;
+    color: var(--accent);
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .hero { padding: 7rem 1.5rem 3rem; }
+    section { padding: 4rem 1.5rem; }
+    .compare-grid { grid-template-columns: 1fr; }
+    .cap-cards { grid-template-columns: 1fr; }
+    .quiz-options { grid-template-columns: 1fr; }
+    nav { padding: 0 1rem; }
+    footer { flex-direction: column; gap: 0.5rem; text-align: center; padding: 1.5rem; }
+  }
+
+  /* ── INLINE CODE ── */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82em;
+    background: rgba(255,255,255,0.07);
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  /* ── CHEATSHEET ── */
+  .cheat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .cheat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .cheat-title {
+    padding: 0.7rem 1rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .cheat-title.mongo { color: var(--accent3); }
+  .cheat-title.redis { color: var(--accent2); }
+  .cheat-title.cassandra { color: var(--accent4); }
+  .cheat-title.neo4j { color: var(--accent5); }
+
+  .cheat-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+  .cheat-table tr:not(:last-child) td { border-bottom: 1px solid rgba(255,255,255,0.04); }
+
+  .cheat-table td {
+    padding: 0.5rem 1rem;
+    vertical-align: top;
+  }
+
+  .cheat-table td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: #60a5fa;
+    white-space: nowrap;
+    width: 45%;
+  }
+
+  .cheat-table td:last-child { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">NoSQL ◆ Guide</div>
+  <ul class="nav-links">
+    <li><a href="#what">What is NoSQL</a></li>
+    <li><a href="#types">Types</a></li>
+    <li><a href="#cap">CAP Theorem</a></li>
+    <li><a href="#usecases">Use Cases</a></li>
+    <li><a href="#code">Code</a></li>
+    <li><a href="#notations">Notations</a></li>
+    <li><a href="#quiz">Quiz</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="top">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div style="position:relative; max-width:1100px; margin:0 auto; width:100%;">
+    <div class="hero-tag">Interactive Learning Guide · Data Engineering Series</div>
+    <h1>No<em>SQL</em><br>Demystified</h1>
+    <p class="hero-sub">
+      From key-value stores to graph databases — understand every NoSQL paradigm
+      with real problems, working code, and crystal-clear explanations.
+    </p>
+    <div class="hero-pills">
+      <span class="pill pill-doc">📄 Document DB</span>
+      <span class="pill pill-kv">⚡ Key-Value</span>
+      <span class="pill pill-col">📊 Column-Family</span>
+      <span class="pill pill-graph">🕸️ Graph DB</span>
+      <span class="pill pill-ts">⏱️ Time-Series</span>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- WHAT IS NOSQL -->
+<section id="what">
+  <div class="section-label">Section 01</div>
+  <h2>What is NoSQL?</h2>
+  <p>
+    <strong>NoSQL</strong> stands for <em>"Not Only SQL"</em>. It is a class of database management systems
+    that store and retrieve data in ways other than tabular relations used in relational (SQL) databases.
+    NoSQL databases are designed for large-scale, distributed data where flexibility, speed, and
+    horizontal scalability matter more than strict schema enforcement.
+  </p>
+
+  <div class="formula-box reveal">
+    <div class="formula-label">Core Philosophy</div>
+    <div class="formula">
+      NoSQL = Schema-Flexibility + Horizontal Scale + High Throughput
+    </div>
+    <div class="formula-explain">
+      <div class="formula-term">
+        <code>Schema-Flexibility</code>
+        <p>Each record can have different fields — no rigid table structure required.</p>
+      </div>
+      <div class="formula-term">
+        <code>Horizontal Scale</code>
+        <p>Add more machines (nodes) to scale out, rather than upgrading one big server.</p>
+      </div>
+      <div class="formula-term">
+        <code>High Throughput</code>
+        <p>Optimized for millions of reads/writes per second with low latency.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:3rem;">SQL vs NoSQL — Side by Side</h3>
+  <div class="compare-grid reveal">
+    <div class="compare-col sql-col">
+      <div class="compare-header">🏛️ Relational SQL</div>
+      <div class="compare-row"><span class="icon">🗂️</span><div class="label"><strong>Fixed Schema</strong>All rows follow the same column structure defined upfront.</div></div>
+      <div class="compare-row"><span class="icon">🔗</span><div class="label"><strong>ACID Transactions</strong>Atomicity, Consistency, Isolation, Durability — guaranteed.</div></div>
+      <div class="compare-row"><span class="icon">📐</span><div class="label"><strong>Vertical Scaling</strong>Scale by upgrading CPU/RAM on a single server.</div></div>
+      <div class="compare-row"><span class="icon">🔍</span><div class="label"><strong>Complex Joins</strong>Powerful multi-table queries with foreign keys.</div></div>
+      <div class="compare-row"><span class="icon">✅</span><div class="label"><strong>Best for:</strong>Banking, ERP, payroll, inventory systems.</div></div>
+    </div>
+    <div class="compare-col nosql-col">
+      <div class="compare-header">⚡ NoSQL</div>
+      <div class="compare-row"><span class="icon">🌊</span><div class="label"><strong>Dynamic Schema</strong>Documents/records can have different shapes. Schema evolves with the app.</div></div>
+      <div class="compare-row"><span class="icon">🌐</span><div class="label"><strong>BASE Model</strong>Basically Available, Soft state, Eventually consistent — trades ACID for speed.</div></div>
+      <div class="compare-row"><span class="icon">🖥️</span><div class="label"><strong>Horizontal Scaling</strong>Distribute data across thousands of commodity servers (sharding).</div></div>
+      <div class="compare-row"><span class="icon">🚀</span><div class="label"><strong>Embedded Data</strong>Store related data together — fewer queries needed, faster reads.</div></div>
+      <div class="compare-row"><span class="icon">✅</span><div class="label"><strong>Best for:</strong>Social media, real-time analytics, IoT, e-commerce catalogs.</div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- TYPES -->
+<section id="types">
+  <div class="section-label">Section 02</div>
+  <h2>The Four Pillars of NoSQL</h2>
+  <p>Each NoSQL type solves a different class of problem. Choosing the right one is half the battle.</p>
+
+  <div class="cards reveal">
+
+    <!-- DOCUMENT -->
+    <div class="card card-doc">
+      <div class="card-icon">📄</div>
+      <h3>Document Store</h3>
+      <p>Stores semi-structured JSON/BSON documents. Each document is self-describing and can nest sub-documents and arrays.</p>
+      <div class="card-example">
+{<br>
+&nbsp;&nbsp;<span style="color:#60a5fa">"_id"</span>: <span style="color:#a3e635">"usr_42"</span>,<br>
+&nbsp;&nbsp;<span style="color:#60a5fa">"name"</span>: <span style="color:#a3e635">"Priya"</span>,<br>
+&nbsp;&nbsp;<span style="color:#60a5fa">"orders"</span>: [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ <span style="color:#60a5fa">"id"</span>: <span style="color:#a3e635">"o1"</span>, <span style="color:#60a5fa">"total"</span>: <span style="color:#fb923c">299</span> }<br>
+&nbsp;&nbsp;]<br>
+}
+      </div>
+      <ul class="card-examples-list">
+        <li>MongoDB</li><li>CouchDB</li><li>Firestore</li><li>DynamoDB</li>
+      </ul>
+    </div>
+
+    <!-- KEY-VALUE -->
+    <div class="card card-kv">
+      <div class="card-icon">⚡</div>
+      <h3>Key-Value Store</h3>
+      <p>The simplest NoSQL model. A giant, distributed hash-map. Lightning-fast lookups by key. Values are opaque blobs.</p>
+      <div class="card-example">
+<span style="color:#6b7280"># SET / GET in Redis</span><br>
+<span style="color:#60a5fa">SET</span> session:<span style="color:#fb923c">42</span> <span style="color:#a3e635">"user_data"</span><br>
+<span style="color:#60a5fa">GET</span> session:<span style="color:#fb923c">42</span><br>
+<span style="color:#60a5fa">TTL</span> session:<span style="color:#fb923c">42</span> → <span style="color:#fb923c">3600</span>s
+      </div>
+      <ul class="card-examples-list">
+        <li>Redis</li><li>DynamoDB</li><li>Riak</li><li>Memcached</li>
+      </ul>
+    </div>
+
+    <!-- COLUMN-FAMILY -->
+    <div class="card card-col">
+      <div class="card-icon">📊</div>
+      <h3>Column-Family Store</h3>
+      <p>Organizes data into rows with dynamic column families. Ideal for write-heavy analytical workloads and time-series data.</p>
+      <div class="card-example">
+<span style="color:#6b7280">Row Key → Column Families</span><br>
+user:<span style="color:#fb923c">42</span> →<br>
+&nbsp;&nbsp;info: { name, email }<br>
+&nbsp;&nbsp;activity: { last_login, views }<br>
+&nbsp;&nbsp;prefs: { theme, lang }
+      </div>
+      <ul class="card-examples-list">
+        <li>Cassandra</li><li>HBase</li><li>Bigtable</li><li>ScyllaDB</li>
+      </ul>
+    </div>
+
+    <!-- GRAPH -->
+    <div class="card card-graph">
+      <div class="card-icon">🕸️</div>
+      <h3>Graph Database</h3>
+      <p>Models data as nodes (entities) and edges (relationships). Native traversal queries are magnitudes faster than SQL JOINs for connected data.</p>
+      <div class="card-example">
+<span style="color:#6b7280">// Cypher (Neo4j)</span><br>
+(Priya)-[<span style="color:#c084fc">:FOLLOWS</span>]->(Ravi)<br>
+(Priya)-[<span style="color:#c084fc">:LIKES</span>]->(Post:42)<br>
+(Ravi)-[<span style="color:#c084fc">:AUTHORED</span>]->(Post:42)
+      </div>
+      <ul class="card-examples-list">
+        <li>Neo4j</li><li>Amazon Neptune</li><li>ArangoDB</li><li>TigerGraph</li>
+      </ul>
+    </div>
+
+    <!-- TIME-SERIES -->
+    <div class="card card-ts">
+      <div class="card-icon">⏱️</div>
+      <h3>Time-Series DB</h3>
+      <p>Optimized for sequential, time-stamped data. Efficient compression, downsampling, and range queries over time windows.</p>
+      <div class="card-example">
+<span style="color:#6b7280"># InfluxDB line protocol</span><br>
+cpu,host=<span style="color:#a3e635">server01</span><br>
+&nbsp;&nbsp;usage=<span style="color:#fb923c">72.3</span> <span style="color:#fb923c">1704067200000000000</span><br>
+memory,host=<span style="color:#a3e635">server01</span><br>
+&nbsp;&nbsp;free=<span style="color:#fb923c">4096</span> <span style="color:#fb923c">1704067200000000000</span>
+      </div>
+      <ul class="card-examples-list">
+        <li>InfluxDB</li><li>TimescaleDB</li><li>Prometheus</li><li>QuestDB</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- CAP THEOREM -->
+<section id="cap">
+  <div class="section-label">Section 03</div>
+  <h2>The CAP Theorem</h2>
+  <p>
+    Proposed by Eric Brewer (2000), the CAP Theorem states that a distributed system can guarantee at most
+    <strong>two out of three</strong> properties simultaneously.
+  </p>
+
+  <div class="formula-box reveal">
+    <div class="formula-label">CAP Theorem</div>
+    <div class="formula">∀ distributed system S: |{C, A, P} ∩ guarantee(S)| ≤ 2</div>
+    <div class="formula-explain">
+      <div class="formula-term">
+        <code>C — Consistency</code>
+        <p>Every read receives the most recent write or an error. All nodes see the same data at the same time.</p>
+      </div>
+      <div class="formula-term">
+        <code>A — Availability</code>
+        <p>Every request receives a (non-error) response — not necessarily the most recent data.</p>
+      </div>
+      <div class="formula-term">
+        <code>P — Partition Tolerance</code>
+        <p>The system continues operating even if network messages are dropped between nodes.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAP SVG Triangle -->
+  <div class="cap-triangle reveal">
+    <svg class="cap-svg" viewBox="0 0 500 420" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="glowC" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="glowA" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#10b981" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="glowP" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#6366f1" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <!-- Triangle -->
+      <polygon points="250,30 30,390 470,390" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+
+      <!-- Glow circles at vertices -->
+      <circle cx="250" cy="30"  r="60" fill="url(#glowC)"/>
+      <circle cx="30"  cy="390" r="60" fill="url(#glowA)"/>
+      <circle cx="470" cy="390" r="60" fill="url(#glowP)"/>
+
+      <!-- Vertex circles -->
+      <circle cx="250" cy="30"  r="26" fill="#141414" stroke="#f59e0b" stroke-width="1.5"/>
+      <circle cx="30"  cy="390" r="26" fill="#141414" stroke="#10b981" stroke-width="1.5"/>
+      <circle cx="470" cy="390" r="26" fill="#141414" stroke="#6366f1" stroke-width="1.5"/>
+
+      <!-- Labels -->
+      <text x="250" y="35"  text-anchor="middle" dominant-baseline="middle" fill="#f59e0b" font-size="18" font-weight="900" font-family="Playfair Display">C</text>
+      <text x="30"  y="395" text-anchor="middle" dominant-baseline="middle" fill="#10b981" font-size="18" font-weight="900" font-family="Playfair Display">A</text>
+      <text x="470" y="395" text-anchor="middle" dominant-baseline="middle" fill="#6366f1" font-size="18" font-weight="900" font-family="Playfair Display">P</text>
+
+      <!-- DB Labels along sides -->
+      <!-- CA side (top→left) -->
+      <text x="118" y="215" text-anchor="middle" fill="#8a8070" font-size="11" font-family="DM Sans" font-weight="600" transform="rotate(-60, 118, 215)">MySQL · PostgreSQL</text>
+      <!-- CP side (top→right) -->
+      <text x="382" y="215" text-anchor="middle" fill="#8a8070" font-size="11" font-family="DM Sans" font-weight="600" transform="rotate(60, 382, 215)">MongoDB · HBase</text>
+      <!-- AP side (bottom) -->
+      <text x="250" y="415" text-anchor="middle" fill="#8a8070" font-size="11" font-family="DM Sans" font-weight="600">Cassandra · CouchDB · DynamoDB</text>
+
+      <!-- Zone labels inside triangle -->
+      <text x="180" y="240" text-anchor="middle" fill="#f59e0b" font-size="10" font-family="DM Sans" font-weight="700" opacity="0.6">CA</text>
+      <text x="320" y="240" text-anchor="middle" fill="#6366f1" font-size="10" font-family="DM Sans" font-weight="700" opacity="0.6">CP</text>
+      <text x="250" y="340" text-anchor="middle" fill="#10b981" font-size="10" font-family="DM Sans" font-weight="700" opacity="0.6">AP</text>
+
+      <!-- Subtext -->
+      <text x="250" y="30" dy="45" text-anchor="middle" fill="#8a8070" font-size="9.5" font-family="DM Sans">Consistency</text>
+      <text x="30"  y="390" dy="22" text-anchor="middle" fill="#8a8070" font-size="9.5" font-family="DM Sans">Availability</text>
+      <text x="470" y="390" dy="22" text-anchor="middle" fill="#8a8070" font-size="9.5" font-family="DM Sans">Partition Tolerance</text>
+    </svg>
+  </div>
+
+  <div class="cap-cards reveal">
+    <div class="cap-card">
+      <div class="cap-letter" style="color:var(--accent)">CA</div>
+      <div class="cap-title">Consistent + Available</div>
+      <div class="cap-desc">No partition tolerance. Works on a single machine or tightly-coupled cluster. Example: <strong>PostgreSQL, MySQL</strong></div>
+    </div>
+    <div class="cap-card">
+      <div class="cap-letter" style="color:var(--accent4)">CP</div>
+      <div class="cap-title">Consistent + Partition Tolerant</div>
+      <div class="cap-desc">May reject requests during partitions to maintain consistency. Example: <strong>MongoDB, HBase, Redis</strong></div>
+    </div>
+    <div class="cap-card">
+      <div class="cap-letter" style="color:var(--accent3)">AP</div>
+      <div class="cap-title">Available + Partition Tolerant</div>
+      <div class="cap-desc">Always responds but data might be stale (eventual consistency). Example: <strong>Cassandra, CouchDB, DynamoDB</strong></div>
+    </div>
+  </div>
+
+  <!-- BASE Model -->
+  <div class="formula-box reveal" style="margin-top:2rem;">
+    <div class="formula-label">BASE vs ACID</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; padding-top:0.5rem;">
+      <div>
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#60a5fa;margin-bottom:0.8rem;">ACID (SQL)</div>
+        <div class="formula-term" style="margin-bottom:0.6rem;"><code style="color:#60a5fa;">A</code><p>tomicity — all or nothing</p></div>
+        <div class="formula-term" style="margin-bottom:0.6rem;"><code style="color:#60a5fa;">C</code><p>onsistency — valid state always</p></div>
+        <div class="formula-term" style="margin-bottom:0.6rem;"><code style="color:#60a5fa;">I</code><p>solation — transactions don't interfere</p></div>
+        <div class="formula-term"><code style="color:#60a5fa;">D</code><p>urability — committed data survives crashes</p></div>
+      </div>
+      <div>
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:0.8rem;">BASE (NoSQL)</div>
+        <div class="formula-term" style="margin-bottom:0.6rem;"><code>BA</code><p>sically Available — system always responds</p></div>
+        <div class="formula-term" style="margin-bottom:0.6rem;"><code>S</code><p>oft state — state may change over time</p></div>
+        <div class="formula-term"><code>E</code><p>ventual consistency — will be consistent eventually</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- USE CASES -->
+<section id="usecases">
+  <div class="section-label">Section 04</div>
+  <h2>Real-Life Use Cases</h2>
+  <p>Every NoSQL type solves a concrete class of problems. Here's where each shines — with the problem it solved.</p>
+
+  <div class="usecase-grid reveal">
+
+    <div class="usecase-card">
+      <div class="usecase-meta">
+        <span class="usecase-badge badge-doc">Document DB</span>
+        <span class="usecase-icon">🛍️</span>
+      </div>
+      <h3>E-Commerce Product Catalog</h3>
+      <p>Amazon, Flipkart — millions of products, each with wildly different attributes (a shirt has size/color, a laptop has RAM/GPU).</p>
+      <div class="problem-solution">
+        <div class="ps-row">
+          <span class="ps-label ps-prob">Problem</span>
+          <span class="ps-text">SQL tables can't handle 50 different attributes per product type without nullable columns or complex EAV patterns.</span>
+        </div>
+        <div class="ps-row">
+          <span class="ps-label ps-sol">Solution</span>
+          <span class="ps-text">MongoDB stores each product as a document with its own schema — shirts have {"size":"L"}, laptops have {"ram":"16GB"}. No wasted nulls.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="usecase-card">
+      <div class="usecase-meta">
+        <span class="usecase-badge badge-kv">Key-Value</span>
+        <span class="usecase-icon">🔐</span>
+      </div>
+      <h3>Session Management</h3>
+      <p>Web apps like Netflix, Swiggy — millions of users logged in simultaneously with active sessions.</p>
+      <div class="problem-solution">
+        <div class="ps-row">
+          <span class="ps-label ps-prob">Problem</span>
+          <span class="ps-text">Querying a SQL DB for session data on every API call adds 20-50ms latency. Under 10M concurrent users, this breaks.</span>
+        </div>
+        <div class="ps-row">
+          <span class="ps-label ps-sol">Solution</span>
+          <span class="ps-text">Redis stores session:userID → {cart, preferences} in RAM. Sub-millisecond reads. TTL auto-expires stale sessions.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="usecase-card">
+      <div class="usecase-meta">
+        <span class="usecase-badge badge-col">Column-Family</span>
+        <span class="usecase-icon">📱</span>
+      </div>
+      <h3>WhatsApp Message History</h3>
+      <p>100 billion messages per day — write-heavy, time-ordered, accessed by conversation ID.</p>
+      <div class="problem-solution">
+        <div class="ps-row">
+          <span class="ps-label ps-prob">Problem</span>
+          <span class="ps-text">SQL can't sustain 10M writes/sec. Sharding is painful. Reads by conversation ID need full table scans without perfect indexing.</span>
+        </div>
+        <div class="ps-row">
+          <span class="ps-label ps-sol">Solution</span>
+          <span class="ps-text">Cassandra (used by WhatsApp/Discord) partitions by chat_id — all messages in a conversation are co-located. Appends are O(1).</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="usecase-card">
+      <div class="usecase-meta">
+        <span class="usecase-badge badge-graph">Graph DB</span>
+        <span class="usecase-icon">👥</span>
+      </div>
+      <h3>LinkedIn — "People You May Know"</h3>
+      <p>Finding friends-of-friends 3 hops away across 900M users.</p>
+      <div class="problem-solution">
+        <div class="ps-row">
+          <span class="ps-label ps-prob">Problem</span>
+          <span class="ps-text">SQL multi-join for 3-hop traversal on 900M users generates billions of intermediate rows. Query time: minutes or crashes.</span>
+        </div>
+        <div class="ps-row">
+          <span class="ps-label ps-sol">Solution</span>
+          <span class="ps-text">Neo4j traverses relationships in milliseconds. Finding 2nd-degree connections is pointer-following — no joins needed.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="usecase-card">
+      <div class="usecase-meta">
+        <span class="usecase-badge badge-kv">Key-Value</span>
+        <span class="usecase-icon">🎮</span>
+      </div>
+      <h3>Gaming Leaderboards</h3>
+      <p>Real-time ranking of 5M players in a live multiplayer game.</p>
+      <div class="problem-solution">
+        <div class="ps-row">
+          <span class="ps-label ps-prob">Problem</span>
+          <span class="ps-text">Updating and querying a sorted rank table in SQL under 10,000 score updates/sec requires constant re-indexing.</span>
+        </div>
+        <div class="ps-row">
+          <span class="ps-label ps-sol">Solution</span>
+          <span class="ps-text">Redis Sorted Sets (ZADD/ZRANK) maintain a live, auto-sorted leaderboard. Rank lookup is O(log N). Top-100 query is O(100).</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="usecase-card">
+      <div class="usecase-meta">
+        <span class="usecase-badge badge-doc">Document DB</span>
+        <span class="usecase-icon">🏥</span>
+      </div>
+      <h3>Electronic Health Records</h3>
+      <p>Patient records with vastly different structure — cardiologist notes vs. dermatology reports vs. lab results.</p>
+      <div class="problem-solution">
+        <div class="ps-row">
+          <span class="ps-label ps-prob">Problem</span>
+          <span class="ps-text">A fixed SQL schema forces all specialties into a single table — 90% of columns are NULL for any given patient visit.</span>
+        </div>
+        <div class="ps-row">
+          <span class="ps-label ps-sol">Solution</span>
+          <span class="ps-text">MongoDB stores each visit as a rich nested document — labs embedded in the record, no JOINs needed to retrieve a full patient history.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- CODE EXAMPLES -->
+<section id="code">
+  <div class="section-label">Section 05</div>
+  <h2>Code — See it in Action</h2>
+  <p>All examples use Python and run directly in <strong>Google Colab</strong>. Click the copy button and paste into a Colab cell.</p>
+
+  <!-- MongoDB -->
+  <div class="code-section reveal">
+    <h3 style="margin-bottom:1rem;">📄 MongoDB (Document Store)</h3>
+    <div class="code-tabs">
+      <button class="code-tab active" onclick="switchTab(this, 'mongo-crud')">CRUD Operations</button>
+      <button class="code-tab" onclick="switchTab(this, 'mongo-agg')">Aggregation Pipeline</button>
+      <button class="code-tab" onclick="switchTab(this, 'mongo-index')">Indexing</button>
+    </div>
+
+    <div class="code-panel active" id="mongo-crud">
+      <div class="code-header">
+        <div class="code-header-left">
+          <div class="code-dot dot-r"></div>
+          <div class="code-dot dot-y"></div>
+          <div class="code-dot dot-g"></div>
+          <span style="margin-left:0.5rem">mongodb_crud.py</span>
+        </div>
+        <div style="display:flex;gap:0.4rem;">
+          <button class="copy-btn" onclick="copyCode(this, 'mongo-crud-code')">📋 Copy</button>
+          <a class="colab-btn" href="https://colab.research.google.com/notebook#create=true" target="_blank">▶ Open Colab</a>
+        </div>
+      </div>
+      <pre id="mongo-crud-code"><span class="cm"># ── Install & setup (run this first in Colab) ──────────────────────────────
+# pip install pymongo dnspython</span>
+
+<span class="kw">from</span> pymongo <span class="kw">import</span> MongoClient
+<span class="kw">import</span> json, datetime
+
+<span class="cm"># ── Connect (using MongoDB Atlas free tier) ─────────────────────────────────
+# Replace URI with your own or use mongomock for in-memory testing:
+# pip install mongomock
+# from mongomock import MongoClient</span>
+
+client = MongoClient(<span class="st">"mongodb://localhost:27017/"</span>)
+db     = client[<span class="st">"ecommerce"</span>]          <span class="cm"># Database</span>
+col    = db[<span class="st">"products"</span>]              <span class="cm"># Collection (≈ table)</span>
+
+<span class="cm"># ── CREATE ─────────────────────────────────────────────────────────────────</span>
+<span class="cm"># Flexible schema: shirt and laptop have different fields</span>
+products = [
+    {
+        <span class="st">"name"</span>: <span class="st">"Cotton Kurta"</span>,
+        <span class="st">"category"</span>: <span class="st">"clothing"</span>,
+        <span class="st">"price"</span>: <span class="nu">799</span>,
+        <span class="st">"variants"</span>: [
+            {<span class="st">"size"</span>: <span class="st">"S"</span>, <span class="st">"color"</span>: <span class="st">"white"</span>, <span class="st">"stock"</span>: <span class="nu">45</span>},
+            {<span class="st">"size"</span>: <span class="st">"M"</span>, <span class="st">"color"</span>: <span class="st">"blue"</span>,  <span class="st">"stock"</span>: <span class="nu">30</span>},
+        ],
+        <span class="st">"created_at"</span>: datetime.datetime.utcnow()
+    },
+    {
+        <span class="st">"name"</span>: <span class="st">"Gaming Laptop"</span>,
+        <span class="st">"category"</span>: <span class="st">"electronics"</span>,
+        <span class="st">"price"</span>: <span class="nu">89999</span>,
+        <span class="st">"specs"</span>: {                    <span class="cm"># Nested sub-document</span>
+            <span class="st">"ram_gb"</span>: <span class="nu">16</span>,
+            <span class="st">"gpu"</span>: <span class="st">"RTX 4060"</span>,
+            <span class="st">"storage_tb"</span>: <span class="nu">1</span>
+        },
+        <span class="st">"created_at"</span>: datetime.datetime.utcnow()
+    }
+]
+
+result = col.insert_many(products)
+<span class="fn">print</span>(<span class="st">f"Inserted IDs: </span>{result.inserted_ids}<span class="st">"</span>)
+
+<span class="cm"># ── READ ───────────────────────────────────────────────────────────────────</span>
+<span class="cm"># Find products under ₹1000</span>
+cheap = col.find({<span class="st">"price"</span>: {<span class="st">"$lt"</span>: <span class="nu">1000</span>}}, {<span class="st">"name"</span>: <span class="nu">1</span>, <span class="st">"price"</span>: <span class="nu">1</span>})
+<span class="fn">print</span>(<span class="st">"\n── Products under ₹1000 ──"</span>)
+<span class="kw">for</span> p <span class="kw">in</span> cheap:
+    <span class="fn">print</span>(<span class="st">f"  {p['name']}: ₹{p['price']}"</span>)
+
+<span class="cm"># ── UPDATE ─────────────────────────────────────────────────────────────────</span>
+<span class="cm"># Apply 10% discount to all electronics</span>
+col.update_many(
+    {<span class="st">"category"</span>: <span class="st">"electronics"</span>},
+    {<span class="st">"$mul"</span>: {<span class="st">"price"</span>: <span class="nu">0.9</span>}}   <span class="cm"># $mul multiplies in-place</span>
+)
+
+<span class="cm"># ── DELETE ─────────────────────────────────────────────────────────────────</span>
+col.delete_many({<span class="st">"stock"</span>: <span class="nu">0</span>})   <span class="cm"># Remove out-of-stock items</span>
+
+<span class="cm"># ── QUERY OPERATORS CHEATSHEET ─────────────────────────────────────────────</span>
+<span class="cm"># $eq, $ne, $gt, $lt, $gte, $lte  → comparisons</span>
+<span class="cm"># $in, $nin                        → membership</span>
+<span class="cm"># $and, $or, $not                  → logical</span>
+<span class="cm"># $exists, $type                   → field checks</span>
+<span class="cm"># $elemMatch                       → match array sub-docs</span>
+<span class="cm"># "field.nested"                   → dot notation for nesting</span>
+</pre>
+    </div>
+
+    <div class="code-panel" id="mongo-agg">
+      <div class="code-header">
+        <div class="code-header-left">
+          <div class="code-dot dot-r"></div>
+          <div class="code-dot dot-y"></div>
+          <div class="code-dot dot-g"></div>
+          <span style="margin-left:0.5rem">mongodb_aggregation.py</span>
+        </div>
+        <div style="display:flex;gap:0.4rem;">
+          <button class="copy-btn" onclick="copyCode(this, 'mongo-agg-code')">📋 Copy</button>
+          <a class="colab-btn" href="https://colab.research.google.com/notebook#create=true" target="_blank">▶ Open Colab</a>
+        </div>
+      </div>
+      <pre id="mongo-agg-code"><span class="cm"># MongoDB Aggregation Pipeline
+# Pipeline = [ Stage1, Stage2, Stage3, ... ]
+# Data flows left→right through each stage</span>
+
+<span class="kw">from</span> pymongo <span class="kw">import</span> MongoClient
+
+client = MongoClient(<span class="st">"mongodb://localhost:27017/"</span>)
+orders = client[<span class="st">"ecommerce"</span>][<span class="st">"orders"</span>]
+
+pipeline = [
+    <span class="cm"># Stage 1 — $match: Filter (like WHERE)</span>
+    {<span class="st">"$match"</span>: {
+        <span class="st">"status"</span>: <span class="st">"delivered"</span>,
+        <span class="st">"order_date"</span>: {<span class="st">"$gte"</span>: <span class="st">"2024-01-01"</span>}
+    }},
+
+    <span class="cm"># Stage 2 — $group: Aggregate (like GROUP BY)</span>
+    {<span class="st">"$group"</span>: {
+        <span class="st">"_id"</span>: <span class="st">"$category"</span>,          <span class="cm"># Group by category</span>
+        <span class="st">"total_revenue"</span>: {<span class="st">"$sum"</span>: <span class="st">"$amount"</span>},
+        <span class="st">"avg_order"</span>:    {<span class="st">"$avg"</span>: <span class="st">"$amount"</span>},
+        <span class="st">"order_count"</span>:  {<span class="st">"$count"</span>: {}}
+    }},
+
+    <span class="cm"># Stage 3 — $sort: Order results (like ORDER BY)</span>
+    {<span class="st">"$sort"</span>: {<span class="st">"total_revenue"</span>: <span class="nu">-1</span>}},  <span class="cm"># -1 = descending</span>
+
+    <span class="cm"># Stage 4 — $limit: Top N (like LIMIT)</span>
+    {<span class="st">"$limit"</span>: <span class="nu">5</span>},
+
+    <span class="cm"># Stage 5 — $project: Select fields (like SELECT)</span>
+    {<span class="st">"$project"</span>: {
+        <span class="st">"category"</span>: <span class="st">"$_id"</span>,
+        <span class="st">"total_revenue"</span>: {<span class="st">"$round"</span>: [<span class="st">"$total_revenue"</span>, <span class="nu">2</span>]},
+        <span class="st">"avg_order"</span>: <span class="nu">1</span>,
+        <span class="st">"order_count"</span>: <span class="nu">1</span>,
+        <span class="st">"_id"</span>: <span class="nu">0</span>
+    }}
+]
+
+results = orders.aggregate(pipeline)
+<span class="kw">for</span> r <span class="kw">in</span> results:
+    <span class="fn">print</span>(r)
+
+<span class="cm"># ── Pipeline Analogy ────────────────────────────────────────────────────────
+# SQL Equivalent:
+# SELECT category, ROUND(SUM(amount),2) AS total_revenue,
+#        AVG(amount) AS avg_order, COUNT(*) AS order_count
+# FROM orders
+# WHERE status = 'delivered' AND order_date >= '2024-01-01'
+# GROUP BY category
+# ORDER BY total_revenue DESC
+# LIMIT 5;</span>
+</pre>
+    </div>
+
+    <div class="code-panel" id="mongo-index">
+      <div class="code-header">
+        <div class="code-header-left">
+          <div class="code-dot dot-r"></div>
+          <div class="code-dot dot-y"></div>
+          <div class="code-dot dot-g"></div>
+          <span style="margin-left:0.5rem">mongodb_indexing.py</span>
+        </div>
+        <div style="display:flex;gap:0.4rem;">
+          <button class="copy-btn" onclick="copyCode(this, 'mongo-index-code')">📋 Copy</button>
+          <a class="colab-btn" href="https://colab.research.google.com/notebook#create=true" target="_blank">▶ Open Colab</a>
+        </div>
+      </div>
+      <pre id="mongo-index-code"><span class="cm"># ── MongoDB Indexing ───────────────────────────────────────────────────────
+# Without index: O(n) — full collection scan
+# With index:    O(log n) — B-tree traversal</span>
+
+<span class="kw">from</span> pymongo <span class="kw">import</span> MongoClient, ASCENDING, DESCENDING, TEXT
+
+col = MongoClient()[<span class="st">"ecommerce"</span>][<span class="st">"products"</span>]
+
+<span class="cm"># ── Single field index ─────────────────────────────────────────────────────</span>
+col.create_index([(<span class="st">"price"</span>, ASCENDING)])
+<span class="cm"># Now: col.find({"price": {"$lt": 1000}}) → O(log n)</span>
+
+<span class="cm"># ── Compound index (most selective field first) ─────────────────────────────</span>
+col.create_index([(<span class="st">"category"</span>, ASCENDING), (<span class="st">"price"</span>, ASCENDING)])
+<span class="cm"># Covers: col.find({"category":"electronics","price":{"$lt":50000}})</span>
+
+<span class="cm"># ── Text index (full-text search) ──────────────────────────────────────────</span>
+col.create_index([(<span class="st">"name"</span>, TEXT), (<span class="st">"description"</span>, TEXT)])
+col.find({<span class="st">"$text"</span>: {<span class="st">"$search"</span>: <span class="st">"gaming laptop"</span>}})
+
+<span class="cm"># ── Unique index ───────────────────────────────────────────────────────────</span>
+col.create_index(<span class="st">"sku"</span>, unique=<span class="kw">True</span>)
+
+<span class="cm"># ── TTL index (auto-expire documents) ─────────────────────────────────────</span>
+sessions = MongoClient()[<span class="st">"app"</span>][<span class="st">"sessions"</span>]
+sessions.create_index(<span class="st">"created_at"</span>, expireAfterSeconds=<span class="nu">3600</span>)
+<span class="cm"># Documents with created_at older than 1 hour are auto-deleted!</span>
+
+<span class="cm"># ── View all indexes ───────────────────────────────────────────────────────</span>
+<span class="fn">print</span>(<span class="fn">list</span>(col.list_indexes()))
+
+<span class="cm"># ── Explain query performance ──────────────────────────────────────────────</span>
+explanation = col.find({<span class="st">"price"</span>: {<span class="st">"$lt"</span>: <span class="nu">1000</span>}}).explain()
+<span class="fn">print</span>(<span class="st">"Plan:"</span>, explanation[<span class="st">"queryPlanner"</span>][<span class="st">"winningPlan"</span>])
+<span class="cm"># Look for "IXSCAN" (index) vs "COLLSCAN" (slow full scan)</span>
+</pre>
+    </div>
+  </div>
+
+  <!-- Redis -->
+  <div class="code-section reveal">
+    <h3 style="margin-bottom:1rem;">⚡ Redis (Key-Value Store)</h3>
+    <div class="code-tabs">
+      <button class="code-tab active" onclick="switchTab(this, 'redis-basic')">Strings & Hashes</button>
+      <button class="code-tab" onclick="switchTab(this, 'redis-ds')">Data Structures</button>
+      <button class="code-tab" onclick="switchTab(this, 'redis-patterns')">Patterns</button>
+    </div>
+
+    <div class="code-panel active" id="redis-basic">
+      <div class="code-header">
+        <div class="code-header-left">
+          <div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div>
+          <span style="margin-left:0.5rem">redis_basics.py</span>
+        </div>
+        <div style="display:flex;gap:0.4rem;">
+          <button class="copy-btn" onclick="copyCode(this, 'redis-basic-code')">📋 Copy</button>
+          <a class="colab-btn" href="https://colab.research.google.com/notebook#create=true" target="_blank">▶ Open Colab</a>
+        </div>
+      </div>
+      <pre id="redis-basic-code"><span class="cm"># pip install redis fakeredis
+# Use fakeredis for Colab (no Redis server needed!)</span>
+
+<span class="kw">import</span> fakeredis, json
+
+r = fakeredis.FakeRedis(decode_responses=<span class="kw">True</span>)
+
+<span class="cm"># ── STRING: Simple key→value ───────────────────────────────────────────────</span>
+r.set(<span class="st">"app:version"</span>, <span class="st">"2.4.1"</span>)
+r.set(<span class="st">"greeting"</span>,   <span class="st">"Namaste!"</span>, ex=<span class="nu">300</span>)   <span class="cm"># TTL = 300 seconds</span>
+<span class="fn">print</span>(r.get(<span class="st">"greeting"</span>))                   <span class="cm"># → Namaste!</span>
+<span class="fn">print</span>(r.ttl(<span class="st">"greeting"</span>))                   <span class="cm"># → 300</span>
+
+<span class="cm"># ── COUNTER (Atomic increment) ─────────────────────────────────────────────</span>
+r.set(<span class="st">"page_views:home"</span>, <span class="nu">0</span>)
+r.incr(<span class="st">"page_views:home"</span>)                  <span class="cm"># Atomic +1</span>
+r.incrby(<span class="st">"page_views:home"</span>, <span class="nu">100</span>)           <span class="cm"># Atomic +N</span>
+<span class="fn">print</span>(r.get(<span class="st">"page_views:home"</span>))            <span class="cm"># → 101</span>
+
+<span class="cm"># ── HASH: Object store (like a row in a table) ─────────────────────────────</span>
+r.hset(<span class="st">"user:42"</span>, mapping={
+    <span class="st">"name"</span>:  <span class="st">"Priya Sharma"</span>,
+    <span class="st">"email"</span>: <span class="st">"priya@example.com"</span>,
+    <span class="st">"score"</span>: <span class="st">"1500"</span>
+})
+
+<span class="fn">print</span>(r.hget(<span class="st">"user:42"</span>, <span class="st">"name"</span>))          <span class="cm"># → Priya Sharma</span>
+<span class="fn">print</span>(r.hgetall(<span class="st">"user:42"</span>))               <span class="cm"># → All fields</span>
+r.hset(<span class="st">"user:42"</span>, <span class="st">"score"</span>, <span class="st">"1600"</span>)       <span class="cm"># Update single field</span>
+r.hincrby(<span class="st">"user:42"</span>, <span class="st">"score"</span>, <span class="nu">50</span>)         <span class="cm"># Increment numeric field</span>
+
+<span class="cm"># ── KEY NAMING CONVENTION ──────────────────────────────────────────────────</span>
+<span class="cm"># Pattern:  object_type:id:field</span>
+<span class="cm"># Examples: user:42, session:abc123, product:99:views</span>
+<span class="cm"># Use ":"  as namespace separator (Redis convention)</span>
+</pre>
+    </div>
+
+    <div class="code-panel" id="redis-ds">
+      <div class="code-header">
+        <div class="code-header-left">
+          <div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div>
+          <span style="margin-left:0.5rem">redis_datastructures.py</span>
+        </div>
+        <div style="display:flex;gap:0.4rem;">
+          <button class="copy-btn" onclick="copyCode(this, 'redis-ds-code')">📋 Copy</button>
+          <a class="colab-btn" href="https://colab.research.google.com/notebook#create=true" target="_blank">▶ Open Colab</a>
+        </div>
+      </div>
+      <pre id="redis-ds-code"><span class="kw">import</span> fakeredis
+r = fakeredis.FakeRedis(decode_responses=<span class="kw">True</span>)
+
+<span class="cm"># ── LIST: Message queue / activity feed ────────────────────────────────────</span>
+<span class="cm"># LPUSH = push to LEFT (head), RPUSH = push to RIGHT (tail)</span>
+r.rpush(<span class="st">"feed:42"</span>, <span class="st">"Priya liked your post"</span>)
+r.rpush(<span class="st">"feed:42"</span>, <span class="st">"Ravi commented: Great!"</span>)
+r.rpush(<span class="st">"feed:42"</span>, <span class="st">"You have 5 new followers"</span>)
+
+<span class="cm"># Get latest 10 items (0 = first, -1 = last)</span>
+<span class="fn">print</span>(r.lrange(<span class="st">"feed:42"</span>, <span class="nu">-10</span>, <span class="nu">-1</span>))
+
+<span class="cm"># BLPOP = blocking pop (consumer waits for messages)</span>
+<span class="cm"># msg = r.blpop("task_queue", timeout=5)</span>
+
+<span class="cm"># ── SET: Unique membership (tags, followers) ───────────────────────────────</span>
+r.sadd(<span class="st">"tags:post:1"</span>, <span class="st">"python"</span>, <span class="st">"nosql"</span>, <span class="st">"database"</span>)
+r.sadd(<span class="st">"tags:post:2"</span>, <span class="st">"python"</span>, <span class="st">"ml"</span>, <span class="st">"ai"</span>)
+
+<span class="cm"># Set operations: SINTER, SUNION, SDIFF</span>
+<span class="fn">print</span>(r.sinter(<span class="st">"tags:post:1"</span>, <span class="st">"tags:post:2"</span>))  <span class="cm"># → {'python'}</span>
+<span class="fn">print</span>(r.sunion(<span class="st">"tags:post:1"</span>, <span class="st">"tags:post:2"</span>))  <span class="cm"># → all unique tags</span>
+<span class="fn">print</span>(r.sismember(<span class="st">"tags:post:1"</span>, <span class="st">"python"</span>))    <span class="cm"># → True</span>
+
+<span class="cm"># ── SORTED SET: Leaderboard ────────────────────────────────────────────────</span>
+<span class="cm"># ZADD key score member — auto-sorted by score</span>
+r.zadd(<span class="st">"leaderboard"</span>, {
+    <span class="st">"Priya"</span>: <span class="nu">9850</span>,
+    <span class="st">"Ravi"</span>:  <span class="nu">9200</span>,
+    <span class="st">"Meera"</span>: <span class="nu">9750</span>,
+    <span class="st">"Arjun"</span>: <span class="nu">10100</span>
+})
+
+<span class="cm"># Top 3 players (highest score first)</span>
+top3 = r.zrevrange(<span class="st">"leaderboard"</span>, <span class="nu">0</span>, <span class="nu">2</span>, withscores=<span class="kw">True</span>)
+<span class="fn">print</span>(<span class="st">"🏆 Top 3:"</span>, top3)
+
+<span class="cm"># Rank of a player (0-indexed)</span>
+rank = r.zrevrank(<span class="st">"leaderboard"</span>, <span class="st">"Priya"</span>)
+<span class="fn">print</span>(<span class="st">f"Priya's rank: #{rank + 1}"</span>)
+
+<span class="cm"># ── BITMAP: Efficient boolean flags ───────────────────────────────────────</span>
+<span class="cm"># Track which users opened email (1 bit per user!)</span>
+r.setbit(<span class="st">"email_opened:campaign_1"</span>, <span class="nu">42</span>, <span class="nu">1</span>)   <span class="cm"># user 42 opened</span>
+r.setbit(<span class="st">"email_opened:campaign_1"</span>, <span class="nu">99</span>, <span class="nu">1</span>)   <span class="cm"># user 99 opened</span>
+<span class="fn">print</span>(r.bitcount(<span class="st">"email_opened:campaign_1"</span>))   <span class="cm"># → 2 total opens</span>
+</pre>
+    </div>
+
+    <div class="code-panel" id="redis-patterns">
+      <div class="code-header">
+        <div class="code-header-left">
+          <div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div>
+          <span style="margin-left:0.5rem">redis_caching_pattern.py</span>
+        </div>
+        <div style="display:flex;gap:0.4rem;">
+          <button class="copy-btn" onclick="copyCode(this, 'redis-patterns-code')">📋 Copy</button>
+          <a class="colab-btn" href="https://colab.research.google.com/notebook#create=true" target="_blank">▶ Open Colab</a>
+        </div>
+      </div>
+      <pre id="redis-patterns-code"><span class="kw">import</span> fakeredis, json, time
+
+r = fakeredis.FakeRedis(decode_responses=<span class="kw">True</span>)
+
+<span class="cm"># ── Cache-Aside Pattern (most common) ─────────────────────────────────────
+# Logic: Read from cache → miss? → query DB → populate cache → return
+#
+#   ┌──────────────────────────────────────────────────────────────┐
+#   │  App → CACHE HIT? → YES → Return                             │
+#   │          ↓ NO                                                 │
+#   │       Query DB → Store in Cache (TTL) → Return               │
+#   └──────────────────────────────────────────────────────────────┘</span>
+
+<span class="kw">def</span> <span class="fn">fake_db_query</span>(user_id: int) -> dict:
+    <span class="cm">"""Simulates slow DB query (200ms)"""</span>
+    time.sleep(<span class="nu">0.2</span>)
+    <span class="kw">return</span> {<span class="st">"id"</span>: user_id, <span class="st">"name"</span>: <span class="st">"Priya"</span>, <span class="st">"plan"</span>: <span class="st">"pro"</span>}
+
+<span class="kw">def</span> <span class="fn">get_user</span>(user_id: int) -> dict:
+    cache_key = <span class="st">f"user:</span>{user_id}<span class="st">"</span>
+
+    <span class="cm"># 1. Try cache first</span>
+    cached = r.get(cache_key)
+    <span class="kw">if</span> cached:
+        <span class="fn">print</span>(<span class="st">"⚡ Cache HIT"</span>)
+        <span class="kw">return</span> json.loads(cached)
+
+    <span class="cm"># 2. Cache miss — query DB</span>
+    <span class="fn">print</span>(<span class="st">"🐌 Cache MISS — querying DB"</span>)
+    data = <span class="fn">fake_db_query</span>(user_id)
+
+    <span class="cm"># 3. Store in cache with TTL (5 minutes)</span>
+    r.setex(cache_key, <span class="nu">300</span>, json.dumps(data))
+    <span class="kw">return</span> data
+
+<span class="cm"># First call — hits DB (slow)</span>
+start = time.time()
+user  = <span class="fn">get_user</span>(<span class="nu">42</span>)
+<span class="fn">print</span>(<span class="st">f"First call:  {(time.time()-start)*1000:.0f}ms → {user}"</span>)
+
+<span class="cm"># Second call — hits cache (fast!)</span>
+start = time.time()
+user  = <span class="fn">get_user</span>(<span class="nu">42</span>)
+<span class="fn">print</span>(<span class="st">f"Second call: {(time.time()-start)*1000:.0f}ms → {user}"</span>)
+
+<span class="cm"># ── Rate Limiting Pattern ──────────────────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">is_rate_limited</span>(user_id: int, limit: int = <span class="nu">5</span>, window: int = <span class="nu">60</span>) -> bool:
+    key    = <span class="st">f"rate:</span>{user_id}<span class="st">"</span>
+    count  = r.incr(key)
+    <span class="kw">if</span> count == <span class="nu">1</span>:
+        r.expire(key, window)       <span class="cm"># Set window on first request</span>
+    <span class="kw">return</span> count > limit
+
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="nu">7</span>):
+    limited = <span class="fn">is_rate_limited</span>(<span class="nu">42</span>)
+    <span class="fn">print</span>(<span class="st">f"Request {i+1}: {'❌ BLOCKED' if limited else '✅ OK'}"</span>)
+</pre>
+    </div>
+  </div>
+
+  <!-- Cassandra -->
+  <div class="code-section reveal">
+    <h3 style="margin-bottom:1rem;">📊 Cassandra (Column-Family)</h3>
+    <div class="code-tabs">
+      <button class="code-tab active" onclick="switchTab(this, 'cass-tab')">Schema Design + CQL</button>
+    </div>
+    <div class="code-panel active" id="cass-tab">
+      <div class="code-header">
+        <div class="code-header-left">
+          <div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div>
+          <span style="margin-left:0.5rem">cassandra_messages.py</span>
+        </div>
+        <div style="display:flex;gap:0.4rem;">
+          <button class="copy-btn" onclick="copyCode(this, 'cass-tab-code')">📋 Copy</button>
+          <a class="colab-btn" href="https://colab.research.google.com/notebook#create=true" target="_blank">▶ Open Colab</a>
+        </div>
+      </div>
+      <pre id="cass-tab-code"><span class="cm"># pip install cassandra-driver
+# For Colab: pip install cassandra-driver aiohttp
+# Use DataStax Astra free tier or local Docker:
+# docker run -p 9042:9042 cassandra</span>
+
+<span class="kw">from</span> cassandra.cluster <span class="kw">import</span> Cluster
+<span class="kw">from</span> cassandra <span class="kw">import</span> ConsistencyLevel
+<span class="kw">import</span> uuid, datetime
+
+cluster = Cluster([<span class="st">'127.0.0.1'</span>])
+session = cluster.connect()
+
+<span class="cm"># ── Keyspace (≈ Database in Cassandra) ─────────────────────────────────────</span>
+session.execute(<span class="st">"""
+    CREATE KEYSPACE IF NOT EXISTS messaging
+    WITH REPLICATION = {
+        'class': 'NetworkTopologyStrategy',
+        'datacenter1': 3           -- 3 replicas per datacenter
+    }
+"""</span>)
+session.set_keyspace(<span class="st">'messaging'</span>)
+
+<span class="cm"># ── Table Design: Query-First Principle ────────────────────────────────────
+# Cassandra forces you to design tables around your READ queries.
+# Primary Key = (Partition Key, Clustering Columns)
+# Partition Key → determines which node stores the row
+# Clustering Columns → sort order within a partition</span>
+
+session.execute(<span class="st">"""
+    CREATE TABLE IF NOT EXISTS messages_by_chat (
+        chat_id     UUID,
+        sent_at     TIMESTAMP,
+        message_id  UUID,
+        sender_id   UUID,
+        content     TEXT,
+        media_url   TEXT,
+        PRIMARY KEY ((chat_id), sent_at, message_id)
+    )
+    WITH CLUSTERING ORDER BY (sent_at DESC)   -- Latest messages first
+    AND  default_time_to_live = 7776000        -- Auto-delete after 90 days
+"""</span>)
+
+<span class="cm"># ── INSERT ─────────────────────────────────────────────────────────────────</span>
+chat_id = uuid.uuid4()
+session.execute(<span class="st">"""
+    INSERT INTO messages_by_chat
+    (chat_id, sent_at, message_id, sender_id, content)
+    VALUES (%s, %s, %s, %s, %s)
+"""</span>, (chat_id, datetime.datetime.utcnow(),
+        uuid.uuid4(), uuid.uuid4(), <span class="st">"Hey! How are you?"</span>))
+
+<span class="cm"># ── QUERY: Last 20 messages in a chat ──────────────────────────────────────</span>
+<span class="cm"># This is O(1) — directly hits the correct partition!</span>
+rows = session.execute(
+    <span class="st">"SELECT * FROM messages_by_chat WHERE chat_id=%s LIMIT 20"</span>,
+    (chat_id,)
+)
+
+<span class="kw">for</span> row <span class="kw">in</span> rows:
+    <span class="fn">print</span>(<span class="st">f"[{row.sent_at}] {row.content}"</span>)
+
+<span class="cm"># ── Consistency Levels ─────────────────────────────────────────────────────</span>
+<span class="cm"># ONE   → Fastest, least consistent (1 replica responds)</span>
+<span class="cm"># QUORUM → Majority of replicas (N/2 + 1) — balanced</span>
+<span class="cm"># ALL   → Slowest, most consistent (all replicas respond)</span>
+
+<span class="kw">from</span> cassandra.query <span class="kw">import</span> SimpleStatement
+stmt = SimpleStatement(
+    <span class="st">"SELECT * FROM messages_by_chat WHERE chat_id=%s"</span>,
+    consistency_level=ConsistencyLevel.QUORUM
+)
+</pre>
+    </div>
+  </div>
+
+  <!-- Neo4j / Graph -->
+  <div class="code-section reveal">
+    <h3 style="margin-bottom:1rem;">🕸️ Neo4j (Graph Database)</h3>
+    <div class="code-tabs">
+      <button class="code-tab active" onclick="switchTab(this, 'neo4j-tab')">Cypher Query Language</button>
+    </div>
+    <div class="code-panel active" id="neo4j-tab">
+      <div class="code-header">
+        <div class="code-header-left">
+          <div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div>
+          <span style="margin-left:0.5rem">neo4j_social_graph.py</span>
+        </div>
+        <div style="display:flex;gap:0.4rem;">
+          <button class="copy-btn" onclick="copyCode(this, 'neo4j-tab-code')">📋 Copy</button>
+          <a class="colab-btn" href="https://colab.research.google.com/notebook#create=true" target="_blank">▶ Open Colab</a>
+        </div>
+      </div>
+      <pre id="neo4j-tab-code"><span class="cm"># pip install neo4j
+# Free sandbox: https://sandbox.neo4j.com</span>
+
+<span class="kw">from</span> neo4j <span class="kw">import</span> GraphDatabase
+
+driver  = GraphDatabase.driver(<span class="st">"bolt://localhost:7687"</span>, auth=(<span class="st">"neo4j"</span>, <span class="st">"password"</span>))
+session = driver.session()
+
+<span class="cm"># ── CREATE nodes and relationships ─────────────────────────────────────────
+# Notation: (Node:Label {properties})-[:RELATIONSHIP]->(Node)</span>
+
+session.run(<span class="st">"""
+    CREATE (priya:User  {name: 'Priya',  city: 'Bengaluru', score: 9850})
+    CREATE (ravi:User   {name: 'Ravi',   city: 'Mumbai',    score: 9200})
+    CREATE (meera:User  {name: 'Meera',  city: 'Bengaluru', score: 9750})
+    CREATE (python:Tag  {name: 'Python'})
+    CREATE (nosql:Tag   {name: 'NoSQL'})
+    CREATE (post1:Post  {title: 'Intro to NoSQL', likes: 142})
+
+    CREATE (priya)-[:FOLLOWS]->(ravi)
+    CREATE (priya)-[:FOLLOWS]->(meera)
+    CREATE (ravi)-[:FOLLOWS]->(meera)
+    CREATE (priya)-[:AUTHORED]->(post1)
+    CREATE (priya)-[:TAGGED]->(python)
+    CREATE (post1)-[:HAS_TAG]->(nosql)
+    CREATE (ravi)-[:LIKED]->(post1)
+    CREATE (meera)-[:LIKED]->(post1)
+"""</span>)
+
+<span class="cm"># ── MATCH: Find friends-of-friends (2 hops) ───────────────────────────────</span>
+result = session.run(<span class="st">"""
+    MATCH (me:User {name: 'Priya'})-[:FOLLOWS*2]->(fof:User)
+    WHERE fof <> me AND NOT (me)-[:FOLLOWS]->(fof)
+    RETURN DISTINCT fof.name AS suggestion, fof.city AS city
+"""</span>)
+<span class="fn">print</span>(<span class="st">"People You May Know:"</span>)
+<span class="kw">for</span> row <span class="kw">in</span> result:
+    <span class="fn">print</span>(<span class="st">f"  {row['suggestion']} — {row['city']}"</span>)
+
+<span class="cm"># ── Shortest Path between two users ───────────────────────────────────────</span>
+path = session.run(<span class="st">"""
+    MATCH p = shortestPath(
+        (a:User {name:'Priya'})-[:FOLLOWS*]-(b:User {name:'Meera'})
+    )
+    RETURN length(p) AS hops, [n IN nodes(p) | n.name] AS path
+"""</span>)
+<span class="kw">for</span> row <span class="kw">in</span> path:
+    <span class="fn">print</span>(<span class="st">f"Shortest path ({row['hops']} hops): {' → '.join(row['path'])}"</span>)
+
+<span class="cm"># ── Recommendation: Posts liked by people you follow ──────────────────────</span>
+recs = session.run(<span class="st">"""
+    MATCH (me:User {name:'Priya'})-[:FOLLOWS]->(friend)-[:LIKED]->(post:Post)
+    WHERE NOT (me)-[:LIKED]->(post)
+    RETURN post.title AS title, COUNT(friend) AS mutual_likes
+    ORDER BY mutual_likes DESC
+    LIMIT 5
+"""</span>)
+<span class="kw">for</span> r <span class="kw">in</span> recs:
+    <span class="fn">print</span>(<span class="st">f"📌 {r['title']} — liked by {r['mutual_likes']} friends"</span>)
+
+<span class="cm"># ── Cypher Cheatsheet ─────────────────────────────────────────────────────
+# MATCH    → Find patterns (like SELECT + JOIN)
+# WHERE    → Filter
+# CREATE   → Insert nodes/relationships
+# MERGE    → Create if not exists (upsert)
+# SET      → Update properties
+# DELETE   → Remove nodes/relationships
+# RETURN   → Output results
+# WITH     → Pipeline intermediate results (like CTEs)</span>
+</pre>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- NOTATIONS -->
+<section id="notations">
+  <div class="section-label">Section 06</div>
+  <h2>Nomenclature & Notations</h2>
+  <p>Every NoSQL system has its own vocabulary. Master these terms to speak the language fluently.</p>
+
+  <div class="search-bar reveal">
+    <span style="color:var(--muted);">🔍</span>
+    <input type="text" id="termSearch" placeholder="Search terms, symbols, databases..." oninput="filterTerms()">
+  </div>
+
+  <div class="reveal">
+    <table class="notation-table" id="notationTable">
+      <thead>
+        <tr>
+          <th>Symbol / Term</th>
+          <th>Name</th>
+          <th>Meaning</th>
+          <th>Example</th>
+        </tr>
+      </thead>
+      <tbody id="notationBody">
+        <tr><td>{ }</td><td>Document</td><td>JSON/BSON object; the basic unit in document databases</td><td>{"name":"Priya","age":28}</td></tr>
+        <tr><td>_id</td><td>Primary Key</td><td>Auto-generated unique identifier for each document (ObjectId in MongoDB)</td><td>ObjectId("64a3...")</td></tr>
+        <tr><td>$match</td><td>Pipeline Filter</td><td>First stage in MongoDB aggregation — filters documents like SQL WHERE</td><td>{"$match":{"status":"active"}}</td></tr>
+        <tr><td>$group</td><td>Aggregation</td><td>Groups documents by a field and computes aggregate values</td><td>{"$group":{"_id":"$cat","total":{"$sum":"$price"}}}</td></tr>
+        <tr><td>$project</td><td>Projection</td><td>Selects which fields to include/exclude — like SQL SELECT</td><td>{"$project":{"name":1,"_id":0}}</td></tr>
+        <tr><td>$lookup</td><td>Join</td><td>Left outer join between collections in MongoDB aggregation</td><td>{"from":"orders","localField":"_id","foreignField":"user_id"}</td></tr>
+        <tr><td>O(1)</td><td>Constant Time</td><td>Operation time doesn't grow with data size — Redis GET, Cassandra partition lookup</td><td>r.get("key") → always same speed</td></tr>
+        <tr><td>O(log n)</td><td>Logarithmic</td><td>B-tree index lookup — doubles data, adds 1 step</td><td>Indexed find() in MongoDB</td></tr>
+        <tr><td>TTL</td><td>Time-To-Live</td><td>Automatic expiry time set on a key or document</td><td>r.setex("session",3600,data)</td></tr>
+        <tr><td>BSON</td><td>Binary JSON</td><td>Binary-encoded JSON used by MongoDB for efficient storage</td><td>Supports Date, Binary, ObjectId types</td></tr>
+        <tr><td>Shard</td><td>Horizontal Partition</td><td>A subset of data distributed across nodes — enables horizontal scaling</td><td>Users A-M on shard1, N-Z on shard2</td></tr>
+        <tr><td>Replica</td><td>Copy</td><td>Redundant copy of data for fault tolerance and read scaling</td><td>Cassandra RF=3 → 3 copies</td></tr>
+        <tr><td>RF</td><td>Replication Factor</td><td>Number of copies Cassandra maintains across the ring</td><td>RF=3: survives 1 node failure</td></tr>
+        <tr><td>(N)</td><td>Node (Graph)</td><td>An entity in a graph database — person, product, page</td><td>(user:User {name:"Priya"})</td></tr>
+        <tr><td>-[:R]-></td><td>Directed Edge</td><td>A relationship with type and direction in graph databases</td><td>(a)-[:FOLLOWS]->(b)</td></tr>
+        <tr><td>*1..3</td><td>Variable-Length Path</td><td>Traverse 1 to 3 hops in a Cypher graph pattern</td><td>MATCH (a)-[:FOLLOWS*1..3]->(b)</td></tr>
+        <tr><td>QUORUM</td><td>Majority Consistency</td><td>Majority of replicas (⌊RF/2⌋+1) must respond — balances speed vs consistency</td><td>RF=3 → 2 replicas must confirm</td></tr>
+        <tr><td>WAL</td><td>Write-Ahead Log</td><td>Append-only log written before any data modification — ensures crash recovery</td><td>Cassandra CommitLog, MongoDB oplog</td></tr>
+        <tr><td>LSM Tree</td><td>Log-Structured Merge</td><td>Write-optimized data structure used by Cassandra, RocksDB — fast writes</td><td>Memtable → SSTable flush cycle</td></tr>
+        <tr><td>SSTable</td><td>Sorted String Table</td><td>Immutable on-disk file of sorted key-value pairs in Cassandra/RocksDB</td><td>data-0001-Data.db in Cassandra</td></tr>
+        <tr><td>Eventual ∞</td><td>Eventual Consistency</td><td>All replicas will converge to same value — given no new updates</td><td>DynamoDB, CouchDB default</td></tr>
+        <tr><td>ZADD/ZRANK</td><td>Sorted Set Ops</td><td>Redis commands to add scored members and retrieve their rank</td><td>ZADD board 9850 "Priya"</td></tr>
+        <tr><td>INCR</td><td>Atomic Increment</td><td>Redis operation to atomically increment a counter — thread-safe</td><td>INCR page_views:home</td></tr>
+        <tr><td>CAP</td><td>CAP Theorem</td><td>Distributed system can only guarantee 2 of: Consistency, Availability, Partition Tolerance</td><td>Cassandra→AP, MongoDB→CP</td></tr>
+        <tr><td>BASE</td><td>BASE Properties</td><td>Basically Available, Soft state, Eventually consistent — NoSQL's alternative to ACID</td><td>DynamoDB, Cassandra</td></tr>
+        <tr><td>Projection</td><td>Field Selection</td><td>Specifying which fields to return — reduces network payload</td><td>find({},{"name":1,"_id":0})</td></tr>
+        <tr><td>$elemMatch</td><td>Array Filter</td><td>Matches documents where at least one array element matches all criteria</td><td>{"orders":{"$elemMatch":{"total":{"$gt":500}}}}</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Cheatsheet -->
+  <h3 style="margin-top:4rem;">Quick Reference — Command Cheatsheet</h3>
+  <div class="cheat-grid reveal">
+    <div class="cheat-card">
+      <div class="cheat-title mongo">🍃 MongoDB</div>
+      <table class="cheat-table">
+        <tr><td>insertOne({})</td><td>Insert single document</td></tr>
+        <tr><td>find({q})</td><td>Query matching docs</td></tr>
+        <tr><td>updateMany(f,u)</td><td>Bulk update</td></tr>
+        <tr><td>deleteOne({f})</td><td>Remove first match</td></tr>
+        <tr><td>aggregate([…])</td><td>Pipeline transformation</td></tr>
+        <tr><td>createIndex(f)</td><td>Speed up queries</td></tr>
+        <tr><td>$set / $unset</td><td>Set / remove fields</td></tr>
+        <tr><td>$push / $pull</td><td>Array add / remove</td></tr>
+      </table>
+    </div>
+    <div class="cheat-card">
+      <div class="cheat-title redis">🔴 Redis</div>
+      <table class="cheat-table">
+        <tr><td>SET k v EX t</td><td>String with TTL</td></tr>
+        <tr><td>INCR / INCRBY</td><td>Atomic counter</td></tr>
+        <tr><td>HSET / HGET</td><td>Hash field ops</td></tr>
+        <tr><td>LPUSH / RPOP</td><td>Queue operations</td></tr>
+        <tr><td>SADD / SINTER</td><td>Set and intersect</td></tr>
+        <tr><td>ZADD / ZRANK</td><td>Sorted set / rank</td></tr>
+        <tr><td>SETBIT / BITCOUNT</td><td>Bitmap operations</td></tr>
+        <tr><td>PUBLISH / SUBSCRIBE</td><td>Pub/sub messaging</td></tr>
+      </table>
+    </div>
+    <div class="cheat-card">
+      <div class="cheat-title cassandra">💎 Cassandra CQL</div>
+      <table class="cheat-table">
+        <tr><td>CREATE KEYSPACE</td><td>Database equivalent</td></tr>
+        <tr><td>CREATE TABLE</td><td>Column-family table</td></tr>
+        <tr><td>INSERT INTO</td><td>Always an upsert</td></tr>
+        <tr><td>SELECT … WHERE pk=?</td><td>Must include partition key</td></tr>
+        <tr><td>ALLOW FILTERING</td><td>Full scan (avoid!)</td></tr>
+        <tr><td>TTL</td><td>Per-column expiry</td></tr>
+        <tr><td>USING CONSISTENCY</td><td>Set per-query level</td></tr>
+        <tr><td>nodetool status</td><td>Check cluster health</td></tr>
+      </table>
+    </div>
+    <div class="cheat-card">
+      <div class="cheat-title neo4j">🔮 Neo4j Cypher</div>
+      <table class="cheat-table">
+        <tr><td>MATCH (n:Label)</td><td>Find nodes</td></tr>
+        <tr><td>WHERE n.prop = v</td><td>Filter</td></tr>
+        <tr><td>CREATE (n)-[r]->(m)</td><td>New node+rel</td></tr>
+        <tr><td>MERGE (n {id:1})</td><td>Upsert pattern</td></tr>
+        <tr><td>SET n.prop = val</td><td>Update property</td></tr>
+        <tr><td>DETACH DELETE n</td><td>Delete with rels</td></tr>
+        <tr><td>shortestPath(…)</td><td>Shortest path</td></tr>
+        <tr><td>[:REL*1..5]</td><td>Variable depth</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- QUIZ -->
+<section id="quiz">
+  <div class="section-label">Section 07</div>
+  <h2>Test Your Knowledge</h2>
+  <p>Solidify your understanding with these scenario-based questions.</p>
+
+  <div class="quiz-box reveal">
+    <div class="quiz-q" id="quizQuestion">Loading...</div>
+    <div class="quiz-options" id="quizOptions"></div>
+    <div class="quiz-result" id="quizResult"></div>
+    <div class="quiz-nav">
+      <span class="quiz-counter" id="quizCounter">0 / 0</span>
+      <button class="btn btn-primary" id="quizNext" onclick="nextQuestion()">Next →</button>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- HISTORY TIMELINE -->
+<section id="history" style="padding-bottom:2rem;">
+  <div class="section-label">Section 08</div>
+  <h2>Brief History of NoSQL</h2>
+  <div class="timeline reveal">
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-year">1998</div>
+      <h4>The Term "NoSQL" is Born</h4>
+      <p>Carlo Strozzi coins "NoSQL" for his lightweight relational database that didn't use SQL. The meaning later shifted to "Not Only SQL".</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-year">2004</div>
+      <h4>Google Bigtable Paper</h4>
+      <p>Google publishes the Bigtable paper — a distributed storage system for structured data. Blueprint for column-family stores like HBase and Cassandra.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-year">2007</div>
+      <h4>Amazon Dynamo Paper</h4>
+      <p>Amazon's Dynamo paper introduces consistent hashing and eventual consistency. Influences Cassandra, Riak, and the AP system design philosophy.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-year">2009</div>
+      <h4>MongoDB & Cassandra Launch</h4>
+      <p>The modern NoSQL era begins. MongoDB launches as a document store; Cassandra open-sourced by Facebook. Redis also debuts this year.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-year">2012</div>
+      <h4>NewSQL Emerges</h4>
+      <p>Google Spanner paper — globally distributed, ACID-compliant, scale-out SQL. Bridges the gap between NoSQL scale and SQL consistency.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-year">2024+</div>
+      <h4>Multi-Model Databases</h4>
+      <p>ArangoDB, Couchbase, and AWS DynamoDB evolve to support multiple NoSQL paradigms in one system. The future is polyglot persistence.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>Built for learners · <em>NoSQL Guide</em></span>
+  <span>Shrinivasa PH · Data Science & Analytics</span>
+  <span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;">v1.0 · 2025</span>
+</footer>
+
+<script>
+// ── TAB SWITCHER ───────────────────────────────────────────────────────────
+function switchTab(btn, panelId) {
+  const parent = btn.closest('.code-section') || btn.closest('.tab-container');
+  parent.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+  parent.querySelectorAll('.code-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
+
+// ── COPY TO CLIPBOARD ──────────────────────────────────────────────────────
+function copyCode(btn, elementId) {
+  const el   = document.getElementById(elementId);
+  const text = el.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '📋 Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+// ── INTERSECTION OBSERVER (scroll reveal) ─────────────────────────────────
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ── NOTATION SEARCH ───────────────────────────────────────────────────────
+function filterTerms() {
+  const q    = document.getElementById('termSearch').value.toLowerCase();
+  const rows = document.querySelectorAll('#notationBody tr');
+  rows.forEach(row => {
+    row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+// ── QUIZ ──────────────────────────────────────────────────────────────────
+const quizData = [
+  {
+    q: "You're building a real-time leaderboard for 5 million players that updates thousands of times per second. Which NoSQL type is the best fit?",
+    opts: ["MongoDB Document Store", "Redis Sorted Set", "Cassandra Column-Family", "Neo4j Graph DB"],
+    ans: 1,
+    explain: "Redis Sorted Sets (ZADD/ZRANK) maintain an auto-sorted leaderboard in RAM with O(log N) inserts and O(1) rank lookups — perfect for real-time gaming."
+  },
+  {
+    q: "WhatsApp needs to store 100 billion messages per day, accessed by conversation ID, with messages returned in chronological order. Which database fits best?",
+    opts: ["PostgreSQL", "MongoDB", "Apache Cassandra", "Redis"],
+    ans: 2,
+    explain: "Cassandra partitions data by chat_id — all messages in a conversation are co-located on the same node. Appends are O(1) and time-ordered clustering gives chronological reads."
+  },
+  {
+    q: "The CAP theorem says a distributed system can guarantee at most 2 of 3 properties. Cassandra sacrifices which property?",
+    opts: ["Partition Tolerance (P)", "Availability (A)", "Consistency (C)", "None — Cassandra guarantees all three"],
+    ans: 2,
+    explain: "Cassandra is AP — it prioritizes Availability and Partition Tolerance. In a network partition, nodes still respond but may return slightly stale data (eventual consistency)."
+  },
+  {
+    q: "An e-commerce catalog has products with wildly different attributes — shirts have size/color, laptops have RAM/GPU. What's the NoSQL advantage?",
+    opts: ["Horizontal scaling across nodes", "ACID transaction guarantees", "Flexible schema — each document can have different fields", "Faster joins between collections"],
+    ans: 2,
+    explain: "Document stores like MongoDB allow each document to have its own structure. Shirts can have {size, color} while laptops have {ram, gpu} — no null columns wasted."
+  },
+  {
+    q: "LinkedIn's 'People You May Know' finds friends-of-friends 3 hops away across 900M users. Why is a graph database better than SQL here?",
+    opts: ["Graph DBs store more data per node", "SQL can't store social network data", "Relationship traversal in graph DBs is pointer-following — no joins needed", "Graph DBs support better full-text search"],
+    ans: 2,
+    explain: "In Neo4j, traversing relationships means following pointers — milliseconds regardless of network size. SQL would require 3 self-joins on a 900M-row table, generating billions of intermediate rows."
+  },
+  {
+    q: "What does TTL stand for in Redis, and what does it do?",
+    opts: ["Total Transfer Limit — caps data size", "Time-To-Live — auto-expires keys after a set duration", "Transaction-To-Log — commits changes to disk", "Token-To-Label — maps auth tokens to users"],
+    ans: 1,
+    explain: "TTL (Time-To-Live) sets an expiry on a key. After the duration passes, Redis automatically deletes it. Perfect for session tokens, OTPs, and cache entries."
+  },
+  {
+    q: "In MongoDB, what does `{\"$mul\": {\"price\": 0.9}}` do in an update operation?",
+    opts: ["Multiplies the price field by 0.9 (applies 10% discount)", "Sets price to the value 0.9", "Deletes the price field if it equals 0.9", "Creates a new field called $mul"],
+    ans: 0,
+    explain: "$mul is a MongoDB update operator that multiplies a field's value by the given number. 0.9 means 90% of original — a 10% discount applied in-place."
+  },
+  {
+    q: "What is the BASE model in NoSQL? What does each letter stand for?",
+    opts: ["Binary-Atomic-Shared-Encrypted", "Basically Available, Soft state, Eventually consistent", "Block-And-Shard-Everything", "Balanced, Asynchronous, Scalable, Elastic"],
+    ans: 1,
+    explain: "BASE is NoSQL's alternative to SQL's ACID. Basically Available = system responds even during failures. Soft state = data may change over time. Eventually consistent = replicas will converge."
+  }
+];
+
+let current = 0, score = 0, answered = false;
+
+function loadQuestion() {
+  answered = false;
+  const q  = quizData[current];
+  document.getElementById('quizQuestion').textContent = q.q;
+  document.getElementById('quizCounter').textContent  = `${current + 1} / ${quizData.length}`;
+  document.getElementById('quizResult').className     = 'quiz-result';
+  document.getElementById('quizNext').textContent     = current < quizData.length - 1 ? 'Next →' : 'See Score';
+
+  const opts = document.getElementById('quizOptions');
+  opts.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className   = 'quiz-opt';
+    btn.textContent = opt;
+    btn.onclick     = () => answer(i, btn);
+    opts.appendChild(btn);
+  });
+}
+
+function answer(idx, btn) {
+  if (answered) return;
+  answered = true;
+  const q = quizData[current];
+  const result = document.getElementById('quizResult');
+
+  document.querySelectorAll('.quiz-opt').forEach((b, i) => {
+    if (i === q.ans) b.classList.add('correct');
+    else if (i === idx && idx !== q.ans) b.classList.add('wrong');
+    b.style.pointerEvents = 'none';
+  });
+
+  if (idx === q.ans) {
+    score++;
+    result.className = 'quiz-result show success';
+    result.innerHTML = `✅ Correct! ${q.explain}`;
+  } else {
+    result.className = 'quiz-result show fail';
+    result.innerHTML = `❌ Not quite. ${q.explain}`;
+  }
+}
+
+function nextQuestion() {
+  if (!answered && current < quizData.length) {
+    document.getElementById('quizResult').className = 'quiz-result show fail';
+    document.getElementById('quizResult').innerHTML = '⚠️ Please select an answer first.';
+    return;
+  }
+  current++;
+  if (current < quizData.length) {
+    loadQuestion();
+  } else {
+    const pct  = Math.round((score / quizData.length) * 100);
+    const grade = pct >= 80 ? '🏆 Excellent!' : pct >= 60 ? '👍 Good effort!' : '📚 Keep studying!';
+    document.getElementById('quizQuestion').textContent = `${grade} You scored ${score}/${quizData.length} (${pct}%)`;
+    document.getElementById('quizOptions').innerHTML    = '';
+    document.getElementById('quizResult').className    = 'quiz-result show ' + (pct >= 60 ? 'success' : 'fail');
+    document.getElementById('quizResult').innerHTML    = pct >= 80
+      ? 'Outstanding! You have a solid grasp of NoSQL fundamentals.'
+      : pct >= 60 ? 'Good job! Review the sections you missed and try again.'
+      : 'Revisit Sections 02–05 for a stronger foundation. NoSQL mastery takes practice!';
+    document.getElementById('quizNext').textContent = '🔄 Retry';
+    document.getElementById('quizNext').onclick = () => {
+      current = 0; score = 0;
+      document.getElementById('quizNext').onclick = nextQuestion;
+      loadQuestion();
+    };
+    document.getElementById('quizCounter').textContent = `${quizData.length} / ${quizData.length}`;
+  }
+}
+
+loadQuestion();
+</script>
+</body>
+</html>

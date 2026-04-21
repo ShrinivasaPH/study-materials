@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PySpark Tutorial - Learn PySpark</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            height: fit-content;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 20px;
+        }
+
+        .sidebar h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar button {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.95em;
+            transition: all 0.3s;
+        }
+
+        .sidebar button:hover {
+            background: #f0f0f0;
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .sidebar button.active {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .main-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .lesson {
+            display: none;
+        }
+
+        .lesson.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .lesson h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .lesson h3 {
+            color: #764ba2;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .lesson p {
+            line-height: 1.8;
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 1.5;
+            white-space: pre;
+            text-align: left;
+        }
+
+        .code-comment { color: #75715e; }
+        .code-keyword { color: #66d9ef; }
+        .code-string { color: #e6db74; }
+        .code-function { color: #a6e22e; }
+
+        .example-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .example-box strong {
+            color: #667eea;
+        }
+
+        .note-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .note-box strong {
+            color: #856404;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        footer {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                position: static;
+            }
+            header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 PySpark Tutorial</h1>
+            <p>Learn Apache Spark with Python - From Basics to Advanced</p>
+        </header>
+
+        <aside class="sidebar">
+            <h3>📚 Contents</h3>
+            <ul>
+                <li><button class="nav-btn active" onclick="showLesson(0)">Introduction</button></li>
+                <li><button class="nav-btn" onclick="showLesson(1)">Installation & Setup</button></li>
+                <li><button class="nav-btn" onclick="showLesson(2)">RDDs Basics</button></li>
+                <li><button class="nav-btn" onclick="showLesson(3)">DataFrames</button></li>
+                <li><button class="nav-btn" onclick="showLesson(4)">SQL Operations</button></li>
+                <li><button class="nav-btn" onclick="showLesson(5)">Transformations</button></li>
+                <li><button class="nav-btn" onclick="showLesson(6)">Actions</button></li>
+                <li><button class="nav-btn" onclick="showLesson(7)">Real-World Example</button></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <!-- Lesson 0: Introduction -->
+            <section class="lesson active">
+                <h2>🎯 What is PySpark?</h2>
+                <p>PySpark is the Python API for Apache Spark, a powerful open-source distributed computing framework designed for fast and large-scale data processing.</p>
+
+                <h3>Why PySpark?</h3>
+                <ul>
+                    <li><strong>Speed:</strong> Spark processes data up to 100x faster than Hadoop MapReduce</li>
+                    <li><strong>Easy to Use:</strong> Simple, intuitive API similar to Pandas</li>
+                    <li><strong>Distributed Computing:</strong> Handle big data across multiple machines</li>
+                    <li><strong>Flexible:</strong> Works with multiple data sources (HDFS, S3, Cassandra, etc.)</li>
+                    <li><strong>Python Integration:</strong> Use Python's rich ecosystem for data science</li>
+                </ul>
+
+                <h3>Key Concepts</h3>
+                <div class="example-box">
+                    <strong>RDD (Resilient Distributed Dataset):</strong> The fundamental data structure of Spark. An immutable, distributed collection of objects that can be processed in parallel.
+                </div>
+
+                <div class="example-box">
+                    <strong>DataFrame:</strong> A distributed collection of data organized into named columns. Similar to a Pandas DataFrame but distributed.
+                </div>
+
+                <div class="example-box">
+                    <strong>Transformations:</strong> Operations that create a new RDD/DataFrame from an existing one (lazy evaluation).
+                </div>
+
+                <div class="example-box">
+                    <strong>Actions:</strong> Operations that return values to the driver program or write data to storage.
+                </div>
+
+                <h3>Spark Architecture</h3>
+                <p>Spark follows a master-slave architecture:</p>
+                <ul>
+                    <li><strong>Driver Program:</strong> Runs your main code and creates SparkContext</li>
+                    <li><strong>Cluster Manager:</strong> Allocates resources (Standalone, Yarn, Mesos)</li>
+                    <li><strong>Worker Nodes:</strong> Run executor tasks in parallel</li>
+                </ul>
+            </section>
+
+            <!-- Lesson 1: Installation & Setup -->
+            <section class="lesson">
+                <h2>⚙️ Installation & Setup</h2>
+
+                <h3>Prerequisites</h3>
+                <ul>
+                    <li>Java (JDK 8 or higher)</li>
+                    <li>Python (3.6 or higher)</li>
+                    <li>Scala (optional, for advanced usage)</li>
+                </ul>
+
+                <h3>Install PySpark</h3>
+                <p>The easiest way to install PySpark is using pip:</p>
+                <div class="code-block">
+pip install pyspark
+                </div>
+
+                <h3>Create Your First Spark Session</h3>
+                <p>A SparkSession is the entry point to PySpark functionality:</p>
+                <div class="code-block">
+<span class="code-keyword">from</span> pyspark.sql <span class="code-keyword">import</span> SparkSession
+
+<span class="code-comment"># Create a SparkSession</span>
+spark = SparkSession.builder \
+    .appName(<span class="code-string">"MyApp"</span>) \
+    .master(<span class="code-string">"local[*]"</span>) \
+    .getOrCreate()
+
+<span class="code-comment"># Get SparkContext (for RDD operations)</span>
+sc = spark.sparkContext
+                </div>
+
+                <div class="note-box">
+                    <strong>Note:</strong> <code>.master("local[*]")</code> uses all available cores on your local machine. For production, use a cluster manager like YARN or Kubernetes.
+                </div>
+
+                <h3>Testing Installation</h3>
+                <div class="code-block">
+<span class="code-comment"># Simple test to verify installation</span>
+rdd = sc.parallelize([1, 2, 3, 4, 5])
+result = rdd.map(<span class="code-keyword">lambda</span> x: x * 2).collect()
+<span class="code-function">print</span>(result)  <span class="code-comment"># Output: [2, 4, 6, 8, 10]</span>
+                </div>
+            </section>
+
+            <!-- Lesson 2: RDDs Basics -->
+            <section class="lesson">
+                <h2>📦 RDDs (Resilient Distributed Datasets)</h2>
+
+                <h3>What are RDDs?</h3>
+                <p>RDDs are the fundamental data structure of Apache Spark. They are immutable distributed collections of objects that can be processed in parallel across a cluster.</p>
+
+                <h3>Creating RDDs</h3>
+                <p><strong>Method 1: From a Python Collection</strong></p>
+                <div class="code-block">
+data = [1, 2, 3, 4, 5]
+rdd = sc.parallelize(data)
+                </div>
+
+                <p><strong>Method 2: From External Storage</strong></p>
+                <div class="code-block">
+<span class="code-comment"># Read from HDFS or local file</span>
+rdd = sc.textFile(<span class="code-string">"path/to/file.txt"</span>)
+                </div>
+
+                <p><strong>Method 3: From Another RDD</strong></p>
+                <div class="code-block">
+rdd2 = rdd.map(<span class="code-keyword">lambda</span> x: x * 2)
+                </div>
+
+                <h3>Basic RDD Operations</h3>
+                <div class="code-block">
+<span class="code-comment"># Create RDD</span>
+rdd = sc.parallelize([1, 2, 3, 4, 5])
+
+<span class="code-comment"># Map: apply function to each element</span>
+squared = rdd.map(<span class="code-keyword">lambda</span> x: x ** 2)
+
+<span class="code-comment"># Filter: keep elements that satisfy condition</span>
+evens = rdd.filter(<span class="code-keyword">lambda</span> x: x % 2 == 0)
+
+<span class="code-comment"># Reduce: aggregate elements</span>
+sum_rdd = rdd.reduce(<span class="code-keyword">lambda</span> a, b: a + b)
+
+<span class="code-comment"># Collect: return all elements to driver</span>
+result = rdd.collect()
+<span class="code-function">print</span>(result)
+                </div>
+
+                <div class="example-box">
+                    <strong>Example:</strong> Find sum of squares of even numbers
+                    <div class="code-block">
+result = rdd \
+    .filter(<span class="code-keyword">lambda</span> x: x % 2 == 0) \
+    .map(<span class="code-keyword">lambda</span> x: x ** 2) \
+    .reduce(<span class="code-keyword">lambda</span> a, b: a + b)
+<span class="code-function">print</span>(result)  <span class="code-comment"># Output: 36</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lesson 3: DataFrames -->
+            <section class="lesson">
+                <h2>📊 DataFrames</h2>
+
+                <h3>What are DataFrames?</h3>
+                <p>DataFrames are distributed collections of data organized into named columns. They are similar to Pandas DataFrames but distributed across a cluster, allowing for fast processing of large datasets.</p>
+
+                <h3>Creating DataFrames</h3>
+                <p><strong>Method 1: From Python Data</strong></p>
+                <div class="code-block">
+data = [(<span class="code-string">"Alice"</span>, 25), (<span class="code-string">"Bob"</span>, 30), (<span class="code-string">"Charlie"</span>, 35)]
+columns = [<span class="code-string">"name"</span>, <span class="code-string">"age"</span>]
+
+df = spark.createDataFrame(data, schema=columns)
+df.show()
+                </div>
+
+                <p><strong>Method 2: From Dictionary/List of Rows</strong></p>
+                <div class="code-block">
+<span class="code-keyword">from</span> pyspark.sql <span class="code-keyword">import</span> Row
+
+data = [
+    Row(name=<span class="code-string">"Alice"</span>, age=25),
+    Row(name=<span class="code-string">"Bob"</span>, age=30)
+]
+df = spark.createDataFrame(data)
+                </div>
+
+                <p><strong>Method 3: From CSV, JSON, Parquet</strong></p>
+                <div class="code-block">
+<span class="code-comment"># Read CSV</span>
+df = spark.read.csv(<span class="code-string">"data.csv"</span>, header=<span class="code-keyword">True</span>)
+
+<span class="code-comment"># Read JSON</span>
+df = spark.read.json(<span class="code-string">"data.json"</span>)
+
+<span class="code-comment"># Read Parquet</span>
+df = spark.read.parquet(<span class="code-string">"data.parquet"</span>)
+                </div>
+
+                <h3>DataFrame Operations</h3>
+                <div class="code-block">
+<span class="code-comment"># Display data</span>
+df.show()
+
+<span class="code-comment"># Get schema</span>
+df.printSchema()
+
+<span class="code-comment"># Select columns</span>
+df.select(<span class="code-string">"name"</span>, <span class="code-string">"age"</span>).show()
+
+<span class="code-comment"># Filter rows</span>
+df.filter(df.age > 25).show()
+
+<span class="code-comment"># Get statistics</span>
+df.describe().show()
+
+<span class="code-comment"># Count rows</span>
+<span class="code-function">print</span>(df.count())
+                </div>
+            </section>
+
+            <!-- Lesson 4: SQL Operations -->
+            <section class="lesson">
+                <h2>🔍 SQL Operations</h2>
+
+                <h3>Using SQL with PySpark</h3>
+                <p>PySpark allows you to write SQL queries directly on DataFrames. First, register the DataFrame as a temporary table:</p>
+
+                <div class="code-block">
+<span class="code-comment"># Register DataFrame as temporary table</span>
+df.createOrReplaceTempView(<span class="code-string">"users"</span>)
+
+<span class="code-comment"># Write SQL query</span>
+result = spark.sql(<span class="code-string">"""
+    SELECT name, age 
+    FROM users 
+    WHERE age > 25
+    ORDER BY age DESC
+"""</span>)
+
+result.show()
+                </div>
+
+                <h3>Common SQL Operations</h3>
+                <div class="code-block">
+<span class="code-comment"># SELECT with WHERE</span>
+spark.sql(<span class="code-string">"SELECT * FROM users WHERE age > 30"</span>).show()
+
+<span class="code-comment"># GROUP BY and aggregation</span>
+spark.sql(<span class="code-string">"SELECT age, COUNT(*) as count FROM users GROUP BY age"</span>).show()
+
+<span class="code-comment"># JOIN</span>
+spark.sql(<span class="code-string">"""
+    SELECT u.name, o.order_id 
+    FROM users u 
+    JOIN orders o ON u.id = o.user_id
+"""</span>).show()
+
+<span class="code-comment"># UNION</span>
+spark.sql(<span class="code-string">"SELECT * FROM table1 UNION SELECT * FROM table2"</span>).show()
+                </div>
+
+                <div class="note-box">
+                    <strong>Tip:</strong> You can mix SQL and DataFrame API. Both have similar performance as Spark optimizes them using Catalyst optimizer.
+                </div>
+            </section>
+
+            <!-- Lesson 5: Transformations -->
+            <section class="lesson">
+                <h2>⚡ Transformations</h2>
+
+                <h3>What are Transformations?</h3>
+                <p>Transformations are operations that create a new RDD/DataFrame from an existing one. They are <strong>lazy</strong>, meaning they don't compute results immediately.</p>
+
+                <h3>Common DataFrame Transformations</h3>
+
+                <h4>1. Select</h4>
+                <div class="code-block">
+<span class="code-comment"># Select specific columns</span>
+df.select(<span class="code-string">"name"</span>, <span class="code-string">"age"</span>).show()
+                </div>
+
+                <h4>2. Filter (Where)</h4>
+                <div class="code-block">
+<span class="code-comment"># Keep rows matching condition</span>
+df.filter(df.age > 25).show()
+df.where(df.salary > 50000).show()
+                </div>
+
+                <h4>3. Map (For RDDs)</h4>
+                <div class="code-block">
+rdd = sc.parallelize([1, 2, 3, 4])
+mapped = rdd.map(<span class="code-keyword">lambda</span> x: x * 2)
+                </div>
+
+                <h4>4. FlatMap</h4>
+                <div class="code-block">
+<span class="code-comment"># Map then flatten results</span>
+rdd = sc.parallelize([<span class="code-string">"Hello World"</span>, <span class="code-string">"PySpark"</span>])
+words = rdd.flatMap(<span class="code-keyword">lambda</span> x: x.split(<span class="code-string">" "</span>))
+<span class="code-comment"># Result: ["Hello", "World", "PySpark"]</span>
+                </div>
+
+                <h4>5. Union</h4>
+                <div class="code-block">
+df3 = df1.union(df2)
+                </div>
+
+                <h4>6. Join</h4>
+                <div class="code-block">
+df_joined = df1.join(df2, df1.id == df2.id)
+                </div>
+
+                <h4>7. GroupBy</h4>
+                <div class="code-block">
+<span class="code-comment"># Group and aggregate</span>
+df.groupBy(<span class="code-string">"department"</span>).count().show()
+df.groupBy(<span class="code-string">"age"</span>).agg({<span class="code-string">"salary"</span>: <span class="code-string">"avg"</span>}).show()
+                </div>
+
+                <div class="note-box">
+                    <strong>Key Point:</strong> Transformations are lazy! They don't execute until you call an action like <code>collect()</code>, <code>show()</code>, or <code>save()</code>.
+                </div>
+            </section>
+
+            <!-- Lesson 6: Actions -->
+            <section class="lesson">
+                <h2>🎬 Actions</h2>
+
+                <h3>What are Actions?</h3>
+                <p>Actions are operations that return values to the driver program or write data to storage. They <strong>trigger</strong> the execution of transformations (lazy evaluation).</p>
+
+                <h3>Common Actions</h3>
+
+                <h4>1. Collect</h4>
+                <p>Returns all elements to the driver program (use carefully with large datasets):</p>
+                <div class="code-block">
+result = df.collect()
+<span class="code-function">print</span>(result)
+                </div>
+
+                <h4>2. Show</h4>
+                <p>Display first n rows:</p>
+                <div class="code-block">
+df.show(5)  <span class="code-comment"># Show first 5 rows</span>
+df.show(<span class="code-keyword">False</span>)  <span class="code-comment"># Don't truncate columns</span>
+                </div>
+
+                <h4>3. Count</h4>
+                <p>Return number of rows:</p>
+                <div class="code-block">
+count = df.count()
+<span class="code-function">print</span>(<span class="code-string">f"Total rows: {count}"</span>)
+                </div>
+
+                <h4>4. First / Head</h4>
+                <p>Get first row(s):</p>
+                <div class="code-block">
+first_row = df.first()
+head_rows = df.head(3)
+                </div>
+
+                <h4>5. Take</h4>
+                <p>Get first n elements (from RDD):</p>
+                <div class="code-block">
+rdd = sc.parallelize([1, 2, 3, 4, 5])
+first_three = rdd.take(3)  <span class="code-comment"># [1, 2, 3]</span>
+                </div>
+
+                <h4>6. Reduce</h4>
+                <p>Aggregate elements:</p>
+                <div class="code-block">
+rdd = sc.parallelize([1, 2, 3, 4, 5])
+sum_val = rdd.reduce(<span class="code-keyword">lambda</span> a, b: a + b)
+                </div>
+
+                <h4>7. Write / Save</h4>
+                <p>Write DataFrame to storage:</p>
+                <div class="code-block">
+<span class="code-comment"># Save as CSV</span>
+df.write.csv(<span class="code-string">"output.csv"</span>, header=<span class="code-keyword">True</span>)
+
+<span class="code-comment"># Save as Parquet</span>
+df.write.parquet(<span class="code-string">"output.parquet"</span>)
+
+<span class="code-comment"># Save as JSON</span>
+df.write.json(<span class="code-string">"output.json"</span>)
+                </div>
+
+                <div class="example-box">
+                    <strong>Example:</strong> Action triggering transformations
+                    <div class="code-block">
+<span class="code-comment"># These are lazy - nothing happens yet</span>
+df2 = df.filter(df.age > 25)
+df3 = df2.select(<span class="code-string">"name"</span>)
+
+<span class="code-comment"># This action triggers execution of all transformations</span>
+df3.show()
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lesson 7: Real-World Example -->
+            <section class="lesson">
+                <h2>🌍 Real-World Example</h2>
+
+                <h3>Analyzing Sales Data</h3>
+                <p>Let's build a complete example that demonstrates PySpark concepts:</p>
+
+                <div class="code-block">
+<span class="code-keyword">from</span> pyspark.sql <span class="code-keyword">import</span> SparkSession
+<span class="code-keyword">from</span> pyspark.sql.functions <span class="code-keyword">import</span> col, avg, count, max
+
+<span class="code-comment"># Initialize Spark</span>
+spark = SparkSession.builder.appName(<span class="code-string">"SalesAnalysis"</span>).master(<span class="code-string">"local[*]"</span>).getOrCreate()
+
+<span class="code-comment"># Create sample data</span>
+data = [
+    (<span class="code-string">"Alice"</span>, <span class="code-string">"Electronics"</span>, 500),
+    (<span class="code-string">"Bob"</span>, <span class="code-string">"Electronics"</span>, 1200),
+    (<span class="code-string">"Charlie"</span>, <span class="code-string">"Clothing"</span>, 300),
+    (<span class="code-string">"David"</span>, <span class="code-string">"Clothing"</span>, 450),
+    (<span class="code-string">"Eve"</span>, <span class="code-string">"Electronics"</span>, 800),
+]
+
+columns = [<span class="code-string">"customer"</span>, <span class="code-string">"category"</span>, <span class="code-string">"amount"</span>]
+df = spark.createDataFrame(data, schema=columns)
+
+<span class="code-comment"># 1. Display data</span>
+df.show()
+
+<span class="code-comment"># 2. Filter high-value transactions</span>
+high_value = df.filter(df.amount > 600)
+high_value.show()
+
+<span class="code-comment"># 3. Group by category and aggregate</span>
+summary = df.groupBy(<span class="code-string">"category"</span>) \
+    .agg(
+        count(<span class="code-string">"*"</span>).alias(<span class="code-string">"count"</span>),
+        avg(<span class="code-string">"amount"</span>).alias(<span class="code-string">"avg_amount"</span>),
+        max(<span class="code-string">"amount"</span>).alias(<span class="code-string">"max_amount"</span>)
+    )
+summary.show()
+
+<span class="code-comment"># 4. Using SQL</span>
+df.createOrReplaceTempView(<span class="code-string">"sales"</span>)
+top_customers = spark.sql(<span class="code-string">"""
+    SELECT customer, category, amount
+    FROM sales
+    WHERE amount > 500
+    ORDER BY amount DESC
+"""</span>)
+top_customers.show()
+
+<span class="code-comment"># 5. Save results</span>
+summary.write.csv(<span class="code-string">"sales_summary.csv"</span>, header=<span class="code-keyword">True</span>)
+                </div>
+
+                <h3>Expected Output</h3>
+                <div class="example-box">
+<strong>Original Data:</strong>
+<pre>+-------+----------+------+
+|customer| category|amount|
++-------+----------+------+
+|  Alice|Electronics|   500|
+|    Bob|Electronics|  1200|
+|Charlie|  Clothing|   300|
+|  David|  Clothing|   450|
+|    Eve|Electronics|   800|
++-------+----------+------+</pre>
+
+<strong>Summary by Category:</strong>
+<pre>+----------+-----+----------+----------+
+| category|count|avg_amount|max_amount|
++----------+-----+----------+----------+
+|Electronics|    3|    833.33|      1200|
+|  Clothing|    2|    375.00|       450|
++----------+-----+----------+----------+</pre>
+                </div>
+
+                <h3>Key Takeaways</h3>
+                <ul>
+                    <li>Create DataFrames from various sources</li>
+                    <li>Apply transformations (filter, groupBy, etc.)</li>
+                    <li>Use aggregation functions (count, avg, max)</li>
+                    <li>Mix SQL and DataFrame API</li>
+                    <li>Save results to files</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <p>PySpark Tutorial © 2024 | Learn Apache Spark with Python</p>
+        </footer>
+    </div>
+
+    <script>
+        const lessons = document.querySelectorAll('.lesson');
+        const navButtons = document.querySelectorAll('.nav-btn');
+
+        function showLesson(index) {
+            // Hide all lessons
+            lessons.forEach(lesson => lesson.classList.remove('active'));
+            navButtons.forEach(btn => btn.classList.remove('active'));
+
+            // Show selected lesson
+            if (index < lessons.length) {
+                lessons[index].classList.add('active');
+                navButtons[index].classList.add('active');
+            }
+
+            // Scroll to top
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent) {
+                mainContent.scrollTop = 0;
+            }
+        }
+    </script>

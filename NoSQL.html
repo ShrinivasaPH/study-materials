@@ -978,6 +978,17 @@
 </head>
 <body>
 
+  <!-- HOME BUTTON — paste just after <body> in every sub-page -->
+<a href="index.html" style="
+position: fixed; top: 16px; left: 16px; z-index: 9999;
+background: #111; color: #fff; text-decoration: none;
+padding: 8px 16px; border-radius: 20px; font-size: 13px;
+font-family: sans-serif; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+transition: opacity 0.2s;
+" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1">
+← Home
+</a>
+
 <!-- NAV -->
 <nav>
   <div class="nav-brand">NoSQL ◆ Guide</div>

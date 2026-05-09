@@ -517,7 +517,7 @@ canvas { display: block; width: 100%; max-height: 340px; }
 <div class="hero">
   <div class="hero-badge">Interactive Learning Guide</div>
   <h1>Machine Learning<br><em style="font-style:italic;color:#a0b0ff;">from first principles</em></h1>
-  <p>Explore the ideas, intuitions, math, and code behind every major ML paradigm — all in one place.</p>
+  <p>Whether you're just getting started or sharpening your intuition, this guide walks you through the ideas, math, and code behind every major ML paradigm — interactively, in one place.</p>
 </div>
 
 <div class="tab-bar" role="tablist">
@@ -549,14 +549,14 @@ canvas { display: block; width: 100%; max-height: 340px; }
   <div class="section-header">
     <div class="chip">Start here</div>
     <h2>What is Machine Learning?</h2>
-    <p class="lead">Algorithms that improve through experience — without being explicitly programmed for every case.</p>
+    <p class="lead">Programs that get better at tasks through experience — without you having to spell out every rule by hand.</p>
   </div>
 
-  <p>Arthur Samuel coined the term in 1959. The idea: instead of writing rules by hand, we give a computer <em>examples</em>, and it figures out the rules itself.</p>
+  <p>Arthur Samuel coined the term back in 1959, and the core insight hasn't changed: instead of painstakingly writing if-this-then-that rules, you hand a computer a pile of <em>examples</em>, and it figures out the patterns itself. It's the difference between teaching someone to recognise a cat by listing every feline feature, versus just showing them a thousand pictures of cats.</p>
 
   <div class="accent-card">
     <h3>The Core Idea</h3>
-    <p style="margin:0">Find a function <strong style="color:var(--teal)">f</strong> such that <strong style="color:var(--teal)">f(X) ≈ y</strong> — mapping input features <strong style="color:var(--accent)">X</strong> to outputs <strong style="color:var(--amber)">y</strong>, learned from data rather than hand-crafted.</p>
+    <p style="margin:0">At its heart, ML is about finding a function <strong style="color:var(--teal)">f</strong> such that <strong style="color:var(--teal)">f(X) ≈ y</strong> — a mapping from input features <strong style="color:var(--accent)">X</strong> to outputs <strong style="color:var(--amber)">y</strong>, discovered from data rather than written by hand. The art lies in choosing how expressive that function should be, and how to search for it efficiently.</p>
   </div>
 
   <h3 style="margin-top:2rem">Three Learning Paradigms</h3>
@@ -564,19 +564,19 @@ canvas { display: block; width: 100%; max-height: 340px; }
     <div class="card-sm">
       <h4>Supervised</h4>
       <h3 style="color:var(--accent)">Labelled Data</h3>
-      <p style="font-size:13px;color:var(--muted)">Pairs of (input, correct answer). The model learns to predict the answer for new inputs.</p>
+      <p style="font-size:13px;color:var(--muted)">You provide pairs of (input, correct answer). The model learns to reproduce those answers — and then generalise that knowledge to inputs it's never seen before. Think of it like learning with an answer key.</p>
       <div><span class="tag tag-blue">Regression</span><span class="tag tag-blue">Classification</span></div>
     </div>
     <div class="card-sm">
       <h4>Unsupervised</h4>
       <h3 style="color:var(--teal)">No Labels</h3>
-      <p style="font-size:13px;color:var(--muted)">Just raw inputs. The model finds structure, patterns, or groups hidden in the data.</p>
+      <p style="font-size:13px;color:var(--muted)">No answer key here — just raw data. The algorithm explores on its own, surfacing hidden structure, natural groupings, or compact representations you might never have thought to look for.</p>
       <div><span class="tag tag-teal">Clustering</span><span class="tag tag-teal">Dim. Reduction</span></div>
     </div>
     <div class="card-sm">
       <h4>Reinforcement</h4>
       <h3 style="color:var(--amber)">Reward Signal</h3>
-      <p style="font-size:13px;color:var(--muted)">An agent takes actions in an environment and learns by maximising cumulative reward.</p>
+      <p style="font-size:13px;color:var(--muted)">An agent interacts with an environment, tries things, and receives rewards or penalties. Over many trials it learns a strategy — called a policy — that maximises long-term reward. This is how AlphaGo learned to play Go.</p>
       <div><span class="tag tag-amber">Games</span><span class="tag tag-amber">Robotics</span></div>
     </div>
   </div>
@@ -599,23 +599,23 @@ canvas { display: block; width: 100%; max-height: 340px; }
 
   <h3 style="margin-top:2rem">The ML Workflow</h3>
   <div class="steps">
-    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Collect & explore data</div><div class="step-desc">Gather labelled examples. Understand distributions, missing values, correlations (EDA).</div></div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Feature engineering</div><div class="step-desc">Transform raw data into meaningful numerical representations. Normalise, encode, create new features.</div></div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Choose & train a model</div><div class="step-desc">Select an algorithm, define a loss function, optimise parameters on the training set.</div></div></div>
-    <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Evaluate & tune</div><div class="step-desc">Measure generalisation on a held-out validation set. Tune hyperparameters. Check for over/underfitting.</div></div></div>
-    <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Deploy & monitor</div><div class="step-desc">Serve predictions in production. Watch for data drift and retrain as the world changes.</div></div></div>
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Collect & explore data</div><div class="step-desc">Garbage in, garbage out — quality data is everything. Gather labelled examples, then spend real time understanding them: check distributions, hunt for missing values, spot correlations, and look for surprises. This phase (EDA) usually takes longer than people expect, and saves enormous pain later.</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Feature engineering</div><div class="step-desc">Raw data rarely speaks directly to models. Transform it into meaningful numerical representations — normalise scales, encode categories, create interaction features, extract useful signals (like "day of week" from a timestamp). Great features can make a simple model outperform a complex one.</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Choose & train a model</div><div class="step-desc">Pick an algorithm that suits your data size, feature types, and interpretability needs. Define a loss function that captures what "wrong" means for your problem, then let an optimiser — usually gradient descent — tune the model's parameters on your training data.</div></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Evaluate & tune</div><div class="step-desc">A model that memorises training data is useless. Measure how well it generalises on a held-out validation set it has never seen. Tune hyperparameters, watch for overfitting or underfitting, and use cross-validation to make your estimates robust.</div></div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Deploy & monitor</div><div class="step-desc">Shipping to production is a beginning, not an end. Real-world data drifts — user behaviour shifts, sensor calibrations change, distributions evolve. Set up monitoring, track key metrics over time, and plan to retrain as the world changes around your model.</div></div></div>
   </div>
 
   <div class="two-col" style="margin-top:1.5rem">
     <div class="card-sm">
       <h4>Underfitting</h4>
-      <p style="font-size:13px;color:var(--muted)">Model is too simple — high bias. It misses patterns in training data and generalises poorly.</p>
-      <p style="font-size:13px;color:var(--coral)">Fix: add more features, use a more complex model, reduce regularisation.</p>
+      <p style="font-size:13px;color:var(--muted)">Your model is too simple to capture the real patterns — think trying to fit a straight line through data that clearly curves. It performs poorly even on training data, let alone on new examples. This is called <em>high bias</em>.</p>
+      <p style="font-size:13px;color:var(--coral)">Fix: add more features, switch to a more expressive model, or dial down regularisation.</p>
     </div>
     <div class="card-sm">
       <h4>Overfitting</h4>
-      <p style="font-size:13px;color:var(--muted)">Model memorises training data — high variance. Great on train, terrible on test.</p>
-      <p style="font-size:13px;color:var(--teal)">Fix: more data, regularisation (L1/L2/Dropout), simpler model, cross-validation.</p>
+      <p style="font-size:13px;color:var(--muted)">Your model has memorised the training data — noise and all. It scores brilliantly on training examples but falls apart on anything new. This is called <em>high variance</em>, and it's the more common pitfall.</p>
+      <p style="font-size:13px;color:var(--teal)">Fix: gather more data, apply regularisation (L1/L2/Dropout), simplify your model, or use cross-validation to catch it early.</p>
     </div>
   </div>
 </div>
@@ -625,11 +625,11 @@ canvas { display: block; width: 100%; max-height: 340px; }
   <div class="section-header">
     <div class="chip" style="color:var(--teal)">Supervised Learning</div>
     <h2>Regression</h2>
-    <p class="lead">Predict a <em>continuous</em> number — house prices, temperatures, stock returns.</p>
+    <p class="lead">When your output is a number on a continuous scale — house prices, temperatures, tomorrow's sales — regression is your starting point.</p>
   </div>
 
   <h3>Linear Regression</h3>
-  <p>The simplest model: assume the relationship between inputs and output is a straight line (or hyperplane in multiple dimensions). Fit a line through data by minimising the sum of squared errors.</p>
+  <p>The simplest model you can build: assume the relationship between your inputs and output can be described by a straight line (or a hyperplane when you have multiple features). You fit that line by finding the weights that minimise the total squared distance between your predictions and the true values. Surprisingly often, this simple idea works remarkably well.</p>
 
   <div class="formula-block">
     <div class="formula-label">Model hypothesis</div>
@@ -678,17 +678,17 @@ canvas { display: block; width: 100%; max-height: 340px; }
   </div>
 
   <h3>Regularisation</h3>
-  <p>Adding a penalty term to the loss prevents overfitting by keeping weights small.</p>
+  <p>When a model has many parameters, it can start fitting noise in the training data rather than genuine patterns. Regularisation adds a penalty to the loss function that discourages large weights — essentially telling the model "keep it simple unless the data really demands otherwise."</p>
   <div class="two-col">
     <div class="card-sm">
       <h4>Ridge (L2)</h4>
       <div style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--teal);margin:0.5rem 0">J + λ Σθⱼ²</div>
-      <p style="font-size:13px;color:var(--muted)">Shrinks all weights smoothly towards zero. Never makes them exactly zero. Good when all features matter a little.</p>
+      <p style="font-size:13px;color:var(--muted)">Penalises the <em>square</em> of each weight, which gently nudges all weights towards zero but never quite reaches it. Every feature gets to contribute a little. A good default when you believe all your features are genuinely relevant.</p>
     </div>
     <div class="card-sm">
       <h4>Lasso (L1)</h4>
       <div style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--amber);margin:0.5rem 0">J + λ Σ|θⱼ|</div>
-      <p style="font-size:13px;color:var(--muted)">Drives unimportant weights to exactly zero — built-in feature selection. Great for high-dimensional sparse problems.</p>
+      <p style="font-size:13px;color:var(--muted)">Penalises the <em>absolute value</em> of each weight, which has a sharper corner at zero — so unimportant weights get pushed all the way to exactly zero. You get automatic feature selection for free. Excellent when you suspect most of your features are irrelevant.</p>
     </div>
   </div>
 
@@ -725,7 +725,7 @@ model.fit(X_train, y_train)
 print(<span class="fn">f</span><span class="st">"R² = {model.score(X_test, y_test):.4f}"</span>)</pre>
 
   <h3>Evaluation Metrics</h3>
-  <p style="font-size:13px;color:var(--muted)">Regression metrics all measure <em>how far off</em> predictions are from truth, just in different ways. Pick the metric that matches your tolerance for large errors.</p>
+  <p style="font-size:13px;color:var(--muted)">Regression metrics all ask the same fundamental question — <em>how far off are your predictions from reality?</em> — but they answer it in subtly different ways. Your choice of metric should reflect what "wrong" actually costs in your problem. An error of 10 units might be catastrophic in one context and totally acceptable in another.</p>
 
   <div class="formula-block">
     <div class="formula-label">Core regression metrics</div>
@@ -743,37 +743,37 @@ print(<span class="fn">f</span><span class="st">"R² = {model.score(X_test, y_te
     <div class="card-sm">
       <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--accent);margin-bottom:0.3rem">MAE</div>
       <h3>Mean Absolute Error</h3>
-      <p style="font-size:13px;color:var(--muted)">Average absolute residual. Same units as target. Robust to outliers — a single huge error doesn't dominate. Easiest to interpret for stakeholders.</p>
+      <p style="font-size:13px;color:var(--muted)">Takes every prediction error, ignores the sign, and averages them. Because it doesn't square errors, a single catastrophic mistake doesn't dominate the score — each error contributes proportionally. The result is in the same units as your target, making it easy to explain to non-technical stakeholders ("our predictions are off by about $X on average").</p>
       <div style="font-size:11px;color:var(--teal);margin-top:0.5rem">Use when: outliers shouldn't be over-penalised</div>
     </div>
     <div class="card-sm">
       <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--amber);margin-bottom:0.3rem">RMSE</div>
       <h3>Root Mean Squared Error</h3>
-      <p style="font-size:13px;color:var(--muted)">Squares errors before averaging, so large mistakes hurt much more. Same units as target. The most common default for regression. Differentiable everywhere.</p>
+      <p style="font-size:13px;color:var(--muted)">Squares each error before averaging, then takes the square root to return to the original units. Crucially, squaring means large errors hurt <em>much</em> more than small ones — a prediction that's off by 10 contributes 100× more than one off by 1. If big mistakes are unacceptable in your use case, RMSE will penalise your model accordingly.</p>
       <div style="font-size:11px;color:var(--teal);margin-top:0.5rem">Use when: large errors are especially costly</div>
     </div>
     <div class="card-sm">
       <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--green);margin-bottom:0.3rem">R²</div>
       <h3>Coefficient of Determination</h3>
-      <p style="font-size:13px;color:var(--muted)">Fraction of target variance explained by the model. Unitless and scale-free. R²=1 is perfect; R²=0 means no better than always predicting the mean; negative = actively harmful.</p>
+      <p style="font-size:13px;color:var(--muted)">Answers the question: "how much of the variance in the target did my model actually explain?" It's unitless and scale-free, so you can meaningfully compare models across completely different problems. R²=1 is perfect prediction; R²=0 means your model is no better than just predicting the mean every time; negative means it's actively worse — a red flag.</p>
       <div style="font-size:11px;color:var(--teal);margin-top:0.5rem">Use when: comparing models on different scales</div>
     </div>
     <div class="card-sm">
       <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--pink);margin-bottom:0.3rem">Adj R²</div>
       <h3>Adjusted R²</h3>
-      <p style="font-size:13px;color:var(--muted)">Penalises adding useless features. R² always increases when you add any variable; Adj R² only increases if the new feature actually improves the model more than chance would.</p>
+      <p style="font-size:13px;color:var(--muted)">A known flaw of R²: it can only go up when you add features, even completely random ones. Adjusted R² corrects for this by penalising model complexity. It only improves when a new feature genuinely earns its keep — contributing more signal than a random variable would. Essential when comparing models with different numbers of features.</p>
       <div style="font-size:11px;color:var(--teal);margin-top:0.5rem">Use when: comparing models with different feature counts</div>
     </div>
     <div class="card-sm">
       <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--coral);margin-bottom:0.3rem">MAPE</div>
       <h3>Mean Absolute % Error</h3>
-      <p style="font-size:13px;color:var(--muted)">Error expressed as a percentage of the true value. Intuitive for business reporting. Undefined when y=0 and penalises under-forecasts more than over-forecasts.</p>
+      <p style="font-size:13px;color:var(--muted)">Expresses error as a percentage of the true value — so being off by 5 on a value of 10 is far worse than being off by 5 on a value of 10,000. Highly intuitive for business reporting ("our forecast was within 8% on average"). Watch out though: it breaks down completely when true values are zero or near-zero, and it systematically penalises under-forecasts more harshly than over-forecasts.</p>
       <div style="font-size:11px;color:var(--teal);margin-top:0.5rem">Use when: relative error matters more than absolute</div>
     </div>
     <div class="card-sm">
       <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--accent2);margin-bottom:0.3rem">Huber</div>
       <h3>Huber Loss</h3>
-      <p style="font-size:13px;color:var(--muted)">Quadratic for small errors (like MSE), linear for large errors (like MAE). Controlled by threshold δ. Best of both worlds when data has occasional outliers.</p>
+      <p style="font-size:13px;color:var(--muted)">A clever hybrid: behaves like MSE for small errors (smooth and differentiable, good for training), but switches to MAE-like behaviour for large errors (less sensitive to outliers). The transition point δ is a hyperparameter you set. It's the go-to choice when your data has occasional extreme values that you don't want driving your training off a cliff.</p>
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--amber)">L = ½r² if |r|≤δ, else δ(|r|−½δ)</div>
     </div>
   </div>
@@ -781,11 +781,11 @@ print(<span class="fn">f</span><span class="st">"R² = {model.score(X_test, y_te
   <div class="accent-card" style="margin-top:1.5rem">
     <h3>Quick decision guide</h3>
     <p style="margin:0;font-size:13px;color:var(--muted)">
-      Outliers present → prefer <strong style="color:var(--accent)">MAE</strong> or <strong style="color:var(--accent2)">Huber</strong>.
-      Large errors very costly → use <strong style="color:var(--amber)">RMSE</strong>.
-      Need % intuition → use <strong style="color:var(--coral)">MAPE</strong>.
-      Comparing across datasets → use <strong style="color:var(--green)">R²</strong>.
-      Always report multiple metrics — no single number tells the whole story.
+      Outliers in your data? Reach for <strong style="color:var(--accent)">MAE</strong> or <strong style="color:var(--accent2)">Huber</strong> — they won't let a few bad rows dominate.
+      Large errors are especially costly? Use <strong style="color:var(--amber)">RMSE</strong> to make the model sweat the big mistakes.
+      Need to explain results in % terms? <strong style="color:var(--coral)">MAPE</strong> translates naturally for non-technical audiences.
+      Comparing models trained on different datasets? <strong style="color:var(--green)">R²</strong> gives a fair, scale-free comparison.
+      One final tip: always report two or three metrics together — no single number ever tells the whole story.
     </p>
   </div>
 </div>
@@ -795,11 +795,11 @@ print(<span class="fn">f</span><span class="st">"R² = {model.score(X_test, y_te
   <div class="section-header">
     <div class="chip" style="color:var(--amber)">Supervised Learning</div>
     <h2>Classification</h2>
-    <p class="lead">Predict a <em>discrete category</em> — spam/not-spam, disease/healthy, which digit 0–9.</p>
+    <p class="lead">When the answer is a category — spam or not, which digit, which disease — you need a classifier rather than a regressor.</p>
   </div>
 
   <h3>Logistic Regression</h3>
-  <p>Despite the name, it's a <em>classifier</em>. We squash the linear output through a sigmoid to get a probability between 0 and 1.</p>
+  <p>Don't let the name fool you — logistic regression is a <em>classifier</em>, not a regressor. The trick: take the usual linear combination of features, then squash it through a sigmoid function that maps any real number to a value strictly between 0 and 1. That output is a <em>probability</em> — "how confident am I that this example belongs to class 1?" You then apply a threshold (usually 0.5) to get a hard decision.</p>
 
   <div class="formula-block">
     <div class="formula-label">Sigmoid activation</div>
@@ -832,7 +832,7 @@ print(<span class="fn">f</span><span class="st">"R² = {model.score(X_test, y_te
   </div>
 
   <h3 style="margin-top:1.5rem">Confusion Matrix</h3>
-  <p>The fundamental tool for evaluating classifiers. Breaks down predictions into 4 quadrants.</p>
+  <p>The most honest diagnostic tool for any classifier. Rather than collapsing everything into one number, it lays out exactly <em>which kinds of mistakes</em> your model is making — a crucial distinction when different error types have very different real-world consequences (missing a cancer diagnosis vs. a false alarm are not symmetric problems).</p>
   <div class="cm-grid">
     <div class="cm-cell"></div>
     <div class="cm-label">Predicted +</div>
@@ -858,84 +858,84 @@ print(<span class="fn">f</span><span class="st">"R² = {model.score(X_test, y_te
   </div>
 
   <h3 style="margin-top:2rem">Evaluation Metrics — deep dive</h3>
-  <p style="font-size:13px;color:var(--muted)">Accuracy is often misleading. On a 99% negative dataset, a model that always says "negative" gets 99% accuracy but is completely useless. These metrics give a fuller picture.</p>
+  <p style="font-size:13px;color:var(--muted)">Here's a trap almost everyone falls into: reporting accuracy and calling it done. On an imbalanced dataset (say, 99% of cases are negative), a model that blindly predicts "negative" every single time scores 99% accuracy — yet it's completely useless. These metrics exist to expose exactly that kind of failure, giving you a far richer picture of where your model actually succeeds and where it breaks down.</p>
 
   <div class="card-grid">
     <div class="card-sm">
       <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--teal);margin-bottom:0.3rem">Accuracy</div>
       <h3>Overall Correctness</h3>
-      <p style="font-size:13px;color:var(--muted)">Fraction of all predictions that are correct. Misleading when classes are imbalanced. The baseline you must beat.</p>
+      <p style="font-size:13px;color:var(--muted)">The fraction of all predictions that were correct. Simple and intuitive, but dangerously misleading on imbalanced datasets. Always check what the "naive" baseline accuracy would be before trusting this number.</p>
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--teal)">(TP+TN) / (TP+TN+FP+FN)</div>
     </div>
     <div class="card-sm">
       <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--accent);margin-bottom:0.3rem">Precision</div>
       <h3>"When you say yes, are you right?"</h3>
-      <p style="font-size:13px;color:var(--muted)">Of all the items predicted positive, how many actually are? Optimise this when false positives are costly — e.g. spam filters (don't block real emails).</p>
+      <p style="font-size:13px;color:var(--muted)">Of everything your model flagged as positive, what fraction actually was? High precision means few false alarms. This is the metric to optimise when the cost of a false positive is high — for example, in a spam filter, incorrectly blocking a legitimate email is a real problem.</p>
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent)">TP / (TP + FP)</div>
     </div>
     <div class="card-sm">
       <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--amber);margin-bottom:0.3rem">Recall</div>
       <h3>"Do you catch everything positive?"</h3>
-      <p style="font-size:13px;color:var(--muted)">Of all actual positives, how many did you find? Optimise this when false negatives are costly — e.g. cancer screening (don't miss cases).</p>
+      <p style="font-size:13px;color:var(--muted)">Of all the actual positives in your data, how many did you catch? High recall means few missed detections. Prioritise this when missing a positive is catastrophic — cancer screening is the classic example: you'd rather flag 10 healthy patients for further tests than miss one real case.</p>
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--amber)">TP / (TP + FN)</div>
     </div>
     <div class="card-sm">
       <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--coral);margin-bottom:0.3rem">F1 Score</div>
       <h3>Harmonic Mean of P & R</h3>
-      <p style="font-size:13px;color:var(--muted)">Balances precision and recall into one number. Punishes extreme imbalances — a model with P=1, R=0 gets F1=0. Good default for imbalanced datasets.</p>
+      <p style="font-size:13px;color:var(--muted)">Since precision and recall trade off against each other, you often need a single number that captures both. The F1 score is their harmonic mean — and crucially, the harmonic mean punishes extreme imbalances: a model with perfect precision but zero recall still gets an F1 of 0. A solid default when classes are imbalanced.</p>
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--coral)">2 · (P · R) / (P + R)</div>
     </div>
     <div class="card-sm">
       <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--green);margin-bottom:0.3rem">AUC-ROC</div>
       <h3>Area Under ROC Curve</h3>
-      <p style="font-size:13px;color:var(--muted)">Plots True Positive Rate vs False Positive Rate at all thresholds. AUC=1 is perfect; AUC=0.5 is random chance. Threshold-independent — great for comparing models.</p>
+      <p style="font-size:13px;color:var(--muted)">Instead of evaluating at one threshold, AUC-ROC sweeps across all possible thresholds and asks: how well does my model <em>rank</em> positives above negatives? AUC of 1.0 means perfect separation; 0.5 is pure random chance. Because it's threshold-independent, it's ideal for comparing two models head-to-head without committing to a deployment threshold.</p>
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--green)">∫₀¹ TPR(FPR) d(FPR)</div>
     </div>
     <div class="card-sm">
       <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--pink);margin-bottom:0.3rem">AUC-PR</div>
       <h3>Precision-Recall AUC</h3>
-      <p style="font-size:13px;color:var(--muted)">Area under the Precision–Recall curve. More informative than ROC-AUC on heavily imbalanced datasets where the negative class dominates. Higher is always better.</p>
+      <p style="font-size:13px;color:var(--muted)">On heavily imbalanced datasets — fraud detection, rare disease diagnosis — the ROC curve can look deceptively optimistic because there are so many true negatives. The Precision-Recall curve ignores true negatives entirely, focusing only on how well you identify the rare positive class. If positives are rare, this is the curve you should be watching.</p>
       <div style="font-size:11px;color:var(--teal);margin-top:0.4rem">Preferred for: fraud detection, rare disease</div>
     </div>
     <div class="card-sm">
       <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--accent2);margin-bottom:0.3rem">Log Loss</div>
       <h3>Cross-Entropy Loss</h3>
-      <p style="font-size:13px;color:var(--muted)">Measures quality of predicted probabilities, not just the hard class label. Penalises confident wrong predictions very harshly. Used directly as training objective in logistic regression.</p>
+      <p style="font-size:13px;color:var(--muted)">Unlike accuracy (which only cares whether you're right or wrong), log loss cares about <em>how confident</em> you were. If you predicted 99% probability and got it wrong, you'll be punished far more than if you'd predicted 51%. This forces your model to be well-calibrated — not just correct, but appropriately certain.</p>
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2)">−(1/m)Σ[y log ŷ + (1−y)log(1−ŷ)]</div>
     </div>
     <div class="card-sm">
       <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--amber);margin-bottom:0.3rem">MCC</div>
       <h3>Matthews Correlation Coefficient</h3>
-      <p style="font-size:13px;color:var(--muted)">Takes all four confusion matrix cells into account. Regarded as the most informative single metric for binary classification. Ranges −1 (inverse) → 0 (random) → +1 (perfect).</p>
+      <p style="font-size:13px;color:var(--muted)">Widely considered the most honest single metric for binary classification, because it incorporates all four cells of the confusion matrix equally. It's essentially a correlation coefficient between your predictions and the ground truth — so 0 means no better than random, +1 means perfect, and −1 means perfectly <em>inverted</em>. It remains meaningful even when classes are wildly imbalanced.</p>
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--amber)">(TP·TN − FP·FN) / √((TP+FP)(TP+FN)(TN+FP)(TN+FN))</div>
     </div>
   </div>
 
   <div class="accent-card" style="margin-top:0.5rem">
     <h3>Precision vs Recall trade-off</h3>
-    <p style="margin:0;font-size:13px;color:var(--muted)">You control this with your decision <strong style="color:var(--text)">threshold</strong> (default 0.5). Lower the threshold → catch more positives (↑ Recall, ↓ Precision). Raise it → fewer false alarms (↑ Precision, ↓ Recall). Always tune the threshold after training, not before.</p>
+    <p style="margin:0;font-size:13px;color:var(--muted)">You control this trade-off with your decision <strong style="color:var(--text)">threshold</strong> (default 0.5, but rarely optimal). Lower the threshold → your model flags more things as positive, catching more true cases but also generating more false alarms (↑ Recall, ↓ Precision). Raise it → fewer flags, fewer false alarms, but you'll miss more real cases (↑ Precision, ↓ Recall). The key insight: always tune your threshold <em>after</em> training, based on what your use case actually requires. Don't assume 0.5 is right.</p>
   </div>
 
   <h3>Other Algorithms</h3>
   <div class="card-grid">
     <div class="card-sm">
       <h4>Decision Tree</h4>
-      <p style="font-size:13px;color:var(--muted)">Recursively splits data by asking yes/no questions on features. Highly interpretable. Prone to overfit alone.</p>
+      <p style="font-size:13px;color:var(--muted)">Learns a series of yes/no questions about features, splitting the data recursively until it can make confident predictions. The result is a flowchart you can literally draw and explain to anyone — a huge advantage when interpretability matters. The downside: a single tree tends to overfit and is sensitive to small changes in data.</p>
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--teal)">Split criterion: max Information Gain or min Gini Impurity</div>
     </div>
     <div class="card-sm">
       <h4>SVM</h4>
-      <p style="font-size:13px;color:var(--muted)">Find the hyperplane with maximum margin between classes. Kernel trick maps data to higher dimensions for non-linear boundaries.</p>
+      <p style="font-size:13px;color:var(--muted)">Finds the decision boundary that maximises the gap (margin) between the two classes — specifically, it's determined by the hardest examples near the boundary, called support vectors. For non-linearly separable data, the kernel trick implicitly maps your features into a higher-dimensional space where a linear boundary works.</p>
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--amber)">min ½‖w‖² s.t. yᵢ(wᵀxᵢ+b) ≥ 1</div>
     </div>
     <div class="card-sm">
       <h4>k-Nearest Neighbours</h4>
-      <p style="font-size:13px;color:var(--muted)">Predict by majority vote of the k closest training examples. No explicit training phase — just store and look up.</p>
+      <p style="font-size:13px;color:var(--muted)">The simplest possible approach: to classify a new point, find the k training examples closest to it and take a majority vote. There's no training phase — you just store all your data and look up neighbours at prediction time. Intuitive and surprisingly effective for small datasets, but slow and memory-hungry at scale.</p>
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--coral)">distance(a,b) = √Σ(aᵢ−bᵢ)²</div>
     </div>
     <div class="card-sm">
       <h4>Naive Bayes</h4>
-      <p style="font-size:13px;color:var(--muted)">Applies Bayes' theorem assuming features are conditionally independent given the class. Blazing fast. Great for text.</p>
+      <p style="font-size:13px;color:var(--muted)">Uses Bayes' theorem to compute the probability of each class given the features — with one simplifying assumption: that features are conditionally independent of each other given the class. The "naive" assumption is rarely true, but the algorithm works remarkably well in practice, particularly for text classification like spam filtering.</p>
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--pink)">P(y|X) ∝ P(y) Πᵢ P(xᵢ|y)</div>
     </div>
   </div>
@@ -965,11 +965,11 @@ print(<span class="fn">f</span><span class="st">"CV F1: {cv_scores.mean():.3f} �
   <div class="section-header">
     <div class="chip" style="color:var(--coral)">Unsupervised Learning</div>
     <h2>Clustering</h2>
-    <p class="lead">Find natural groups in data — <em>without</em> any labels. The algorithm discovers structure on its own.</p>
+    <p class="lead">Discover the natural structure hiding in your data — without any labels to guide you. The algorithm finds it on its own.</p>
   </div>
 
   <h3>k-Means Clustering</h3>
-  <p>Partition n points into k clusters by minimising within-cluster variance. Simple, fast, widely used.</p>
+  <p>The workhorse of clustering: divide your data into k groups by repeatedly asking "which centroid is each point closest to?" and "where should each centroid be, given its assigned points?". It's fast, intuitive, and scales well. The catch: you have to decide in advance how many clusters you want — which isn't always obvious. That's what the Elbow Method below is for.</p>
 
   <div class="formula-block">
     <div class="formula-label">k-Means Objective (Inertia)</div>
@@ -982,10 +982,10 @@ print(<span class="fn">f</span><span class="st">"CV F1: {cv_scores.mean():.3f} �
   </div>
 
   <div class="steps" style="margin-top:1.5rem">
-    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Initialise</div><div class="step-desc">Randomly pick k points as initial centroids (k-means++ picks them far apart for better initialisation).</div></div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Assign</div><div class="step-desc">Assign each data point to the nearest centroid. This creates k clusters.</div></div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Update</div><div class="step-desc">Move each centroid to the mean position of all points assigned to it.</div></div></div>
-    <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Repeat</div><div class="step-desc">Alternate Assign ↔ Update until centroids stop moving (convergence). Always converges in finite steps.</div></div></div>
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Initialise</div><div class="step-desc">Randomly pick k data points as your starting centroids. (The smarter k-means++ variant spreads them apart, reducing the chance of a bad initialisation — highly recommended in practice.)</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Assign</div><div class="step-desc">For every data point, calculate its distance to each centroid and assign it to the nearest one. This partitions your data into k clusters.</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Update</div><div class="step-desc">Recompute each centroid as the mean (average position) of all points currently assigned to it. The centroids shift to the "centre of gravity" of their cluster.</div></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Repeat</div><div class="step-desc">Alternate between Assign and Update until the centroids stop moving — or move less than some tiny threshold. The algorithm is guaranteed to converge in a finite number of steps, though it may find a local minimum rather than the global best.</div></div></div>
   </div>
 
   <h3>Interactive: k-Means Sandbox</h3>
@@ -1005,7 +1005,7 @@ print(<span class="fn">f</span><span class="st">"CV F1: {cv_scores.mean():.3f} �
   </div>
 
   <h3 style="margin-top:1.5rem">Choosing k — the Elbow Method</h3>
-  <p style="font-size:13px;color:var(--muted)">Plot inertia vs k. The "elbow" — where the rate of decrease sharply slows — is usually the best k.</p>
+  <p style="font-size:13px;color:var(--muted)">Run k-means with k=1, 2, 3… and record the total inertia (within-cluster sum of squares) each time. More clusters always reduces inertia, but at some point you're just splitting real groups apart unnecessarily. The "elbow" is where adding another cluster stops giving you a meaningful improvement — that's typically the right k. It's not always perfectly sharp, so use it as a guide alongside domain knowledge.</p>
   <div class="ts-chart-wrap" style="height:220px;padding:1rem">
     <canvas id="elbowChart"></canvas>
   </div>
@@ -1014,17 +1014,17 @@ print(<span class="fn">f</span><span class="st">"CV F1: {cv_scores.mean():.3f} �
   <div class="card-grid">
     <div class="card-sm">
       <h4>DBSCAN</h4>
-      <p style="font-size:13px;color:var(--muted)">Density-based. Finds arbitrarily shaped clusters and marks outliers as noise. No need to specify k upfront.</p>
+      <p style="font-size:13px;color:var(--muted)">Rather than finding clusters by distance to centroids, DBSCAN looks for dense regions of points. It can discover clusters of any shape — rings, crescents, blobs — and anything that doesn't belong to a dense region gets labelled as noise/outlier. No need to specify k in advance, but you do need to tune the density radius ε and minimum points parameters.</p>
       <div><span class="tag tag-teal">Works with noise</span><span class="tag tag-teal">Arbitrary shapes</span></div>
     </div>
     <div class="card-sm">
       <h4>Hierarchical</h4>
-      <p style="font-size:13px;color:var(--muted)">Builds a tree (dendrogram) of nested clusters. Cut the tree at any height to get any number of clusters.</p>
+      <p style="font-size:13px;color:var(--muted)">Builds a tree-like structure (a dendrogram) showing how clusters merge or split at different scales. You don't need to commit to a number of clusters upfront — just cut the tree at whatever height suits your analysis. Excellent for exploring data structure, though it can be slow on very large datasets.</p>
       <div><span class="tag tag-amber">No k needed</span><span class="tag tag-amber">Dendrogram</span></div>
     </div>
     <div class="card-sm">
       <h4>Gaussian Mixture</h4>
-      <p style="font-size:13px;color:var(--muted)">Soft assignments — each point has a probability of belonging to each cluster. Fitted via EM algorithm.</p>
+      <p style="font-size:13px;color:var(--muted)">Instead of hard assignments (each point belongs to exactly one cluster), GMM gives every point a <em>probability</em> of belonging to each cluster. Clusters are modelled as Gaussian distributions, and the model is fit via the EM algorithm. Particularly useful when clusters overlap and hard boundaries feel artificial.</p>
       <div><span class="tag tag-coral">Probabilistic</span><span class="tag tag-coral">Soft clustering</span></div>
     </div>
   </div>
@@ -1056,25 +1056,25 @@ labels = db.labels_                    <span class="cm"># -1 = noise</span>
 n_clusters = len(set(labels)) - (<span class="nb">1</span> <span class="kw">if</span> -<span class="nb">1</span> <span class="kw">in</span> labels <span class="kw">else</span> <span class="nb">0</span>)</pre>
 
   <h3 style="margin-top:1.5rem">Evaluation Metrics</h3>
-  <p style="font-size:13px;color:var(--muted)">Clustering is unsupervised — there are no ground-truth labels to compare against. Metrics fall into two families: <em>internal</em> (use only the data itself) and <em>external</em> (require ground-truth labels for benchmarking).</p>
+  <p style="font-size:13px;color:var(--muted)">Evaluating clustering is genuinely tricky — unlike supervised learning, there's no ground truth to compare against in real-world use. Instead, metrics fall into two camps: <em>internal</em> metrics, which assess cluster quality using only the data itself, and <em>external</em> metrics, which require pre-labelled data and are mostly used for benchmarking on known datasets.</p>
 
   <div class="two-col" style="margin-top:1rem">
     <div>
       <h4>Internal metrics (no labels needed)</h4>
       <div class="card-sm" style="margin-bottom:0.75rem">
         <div style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--teal);margin-bottom:0.3rem">Silhouette Score</div>
-        <p style="font-size:13px;color:var(--muted)">For each point, compares how similar it is to its own cluster vs the nearest other cluster. Ranges −1 → +1. Higher means better-separated clusters. The gold standard internal metric.</p>
+        <p style="font-size:13px;color:var(--muted)">For each point, asks: "how similar am I to my own cluster compared to the nearest other cluster?" A score near +1 means you're well inside your cluster; near 0 means you're on a boundary; negative means you're probably in the wrong cluster. The average silhouette score across all points is a robust measure of how well your clusters are defined. It's the internal metric to reach for first.</p>
         <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent)">s = (b − a) / max(a, b)</div>
         <div style="font-size:11px;color:var(--muted);margin-top:4px"><code style="color:var(--teal)">a</code> = mean intra-cluster distance &nbsp; <code style="color:var(--amber)">b</code> = mean nearest-cluster distance</div>
       </div>
       <div class="card-sm" style="margin-bottom:0.75rem">
         <div style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--amber);margin-bottom:0.3rem">Inertia (WCSS)</div>
-        <p style="font-size:13px;color:var(--muted)">Sum of squared distances from each point to its cluster centroid. Used in the elbow method. Lower = tighter clusters. Not comparable across different k values on its own.</p>
+        <p style="font-size:13px;color:var(--muted)">The total sum of squared distances from each point to its assigned centroid — a direct measure of how tight and compact your clusters are. Lower is better, but inertia always decreases as you add more clusters (even trivially), so you shouldn't compare raw inertia values across different k. Use it for the elbow plot, not as a standalone quality score.</p>
         <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--amber)">Σₖ Σᵢ∈Cₖ ‖xᵢ − μₖ‖²</div>
       </div>
       <div class="card-sm">
         <div style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--coral);margin-bottom:0.3rem">Davies-Bouldin Index</div>
-        <p style="font-size:13px;color:var(--muted)">Ratio of within-cluster scatter to between-cluster separation. Lower is better (0 is perfect). Penalises clusters that are large and close together.</p>
+        <p style="font-size:13px;color:var(--muted)">Computes a ratio of within-cluster scatter to between-cluster distance for every pair of clusters, then averages the worst cases. A lower score means clusters are compact and well-separated. Zero would be perfect. It's particularly useful for diagnosing which specific clusters are problematic — the ones with high DB contributions are the ones bleeding into each other.</p>
         <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--coral)">DB = (1/k) Σᵢ maxⱼ≠ᵢ (σᵢ+σⱼ)/d(μᵢ,μⱼ)</div>
       </div>
     </div>
@@ -1082,17 +1082,17 @@ n_clusters = len(set(labels)) - (<span class="nb">1</span> <span class="kw">if</
       <h4>External metrics (need ground truth)</h4>
       <div class="card-sm" style="margin-bottom:0.75rem">
         <div style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--green);margin-bottom:0.3rem">Adjusted Rand Index</div>
-        <p style="font-size:13px;color:var(--muted)">Compares cluster assignments to true labels by looking at all pairs of points. Corrected for chance — random clustering scores ~0. Perfect agreement scores 1.</p>
+        <p style="font-size:13px;color:var(--muted)">Looks at every pair of points and asks: did the clustering agree with the ground truth labels about whether they should be together or apart? Crucially, it's adjusted for chance — so randomly assigning clusters scores near 0, not some inflated value. Perfect agreement with the true labels gives +1.</p>
         <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--green)">ARI ∈ [−1, 1], chance-corrected</div>
       </div>
       <div class="card-sm" style="margin-bottom:0.75rem">
         <div style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--pink);margin-bottom:0.3rem">Normalised Mutual Info</div>
-        <p style="font-size:13px;color:var(--muted)">Information-theoretic measure of how much knowing the cluster assignment tells you about the true label. Normalised to [0, 1]. Insensitive to label permutations.</p>
+        <p style="font-size:13px;color:var(--muted)">An information-theoretic perspective: how much does knowing a point's cluster assignment tell you about its true label? Scaled to [0, 1] so it's easy to interpret, and it doesn't matter if you've permuted the cluster labels (cluster 1 vs. cluster 2 is arbitrary, after all). Useful when you want a single number to compare different clustering configurations against a known ground truth.</p>
         <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--pink)">NMI = I(Y;C) / √[H(Y)·H(C)]</div>
       </div>
       <div class="card-sm">
         <div style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--accent);margin-bottom:0.3rem">Homogeneity & Completeness</div>
-        <p style="font-size:13px;color:var(--muted)"><strong style="color:var(--text)">Homogeneity:</strong> each cluster contains only one class. <strong style="color:var(--text)">Completeness:</strong> all members of a class are in the same cluster. V-measure is their harmonic mean — analogous to F1.</p>
+        <p style="font-size:13px;color:var(--muted)"><strong style="color:var(--text)">Homogeneity</strong> asks: does each cluster contain only members of a single class? <strong style="color:var(--text)">Completeness</strong> asks: are all members of a given class placed into the same cluster? You'd want both — but they trade off like precision and recall do. V-measure takes their harmonic mean, giving you one balanced score that's zero if either property is completely absent.</p>
         <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent)">V = 2 · hom · comp / (hom + comp)</div>
       </div>
     </div>
@@ -1113,19 +1113,19 @@ n_clusters = len(set(labels)) - (<span class="nb">1</span> <span class="kw">if</
   <div class="section-header">
     <div class="chip" style="color:var(--green)">Meta-Learning</div>
     <h2>Ensemble Methods</h2>
-    <p class="lead">Combine many weak learners into one powerful predictor. The wisdom of crowds — for models.</p>
+    <p class="lead">Why bet on one model when you can combine many? Ensemble methods are some of the most reliable and battle-tested algorithms in all of machine learning.</p>
   </div>
 
-  <p>A single decision tree is unstable (high variance). A single linear model is rigid (high bias). Ensemble methods fix this by <em>combining many models</em>. The key insight: errors that are uncorrelated tend to cancel out.</p>
+  <p>A single decision tree is brittle — small changes to the data can result in a completely different tree (high variance). A single linear model is too rigid to capture complex patterns (high bias). Ensemble methods escape both traps by training many models and combining their outputs. The magic: individual errors tend to cancel out when they're uncorrelated. A wrong guess from one model gets outvoted by correct guesses from the others.</p>
 
   <div class="accent-card">
     <h3>Bias–Variance Decomposition</h3>
     <p style="margin:0">Expected Error = <span style="color:var(--coral)">Bias²</span> + <span style="color:var(--accent)">Variance</span> + <span style="color:var(--muted)">Irreducible Noise</span></p>
-    <p style="margin-top:0.5rem;font-size:13px;color:var(--muted)">Bagging reduces variance. Boosting reduces bias. Stacking can reduce both.</p>
+    <p style="margin-top:0.5rem;font-size:13px;color:var(--muted)">This decomposition explains <em>why</em> ensembles work so well. Bagging trains models on different data samples, so their errors are less correlated — averaging them out reduces variance without touching bias. Boosting takes the opposite approach: it trains models sequentially to correct each other's mistakes, reducing bias. Stacking is flexible enough to reduce both, by learning how to optimally combine diverse base models.</p>
   </div>
 
   <h3 style="margin-top:2rem">1. Bagging — Bootstrap Aggregating</h3>
-  <p>Train many models on different <em>bootstrap samples</em> (random subsets with replacement) of the data. Average their predictions. Models are independent — they reduce variance.</p>
+  <p>Create B versions of your training dataset by sampling with replacement (bootstrapping), train an independent model on each, then average their predictions. Because each model sees slightly different data, they make different mistakes — and averaging washes those mistakes out. The models are trained in parallel, so bagging is fast even with large ensembles.</p>
 
   <div class="formula-block">
     <div class="formula-label">Bagging prediction</div>
@@ -1138,34 +1138,34 @@ n_clusters = len(set(labels)) - (<span class="nb">1</span> <span class="kw">if</
 
   <div class="card-sm" style="margin-bottom:1.5rem">
     <h4>Random Forest</h4>
-    <p style="font-size:13px;color:var(--muted)">Bagging + extra randomness: at each split, only a random subset of √n features is considered. This de-correlates trees further, giving a huge variance reduction. One of the most reliable general-purpose algorithms.</p>
+    <p style="font-size:13px;color:var(--muted)">Random Forest takes bagging one step further: not only does each tree see different data, but at each split it can only consider a random subset of features. This decorrelates the trees further — preventing them all from making the same mistake when one feature is particularly dominant. The result is one of the most reliable, low-effort algorithms in existence. It handles mixed data types, is robust to outliers, and gives you feature importances for free.</p>
     <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--teal)">features per split ≈ √n (classification) or n/3 (regression)</div>
   </div>
 
   <h3>2. Boosting — Sequential Error Correction</h3>
-  <p>Train models <em>sequentially</em>, each one focusing on the mistakes of the previous. Combines many weak learners (stumps) into a strong one. Reduces both bias and variance.</p>
+  <p>Where bagging trains models independently in parallel, boosting trains them <em>one after another</em> — each new model specifically targeting the cases the previous models got wrong. Start with a simple model, find what it struggles with, train the next model to focus on those hard examples, and keep going. The result is a powerful model built from many simple "stumps" that collectively cover each other's blind spots.</p>
 
   <div class="two-col">
     <div class="card-sm">
       <h4>AdaBoost</h4>
-      <p style="font-size:13px;color:var(--muted)">Re-weights training examples after each round. Misclassified points get higher weight — next learner pays more attention to hard cases.</p>
+      <p style="font-size:13px;color:var(--muted)">After each training round, misclassified examples get their weights increased — so the next learner is forced to pay more attention to the hard cases. Final predictions are a weighted vote of all learners, where more accurate learners get higher say. Elegant and interpretable, though sensitive to noisy data and outliers.</p>
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent)">ŷ = sign(Σᵦ αᵦ hᵦ(x))</div>
     </div>
     <div class="card-sm">
       <h4>Gradient Boosting</h4>
-      <p style="font-size:13px;color:var(--muted)">Each new tree fits the <em>residuals</em> (pseudo-residuals = negative gradient of loss) of the current ensemble. Generalises boosting to any differentiable loss.</p>
+      <p style="font-size:13px;color:var(--muted)">Each new tree is fit to the <em>residuals</em> of the current ensemble — specifically, the negative gradient of the loss function with respect to the current predictions. This generalises boosting to any differentiable loss, making it incredibly flexible. Slower to train than bagging (can't parallelise), but typically achieves better accuracy on tabular data.</p>
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--amber)">Fₜ(x) = Fₜ₋₁(x) + α · hₜ(x)</div>
     </div>
   </div>
 
   <div class="card-sm" style="margin-top:1rem">
     <h4>XGBoost / LightGBM / CatBoost</h4>
-    <p style="font-size:13px;color:var(--muted)">Industrial-strength gradient boosting libraries. They add regularisation (L1/L2 on tree weights), second-order gradient approximations, GPU support, and handling of missing values. XGBoost won dozens of Kaggle competitions; LightGBM is faster with very large datasets.</p>
+    <p style="font-size:13px;color:var(--muted)">These libraries took gradient boosting from a textbook algorithm to a competition-winning machine. Beyond the core boosting logic, they add L1/L2 regularisation on tree weights, second-order gradient information for faster convergence, built-in handling of missing values, GPU acceleration, and clever memory-efficient tree-growing strategies. XGBoost became legendary after dominating Kaggle competitions; LightGBM is the go-to when you have very large datasets and need speed; CatBoost handles categorical features natively without preprocessing.</p>
     <div><span class="tag tag-green">Tabular SOTA</span><span class="tag tag-green">Kaggle winner</span><span class="tag tag-green">Production ready</span></div>
   </div>
 
   <h3 style="margin-top:2rem">3. Stacking</h3>
-  <p>Train a <em>meta-learner</em> (level-1 model) on the out-of-fold predictions of base models (level-0). The meta-learner learns how to best combine the base models.</p>
+  <p>Rather than averaging or voting, stacking trains a second-level <em>meta-learner</em> whose job is to figure out how to best combine the base models. The key trick: base models make predictions on held-out folds (out-of-fold predictions), and the meta-learner is trained on those — not the base models' training data. This prevents leakage and teaches the meta-learner to compensate for each base model's specific weaknesses.</p>
 
   <div class="formula-block">
     <div class="formula-label">Stacking — two-level structure</div>
@@ -1235,35 +1235,36 @@ stack.fit(X_train, y_train)</pre>
   <div class="section-header">
     <div class="chip" style="color:var(--pink)">Sequential Data</div>
     <h2>Time Series</h2>
-    <p class="lead">Data ordered in time. The past predicts the future — but the relationship is dynamic.</p>
+    <p class="lead">When your data has a time dimension, order matters — and the past contains real signal about the future. But that signal is rarely simple.</p>
   </div>
 
   <h3>Components of a Time Series</h3>
+  <p style="font-size:13px;color:var(--muted)">Most real-world time series are a mix of several underlying patterns layered on top of each other. The first step in any time series analysis is to decompose the signal and understand what you're working with.</p>
   <div class="card-grid">
     <div class="card-sm">
       <div style="font-size:1.5rem;margin-bottom:0.5rem">📈</div>
       <h4>Trend</h4>
-      <p style="font-size:13px;color:var(--muted)">Long-term direction — upward, downward, or flat. E.g. global temperature rising over decades.</p>
+      <p style="font-size:13px;color:var(--muted)">The long-term direction the series is heading — steadily rising, falling, or roughly flat. Think of global average temperatures climbing over decades, or a company's user base growing year after year. Trend is the "big picture" movement that persists over a long time horizon.</p>
     </div>
     <div class="card-sm">
       <div style="font-size:1.5rem;margin-bottom:0.5rem">🔄</div>
       <h4>Seasonality</h4>
-      <p style="font-size:13px;color:var(--muted)">Regular repeating patterns tied to calendar. E.g. retail sales surge every December.</p>
+      <p style="font-size:13px;color:var(--muted)">Repeating patterns that follow a fixed, known calendar period — daily, weekly, monthly, or yearly. Retail sales reliably surge every December. Website traffic drops every weekend. Electricity demand peaks every summer evening. If you can set your watch to it, it's seasonality.</p>
     </div>
     <div class="card-sm">
       <div style="font-size:1.5rem;margin-bottom:0.5rem">〰️</div>
       <h4>Cyclicality</h4>
-      <p style="font-size:13px;color:var(--muted)">Irregular, longer-period fluctuations. E.g. economic boom-bust cycles.</p>
+      <p style="font-size:13px;color:var(--muted)">Longer-term, irregular fluctuations that don't have a fixed period. Economic boom-and-bust cycles are the classic example — they recur, but not on a predictable schedule. Unlike seasonality, cycles can last for years and are much harder to forecast.</p>
     </div>
     <div class="card-sm">
       <div style="font-size:1.5rem;margin-bottom:0.5rem">⚡</div>
       <h4>Residual / Noise</h4>
-      <p style="font-size:13px;color:var(--muted)">The unexplained variation after removing trend and seasonality. Ideally white noise.</p>
+      <p style="font-size:13px;color:var(--muted)">Everything left over after you've accounted for trend, seasonality, and cycles. In a well-specified model, this should look like random white noise — no remaining pattern. If it doesn't, your model is missing something systematic.</p>
     </div>
   </div>
 
   <h3>ARIMA — The Classical Model</h3>
-  <p>ARIMA(p, d, q) combines three ideas: autoregression, integration (differencing), and moving average.</p>
+  <p>ARIMA(p, d, q) is the foundational statistical model for time series forecasting. It weaves together three ideas: <em>autoregression</em> (the current value depends on its own recent past), <em>integration</em> (differencing to remove trend and make the series stationary), and <em>moving average</em> (the current value also depends on past forecast errors). Getting the stationarity step right is crucial — most ARIMA failures can be traced back to modelling a non-stationary series directly.</p>
 
   <div class="formula-block">
     <div class="formula-label">ARIMA(p, d, q) model</div>
@@ -1308,22 +1309,22 @@ stack.fit(X_train, y_train)</pre>
   <div class="card-grid">
     <div class="card-sm">
       <h4>Prophet (Meta)</h4>
-      <p style="font-size:13px;color:var(--muted)">Additive model: trend + seasonality + holidays. Robust to missing data and outliers. Excellent for business forecasting.</p>
+      <p style="font-size:13px;color:var(--muted)">An additive model designed for business forecasting, where non-statisticians need reliable results without deep expertise. It automatically handles missing data, outliers, and trend changepoints, and lets you add known holiday effects explicitly. Not the most accurate on every benchmark, but remarkably robust and easy to iterate on.</p>
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--pink)">y(t) = g(t) + s(t) + h(t) + ε(t)</div>
     </div>
     <div class="card-sm">
       <h4>LSTM / GRU</h4>
-      <p style="font-size:13px;color:var(--muted)">Recurrent neural networks with gating mechanisms. Learn long-range dependencies. Powerful but data-hungry and slow to train.</p>
+      <p style="font-size:13px;color:var(--muted)">Recurrent neural networks with gating mechanisms that selectively remember or forget past information across long sequences. They can theoretically capture patterns spanning hundreds of timesteps. Powerful when you have large datasets and complex long-range dependencies, but they're slow to train, sensitive to hyperparameters, and often outperformed by simpler models on short series.</p>
       <div><span class="tag tag-pink">Deep Learning</span><span class="tag tag-pink">Long horizon</span></div>
     </div>
     <div class="card-sm">
       <h4>Temporal Fusion Transformer</h4>
-      <p style="font-size:13px;color:var(--muted)">Attention-based architecture for multi-horizon forecasting with interpretable temporal patterns and feature importance.</p>
+      <p style="font-size:13px;color:var(--muted)">A transformer-based architecture built specifically for multi-horizon forecasting with mixed static and time-varying inputs. Its attention mechanisms are designed to be interpretable — you can inspect which past timesteps the model is paying attention to when making a prediction. Currently one of the strongest general-purpose deep learning forecasters.</p>
       <div><span class="tag tag-blue">Transformer</span><span class="tag tag-blue">Multi-horizon</span></div>
     </div>
     <div class="card-sm">
       <h4>N-BEATS / N-HiTS</h4>
-      <p style="font-size:13px;color:var(--muted)">Pure MLP architectures that decompose the forecast into trend/seasonality blocks. State-of-the-art on many benchmarks.</p>
+      <p style="font-size:13px;color:var(--muted)">Surprisingly effective architectures built entirely from MLPs (no recurrence, no attention). They use a basis expansion framework to explicitly decompose the forecast into interpretable trend and seasonality components. N-HiTS extends this with hierarchical interpolation for longer horizons. Both consistently rank near the top on standard forecasting benchmarks despite their architectural simplicity.</p>
       <div><span class="tag tag-teal">No recurrence</span><span class="tag tag-teal">Interpretable</span></div>
     </div>
   </div>

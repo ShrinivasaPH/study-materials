@@ -539,6 +539,9 @@ canvas { display: block; width: 100%; max-height: 340px; }
   <button class="tab" onclick="switchTab(5)" role="tab">
     <span class="tab-dot" style="background:var(--pink)"></span> Time Series
   </button>
+  <button class="tab" onclick="switchTab(6)" role="tab">
+    <span class="tab-dot" style="background:#c084fc"></span> Recommender Systems
+  </button>
 </div>
 
 <!-- ════════════════════════════════════════ OVERVIEW ═══ -->
@@ -721,11 +724,69 @@ model = Pipeline([
 model.fit(X_train, y_train)
 print(<span class="fn">f</span><span class="st">"R² = {model.score(X_test, y_test):.4f}"</span>)</pre>
 
-  <h3>Key Metrics</h3>
-  <div class="card-grid">
-    <div class="card-sm"><div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--accent);margin-bottom:0.3rem">R²</div><h3>R-Squared</h3><p style="font-size:13px;color:var(--muted)">Fraction of variance explained. 1 = perfect, 0 = no better than mean, negative = worse than mean.</p></div>
-    <div class="card-sm"><div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--teal);margin-bottom:0.3rem">MAE</div><h3>Mean Absolute Error</h3><p style="font-size:13px;color:var(--muted)">Average absolute difference. Same units as target. Robust to outliers.</p></div>
-    <div class="card-sm"><div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--amber);margin-bottom:0.3rem">RMSE</div><h3>Root Mean Sq. Error</h3><p style="font-size:13px;color:var(--muted)">Same units as target. Penalises large errors more than MAE.</p></div>
+  <h3>Evaluation Metrics</h3>
+  <p style="font-size:13px;color:var(--muted)">Regression metrics all measure <em>how far off</em> predictions are from truth, just in different ways. Pick the metric that matches your tolerance for large errors.</p>
+
+  <div class="formula-block">
+    <div class="formula-label">Core regression metrics</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;text-align:left;font-family:'DM Mono',monospace;font-size:0.83rem;padding:0.5rem 0">
+      <div><span style="color:var(--accent)">MAE  </span> = (1/m) Σ|ŷ⁽ⁱ⁾ − y⁽ⁱ⁾|</div>
+      <div><span style="color:var(--teal)">MSE  </span> = (1/m) Σ(ŷ⁽ⁱ⁾ − y⁽ⁱ⁾)²</div>
+      <div><span style="color:var(--amber)">RMSE </span> = √MSE</div>
+      <div><span style="color:var(--coral)">MAPE </span> = (1/m) Σ|ŷ−y|/|y| × 100%</div>
+      <div><span style="color:var(--green)">R²   </span> = 1 − SS_res / SS_tot</div>
+      <div><span style="color:var(--pink)">Adj R²</span> = 1 − (1−R²)(m−1)/(m−n−1)</div>
+    </div>
+  </div>
+
+  <div class="card-grid" style="margin-top:1rem">
+    <div class="card-sm">
+      <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--accent);margin-bottom:0.3rem">MAE</div>
+      <h3>Mean Absolute Error</h3>
+      <p style="font-size:13px;color:var(--muted)">Average absolute residual. Same units as target. Robust to outliers — a single huge error doesn't dominate. Easiest to interpret for stakeholders.</p>
+      <div style="font-size:11px;color:var(--teal);margin-top:0.5rem">Use when: outliers shouldn't be over-penalised</div>
+    </div>
+    <div class="card-sm">
+      <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--amber);margin-bottom:0.3rem">RMSE</div>
+      <h3>Root Mean Squared Error</h3>
+      <p style="font-size:13px;color:var(--muted)">Squares errors before averaging, so large mistakes hurt much more. Same units as target. The most common default for regression. Differentiable everywhere.</p>
+      <div style="font-size:11px;color:var(--teal);margin-top:0.5rem">Use when: large errors are especially costly</div>
+    </div>
+    <div class="card-sm">
+      <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--green);margin-bottom:0.3rem">R²</div>
+      <h3>Coefficient of Determination</h3>
+      <p style="font-size:13px;color:var(--muted)">Fraction of target variance explained by the model. Unitless and scale-free. R²=1 is perfect; R²=0 means no better than always predicting the mean; negative = actively harmful.</p>
+      <div style="font-size:11px;color:var(--teal);margin-top:0.5rem">Use when: comparing models on different scales</div>
+    </div>
+    <div class="card-sm">
+      <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--pink);margin-bottom:0.3rem">Adj R²</div>
+      <h3>Adjusted R²</h3>
+      <p style="font-size:13px;color:var(--muted)">Penalises adding useless features. R² always increases when you add any variable; Adj R² only increases if the new feature actually improves the model more than chance would.</p>
+      <div style="font-size:11px;color:var(--teal);margin-top:0.5rem">Use when: comparing models with different feature counts</div>
+    </div>
+    <div class="card-sm">
+      <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--coral);margin-bottom:0.3rem">MAPE</div>
+      <h3>Mean Absolute % Error</h3>
+      <p style="font-size:13px;color:var(--muted)">Error expressed as a percentage of the true value. Intuitive for business reporting. Undefined when y=0 and penalises under-forecasts more than over-forecasts.</p>
+      <div style="font-size:11px;color:var(--teal);margin-top:0.5rem">Use when: relative error matters more than absolute</div>
+    </div>
+    <div class="card-sm">
+      <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--accent2);margin-bottom:0.3rem">Huber</div>
+      <h3>Huber Loss</h3>
+      <p style="font-size:13px;color:var(--muted)">Quadratic for small errors (like MSE), linear for large errors (like MAE). Controlled by threshold δ. Best of both worlds when data has occasional outliers.</p>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--amber)">L = ½r² if |r|≤δ, else δ(|r|−½δ)</div>
+    </div>
+  </div>
+
+  <div class="accent-card" style="margin-top:1.5rem">
+    <h3>Quick decision guide</h3>
+    <p style="margin:0;font-size:13px;color:var(--muted)">
+      Outliers present → prefer <strong style="color:var(--accent)">MAE</strong> or <strong style="color:var(--accent2)">Huber</strong>.
+      Large errors very costly → use <strong style="color:var(--amber)">RMSE</strong>.
+      Need % intuition → use <strong style="color:var(--coral)">MAPE</strong>.
+      Comparing across datasets → use <strong style="color:var(--green)">R²</strong>.
+      Always report multiple metrics — no single number tells the whole story.
+    </p>
   </div>
 </div>
 
@@ -794,6 +855,65 @@ print(<span class="fn">f</span><span class="st">"R² = {model.score(X_test, y_te
       <div><span style="color:var(--pink)">Specificity</span>= TN / (TN+FP)</div>
       <div><span style="color:var(--green)">AUC-ROC</span>   = area under ROC curve</div>
     </div>
+  </div>
+
+  <h3 style="margin-top:2rem">Evaluation Metrics — deep dive</h3>
+  <p style="font-size:13px;color:var(--muted)">Accuracy is often misleading. On a 99% negative dataset, a model that always says "negative" gets 99% accuracy but is completely useless. These metrics give a fuller picture.</p>
+
+  <div class="card-grid">
+    <div class="card-sm">
+      <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--teal);margin-bottom:0.3rem">Accuracy</div>
+      <h3>Overall Correctness</h3>
+      <p style="font-size:13px;color:var(--muted)">Fraction of all predictions that are correct. Misleading when classes are imbalanced. The baseline you must beat.</p>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--teal)">(TP+TN) / (TP+TN+FP+FN)</div>
+    </div>
+    <div class="card-sm">
+      <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--accent);margin-bottom:0.3rem">Precision</div>
+      <h3>"When you say yes, are you right?"</h3>
+      <p style="font-size:13px;color:var(--muted)">Of all the items predicted positive, how many actually are? Optimise this when false positives are costly — e.g. spam filters (don't block real emails).</p>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent)">TP / (TP + FP)</div>
+    </div>
+    <div class="card-sm">
+      <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--amber);margin-bottom:0.3rem">Recall</div>
+      <h3>"Do you catch everything positive?"</h3>
+      <p style="font-size:13px;color:var(--muted)">Of all actual positives, how many did you find? Optimise this when false negatives are costly — e.g. cancer screening (don't miss cases).</p>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--amber)">TP / (TP + FN)</div>
+    </div>
+    <div class="card-sm">
+      <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--coral);margin-bottom:0.3rem">F1 Score</div>
+      <h3>Harmonic Mean of P & R</h3>
+      <p style="font-size:13px;color:var(--muted)">Balances precision and recall into one number. Punishes extreme imbalances — a model with P=1, R=0 gets F1=0. Good default for imbalanced datasets.</p>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--coral)">2 · (P · R) / (P + R)</div>
+    </div>
+    <div class="card-sm">
+      <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--green);margin-bottom:0.3rem">AUC-ROC</div>
+      <h3>Area Under ROC Curve</h3>
+      <p style="font-size:13px;color:var(--muted)">Plots True Positive Rate vs False Positive Rate at all thresholds. AUC=1 is perfect; AUC=0.5 is random chance. Threshold-independent — great for comparing models.</p>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--green)">∫₀¹ TPR(FPR) d(FPR)</div>
+    </div>
+    <div class="card-sm">
+      <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--pink);margin-bottom:0.3rem">AUC-PR</div>
+      <h3>Precision-Recall AUC</h3>
+      <p style="font-size:13px;color:var(--muted)">Area under the Precision–Recall curve. More informative than ROC-AUC on heavily imbalanced datasets where the negative class dominates. Higher is always better.</p>
+      <div style="font-size:11px;color:var(--teal);margin-top:0.4rem">Preferred for: fraud detection, rare disease</div>
+    </div>
+    <div class="card-sm">
+      <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--accent2);margin-bottom:0.3rem">Log Loss</div>
+      <h3>Cross-Entropy Loss</h3>
+      <p style="font-size:13px;color:var(--muted)">Measures quality of predicted probabilities, not just the hard class label. Penalises confident wrong predictions very harshly. Used directly as training objective in logistic regression.</p>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2)">−(1/m)Σ[y log ŷ + (1−y)log(1−ŷ)]</div>
+    </div>
+    <div class="card-sm">
+      <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--amber);margin-bottom:0.3rem">MCC</div>
+      <h3>Matthews Correlation Coefficient</h3>
+      <p style="font-size:13px;color:var(--muted)">Takes all four confusion matrix cells into account. Regarded as the most informative single metric for binary classification. Ranges −1 (inverse) → 0 (random) → +1 (perfect).</p>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--amber)">(TP·TN − FP·FN) / √((TP+FP)(TP+FN)(TN+FP)(TN+FN))</div>
+    </div>
+  </div>
+
+  <div class="accent-card" style="margin-top:0.5rem">
+    <h3>Precision vs Recall trade-off</h3>
+    <p style="margin:0;font-size:13px;color:var(--muted)">You control this with your decision <strong style="color:var(--text)">threshold</strong> (default 0.5). Lower the threshold → catch more positives (↑ Recall, ↓ Precision). Raise it → fewer false alarms (↑ Precision, ↓ Recall). Always tune the threshold after training, not before.</p>
   </div>
 
   <h3>Other Algorithms</h3>
@@ -934,6 +1054,58 @@ print(<span class="fn">f</span><span class="st">"Best k = {best_k}, silhouette =
 db = DBSCAN(eps=<span class="nb">0.5</span>, min_samples=<span class="nb">5</span>).fit(X)
 labels = db.labels_                    <span class="cm"># -1 = noise</span>
 n_clusters = len(set(labels)) - (<span class="nb">1</span> <span class="kw">if</span> -<span class="nb">1</span> <span class="kw">in</span> labels <span class="kw">else</span> <span class="nb">0</span>)</pre>
+
+  <h3 style="margin-top:1.5rem">Evaluation Metrics</h3>
+  <p style="font-size:13px;color:var(--muted)">Clustering is unsupervised — there are no ground-truth labels to compare against. Metrics fall into two families: <em>internal</em> (use only the data itself) and <em>external</em> (require ground-truth labels for benchmarking).</p>
+
+  <div class="two-col" style="margin-top:1rem">
+    <div>
+      <h4>Internal metrics (no labels needed)</h4>
+      <div class="card-sm" style="margin-bottom:0.75rem">
+        <div style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--teal);margin-bottom:0.3rem">Silhouette Score</div>
+        <p style="font-size:13px;color:var(--muted)">For each point, compares how similar it is to its own cluster vs the nearest other cluster. Ranges −1 → +1. Higher means better-separated clusters. The gold standard internal metric.</p>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent)">s = (b − a) / max(a, b)</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px"><code style="color:var(--teal)">a</code> = mean intra-cluster distance &nbsp; <code style="color:var(--amber)">b</code> = mean nearest-cluster distance</div>
+      </div>
+      <div class="card-sm" style="margin-bottom:0.75rem">
+        <div style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--amber);margin-bottom:0.3rem">Inertia (WCSS)</div>
+        <p style="font-size:13px;color:var(--muted)">Sum of squared distances from each point to its cluster centroid. Used in the elbow method. Lower = tighter clusters. Not comparable across different k values on its own.</p>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--amber)">Σₖ Σᵢ∈Cₖ ‖xᵢ − μₖ‖²</div>
+      </div>
+      <div class="card-sm">
+        <div style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--coral);margin-bottom:0.3rem">Davies-Bouldin Index</div>
+        <p style="font-size:13px;color:var(--muted)">Ratio of within-cluster scatter to between-cluster separation. Lower is better (0 is perfect). Penalises clusters that are large and close together.</p>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--coral)">DB = (1/k) Σᵢ maxⱼ≠ᵢ (σᵢ+σⱼ)/d(μᵢ,μⱼ)</div>
+      </div>
+    </div>
+    <div>
+      <h4>External metrics (need ground truth)</h4>
+      <div class="card-sm" style="margin-bottom:0.75rem">
+        <div style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--green);margin-bottom:0.3rem">Adjusted Rand Index</div>
+        <p style="font-size:13px;color:var(--muted)">Compares cluster assignments to true labels by looking at all pairs of points. Corrected for chance — random clustering scores ~0. Perfect agreement scores 1.</p>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--green)">ARI ∈ [−1, 1], chance-corrected</div>
+      </div>
+      <div class="card-sm" style="margin-bottom:0.75rem">
+        <div style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--pink);margin-bottom:0.3rem">Normalised Mutual Info</div>
+        <p style="font-size:13px;color:var(--muted)">Information-theoretic measure of how much knowing the cluster assignment tells you about the true label. Normalised to [0, 1]. Insensitive to label permutations.</p>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--pink)">NMI = I(Y;C) / √[H(Y)·H(C)]</div>
+      </div>
+      <div class="card-sm">
+        <div style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--accent);margin-bottom:0.3rem">Homogeneity & Completeness</div>
+        <p style="font-size:13px;color:var(--muted)"><strong style="color:var(--text)">Homogeneity:</strong> each cluster contains only one class. <strong style="color:var(--text)">Completeness:</strong> all members of a class are in the same cluster. V-measure is their harmonic mean — analogous to F1.</p>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent)">V = 2 · hom · comp / (hom + comp)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="accent-card" style="margin-top:1rem;border-left-color:var(--coral)">
+    <h3>When to use which metric</h3>
+    <p style="margin:0;font-size:13px;color:var(--muted)">
+      No ground truth available? Use <strong style="color:var(--teal)">Silhouette</strong> to find the best k, and <strong style="color:var(--amber)">Inertia</strong> for the elbow plot.
+      Benchmarking against known labels? Use <strong style="color:var(--green)">ARI</strong> or <strong style="color:var(--pink)">NMI</strong>.
+      Diagnosing cluster quality? <strong style="color:var(--coral)">Davies-Bouldin</strong> pinpoints which clusters overlap.
+    </p>
+  </div>
 </div>
 
 <!-- ════════════════════════════════════════ ENSEMBLE ═══ -->

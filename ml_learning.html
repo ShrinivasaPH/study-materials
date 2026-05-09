@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Machine Learning — Interactive Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0b0d12;
+  --surface: #13161f;
+  --surface2: #1a1e2b;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --text: #e8eaf0;
+  --muted: #7a7f94;
+  --accent: #6c8cff;
+  --accent2: #b06cff;
+  --teal: #3dd6b5;
+  --amber: #f5a623;
+  --coral: #ff6b6b;
+  --green: #5de0a0;
+  --pink: #ff82c3;
+  --glow: rgba(108,140,255,0.15);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.7;
+}
+
+/* ── Header ── */
+.hero {
+  text-align: center;
+  padding: 4rem 2rem 2rem;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(108,140,255,0.12) 0%, transparent 70%);
+  border-bottom: 0.5px solid var(--border);
+}
+.hero-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 0.5px solid var(--accent);
+  border-radius: 100px;
+  padding: 4px 14px;
+  margin-bottom: 1.5rem;
+}
+.hero h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #fff 40%, #a0b0ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero p {
+  color: var(--muted);
+  font-size: 1.1rem;
+  font-weight: 300;
+  max-width: 560px;
+  margin: 0 auto 2.5rem;
+}
+
+/* ── Tabs ── */
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 0 2rem;
+  background: var(--surface);
+  border-bottom: 0.5px solid var(--border);
+  scrollbar-width: none;
+}
+.tab-bar::-webkit-scrollbar { display: none; }
+
+.tab {
+  flex-shrink: 0;
+  padding: 1rem 1.4rem;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ── Main layout ── */
+.main { max-width: 1000px; margin: 0 auto; padding: 3rem 2rem; }
+.section { display: none; }
+.section.active { display: block; }
+
+/* ── Typography ── */
+h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2rem;
+  font-weight: 400;
+  margin-bottom: 0.4rem;
+  line-height: 1.2;
+}
+h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+p { color: #b0b5c8; margin-bottom: 1rem; }
+.lead {
+  font-size: 1.1rem;
+  color: var(--muted);
+  margin-bottom: 2.5rem;
+  font-weight: 300;
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.card-sm {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 1.2rem;
+}
+.accent-card {
+  border-left: 3px solid var(--accent);
+  background: rgba(108,140,255,0.05);
+  border-radius: 0 12px 12px 0;
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  border-top: none; border-right: none; border-bottom: none;
+  border: none;
+  border-left: 3px solid var(--accent);
+  background: rgba(108,140,255,0.06);
+}
+
+/* ── Formula ── */
+.formula-block {
+  background: var(--surface2);
+  border: 0.5px solid var(--border2);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+  font-family: 'DM Mono', monospace;
+  font-size: 1.05rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.formula-block::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+}
+.formula-label {
+  font-family: 'Outfit', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+.formula-main {
+  font-size: 1.3rem;
+  color: #e8eaf0;
+  margin-bottom: 1rem;
+}
+.formula-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  justify-content: center;
+  margin-top: 0.75rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  color: var(--muted);
+}
+.formula-var {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.formula-var code {
+  font-family: 'DM Mono', monospace;
+  color: var(--teal);
+  font-size: 11px;
+}
+
+/* ── Code blocks ── */
+pre {
+  background: #0d0f18;
+  border: 0.5px solid var(--border2);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 1.5rem 0;
+}
+.kw { color: #c792ea; }
+.fn { color: #82aaff; }
+.st { color: #c3e88d; }
+.cm { color: #546e7a; }
+.nb { color: #f78c6c; }
+.op { color: var(--muted); }
+
+/* ── Interactive canvas ── */
+.canvas-wrap {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin: 1.5rem 0;
+}
+.canvas-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.75rem 1rem;
+  border-bottom: 0.5px solid var(--border);
+  flex-wrap: wrap;
+}
+.canvas-toolbar label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+}
+canvas { display: block; width: 100%; max-height: 340px; }
+
+/* ── Buttons ── */
+.btn {
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 16px;
+  border-radius: 8px;
+  border: 0.5px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.btn:hover { background: var(--surface); border-color: var(--accent); color: var(--accent); }
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+}
+.btn-primary:hover { background: #5a7dff; color: #fff; }
+
+/* ── Range inputs ── */
+.control-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0.75rem;
+}
+.control-row label {
+  font-size: 12px;
+  color: var(--muted);
+  min-width: 130px;
+}
+.control-row input[type=range] {
+  flex: 1;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.control-row .val {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--teal);
+  min-width: 48px;
+  text-align: right;
+}
+
+/* ── Tags ── */
+.tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 100px;
+  margin: 2px;
+}
+.tag-blue { background: rgba(108,140,255,0.15); color: var(--accent); }
+.tag-teal { background: rgba(61,214,181,0.15); color: var(--teal); }
+.tag-coral { background: rgba(255,107,107,0.15); color: var(--coral); }
+.tag-amber { background: rgba(245,166,35,0.15); color: var(--amber); }
+.tag-green { background: rgba(93,224,160,0.15); color: var(--green); }
+.tag-pink { background: rgba(255,130,195,0.15); color: var(--pink); }
+
+/* ── Section header ── */
+.section-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 0.5px solid var(--border);
+}
+.section-header .chip {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+/* ── Notation table ── */
+.notation-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 1rem 0 1.5rem;
+}
+.notation-table th {
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  border-bottom: 0.5px solid var(--border);
+}
+.notation-table td {
+  padding: 10px 12px;
+  border-bottom: 0.5px solid var(--border);
+  vertical-align: top;
+}
+.notation-table td:first-child {
+  font-family: 'DM Mono', monospace;
+  font-size: 1rem;
+  color: var(--teal);
+  width: 60px;
+}
+.notation-table td:nth-child(2) {
+  color: var(--text);
+  font-weight: 500;
+}
+.notation-table td:nth-child(3) {
+  color: var(--muted);
+}
+
+/* ── Step sequence ── */
+.steps { display: flex; flex-direction: column; gap: 0; margin: 1.5rem 0; }
+.step {
+  display: flex;
+  gap: 1rem;
+  position: relative;
+}
+.step::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 32px;
+  bottom: 0;
+  width: 0.5px;
+  background: var(--border2);
+}
+.step:last-child::before { display: none; }
+.step-num {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 0.5px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  position: relative;
+  z-index: 1;
+  margin-top: 4px;
+}
+.step-body { padding-bottom: 1.5rem; }
+.step-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.3rem; }
+.step-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+/* ── Cluster viz ── */
+#clusterCanvas { cursor: crosshair; }
+
+/* ── Grid layout ── */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+@media(max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+/* ── Matrix display ── */
+.matrix {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 0.75rem 0;
+  display: inline-block;
+  position: relative;
+}
+.matrix::before, .matrix::after {
+  content: '';
+  position: absolute;
+  top: 8px; bottom: 8px;
+  width: 2px;
+  border-top: 1px solid var(--border2);
+  border-bottom: 1px solid var(--border2);
+}
+.matrix::before { left: 6px; border-left: 1px solid var(--border2); border-right: none; }
+.matrix::after { right: 6px; border-right: 1px solid var(--border2); border-left: none; }
+.matrix-inner { padding: 0 12px; }
+.matrix-row { white-space: nowrap; }
+.matrix-row span { display: inline-block; width: 40px; text-align: right; color: var(--teal); }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ── Animation ── */
+@keyframes fadeIn { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+.section.active { animation: fadeIn 0.3s ease; }
+
+/* ── Confusion matrix ── */
+.cm-grid {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  gap: 4px;
+  width: fit-content;
+  margin: 1rem auto;
+}
+.cm-cell {
+  width: 90px; height: 70px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.cm-label {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.cm-tp { background: rgba(93,224,160,0.2); color: var(--green); }
+.cm-tn { background: rgba(93,224,160,0.2); color: var(--green); }
+.cm-fp { background: rgba(255,107,107,0.15); color: var(--coral); }
+.cm-fn { background: rgba(255,107,107,0.15); color: var(--coral); }
+.cm-num { font-size: 1.5rem; font-family: 'DM Mono', monospace; font-weight: 500; }
+
+/* ── Tree viz ── */
+.tree-svg { width: 100%; display: block; }
+
+/* ── Timeline ── */
+.timeline-wrap { overflow-x: auto; padding-bottom: 1rem; }
+.ts-chart-wrap {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">Interactive Learning Guide</div>
+  <h1>Machine Learning<br><em style="font-style:italic;color:#a0b0ff;">from first principles</em></h1>
+  <p>Explore the ideas, intuitions, math, and code behind every major ML paradigm — all in one place.</p>
+</div>
+
+<div class="tab-bar" role="tablist">
+  <button class="tab active" onclick="switchTab(0)" role="tab">
+    <span class="tab-dot" style="background:var(--accent)"></span> Overview
+  </button>
+  <button class="tab" onclick="switchTab(1)" role="tab">
+    <span class="tab-dot" style="background:var(--teal)"></span> Regression
+  </button>
+  <button class="tab" onclick="switchTab(2)" role="tab">
+    <span class="tab-dot" style="background:var(--amber)"></span> Classification
+  </button>
+  <button class="tab" onclick="switchTab(3)" role="tab">
+    <span class="tab-dot" style="background:var(--coral)"></span> Clustering
+  </button>
+  <button class="tab" onclick="switchTab(4)" role="tab">
+    <span class="tab-dot" style="background:var(--green)"></span> Ensemble
+  </button>
+  <button class="tab" onclick="switchTab(5)" role="tab">
+    <span class="tab-dot" style="background:var(--pink)"></span> Time Series
+  </button>
+</div>
+
+<!-- ════════════════════════════════════════ OVERVIEW ═══ -->
+<div class="main section active" id="tab-0">
+  <div class="section-header">
+    <div class="chip">Start here</div>
+    <h2>What is Machine Learning?</h2>
+    <p class="lead">Algorithms that improve through experience — without being explicitly programmed for every case.</p>
+  </div>
+
+  <p>Arthur Samuel coined the term in 1959. The idea: instead of writing rules by hand, we give a computer <em>examples</em>, and it figures out the rules itself.</p>
+
+  <div class="accent-card">
+    <h3>The Core Idea</h3>
+    <p style="margin:0">Find a function <strong style="color:var(--teal)">f</strong> such that <strong style="color:var(--teal)">f(X) ≈ y</strong> — mapping input features <strong style="color:var(--accent)">X</strong> to outputs <strong style="color:var(--amber)">y</strong>, learned from data rather than hand-crafted.</p>
+  </div>
+
+  <h3 style="margin-top:2rem">Three Learning Paradigms</h3>
+  <div class="card-grid" style="margin-top:1rem">
+    <div class="card-sm">
+      <h4>Supervised</h4>
+      <h3 style="color:var(--accent)">Labelled Data</h3>
+      <p style="font-size:13px;color:var(--muted)">Pairs of (input, correct answer). The model learns to predict the answer for new inputs.</p>
+      <div><span class="tag tag-blue">Regression</span><span class="tag tag-blue">Classification</span></div>
+    </div>
+    <div class="card-sm">
+      <h4>Unsupervised</h4>
+      <h3 style="color:var(--teal)">No Labels</h3>
+      <p style="font-size:13px;color:var(--muted)">Just raw inputs. The model finds structure, patterns, or groups hidden in the data.</p>
+      <div><span class="tag tag-teal">Clustering</span><span class="tag tag-teal">Dim. Reduction</span></div>
+    </div>
+    <div class="card-sm">
+      <h4>Reinforcement</h4>
+      <h3 style="color:var(--amber)">Reward Signal</h3>
+      <p style="font-size:13px;color:var(--muted)">An agent takes actions in an environment and learns by maximising cumulative reward.</p>
+      <div><span class="tag tag-amber">Games</span><span class="tag tag-amber">Robotics</span></div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:2rem">Standard Notation Cheat Sheet</h3>
+  <table class="notation-table">
+    <thead><tr><th>Symbol</th><th>Name</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>m</td><td>Training examples</td><td>Number of rows in your dataset</td></tr>
+      <tr><td>n</td><td>Features</td><td>Number of input variables / columns</td></tr>
+      <tr><td>x⁽ⁱ⁾</td><td>i-th example</td><td>One row of inputs (a vector of length n)</td></tr>
+      <tr><td>y⁽ⁱ⁾</td><td>i-th label</td><td>The target value for that row</td></tr>
+      <tr><td>X</td><td>Design matrix</td><td>m × n matrix of all inputs</td></tr>
+      <tr><td>ŷ</td><td>Prediction</td><td>Model's estimated output (y-hat)</td></tr>
+      <tr><td>θ, W, β</td><td>Parameters</td><td>The learned weights the model tunes</td></tr>
+      <tr><td>α</td><td>Learning rate</td><td>Step size in gradient descent</td></tr>
+      <tr><td>J(θ)</td><td>Cost / Loss</td><td>Measure of how wrong our predictions are</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top:2rem">The ML Workflow</h3>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Collect & explore data</div><div class="step-desc">Gather labelled examples. Understand distributions, missing values, correlations (EDA).</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Feature engineering</div><div class="step-desc">Transform raw data into meaningful numerical representations. Normalise, encode, create new features.</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Choose & train a model</div><div class="step-desc">Select an algorithm, define a loss function, optimise parameters on the training set.</div></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Evaluate & tune</div><div class="step-desc">Measure generalisation on a held-out validation set. Tune hyperparameters. Check for over/underfitting.</div></div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Deploy & monitor</div><div class="step-desc">Serve predictions in production. Watch for data drift and retrain as the world changes.</div></div></div>
+  </div>
+
+  <div class="two-col" style="margin-top:1.5rem">
+    <div class="card-sm">
+      <h4>Underfitting</h4>
+      <p style="font-size:13px;color:var(--muted)">Model is too simple — high bias. It misses patterns in training data and generalises poorly.</p>
+      <p style="font-size:13px;color:var(--coral)">Fix: add more features, use a more complex model, reduce regularisation.</p>
+    </div>
+    <div class="card-sm">
+      <h4>Overfitting</h4>
+      <p style="font-size:13px;color:var(--muted)">Model memorises training data — high variance. Great on train, terrible on test.</p>
+      <p style="font-size:13px;color:var(--teal)">Fix: more data, regularisation (L1/L2/Dropout), simpler model, cross-validation.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ REGRESSION ═══ -->
+<div class="main section" id="tab-1">
+  <div class="section-header">
+    <div class="chip" style="color:var(--teal)">Supervised Learning</div>
+    <h2>Regression</h2>
+    <p class="lead">Predict a <em>continuous</em> number — house prices, temperatures, stock returns.</p>
+  </div>
+
+  <h3>Linear Regression</h3>
+  <p>The simplest model: assume the relationship between inputs and output is a straight line (or hyperplane in multiple dimensions). Fit a line through data by minimising the sum of squared errors.</p>
+
+  <div class="formula-block">
+    <div class="formula-label">Model hypothesis</div>
+    <div class="formula-main">ŷ = θ₀ + θ₁x₁ + θ₂x₂ + … + θₙxₙ = θᵀx</div>
+    <div class="formula-legend">
+      <span class="formula-var"><code>ŷ</code> predicted value</span>
+      <span class="formula-var"><code>θ₀</code> bias / intercept</span>
+      <span class="formula-var"><code>θᵢ</code> weight for feature i</span>
+      <span class="formula-var"><code>xᵢ</code> feature i</span>
+    </div>
+  </div>
+
+  <div class="formula-block">
+    <div class="formula-label">Mean Squared Error — Loss function</div>
+    <div class="formula-main">J(θ) = (1/2m) Σᵢ (ŷ⁽ⁱ⁾ − y⁽ⁱ⁾)²</div>
+    <div class="formula-legend">
+      <span class="formula-var"><code>m</code> number of examples</span>
+      <span class="formula-var"><code>ŷ⁽ⁱ⁾</code> prediction for example i</span>
+      <span class="formula-var"><code>y⁽ⁱ⁾</code> true label for example i</span>
+    </div>
+  </div>
+
+  <div class="formula-block">
+    <div class="formula-label">Gradient Descent Update Rule</div>
+    <div class="formula-main">θⱼ ← θⱼ − α · (∂J/∂θⱼ) = θⱼ − (α/m) Σᵢ (ŷ⁽ⁱ⁾ − y⁽ⁱ⁾) · xⱼ⁽ⁱ⁾</div>
+    <div class="formula-legend">
+      <span class="formula-var"><code>α</code> learning rate</span>
+      <span class="formula-var"><code>∂J/∂θⱼ</code> gradient (slope of loss surface)</span>
+    </div>
+  </div>
+
+  <h3 style="margin-top:2rem">Interactive: Fit a Line</h3>
+  <p style="font-size:13px;color:var(--muted)">Click on the canvas to add data points. Watch the regression line update in real time.</p>
+  <div class="canvas-wrap">
+    <div class="canvas-toolbar">
+      <button class="btn" onclick="clearRegressionPoints()">Clear</button>
+      <button class="btn" onclick="addRandomRegPoints()">Random data</button>
+      <label>Degree: <select id="polyDeg" onchange="drawRegression()" style="background:var(--surface2);color:var(--text);border:0.5px solid var(--border2);border-radius:6px;padding:4px 8px;font-family:Outfit,sans-serif;font-size:12px">
+        <option value="1">1 — Linear</option>
+        <option value="2">2 — Quadratic</option>
+        <option value="3">3 — Cubic</option>
+      </select></label>
+      <span id="regStats" style="font-size:12px;color:var(--muted);margin-left:auto"></span>
+    </div>
+    <canvas id="regCanvas" width="900" height="300" onclick="addRegressionPoint(event)"></canvas>
+  </div>
+
+  <h3>Regularisation</h3>
+  <p>Adding a penalty term to the loss prevents overfitting by keeping weights small.</p>
+  <div class="two-col">
+    <div class="card-sm">
+      <h4>Ridge (L2)</h4>
+      <div style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--teal);margin:0.5rem 0">J + λ Σθⱼ²</div>
+      <p style="font-size:13px;color:var(--muted)">Shrinks all weights smoothly towards zero. Never makes them exactly zero. Good when all features matter a little.</p>
+    </div>
+    <div class="card-sm">
+      <h4>Lasso (L1)</h4>
+      <div style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--amber);margin:0.5rem 0">J + λ Σ|θⱼ|</div>
+      <p style="font-size:13px;color:var(--muted)">Drives unimportant weights to exactly zero — built-in feature selection. Great for high-dimensional sparse problems.</p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:2rem">Python Code</h3>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression, Ridge, Lasso
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> PolynomialFeatures
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+
+<span class="cm"># --- Simple linear regression from scratch ---</span>
+<span class="kw">class</span> <span class="fn">LinearReg</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, lr=<span class="nb">0.01</span>, epochs=<span class="nb">1000</span>):
+        self.lr, self.epochs = lr, epochs
+
+    <span class="kw">def</span> <span class="fn">fit</span>(self, X, y):
+        m, n = X.shape
+        self.theta = np.zeros(n + <span class="nb">1</span>)          <span class="cm"># weights + bias</span>
+        Xb = np.c_[np.ones(m), X]              <span class="cm"># add bias column</span>
+        <span class="kw">for</span> _ <span class="kw">in</span> range(self.epochs):
+            y_hat = Xb @ self.theta
+            grad = (Xb.T @ (y_hat - y)) / m   <span class="cm"># ∂J/∂θ</span>
+            self.theta -= self.lr * grad        <span class="cm"># gradient descent step</span>
+        <span class="kw">return</span> self
+
+    <span class="kw">def</span> <span class="fn">predict</span>(self, X):
+        <span class="kw">return</span> np.c_[np.ones(len(X)), X] @ self.theta
+
+<span class="cm"># --- Sklearn pipeline with polynomial features + Ridge ---</span>
+model = Pipeline([
+    (<span class="st">'poly'</span>, PolynomialFeatures(degree=<span class="nb">2</span>)),
+    (<span class="st">'ridge'</span>, Ridge(alpha=<span class="nb">1.0</span>))
+])
+model.fit(X_train, y_train)
+print(<span class="fn">f</span><span class="st">"R² = {model.score(X_test, y_test):.4f}"</span>)</pre>
+
+  <h3>Key Metrics</h3>
+  <div class="card-grid">
+    <div class="card-sm"><div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--accent);margin-bottom:0.3rem">R²</div><h3>R-Squared</h3><p style="font-size:13px;color:var(--muted)">Fraction of variance explained. 1 = perfect, 0 = no better than mean, negative = worse than mean.</p></div>
+    <div class="card-sm"><div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--teal);margin-bottom:0.3rem">MAE</div><h3>Mean Absolute Error</h3><p style="font-size:13px;color:var(--muted)">Average absolute difference. Same units as target. Robust to outliers.</p></div>
+    <div class="card-sm"><div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--amber);margin-bottom:0.3rem">RMSE</div><h3>Root Mean Sq. Error</h3><p style="font-size:13px;color:var(--muted)">Same units as target. Penalises large errors more than MAE.</p></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ CLASSIFICATION ═══ -->
+<div class="main section" id="tab-2">
+  <div class="section-header">
+    <div class="chip" style="color:var(--amber)">Supervised Learning</div>
+    <h2>Classification</h2>
+    <p class="lead">Predict a <em>discrete category</em> — spam/not-spam, disease/healthy, which digit 0–9.</p>
+  </div>
+
+  <h3>Logistic Regression</h3>
+  <p>Despite the name, it's a <em>classifier</em>. We squash the linear output through a sigmoid to get a probability between 0 and 1.</p>
+
+  <div class="formula-block">
+    <div class="formula-label">Sigmoid activation</div>
+    <div class="formula-main">σ(z) = 1 / (1 + e⁻ᶻ) &nbsp;&nbsp; where &nbsp;&nbsp; z = θᵀx</div>
+    <div class="formula-legend">
+      <span class="formula-var"><code>σ(z)</code> ∈ (0, 1) — probability of class 1</span>
+      <span class="formula-var"><code>e</code> Euler's number ≈ 2.718</span>
+    </div>
+  </div>
+
+  <div class="formula-block">
+    <div class="formula-label">Binary Cross-Entropy Loss</div>
+    <div class="formula-main">J(θ) = −(1/m) Σᵢ [ y⁽ⁱ⁾ log(ŷ⁽ⁱ⁾) + (1−y⁽ⁱ⁾) log(1−ŷ⁽ⁱ⁾) ]</div>
+    <div class="formula-legend">
+      <span class="formula-var"><code>log(ŷ)</code> penalises confident wrong predictions harshly</span>
+    </div>
+  </div>
+
+  <h3 style="margin-top:2rem">Interactive: Decision Boundary</h3>
+  <p style="font-size:13px;color:var(--muted)">Click to add Class A (blue) or Class B (orange) points. Switch mode using the buttons.</p>
+  <div class="canvas-wrap">
+    <div class="canvas-toolbar">
+      <button class="btn btn-primary" id="classABtn" onclick="setClassMode(0)">+ Class A</button>
+      <button class="btn" id="classBBtn" onclick="setClassMode(1)">+ Class B</button>
+      <button class="btn" onclick="clearClassPoints()">Clear</button>
+      <button class="btn" onclick="addClassDemo()">Demo data</button>
+      <span id="classStats" style="font-size:12px;color:var(--muted);margin-left:auto"></span>
+    </div>
+    <canvas id="classCanvas" width="900" height="300" onclick="addClassPoint(event)"></canvas>
+  </div>
+
+  <h3 style="margin-top:1.5rem">Confusion Matrix</h3>
+  <p>The fundamental tool for evaluating classifiers. Breaks down predictions into 4 quadrants.</p>
+  <div class="cm-grid">
+    <div class="cm-cell"></div>
+    <div class="cm-label">Predicted +</div>
+    <div class="cm-label">Predicted −</div>
+    <div class="cm-label">Actual +</div>
+    <div class="cm-cell cm-tp"><div class="cm-num">TP</div><div>True Positive</div></div>
+    <div class="cm-cell cm-fn"><div class="cm-num">FN</div><div>False Negative</div></div>
+    <div class="cm-label">Actual −</div>
+    <div class="cm-cell cm-fp"><div class="cm-num">FP</div><div>False Positive</div></div>
+    <div class="cm-cell cm-tn"><div class="cm-num">TN</div><div>True Negative</div></div>
+  </div>
+
+  <div class="formula-block" style="margin-top:1.5rem">
+    <div class="formula-label">Key classification metrics</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:left;font-family:'DM Mono',monospace;font-size:0.88rem;padding:0.5rem 0">
+      <div><span style="color:var(--teal)">Accuracy</span>  = (TP+TN) / (TP+TN+FP+FN)</div>
+      <div><span style="color:var(--accent)">Precision</span> = TP / (TP+FP)</div>
+      <div><span style="color:var(--amber)">Recall</span>    = TP / (TP+FN)  [Sensitivity]</div>
+      <div><span style="color:var(--coral)">F1 Score</span>  = 2 · P·R / (P+R)</div>
+      <div><span style="color:var(--pink)">Specificity</span>= TN / (TN+FP)</div>
+      <div><span style="color:var(--green)">AUC-ROC</span>   = area under ROC curve</div>
+    </div>
+  </div>
+
+  <h3>Other Algorithms</h3>
+  <div class="card-grid">
+    <div class="card-sm">
+      <h4>Decision Tree</h4>
+      <p style="font-size:13px;color:var(--muted)">Recursively splits data by asking yes/no questions on features. Highly interpretable. Prone to overfit alone.</p>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--teal)">Split criterion: max Information Gain or min Gini Impurity</div>
+    </div>
+    <div class="card-sm">
+      <h4>SVM</h4>
+      <p style="font-size:13px;color:var(--muted)">Find the hyperplane with maximum margin between classes. Kernel trick maps data to higher dimensions for non-linear boundaries.</p>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--amber)">min ½‖w‖² s.t. yᵢ(wᵀxᵢ+b) ≥ 1</div>
+    </div>
+    <div class="card-sm">
+      <h4>k-Nearest Neighbours</h4>
+      <p style="font-size:13px;color:var(--muted)">Predict by majority vote of the k closest training examples. No explicit training phase — just store and look up.</p>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--coral)">distance(a,b) = √Σ(aᵢ−bᵢ)²</div>
+    </div>
+    <div class="card-sm">
+      <h4>Naive Bayes</h4>
+      <p style="font-size:13px;color:var(--muted)">Applies Bayes' theorem assuming features are conditionally independent given the class. Blazing fast. Great for text.</p>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--pink)">P(y|X) ∝ P(y) Πᵢ P(xᵢ|y)</div>
+    </div>
+  </div>
+
+<pre><span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LogisticRegression
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> classification_report, roc_auc_score
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> cross_val_score
+
+<span class="cm"># Train logistic regression</span>
+clf = LogisticRegression(C=<span class="nb">1.0</span>, max_iter=<span class="nb">1000</span>)
+clf.fit(X_train, y_train)
+
+<span class="cm"># Detailed metrics</span>
+y_pred = clf.predict(X_test)
+y_prob = clf.predict_proba(X_test)[:, <span class="nb">1</span>]
+
+print(classification_report(y_test, y_pred))
+print(<span class="fn">f</span><span class="st">"AUC-ROC: {roc_auc_score(y_test, y_prob):.4f}"</span>)
+
+<span class="cm"># 5-fold cross-validation</span>
+cv_scores = cross_val_score(clf, X, y, cv=<span class="nb">5</span>, scoring=<span class="st">'f1'</span>)
+print(<span class="fn">f</span><span class="st">"CV F1: {cv_scores.mean():.3f} ± {cv_scores.std():.3f}"</span>)</pre>
+</div>
+
+<!-- ════════════════════════════════════════ CLUSTERING ═══ -->
+<div class="main section" id="tab-3">
+  <div class="section-header">
+    <div class="chip" style="color:var(--coral)">Unsupervised Learning</div>
+    <h2>Clustering</h2>
+    <p class="lead">Find natural groups in data — <em>without</em> any labels. The algorithm discovers structure on its own.</p>
+  </div>
+
+  <h3>k-Means Clustering</h3>
+  <p>Partition n points into k clusters by minimising within-cluster variance. Simple, fast, widely used.</p>
+
+  <div class="formula-block">
+    <div class="formula-label">k-Means Objective (Inertia)</div>
+    <div class="formula-main">J = Σₖ Σᵢ∈Cₖ ‖xᵢ − μₖ‖²</div>
+    <div class="formula-legend">
+      <span class="formula-var"><code>Cₖ</code> set of points in cluster k</span>
+      <span class="formula-var"><code>μₖ</code> centroid (mean) of cluster k</span>
+      <span class="formula-var"><code>‖·‖²</code> squared Euclidean distance</span>
+    </div>
+  </div>
+
+  <div class="steps" style="margin-top:1.5rem">
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Initialise</div><div class="step-desc">Randomly pick k points as initial centroids (k-means++ picks them far apart for better initialisation).</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Assign</div><div class="step-desc">Assign each data point to the nearest centroid. This creates k clusters.</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Update</div><div class="step-desc">Move each centroid to the mean position of all points assigned to it.</div></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Repeat</div><div class="step-desc">Alternate Assign ↔ Update until centroids stop moving (convergence). Always converges in finite steps.</div></div></div>
+  </div>
+
+  <h3>Interactive: k-Means Sandbox</h3>
+  <p style="font-size:13px;color:var(--muted)">Click to add points. Hit "Step" to watch one E-M iteration. "Run" animates to convergence.</p>
+  <div class="canvas-wrap">
+    <div class="canvas-toolbar">
+      <label>k = <select id="kSelect" style="background:var(--surface2);color:var(--text);border:0.5px solid var(--border2);border-radius:6px;padding:4px 8px;font-family:Outfit,sans-serif;font-size:12px">
+        <option>2</option><option selected>3</option><option>4</option><option>5</option>
+      </select></label>
+      <button class="btn" onclick="kmeansReset()">Reset</button>
+      <button class="btn" onclick="kmeansStep()">Step</button>
+      <button class="btn btn-primary" onclick="kmeansRun()">Run</button>
+      <button class="btn" onclick="addClusterDemo()">Demo data</button>
+      <span id="kmeansInfo" style="font-size:12px;color:var(--muted);margin-left:auto"></span>
+    </div>
+    <canvas id="clusterCanvas" width="900" height="300" onclick="addClusterPoint(event)"></canvas>
+  </div>
+
+  <h3 style="margin-top:1.5rem">Choosing k — the Elbow Method</h3>
+  <p style="font-size:13px;color:var(--muted)">Plot inertia vs k. The "elbow" — where the rate of decrease sharply slows — is usually the best k.</p>
+  <div class="ts-chart-wrap" style="height:220px;padding:1rem">
+    <canvas id="elbowChart"></canvas>
+  </div>
+
+  <h3>Other Clustering Algorithms</h3>
+  <div class="card-grid">
+    <div class="card-sm">
+      <h4>DBSCAN</h4>
+      <p style="font-size:13px;color:var(--muted)">Density-based. Finds arbitrarily shaped clusters and marks outliers as noise. No need to specify k upfront.</p>
+      <div><span class="tag tag-teal">Works with noise</span><span class="tag tag-teal">Arbitrary shapes</span></div>
+    </div>
+    <div class="card-sm">
+      <h4>Hierarchical</h4>
+      <p style="font-size:13px;color:var(--muted)">Builds a tree (dendrogram) of nested clusters. Cut the tree at any height to get any number of clusters.</p>
+      <div><span class="tag tag-amber">No k needed</span><span class="tag tag-amber">Dendrogram</span></div>
+    </div>
+    <div class="card-sm">
+      <h4>Gaussian Mixture</h4>
+      <p style="font-size:13px;color:var(--muted)">Soft assignments — each point has a probability of belonging to each cluster. Fitted via EM algorithm.</p>
+      <div><span class="tag tag-coral">Probabilistic</span><span class="tag tag-coral">Soft clustering</span></div>
+    </div>
+  </div>
+
+<pre><span class="kw">from</span> sklearn.cluster <span class="kw">import</span> KMeans, DBSCAN
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> silhouette_score
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># k-Means with elbow method</span>
+inertias = []
+K_range = range(<span class="nb">1</span>, <span class="nb">11</span>)
+<span class="kw">for</span> k <span class="kw">in</span> K_range:
+    km = KMeans(n_clusters=k, init=<span class="st">'k-means++'</span>, n_init=<span class="nb">10</span>, random_state=<span class="nb">42</span>)
+    km.fit(X)
+    inertias.append(km.inertia_)
+
+<span class="cm"># Best k via silhouette score (higher = better separated clusters)</span>
+best_k, best_s = <span class="nb">2</span>, -<span class="nb">1</span>
+<span class="kw">for</span> k <span class="kw">in</span> range(<span class="nb">2</span>, <span class="nb">11</span>):
+    labels = KMeans(n_clusters=k, random_state=<span class="nb">42</span>).fit_predict(X)
+    s = silhouette_score(X, labels)
+    <span class="kw">if</span> s > best_s: best_k, best_s = k, s
+
+print(<span class="fn">f</span><span class="st">"Best k = {best_k}, silhouette = {best_s:.3f}"</span>)
+
+<span class="cm"># DBSCAN — good for irregular shapes</span>
+db = DBSCAN(eps=<span class="nb">0.5</span>, min_samples=<span class="nb">5</span>).fit(X)
+labels = db.labels_                    <span class="cm"># -1 = noise</span>
+n_clusters = len(set(labels)) - (<span class="nb">1</span> <span class="kw">if</span> -<span class="nb">1</span> <span class="kw">in</span> labels <span class="kw">else</span> <span class="nb">0</span>)</pre>
+</div>
+
+<!-- ════════════════════════════════════════ ENSEMBLE ═══ -->
+<div class="main section" id="tab-4">
+  <div class="section-header">
+    <div class="chip" style="color:var(--green)">Meta-Learning</div>
+    <h2>Ensemble Methods</h2>
+    <p class="lead">Combine many weak learners into one powerful predictor. The wisdom of crowds — for models.</p>
+  </div>
+
+  <p>A single decision tree is unstable (high variance). A single linear model is rigid (high bias). Ensemble methods fix this by <em>combining many models</em>. The key insight: errors that are uncorrelated tend to cancel out.</p>
+
+  <div class="accent-card">
+    <h3>Bias–Variance Decomposition</h3>
+    <p style="margin:0">Expected Error = <span style="color:var(--coral)">Bias²</span> + <span style="color:var(--accent)">Variance</span> + <span style="color:var(--muted)">Irreducible Noise</span></p>
+    <p style="margin-top:0.5rem;font-size:13px;color:var(--muted)">Bagging reduces variance. Boosting reduces bias. Stacking can reduce both.</p>
+  </div>
+
+  <h3 style="margin-top:2rem">1. Bagging — Bootstrap Aggregating</h3>
+  <p>Train many models on different <em>bootstrap samples</em> (random subsets with replacement) of the data. Average their predictions. Models are independent — they reduce variance.</p>
+
+  <div class="formula-block">
+    <div class="formula-label">Bagging prediction</div>
+    <div class="formula-main">ŷ_bag = (1/B) Σᵦ hᵦ(x) &nbsp;&nbsp;[regression] &nbsp;&nbsp; or &nbsp;&nbsp; majority vote &nbsp;&nbsp;[classification]</div>
+    <div class="formula-legend">
+      <span class="formula-var"><code>B</code> number of base models</span>
+      <span class="formula-var"><code>hᵦ</code> b-th base learner trained on bootstrap sample b</span>
+    </div>
+  </div>
+
+  <div class="card-sm" style="margin-bottom:1.5rem">
+    <h4>Random Forest</h4>
+    <p style="font-size:13px;color:var(--muted)">Bagging + extra randomness: at each split, only a random subset of √n features is considered. This de-correlates trees further, giving a huge variance reduction. One of the most reliable general-purpose algorithms.</p>
+    <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--teal)">features per split ≈ √n (classification) or n/3 (regression)</div>
+  </div>
+
+  <h3>2. Boosting — Sequential Error Correction</h3>
+  <p>Train models <em>sequentially</em>, each one focusing on the mistakes of the previous. Combines many weak learners (stumps) into a strong one. Reduces both bias and variance.</p>
+
+  <div class="two-col">
+    <div class="card-sm">
+      <h4>AdaBoost</h4>
+      <p style="font-size:13px;color:var(--muted)">Re-weights training examples after each round. Misclassified points get higher weight — next learner pays more attention to hard cases.</p>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent)">ŷ = sign(Σᵦ αᵦ hᵦ(x))</div>
+    </div>
+    <div class="card-sm">
+      <h4>Gradient Boosting</h4>
+      <p style="font-size:13px;color:var(--muted)">Each new tree fits the <em>residuals</em> (pseudo-residuals = negative gradient of loss) of the current ensemble. Generalises boosting to any differentiable loss.</p>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--amber)">Fₜ(x) = Fₜ₋₁(x) + α · hₜ(x)</div>
+    </div>
+  </div>
+
+  <div class="card-sm" style="margin-top:1rem">
+    <h4>XGBoost / LightGBM / CatBoost</h4>
+    <p style="font-size:13px;color:var(--muted)">Industrial-strength gradient boosting libraries. They add regularisation (L1/L2 on tree weights), second-order gradient approximations, GPU support, and handling of missing values. XGBoost won dozens of Kaggle competitions; LightGBM is faster with very large datasets.</p>
+    <div><span class="tag tag-green">Tabular SOTA</span><span class="tag tag-green">Kaggle winner</span><span class="tag tag-green">Production ready</span></div>
+  </div>
+
+  <h3 style="margin-top:2rem">3. Stacking</h3>
+  <p>Train a <em>meta-learner</em> (level-1 model) on the out-of-fold predictions of base models (level-0). The meta-learner learns how to best combine the base models.</p>
+
+  <div class="formula-block">
+    <div class="formula-label">Stacking — two-level structure</div>
+    <div style="display:grid;grid-template-columns:1fr;gap:0.75rem;font-family:'DM Mono',monospace;font-size:0.9rem;text-align:left;padding:0.5rem 0">
+      <div><span style="color:var(--muted)">Level 0:</span>  h₁(x), h₂(x), …, hₙ(x)  <span style="color:var(--muted)">— diverse base models</span></div>
+      <div><span style="color:var(--muted)">Level 1:</span>  g([h₁(x), h₂(x), …, hₙ(x)])  <span style="color:var(--muted)">— meta-learner</span></div>
+    </div>
+  </div>
+
+  <h3>Interactive: Ensemble Comparison</h3>
+  <div class="canvas-wrap">
+    <div class="canvas-toolbar">
+      <label>Noise level:</label>
+      <input type="range" id="noiseSlider" min="0" max="50" value="15" oninput="document.getElementById('noiseVal').textContent=this.value+'%';drawEnsemble()" style="width:120px;accent-color:var(--green)">
+      <span id="noiseVal" style="font-size:12px;color:var(--teal);min-width:36px">15%</span>
+      <label>Trees:</label>
+      <input type="range" id="treesSlider" min="1" max="50" value="10" oninput="document.getElementById('treesVal').textContent=this.value;drawEnsemble()" style="width:120px;accent-color:var(--green)">
+      <span id="treesVal" style="font-size:12px;color:var(--teal);min-width:24px">10</span>
+      <button class="btn" onclick="drawEnsemble()">Refresh</button>
+    </div>
+    <canvas id="ensembleCanvas" width="900" height="280"></canvas>
+  </div>
+
+<pre><span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier, GradientBoostingClassifier
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> StackingClassifier
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LogisticRegression
+<span class="kw">import</span> xgboost <span class="kw">as</span> xgb
+
+<span class="cm"># --- Random Forest ---</span>
+rf = RandomForestClassifier(
+    n_estimators=<span class="nb">200</span>,        <span class="cm"># number of trees</span>
+    max_features=<span class="st">'sqrt'</span>,      <span class="cm"># features per split</span>
+    max_depth=<span class="nb">None</span>,           <span class="cm"># grow full trees</span>
+    oob_score=<span class="kw">True</span>,           <span class="cm"># out-of-bag validation estimate</span>
+    random_state=<span class="nb">42</span>
+)
+rf.fit(X_train, y_train)
+print(<span class="fn">f</span><span class="st">"OOB accuracy: {rf.oob_score_:.4f}"</span>)
+<span class="cm"># Feature importances (mean decrease in impurity)</span>
+importances = rf.feature_importances_
+
+<span class="cm"># --- XGBoost ---</span>
+xgb_model = xgb.XGBClassifier(
+    n_estimators=<span class="nb">500</span>,
+    learning_rate=<span class="nb">0.05</span>,       <span class="cm"># shrinkage — slow but better</span>
+    max_depth=<span class="nb">6</span>,
+    subsample=<span class="nb">0.8</span>,            <span class="cm"># row sampling (like bagging)</span>
+    colsample_bytree=<span class="nb">0.8</span>,    <span class="cm"># column sampling per tree</span>
+    reg_alpha=<span class="nb">0.1</span>,            <span class="cm"># L1 on leaf weights</span>
+    reg_lambda=<span class="nb">1.0</span>,           <span class="cm"># L2 on leaf weights</span>
+    early_stopping_rounds=<span class="nb">20</span>,
+    eval_metric=<span class="st">'auc'</span>
+)
+
+<span class="cm"># --- Stacking ---</span>
+estimators = [(<span class="st">'rf'</span>, rf), (<span class="st">'xgb'</span>, xgb_model)]
+stack = StackingClassifier(
+    estimators=estimators,
+    final_estimator=LogisticRegression(),
+    cv=<span class="nb">5</span>, passthrough=<span class="kw">False</span>
+)
+stack.fit(X_train, y_train)</pre>
+</div>
+
+<!-- ════════════════════════════════════════ TIME SERIES ═══ -->
+<div class="main section" id="tab-5">
+  <div class="section-header">
+    <div class="chip" style="color:var(--pink)">Sequential Data</div>
+    <h2>Time Series</h2>
+    <p class="lead">Data ordered in time. The past predicts the future — but the relationship is dynamic.</p>
+  </div>
+
+  <h3>Components of a Time Series</h3>
+  <div class="card-grid">
+    <div class="card-sm">
+      <div style="font-size:1.5rem;margin-bottom:0.5rem">📈</div>
+      <h4>Trend</h4>
+      <p style="font-size:13px;color:var(--muted)">Long-term direction — upward, downward, or flat. E.g. global temperature rising over decades.</p>
+    </div>
+    <div class="card-sm">
+      <div style="font-size:1.5rem;margin-bottom:0.5rem">🔄</div>
+      <h4>Seasonality</h4>
+      <p style="font-size:13px;color:var(--muted)">Regular repeating patterns tied to calendar. E.g. retail sales surge every December.</p>
+    </div>
+    <div class="card-sm">
+      <div style="font-size:1.5rem;margin-bottom:0.5rem">〰️</div>
+      <h4>Cyclicality</h4>
+      <p style="font-size:13px;color:var(--muted)">Irregular, longer-period fluctuations. E.g. economic boom-bust cycles.</p>
+    </div>
+    <div class="card-sm">
+      <div style="font-size:1.5rem;margin-bottom:0.5rem">⚡</div>
+      <h4>Residual / Noise</h4>
+      <p style="font-size:13px;color:var(--muted)">The unexplained variation after removing trend and seasonality. Ideally white noise.</p>
+    </div>
+  </div>
+
+  <h3>ARIMA — The Classical Model</h3>
+  <p>ARIMA(p, d, q) combines three ideas: autoregression, integration (differencing), and moving average.</p>
+
+  <div class="formula-block">
+    <div class="formula-label">ARIMA(p, d, q) model</div>
+    <div class="formula-main">Φ(B)(1−B)ᵈ yₜ = Θ(B) εₜ</div>
+    <div style="margin-top:1rem;text-align:left;font-family:'DM Mono',monospace;font-size:0.85rem">
+      <div style="margin-bottom:0.5rem"><span style="color:var(--teal)">AR(p):</span> yₜ = c + φ₁yₜ₋₁ + φ₂yₜ₋₂ + … + φₚyₜ₋ₚ + εₜ</div>
+      <div style="margin-bottom:0.5rem"><span style="color:var(--accent)">MA(q):</span> yₜ = μ + εₜ + θ₁εₜ₋₁ + θ₂εₜ₋₂ + … + θqεₜ₋q</div>
+      <div><span style="color:var(--amber)">I(d):</span> difference the series d times to make it stationary</div>
+    </div>
+    <div class="formula-legend">
+      <span class="formula-var"><code>p</code> AR order — lags of yₜ</span>
+      <span class="formula-var"><code>d</code> differencing order</span>
+      <span class="formula-var"><code>q</code> MA order — lags of εₜ</span>
+      <span class="formula-var"><code>B</code> backshift operator: Byₜ = yₜ₋₁</span>
+      <span class="formula-var"><code>εₜ</code> white noise residual</span>
+    </div>
+  </div>
+
+  <h3>Interactive: Time Series Decomposition</h3>
+  <div class="ts-chart-wrap">
+    <div style="display:flex;gap:12px;margin-bottom:1rem;flex-wrap:wrap">
+      <div class="control-row" style="margin:0">
+        <label style="min-width:auto;font-size:12px;color:var(--muted)">Trend:</label>
+        <input type="range" id="trendSlider" min="-3" max="3" step="0.5" value="1" oninput="updateTSCharts()" style="width:100px;accent-color:var(--pink)">
+        <span id="trendVal" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--teal);min-width:36px">1</span>
+      </div>
+      <div class="control-row" style="margin:0">
+        <label style="min-width:auto;font-size:12px;color:var(--muted)">Season amplitude:</label>
+        <input type="range" id="seasonSlider" min="0" max="30" value="15" oninput="updateTSCharts()" style="width:100px;accent-color:var(--pink)">
+        <span id="seasonVal" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--teal);min-width:36px">15</span>
+      </div>
+      <div class="control-row" style="margin:0">
+        <label style="min-width:auto;font-size:12px;color:var(--muted)">Noise:</label>
+        <input type="range" id="noiseTS" min="0" max="20" value="5" oninput="updateTSCharts()" style="width:100px;accent-color:var(--pink)">
+        <span id="noiseTSVal" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--teal);min-width:36px">5</span>
+      </div>
+    </div>
+    <canvas id="tsChart" height="200"></canvas>
+  </div>
+
+  <h3>Modern Approaches</h3>
+  <div class="card-grid">
+    <div class="card-sm">
+      <h4>Prophet (Meta)</h4>
+      <p style="font-size:13px;color:var(--muted)">Additive model: trend + seasonality + holidays. Robust to missing data and outliers. Excellent for business forecasting.</p>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--pink)">y(t) = g(t) + s(t) + h(t) + ε(t)</div>
+    </div>
+    <div class="card-sm">
+      <h4>LSTM / GRU</h4>
+      <p style="font-size:13px;color:var(--muted)">Recurrent neural networks with gating mechanisms. Learn long-range dependencies. Powerful but data-hungry and slow to train.</p>
+      <div><span class="tag tag-pink">Deep Learning</span><span class="tag tag-pink">Long horizon</span></div>
+    </div>
+    <div class="card-sm">
+      <h4>Temporal Fusion Transformer</h4>
+      <p style="font-size:13px;color:var(--muted)">Attention-based architecture for multi-horizon forecasting with interpretable temporal patterns and feature importance.</p>
+      <div><span class="tag tag-blue">Transformer</span><span class="tag tag-blue">Multi-horizon</span></div>
+    </div>
+    <div class="card-sm">
+      <h4>N-BEATS / N-HiTS</h4>
+      <p style="font-size:13px;color:var(--muted)">Pure MLP architectures that decompose the forecast into trend/seasonality blocks. State-of-the-art on many benchmarks.</p>
+      <div><span class="tag tag-teal">No recurrence</span><span class="tag tag-teal">Interpretable</span></div>
+    </div>
+  </div>
+
+  <div class="formula-block">
+    <div class="formula-label">Forecast evaluation metrics</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:left;font-family:'DM Mono',monospace;font-size:0.82rem;padding:0.5rem 0">
+      <div><span style="color:var(--teal)">MAE  </span> = (1/n) Σ|yₜ − ŷₜ|</div>
+      <div><span style="color:var(--accent)">RMSE </span> = √[(1/n) Σ(yₜ − ŷₜ)²]</div>
+      <div><span style="color:var(--amber)">MAPE </span> = (1/n) Σ|yₜ − ŷₜ|/|yₜ| × 100%</div>
+      <div><span style="color:var(--coral)">SMAPE</span> = (2/n) Σ|yₜ−ŷₜ|/(|yₜ|+|ŷₜ|)</div>
+    </div>
+  </div>
+
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> statsmodels.tsa.statespace.sarimax <span class="kw">import</span> SARIMAX
+<span class="kw">from</span> statsmodels.tsa.stattools <span class="kw">import</span> adfuller
+
+<span class="cm"># Test for stationarity (ADF test)</span>
+result = adfuller(series.dropna())
+print(<span class="fn">f</span><span class="st">"ADF stat: {result[0]:.4f}, p-value: {result[1]:.4f}"</span>)
+<span class="cm"># p < 0.05 → stationary (safe to model)</span>
+
+<span class="cm"># SARIMA(p,d,q)(P,D,Q,s) — seasonal ARIMA</span>
+model = SARIMAX(train,
+    order=(<span class="nb">1</span>, <span class="nb">1</span>, <span class="nb">1</span>),              <span class="cm"># ARIMA(p,d,q)</span>
+    seasonal_order=(<span class="nb">1</span>, <span class="nb">1</span>, <span class="nb">1</span>, <span class="nb">12</span>), <span class="cm"># seasonal period = 12 months</span>
+    enforce_stationarity=<span class="kw">False</span>,
+    enforce_invertibility=<span class="kw">False</span>
+)
+res = model.fit(disp=<span class="kw">False</span>)
+forecast = res.get_forecast(steps=<span class="nb">24</span>)
+pred_mean = forecast.predicted_mean
+conf_int  = forecast.conf_int()    <span class="cm"># 95% confidence intervals</span>
+
+<span class="cm"># --- Prophet (quick and robust) ---</span>
+<span class="kw">from</span> prophet <span class="kw">import</span> Prophet
+df = pd.DataFrame({<span class="st">'ds'</span>: dates, <span class="st">'y'</span>: values})
+m = Prophet(yearly_seasonality=<span class="kw">True</span>, weekly_seasonality=<span class="kw">True</span>)
+m.add_country_holidays(country_name=<span class="st">'US'</span>)
+m.fit(df)
+future  = m.make_future_dataframe(periods=<span class="nb">365</span>)
+forecast = m.predict(future)       <span class="cm"># yhat, yhat_lower, yhat_upper</span></pre>
+</div>
+
+<script>
+/* ═══════════════════════════ TAB LOGIC ═══════════════════════════ */
+function switchTab(idx) {
+  document.querySelectorAll('.section').forEach((s, i) => {
+    s.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', i === idx);
+  });
+  if (idx === 1) setTimeout(drawRegression, 100);
+  if (idx === 2) { setTimeout(() => { drawClassCanvas(); }, 100); }
+  if (idx === 3) { setTimeout(() => { initCluster(); drawCluster(); drawElbow(); }, 100); }
+  if (idx === 4) setTimeout(drawEnsemble, 100);
+  if (idx === 5) setTimeout(initTSCharts, 100);
+}
+
+/* ═══════════════════════════ REGRESSION ═══════════════════════════ */
+let regPoints = [];
+function getRegCanvas() {
+  const c = document.getElementById('regCanvas');
+  const dpr = window.devicePixelRatio || 1;
+  if (!c._init) {
+    c.width = c.offsetWidth * dpr;
+    c.height = 300 * dpr;
+    c.style.height = '300px';
+    c._init = true;
+  }
+  return c;
+}
+function addRegressionPoint(e) {
+  const c = document.getElementById('regCanvas');
+  const rect = c.getBoundingClientRect();
+  const x = (e.clientX - rect.left) / rect.width;
+  const y = (e.clientY - rect.top) / rect.height;
+  regPoints.push({ x, y });
+  drawRegression();
+}
+function clearRegressionPoints() { regPoints = []; drawRegression(); }
+function addRandomRegPoints() {
+  const deg = parseInt(document.getElementById('polyDeg').value);
+  regPoints = [];
+  for (let i = 0; i < 30; i++) {
+    const x = Math.random();
+    let y = 0;
+    if (deg === 1) y = 0.2 + 0.6 * x + (Math.random() - 0.5) * 0.15;
+    else if (deg === 2) y = 0.7 - 2.5 * (x - 0.5) ** 2 + (Math.random() - 0.5) * 0.1;
+    else y = 0.5 + 1.8 * (x - 0.5) - 5 * (x - 0.5) ** 3 + (Math.random() - 0.5) * 0.08;
+    regPoints.push({ x: Math.max(0.02, Math.min(0.98, x)), y: Math.max(0.02, Math.min(0.98, y)) });
+  }
+  drawRegression();
+}
+function polyfit(xs, ys, degree) {
+  const n = xs.length, d = degree + 1;
+  const X = [], Y = [];
+  for (let i = 0; i < n; i++) {
+    const row = [];
+    for (let j = 0; j < d; j++) row.push(Math.pow(xs[i], j));
+    X.push(row); Y.push(ys[i]);
+  }
+  const Xt = X[0].map((_, ci) => X.map(row => row[ci]));
+  const XtX = Xt.map(row => X[0].map((_, ci) => row.reduce((s, _, ri) => s + row[ri] * X[ri][ci], 0)));
+  const XtY = Xt.map(row => row.reduce((s, v, i) => s + v * Y[i], 0));
+  return gaussElim(XtX, XtY);
+}
+function gaussElim(A, b) {
+  const n = b.length, M = A.map((r, i) => [...r, b[i]]);
+  for (let col = 0; col < n; col++) {
+    let maxR = col;
+    for (let r = col + 1; r < n; r++) if (Math.abs(M[r][col]) > Math.abs(M[maxR][col])) maxR = r;
+    [M[col], M[maxR]] = [M[maxR], M[col]];
+    for (let r = col + 1; r < n; r++) {
+      const f = M[r][col] / M[col][col];
+      for (let c = col; c <= n; c++) M[r][c] -= f * M[col][c];
+    }
+  }
+  const x = new Array(n).fill(0);
+  for (let i = n - 1; i >= 0; i--) {
+    x[i] = M[i][n];
+    for (let j = i + 1; j < n; j++) x[i] -= M[i][j] * x[j];
+    x[i] /= M[i][i];
+  }
+  return x;
+}
+function evalPoly(coeffs, x) { return coeffs.reduce((s, c, i) => s + c * Math.pow(x, i), 0); }
+function drawRegression() {
+  const c = document.getElementById('regCanvas');
+  if (!c) return;
+  const dpr = window.devicePixelRatio || 1;
+  if (c.width !== c.offsetWidth * dpr) { c.width = c.offsetWidth * dpr; c.height = 300 * dpr; }
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.scale(1, 1);
+  const pad = 40 * dpr;
+  const pw = W - pad * 2, ph = H - pad * 2;
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 0.5 * dpr;
+  for (let i = 0; i <= 5; i++) {
+    const x = pad + (pw / 5) * i, y = pad + (ph / 5) * i;
+    ctx.beginPath(); ctx.moveTo(x, pad); ctx.lineTo(x, pad + ph); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(pad + pw, y); ctx.stroke();
+  }
+  regPoints.forEach(p => {
+    const cx = pad + p.x * pw, cy = pad + p.y * ph;
+    ctx.beginPath(); ctx.arc(cx, cy, 5 * dpr, 0, Math.PI * 2);
+    ctx.fillStyle = '#6c8cff'; ctx.fill();
+    ctx.strokeStyle = 'rgba(108,140,255,0.4)'; ctx.lineWidth = dpr;
+    ctx.stroke();
+  });
+  if (regPoints.length >= 2) {
+    const deg = parseInt(document.getElementById('polyDeg').value);
+    const xs = regPoints.map(p => p.x), ys = regPoints.map(p => p.y);
+    let coeffs;
+    try { coeffs = polyfit(xs, ys, Math.min(deg, regPoints.length - 1)); } catch (e) { return; }
+    ctx.beginPath();
+    ctx.lineWidth = 2 * dpr;
+    const grad = ctx.createLinearGradient(pad, 0, pad + pw, 0);
+    grad.addColorStop(0, '#6c8cff');
+    grad.addColorStop(1, '#b06cff');
+    ctx.strokeStyle = grad;
+    for (let i = 0; i <= 200; i++) {
+      const t = i / 200;
+      const fx = pad + t * pw, fy = pad + evalPoly(coeffs, t) * ph;
+      if (i === 0) ctx.moveTo(fx, fy); else ctx.lineTo(fx, fy);
+    }
+    ctx.stroke();
+    const preds = xs.map(x => evalPoly(coeffs, x));
+    const mean = ys.reduce((a, b) => a + b) / ys.length;
+    const ss_res = ys.reduce((s, y, i) => s + (y - preds[i]) ** 2, 0);
+    const ss_tot = ys.reduce((s, y) => s + (y - mean) ** 2, 0);
+    const r2 = 1 - ss_res / ss_tot;
+    document.getElementById('regStats').textContent = `n=${regPoints.length}  R²=${r2.toFixed(3)}`;
+  }
+}
+window.addEventListener('load', () => {
+  const c = document.getElementById('regCanvas');
+  if (c) { c.style.height = '300px'; addRandomRegPoints(); }
+});
+
+/* ═══════════════════════════ CLASSIFICATION ═══════════════════════════ */
+let classPoints = [], classMode = 0;
+const classColors = ['#6c8cff', '#f5a623'];
+function setClassMode(m) {
+  classMode = m;
+  document.getElementById('classABtn').className = m === 0 ? 'btn btn-primary' : 'btn';
+  document.getElementById('classBBtn').className = m === 1 ? 'btn btn-primary' : 'btn';
+}
+function clearClassPoints() { classPoints = []; drawClassCanvas(); }
+function addClassDemo() {
+  classPoints = [];
+  for (let i = 0; i < 25; i++) {
+    const ang = Math.random() * Math.PI * 2, r = 0.1 + Math.random() * 0.12;
+    classPoints.push({ x: 0.3 + r * Math.cos(ang), y: 0.45 + r * Math.sin(ang), cls: 0 });
+  }
+  for (let i = 0; i < 25; i++) {
+    const ang = Math.random() * Math.PI * 2, r = 0.1 + Math.random() * 0.12;
+    classPoints.push({ x: 0.7 + r * Math.cos(ang), y: 0.55 + r * Math.sin(ang), cls: 1 });
+  }
+  drawClassCanvas();
+}
+function addClassPoint(e) {
+  const c = document.getElementById('classCanvas');
+  const rect = c.getBoundingClientRect();
+  classPoints.push({
+    x: (e.clientX - rect.left) / rect.width,
+    y: (e.clientY - rect.top) / rect.height,
+    cls: classMode
+  });
+  drawClassCanvas();
+}
+function sigmoid(z) { return 1 / (1 + Math.exp(-z)); }
+function drawClassCanvas() {
+  const c = document.getElementById('classCanvas');
+  if (!c) return;
+  const dpr = window.devicePixelRatio || 1;
+  if (c.width !== c.offsetWidth * dpr) { c.width = c.offsetWidth * dpr; c.height = 300 * dpr; }
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0, 0, W, H);
+  const pad = 20 * dpr;
+  const pw = W - pad * 2, ph = H - pad * 2;
+  const cls0 = classPoints.filter(p => p.cls === 0);
+  const cls1 = classPoints.filter(p => p.cls === 1);
+  if (cls0.length >= 1 && cls1.length >= 1) {
+    const mx0 = cls0.reduce((s, p) => s + p.x, 0) / cls0.length;
+    const my0 = cls0.reduce((s, p) => s + p.y, 0) / cls0.length;
+    const mx1 = cls1.reduce((s, p) => s + p.x, 0) / cls1.length;
+    const my1 = cls1.reduce((s, p) => s + p.y, 0) / cls1.length;
+    const dx = mx1 - mx0, dy = my1 - my0;
+    const mx = (mx0 + mx1) / 2, my = (my0 + my1) / 2;
+    const steps = 60;
+    for (let ix = 0; ix < steps; ix++) {
+      for (let iy = 0; iy < steps; iy++) {
+        const fx = ix / steps, fy = iy / steps;
+        const dot = (fx - mx) * dx + (fy - my) * dy;
+        const prob = sigmoid(dot * 15);
+        const x = pad + fx * pw, y = pad + fy * ph;
+        const sw = pw / steps + 1, sh = ph / steps + 1;
+        ctx.fillStyle = prob > 0.5
+          ? `rgba(245,166,35,${0.08 + (prob - 0.5) * 0.18})`
+          : `rgba(108,140,255,${0.08 + (0.5 - prob) * 0.18})`;
+        ctx.fillRect(x, y, sw, sh);
+      }
+    }
+    const bx1 = pad, bx2 = pad + pw;
+    const by1 = pad + (my - dx * (bx1 / pw - mx) / dy * ph);
+    const by2 = pad + (my - dx * (bx2 / pw - mx) / dy * ph);
+    ctx.beginPath(); ctx.moveTo(bx1, by1); ctx.lineTo(bx2, by2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+    ctx.lineWidth = 2 * dpr; ctx.setLineDash([6 * dpr, 4 * dpr]); ctx.stroke(); ctx.setLineDash([]);
+  }
+  classPoints.forEach(p => {
+    const cx = pad + p.x * pw, cy = pad + p.y * ph;
+    ctx.beginPath(); ctx.arc(cx, cy, 6 * dpr, 0, Math.PI * 2);
+    ctx.fillStyle = classColors[p.cls]; ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = dpr; ctx.stroke();
+  });
+  document.getElementById('classStats').textContent = `A: ${cls0.length}  B: ${cls1.length}`;
+}
+
+/* ═══════════════════════════ CLUSTERING ═══════════════════════════ */
+let clusterPoints = [], centroids = [], clusterLabels = [], kmStep = 0;
+const CLUSTER_COLORS = ['#6c8cff', '#f5a623', '#3dd6b5', '#ff6b6b', '#ff82c3'];
+function addClusterPoint(e) {
+  const c = document.getElementById('clusterCanvas');
+  const rect = c.getBoundingClientRect();
+  clusterPoints.push({ x: (e.clientX - rect.left) / rect.width, y: (e.clientY - rect.top) / rect.height });
+  clusterLabels = new Array(clusterPoints.length).fill(-1);
+  drawCluster();
+}
+function addClusterDemo() {
+  clusterPoints = [];
+  const k = parseInt(document.getElementById('kSelect').value);
+  const centers = [];
+  for (let i = 0; i < k; i++) {
+    centers.push({ x: 0.15 + Math.random() * 0.7, y: 0.15 + Math.random() * 0.7 });
+  }
+  centers.forEach(c => {
+    for (let j = 0; j < 18; j++) {
+      clusterPoints.push({
+        x: Math.max(0.02, Math.min(0.98, c.x + (Math.random() - 0.5) * 0.2)),
+        y: Math.max(0.02, Math.min(0.98, c.y + (Math.random() - 0.5) * 0.2))
+      });
+    }
+  });
+  kmeansReset();
+}
+function kmeansReset() {
+  const k = parseInt(document.getElementById('kSelect').value);
+  clusterLabels = new Array(clusterPoints.length).fill(-1);
+  centroids = [];
+  for (let i = 0; i < k; i++) {
+    const idx = Math.floor(Math.random() * clusterPoints.length);
+    centroids.push({ ...clusterPoints[idx] || { x: Math.random(), y: Math.random() } });
+  }
+  kmStep = 0;
+  document.getElementById('kmeansInfo').textContent = 'Initialised';
+  drawCluster();
+}
+function kmeansAssign() {
+  clusterPoints.forEach((p, i) => {
+    let minD = Infinity, best = 0;
+    centroids.forEach((c, ci) => {
+      const d = (p.x - c.x) ** 2 + (p.y - c.y) ** 2;
+      if (d < minD) { minD = d; best = ci; }
+    });
+    clusterLabels[i] = best;
+  });
+}
+function kmeansUpdate() {
+  const k = centroids.length;
+  const sums = centroids.map(() => ({ x: 0, y: 0, n: 0 }));
+  clusterPoints.forEach((p, i) => {
+    const ci = clusterLabels[i];
+    if (ci >= 0) { sums[ci].x += p.x; sums[ci].y += p.y; sums[ci].n++; }
+  });
+  centroids = sums.map(s => s.n > 0 ? { x: s.x / s.n, y: s.y / s.n } : centroids[0]);
+}
+function kmeansStep() {
+  if (!clusterPoints.length) { addClusterDemo(); return; }
+  if (!centroids.length) kmeansReset();
+  kmeansAssign(); kmeansUpdate(); kmStep++;
+  const inertia = clusterPoints.reduce((s, p, i) => {
+    const c = centroids[clusterLabels[i]];
+    return s + (p.x - c.x) ** 2 + (p.y - c.y) ** 2;
+  }, 0);
+  document.getElementById('kmeansInfo').textContent = `Step ${kmStep} — Inertia: ${inertia.toFixed(4)}`;
+  drawCluster();
+}
+let runTimer = null;
+function kmeansRun() {
+  if (runTimer) { clearInterval(runTimer); runTimer = null; return; }
+  if (!clusterPoints.length) addClusterDemo();
+  if (!centroids.length) kmeansReset();
+  runTimer = setInterval(() => { kmeansStep(); if (kmStep > 50) { clearInterval(runTimer); runTimer = null; } }, 200);
+}
+function initCluster() {
+  if (!clusterPoints.length) addClusterDemo();
+}
+function drawCluster() {
+  const c = document.getElementById('clusterCanvas');
+  if (!c) return;
+  const dpr = window.devicePixelRatio || 1;
+  if (c.width !== c.offsetWidth * dpr) { c.width = c.offsetWidth * dpr; c.height = 300 * dpr; }
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0, 0, W, H);
+  const pad = 20 * dpr;
+  const pw = W - pad * 2, ph = H - pad * 2;
+  if (centroids.length) {
+    centroids.forEach((cen, ci) => {
+      clusterPoints.forEach(p => {
+        if (clusterLabels[clusterPoints.indexOf(p)] === ci) {
+          ctx.beginPath();
+          ctx.moveTo(pad + p.x * pw, pad + p.y * ph);
+          ctx.lineTo(pad + cen.x * pw, pad + cen.y * ph);
+          ctx.strokeStyle = `${CLUSTER_COLORS[ci]}22`;
+          ctx.lineWidth = dpr; ctx.stroke();
+        }
+      });
+    });
+  }
+  clusterPoints.forEach((p, i) => {
+    const ci = clusterLabels[i];
+    const col = ci >= 0 ? CLUSTER_COLORS[ci] : '#7a7f94';
+    const cx = pad + p.x * pw, cy = pad + p.y * ph;
+    ctx.beginPath(); ctx.arc(cx, cy, 5 * dpr, 0, Math.PI * 2);
+    ctx.fillStyle = col; ctx.fill();
+  });
+  centroids.forEach((cen, ci) => {
+    const cx = pad + cen.x * pw, cy = pad + cen.y * ph;
+    ctx.beginPath();
+    const s = 10 * dpr;
+    ctx.moveTo(cx, cy - s); ctx.lineTo(cx + s, cy + s); ctx.lineTo(cx - s, cy + s);
+    ctx.closePath();
+    ctx.fillStyle = CLUSTER_COLORS[ci]; ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5 * dpr; ctx.stroke();
+  });
+}
+let elbowChartInst = null;
+function drawElbow() {
+  const ctx = document.getElementById('elbowChart');
+  if (!ctx) return;
+  const inertias = [1800, 950, 560, 380, 290, 240, 210, 195, 185, 180];
+  if (elbowChartInst) elbowChartInst.destroy();
+  elbowChartInst = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: inertias.map((_, i) => `k=${i+1}`),
+      datasets: [{
+        label: 'Inertia',
+        data: inertias,
+        borderColor: '#3dd6b5',
+        backgroundColor: 'rgba(61,214,181,0.1)',
+        pointBackgroundColor: inertias.map((_, i) => i === 2 ? '#ff6b6b' : '#3dd6b5'),
+        pointRadius: inertias.map((_, i) => i === 2 ? 8 : 4),
+        tension: 0.4, fill: true
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `Inertia: ${ctx.raw}` } } },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#7a7f94', font: { size: 11 } } },
+        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#7a7f94', font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+/* ═══════════════════════════ ENSEMBLE ═══════════════════════════ */
+function drawEnsemble() {
+  const c = document.getElementById('ensembleCanvas');
+  if (!c) return;
+  const dpr = window.devicePixelRatio || 1;
+  if (c.width !== c.offsetWidth * dpr) { c.width = c.offsetWidth * dpr; c.height = 280 * dpr; }
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0, 0, W, H);
+  const noise = parseInt(document.getElementById('noiseSlider').value) / 100;
+  const nTrees = parseInt(document.getElementById('treesSlider').value);
+  const pad = 40 * dpr, pw = W - pad * 2, ph = H - pad * 2;
+  const pts = 60;
+  const xs = Array.from({ length: pts }, (_, i) => i / (pts - 1));
+  const trueY = xs.map(x => 0.5 + 0.35 * Math.sin(x * Math.PI * 2));
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 0.5 * dpr;
+  for (let i = 0; i <= 5; i++) {
+    const y = pad + (ph / 5) * i;
+    ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(pad + pw, y); ctx.stroke();
+  }
+  const treePreds = [];
+  for (let t = 0; t < nTrees; t++) {
+    const offset = (Math.random() - 0.5) * noise * 0.8;
+    const freq = 0.8 + Math.random() * 0.4;
+    const preds = xs.map(x => trueY[Math.floor(x * (pts - 1))] + offset + (Math.random() - 0.5) * noise * 0.5);
+    treePreds.push(preds);
+    if (t < 8) {
+      ctx.beginPath();
+      preds.forEach((y, i) => {
+        const px = pad + xs[i] * pw, py = pad + y * ph;
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      });
+      ctx.strokeStyle = `rgba(108,140,255,${0.12 + 0.04 * (t === 0 ? 1 : 0)})`;
+      ctx.lineWidth = dpr; ctx.stroke();
+    }
+  }
+  const ensembleY = xs.map((_, i) => treePreds.reduce((s, t) => s + t[i], 0) / treePreds.length);
+  ctx.beginPath();
+  ensembleY.forEach((y, i) => {
+    const px = pad + xs[i] * pw, py = pad + y * ph;
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  });
+  ctx.strokeStyle = '#5de0a0'; ctx.lineWidth = 2.5 * dpr; ctx.stroke();
+  ctx.beginPath();
+  trueY.forEach((y, i) => {
+    const px = pad + xs[i] * pw, py = pad + y * ph;
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  });
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.setLineDash([6 * dpr, 4 * dpr]);
+  ctx.lineWidth = 1.5 * dpr; ctx.stroke(); ctx.setLineDash([]);
+  const fSize = 11 * dpr;
+  ctx.font = `${fSize}px Outfit, sans-serif`;
+  ctx.fillStyle = '#5de0a0';
+  ctx.fillText(`Ensemble (${nTrees} trees)`, pad + 8, pad + 20);
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.fillText('True signal', pad + 8, pad + 36);
+  ctx.fillStyle = 'rgba(108,140,255,0.6)';
+  ctx.fillText('Individual trees', pad + 8, pad + 52);
+}
+
+/* ═══════════════════════════ TIME SERIES ═══════════════════════════ */
+let tsChartInst = null;
+function generateTS() {
+  const trend = parseFloat(document.getElementById('trendSlider').value);
+  const season = parseFloat(document.getElementById('seasonSlider').value);
+  const noiseAmp = parseFloat(document.getElementById('noiseTS').value);
+  document.getElementById('trendVal').textContent = trend;
+  document.getElementById('seasonVal').textContent = season;
+  document.getElementById('noiseTSVal').textContent = noiseAmp;
+  const n = 72;
+  const observed = [], trendLine = [], seasonal = [], residual = [];
+  for (let t = 0; t < n; t++) {
+    const tr = 50 + trend * t / 6;
+    const se = season * Math.sin((t / 12) * Math.PI * 2);
+    const noise = (Math.random() - 0.5) * noiseAmp * 2;
+    observed.push(+(tr + se + noise).toFixed(2));
+    trendLine.push(+tr.toFixed(2));
+    seasonal.push(+se.toFixed(2));
+    residual.push(+noise.toFixed(2));
+  }
+  return { observed, trendLine, seasonal, residual };
+}
+function initTSCharts() {
+  const ctx = document.getElementById('tsChart');
+  if (!ctx) return;
+  const { observed, trendLine, seasonal } = generateTS();
+  const labels = Array.from({ length: observed.length }, (_, i) => {
+    const month = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][i % 12];
+    return i % 12 === 0 ? `${month} Y${Math.floor(i/12)+1}` : (i % 6 === 0 ? month : '');
+  });
+  if (tsChartInst) tsChartInst.destroy();
+  tsChartInst = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Observed', data: observed, borderColor: '#ff82c3', backgroundColor: 'transparent', pointRadius: 0, tension: 0.3, borderWidth: 1.5 },
+        { label: 'Trend', data: trendLine, borderColor: '#6c8cff', backgroundColor: 'transparent', pointRadius: 0, tension: 0.1, borderDash: [5, 3], borderWidth: 2 },
+        { label: 'Seasonal', data: seasonal.map(v => v + 50), borderColor: '#3dd6b5', backgroundColor: 'transparent', pointRadius: 0, tension: 0.4, borderWidth: 1.5 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#7a7f94', font: { size: 11, family: 'Outfit' }, boxWidth: 20 } }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#7a7f94', font: { size: 10 }, maxRotation: 0 } },
+        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#7a7f94', font: { size: 10 } } }
+      }
+    }
+  });
+}
+function updateTSCharts() { initTSCharts(); }
+
+/* ═══════════════════════════ INIT ═══════════════════════════ */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    drawRegression();
+  }, 200);
+});
+</script>
+</body>
+</html>

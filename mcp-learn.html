@@ -1,0 +1,2461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCP — Model Context Protocol: Interactive Learning Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg2: #0f1525;
+    --bg3: #151c30;
+    --bg4: #1a2238;
+    --border: rgba(99,179,237,0.15);
+    --border2: rgba(99,179,237,0.3);
+    --accent: #63b3ed;
+    --accent2: #90cdf4;
+    --accent3: #4299e1;
+    --green: #68d391;
+    --amber: #f6ad55;
+    --red: #fc8181;
+    --purple: #b794f4;
+    --teal: #4fd1c5;
+    --text: #e2e8f0;
+    --text2: #a0aec0;
+    --text3: #718096;
+    --mono: 'JetBrains Mono', monospace;
+    --head: 'Syne', sans-serif;
+    --body: 'Lora', serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(10,14,26,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid var(--border);
+    padding: 0 2rem;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  nav .logo {
+    font-family: var(--head);
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+    margin-right: 2.5rem;
+    white-space: nowrap;
+  }
+  nav .logo span { color: var(--text3); font-weight: 400; }
+  nav .nav-links {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex: 1;
+  }
+  nav .nav-links::-webkit-scrollbar { display: none; }
+  nav a.nav-item {
+    font-family: var(--head);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+    text-decoration: none;
+    padding: 0 14px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    white-space: nowrap;
+  }
+  nav a.nav-item:hover, nav a.nav-item.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .progress-bar {
+    position: fixed;
+    top: 56px; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent3), var(--teal));
+    z-index: 101;
+    transition: width 0.1s;
+    width: 0%;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(99,179,237,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(99,179,237,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+  .hero-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(66,153,225,0.12) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    border: 1px solid var(--border2);
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 2rem;
+    background: rgba(99,179,237,0.06);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .hero-badge .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+  .hero h1 {
+    font-family: var(--head);
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 1rem;
+    position: relative;
+  }
+  .hero h1 .mcp { color: var(--accent); }
+  .hero h1 .full { color: var(--text); }
+  .hero-sub {
+    font-size: 1.2rem;
+    color: var(--text2);
+    max-width: 600px;
+    margin: 1rem auto 2.5rem;
+    font-style: italic;
+  }
+  .hero-stats {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  .hero-stat {
+    text-align: center;
+  }
+  .hero-stat .num {
+    font-family: var(--head);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+    display: block;
+  }
+  .hero-stat .lbl {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text3);
+    font-family: var(--head);
+  }
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 1px;
+    animation: bounce 2s infinite;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+  .scroll-hint::after {
+    content: '';
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(var(--accent), transparent);
+  }
+
+  /* SECTIONS */
+  section {
+    padding: 5rem 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  section.wide { max-width: 1100px; }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+  .section-title {
+    font-family: var(--head);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+  }
+  .section-intro {
+    font-size: 1.05rem;
+    color: var(--text2);
+    margin-bottom: 3rem;
+    max-width: 700px;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover {
+    border-color: var(--border2);
+    transform: translateY(-2px);
+  }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .card-icon {
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin-bottom: 1rem;
+  }
+  .card h3 {
+    font-family: var(--head);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+  .card p {
+    font-size: 0.88rem;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  /* ARCHITECTURE DIAGRAM */
+  .arch-diagram {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    margin: 2rem 0;
+    overflow-x: auto;
+  }
+  .arch-flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    min-width: 700px;
+    position: relative;
+  }
+  .arch-box {
+    flex: 1;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1rem;
+    text-align: center;
+    position: relative;
+  }
+  .arch-box.host { border-color: rgba(99,179,237,0.4); }
+  .arch-box.client { border-color: rgba(184,148,244,0.4); }
+  .arch-box.server1 { border-color: rgba(104,211,145,0.4); }
+  .arch-box.server2 { border-color: rgba(246,173,85,0.4); }
+  .arch-box.server3 { border-color: rgba(79,209,197,0.4); }
+  .arch-box .box-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .arch-box.host .box-label { color: var(--accent); }
+  .arch-box.client .box-label { color: var(--purple); }
+  .arch-box.server1 .box-label, .arch-box.server2 .box-label, .arch-box.server3 .box-label { color: var(--green); }
+  .arch-box .box-name {
+    font-family: var(--head);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .arch-box .box-items {
+    list-style: none;
+    font-size: 11px;
+    color: var(--text3);
+    font-family: var(--mono);
+    text-align: left;
+  }
+  .arch-box .box-items li { padding: 2px 0; }
+  .arch-box .box-items li::before { content: '→ '; color: var(--accent3); }
+  .arch-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    gap: 4px;
+    min-width: 60px;
+  }
+  .arch-arrow .proto {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text3);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .arch-arrow .line {
+    width: 100%;
+    height: 1px;
+    background: var(--border2);
+    position: relative;
+  }
+  .arch-arrow .line::after {
+    content: '';
+    position: absolute;
+    right: -4px; top: -3px;
+    border: 4px solid transparent;
+    border-left-color: var(--border2);
+  }
+  .arch-arrow .line.both::before {
+    content: '';
+    position: absolute;
+    left: -4px; top: -3px;
+    border: 4px solid transparent;
+    border-right-color: var(--border2);
+  }
+  .servers-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 2;
+  }
+  .servers-row {
+    display: flex;
+    gap: 8px;
+  }
+  .servers-row .arch-box { flex: 1; }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--bg3);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 1.5rem 0;
+    font-family: var(--mono);
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--bg4);
+    border-bottom: 0.5px solid var(--border);
+  }
+  .code-lang {
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .code-filename {
+    font-size: 11px;
+    color: var(--text3);
+  }
+  .code-copy {
+    font-size: 11px;
+    color: var(--text3);
+    cursor: pointer;
+    background: none;
+    border: 0.5px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 10px;
+    color: var(--text2);
+    font-family: var(--mono);
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .code-copy:hover { border-color: var(--accent); color: var(--accent); }
+  pre {
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+  pre .k { color: var(--purple); }
+  pre .s { color: var(--green); }
+  pre .n { color: var(--accent2); }
+  pre .c { color: var(--text3); font-style: italic; }
+  pre .t { color: var(--teal); }
+  pre .a { color: var(--amber); }
+  pre .r { color: var(--red); }
+  pre .num { color: var(--amber); }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    font-family: var(--head);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text3);
+    padding: 12px 20px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    letter-spacing: 0.3px;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* PRIMITIVES */
+  .primitive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .primitive {
+    background: var(--bg2);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .primitive-header {
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .prim-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .prim-tools .primitive-header { background: rgba(99,179,237,0.08); border-bottom: 0.5px solid rgba(99,179,237,0.2); }
+  .prim-tools .prim-icon { background: rgba(99,179,237,0.15); }
+  .prim-resources .primitive-header { background: rgba(104,211,145,0.08); border-bottom: 0.5px solid rgba(104,211,145,0.2); }
+  .prim-resources .prim-icon { background: rgba(104,211,145,0.15); }
+  .prim-prompts .primitive-header { background: rgba(184,148,244,0.08); border-bottom: 0.5px solid rgba(184,148,244,0.2); }
+  .prim-prompts .prim-icon { background: rgba(184,148,244,0.15); }
+  .prim-sampling .primitive-header { background: rgba(246,173,85,0.08); border-bottom: 0.5px solid rgba(246,173,85,0.2); }
+  .prim-sampling .prim-icon { background: rgba(246,173,85,0.15); }
+  .prim-roots .primitive-header { background: rgba(79,209,197,0.08); border-bottom: 0.5px solid rgba(79,209,197,0.2); }
+  .prim-roots .prim-icon { background: rgba(79,209,197,0.15); }
+  .primitive-body {
+    padding: 1rem 1.25rem;
+  }
+  .primitive-body p {
+    font-size: 0.88rem;
+    color: var(--text2);
+    margin-bottom: 0.75rem;
+  }
+  .primitive-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin: 2px;
+  }
+  .tag-client { background: rgba(99,179,237,0.1); color: var(--accent); }
+  .tag-server { background: rgba(104,211,145,0.1); color: var(--green); }
+  .tag-both { background: rgba(184,148,244,0.1); color: var(--purple); }
+
+  /* MESSAGE FLOW EXPLORER */
+  .flow-explorer {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    margin: 2rem 0;
+  }
+  .flow-title {
+    font-family: var(--head);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+  }
+  .flow-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .flow-step {
+    display: grid;
+    grid-template-columns: 80px 40px 1fr;
+    align-items: start;
+    gap: 12px;
+    padding: 12px 0;
+    position: relative;
+  }
+  .flow-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 99px;
+    top: 44px;
+    bottom: -12px;
+    width: 1px;
+    background: var(--border);
+  }
+  .flow-actor {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-align: right;
+    padding-top: 10px;
+    letter-spacing: 0.5px;
+  }
+  .actor-host { color: var(--accent); }
+  .actor-client { color: var(--purple); }
+  .actor-server { color: var(--green); }
+  .flow-icon-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .flow-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+  .dot-host { background: rgba(99,179,237,0.15); border: 1px solid rgba(99,179,237,0.4); }
+  .dot-client { background: rgba(184,148,244,0.15); border: 1px solid rgba(184,148,244,0.4); }
+  .dot-server { background: rgba(104,211,145,0.15); border: 1px solid rgba(104,211,145,0.4); }
+  .flow-msg {
+    background: var(--bg3);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+  }
+  .flow-msg-type {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 3px;
+  }
+  .flow-msg-desc {
+    font-size: 13px;
+    color: var(--text2);
+  }
+  .flow-msg-data {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 6px;
+    padding: 6px 10px;
+    background: var(--bg4);
+    border-radius: 4px;
+    overflow-x: auto;
+  }
+
+  /* INTERACTIVE SANDBOX */
+  .sandbox {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin: 2rem 0;
+  }
+  .sandbox-header {
+    background: var(--bg4);
+    border-bottom: 0.5px solid var(--border);
+    padding: 12px 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .sandbox-dots { display: flex; gap: 6px; }
+  .sandbox-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .sandbox-title {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text3);
+    margin-left: 4px;
+  }
+  .sandbox-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 300px;
+  }
+  .sandbox-panel {
+    padding: 1.25rem;
+    overflow: auto;
+  }
+  .sandbox-panel:first-child {
+    border-right: 0.5px solid var(--border);
+  }
+  .sandbox-panel-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .sandbox-output {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.8;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .output-line { display: flex; gap: 8px; }
+  .output-line .arrow { color: var(--accent3); flex-shrink: 0; }
+  .output-line .method { color: var(--purple); }
+  .output-line .ok { color: var(--green); }
+  .output-line .err { color: var(--red); }
+  .output-line .ts { color: var(--text3); font-size: 10px; margin-top: 2px; }
+
+  .msg-builder { display: flex; flex-direction: column; gap: 12px; }
+  .msg-builder label {
+    font-size: 12px;
+    color: var(--text3);
+    font-family: var(--mono);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .msg-builder select,
+  .msg-builder input,
+  .msg-builder textarea {
+    width: 100%;
+    background: var(--bg3);
+    border: 0.5px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-family: var(--mono);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .msg-builder select:focus,
+  .msg-builder input:focus,
+  .msg-builder textarea:focus { border-color: var(--accent); }
+  .send-btn {
+    background: rgba(99,179,237,0.1);
+    border: 1px solid rgba(99,179,237,0.4);
+    color: var(--accent);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: var(--head);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .send-btn:hover { background: rgba(99,179,237,0.2); }
+
+  /* TRANSPORT COMPARISON */
+  .transport-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  .transport-card {
+    background: var(--bg2);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .transport-header {
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .transport-stdio .transport-header { background: rgba(104,211,145,0.06); border-bottom: 0.5px solid rgba(104,211,145,0.2); }
+  .transport-sse .transport-header { background: rgba(99,179,237,0.06); border-bottom: 0.5px solid rgba(99,179,237,0.2); }
+  .transport-icon {
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .transport-stdio .transport-icon { background: rgba(104,211,145,0.15); }
+  .transport-sse .transport-icon { background: rgba(99,179,237,0.15); }
+  .transport-name {
+    font-family: var(--head);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text);
+  }
+  .transport-subtitle {
+    font-size: 11px;
+    color: var(--text3);
+    font-family: var(--mono);
+  }
+  .transport-body {
+    padding: 1rem 1.25rem;
+  }
+  .transport-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 0.5px solid var(--border);
+    font-size: 12px;
+  }
+  .transport-row:last-child { border-bottom: none; }
+  .transport-row .key { color: var(--text3); }
+  .transport-row .val { color: var(--text2); font-family: var(--mono); }
+  .val.good { color: var(--green); }
+  .val.warn { color: var(--amber); }
+  .val.bad { color: var(--red); }
+
+  /* SECURITY */
+  .security-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  .security-item {
+    background: var(--bg2);
+    border-radius: 10px;
+    padding: 1.25rem;
+    border-left: 3px solid;
+  }
+  .security-item.tip { border-left-color: var(--green); }
+  .security-item.warn { border-left-color: var(--amber); }
+  .security-item.danger { border-left-color: var(--red); }
+  .security-item h4 {
+    font-family: var(--head);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .security-item p {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  /* TIMELINE */
+  .timeline {
+    position: relative;
+    margin: 2rem 0;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: var(--border);
+  }
+  .timeline-item {
+    padding-left: 52px;
+    padding-bottom: 2rem;
+    position: relative;
+  }
+  .timeline-dot {
+    position: absolute;
+    left: 8px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: var(--bg);
+    top: 3px;
+  }
+  .timeline-dot.filled { background: var(--accent); }
+  .timeline-date {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    margin-bottom: 4px;
+  }
+  .timeline-event {
+    font-family: var(--head);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .timeline-desc {
+    font-size: 13px;
+    color: var(--text2);
+  }
+
+  /* QUIZ */
+  .quiz-card {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-top: 2rem;
+  }
+  .quiz-q {
+    font-family: var(--head);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1.25rem;
+  }
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+  .quiz-option {
+    padding: 12px 16px;
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text2);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg3);
+  }
+  .quiz-option:hover { border-color: var(--border2); color: var(--text); }
+  .quiz-option.correct { border-color: var(--green); color: var(--green); background: rgba(104,211,145,0.08); }
+  .quiz-option.wrong { border-color: var(--red); color: var(--red); background: rgba(252,129,129,0.08); }
+  .quiz-option-letter {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--head);
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .quiz-feedback {
+    display: none;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-top: 8px;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.good { background: rgba(104,211,145,0.1); color: var(--green); }
+  .quiz-feedback.bad { background: rgba(252,129,129,0.1); color: var(--red); }
+  .quiz-nav { display: flex; gap: 12px; margin-top: 1rem; }
+  .quiz-btn {
+    font-family: var(--head);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .quiz-btn.next {
+    background: rgba(99,179,237,0.1);
+    border: 1px solid rgba(99,179,237,0.4);
+    color: var(--accent);
+  }
+  .quiz-btn.next:hover { background: rgba(99,179,237,0.2); }
+  .quiz-btn.reset {
+    background: transparent;
+    border: 0.5px solid var(--border);
+    color: var(--text3);
+  }
+  .quiz-progress {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .quiz-progress-bar {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+  .quiz-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.4s;
+  }
+
+  /* INSTALL STEPS */
+  .install-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  .install-step {
+    display: flex;
+    gap: 1rem;
+    align-items: start;
+  }
+  .step-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(99,179,237,0.1);
+    border: 1px solid rgba(99,179,237,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--head);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-content h4 {
+    font-family: var(--head);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .step-content p { font-size: 13px; color: var(--text2); }
+
+  /* INLINE CODE */
+  code {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    background: rgba(99,179,237,0.1);
+    color: var(--accent2);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+
+  /* CALLOUT */
+  .callout {
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    display: flex;
+    gap: 12px;
+    font-size: 14px;
+  }
+  .callout-info { background: rgba(99,179,237,0.08); border-left: 3px solid var(--accent3); }
+  .callout-warn { background: rgba(246,173,85,0.08); border-left: 3px solid var(--amber); }
+  .callout-tip { background: rgba(104,211,145,0.08); border-left: 3px solid var(--green); }
+  .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .callout-body { color: var(--text2); line-height: 1.6; }
+  .callout-body strong { color: var(--text); font-family: var(--head); font-weight: 700; }
+
+  /* DIVIDER */
+  .divider {
+    height: 0.5px;
+    background: var(--border);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    font-size: 12px;
+    color: var(--text3);
+    font-family: var(--mono);
+    border-top: 0.5px solid var(--border);
+    margin-top: 4rem;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* RESPONSIVE */
+  @media (max-width: 700px) {
+    .sandbox-body { grid-template-columns: 1fr; }
+    .sandbox-panel:first-child { border-right: none; border-bottom: 0.5px solid var(--border); }
+    .transport-grid { grid-template-columns: 1fr; }
+    .arch-flow { flex-direction: column; min-width: unset; }
+    nav .logo { font-size: 15px; }
+  }
+
+  /* ANIMATIONS */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .highlight { color: var(--accent); }
+
+  /* JSON-RPC formula box */
+  .formula-box {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text);
+  }
+  .formula-title {
+    font-family: var(--head);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 1rem;
+  }
+  .formula-row {
+    display: flex;
+    gap: 1rem;
+    margin: 6px 0;
+    align-items: baseline;
+    flex-wrap: wrap;
+  }
+  .formula-field { color: var(--accent); }
+  .formula-sep { color: var(--text3); }
+  .formula-type { color: var(--purple); }
+  .formula-optional { color: var(--amber); }
+  .formula-desc { font-size: 11px; color: var(--text3); margin-left: auto; }
+
+  /* RESOURCES table */
+  .resources-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+    font-size: 13px;
+  }
+  .resources-table th {
+    font-family: var(--head);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text3);
+    font-weight: 700;
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .resources-table td {
+    padding: 10px 12px;
+    border-bottom: 0.5px solid var(--border);
+    color: var(--text2);
+  }
+  .resources-table td:first-child { font-family: var(--mono); color: var(--accent); }
+  .resources-table tr:last-child td { border-bottom: none; }
+  .resources-table tr:hover td { background: var(--bg3); }
+  .badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 4px;
+  }
+  .badge-new { background: rgba(104,211,145,0.15); color: var(--green); }
+  .badge-exp { background: rgba(246,173,85,0.15); color: var(--amber); }
+
+  /* Use case pills */
+  .usecase-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 1.5rem;
+  }
+  .usecase-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: 100px;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .usecase-pill:hover { border-color: var(--accent); color: var(--accent); }
+  .usecase-pill .pill-icon { font-size: 16px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">MCP <span>/ Guide</span></div>
+  <div class="nav-links">
+    <a href="#overview" class="nav-item">Overview</a>
+    <a href="#architecture" class="nav-item">Architecture</a>
+    <a href="#primitives" class="nav-item">Primitives</a>
+    <a href="#protocol" class="nav-item">Protocol</a>
+    <a href="#transports" class="nav-item">Transports</a>
+    <a href="#building" class="nav-item">Building</a>
+    <a href="#security" class="nav-item">Security</a>
+    <a href="#ecosystem" class="nav-item">Ecosystem</a>
+    <a href="#quiz" class="nav-item">Quiz</a>
+  </div>
+</nav>
+<div class="progress-bar" id="progress"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Open Standard · Anthropic · 2024
+  </div>
+  <h1>
+    <span class="mcp">MCP</span><br>
+    <span class="full" style="font-size:0.55em; color: var(--text2);">Model Context Protocol</span>
+  </h1>
+  <p class="hero-sub">The open standard for connecting AI models to the tools, data, and systems they need — a universal interface for intelligent agents.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="num">1</span><span class="lbl">Protocol</span></div>
+    <div class="hero-stat"><span class="num">3</span><span class="lbl">Primitives</span></div>
+    <div class="hero-stat"><span class="num">2</span><span class="lbl">Transports</span></div>
+    <div class="hero-stat"><span class="num">∞</span><span class="lbl">Integrations</span></div>
+  </div>
+  <div class="scroll-hint">scroll to learn</div>
+</div>
+
+<!-- OVERVIEW -->
+<section id="overview" class="fade-in">
+  <div class="section-label">// section 01</div>
+  <h2 class="section-title">What is MCP?</h2>
+  <p class="section-intro">Model Context Protocol (MCP) is an open protocol introduced by Anthropic in November 2024 that standardizes how large language models communicate with external tools, data sources, and services.</p>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">💡</span>
+    <div class="callout-body"><strong>The core idea:</strong> Before MCP, every AI integration required custom, one-off glue code. MCP defines a single, universal "language" that any AI model (client) can use to talk to any external system (server) — like USB for AI tools.</div>
+  </div>
+
+  <p style="color: var(--text2); margin-bottom: 1.5rem;">Think of MCP as the HTTP of AI tool use. Just as HTTP standardized how browsers and web servers communicate, MCP standardizes how AI models and their tool providers communicate.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon" style="background: rgba(99,179,237,0.1);">🔌</div>
+      <h3>Standardization</h3>
+      <p>One protocol replaces countless custom integrations. Build once, connect everywhere — any MCP client works with any MCP server.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background: rgba(104,211,145,0.1);">🔒</div>
+      <h3>Security-first</h3>
+      <p>Explicit capability negotiation, consent-based data access, and clear separation between the AI model and external systems.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background: rgba(184,148,244,0.1);">⚡</div>
+      <h3>Stateful connections</h3>
+      <p>Long-lived sessions allow complex, multi-turn agentic workflows — not just single request-response tool calls.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background: rgba(246,173,85,0.1);">🌍</div>
+      <h3>Open standard</h3>
+      <p>Open-source specification licensed under MIT. Supported by Anthropic, OpenAI, Google DeepMind, and hundreds of developers.</p>
+    </div>
+  </div>
+
+  <div style="margin-top: 3rem;">
+    <h3 style="font-family: var(--head); font-size: 1.2rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--text);">The Problem MCP Solves</h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div style="background: rgba(252,129,129,0.06); border: 0.5px solid rgba(252,129,129,0.2); border-radius: 12px; padding: 1.25rem;">
+        <div style="font-family: var(--head); font-weight: 700; color: var(--red); margin-bottom: 8px; font-size: 0.9rem;">❌ Before MCP</div>
+        <ul style="list-style: none; font-size: 13px; color: var(--text2); line-height: 2;">
+          <li>→ N tools × M models = N×M integrations</li>
+          <li>→ Each integration has its own API format</li>
+          <li>→ Context lost between tool calls</li>
+          <li>→ No standard for auth, errors, streaming</li>
+          <li>→ Difficult to compose multiple tools</li>
+        </ul>
+      </div>
+      <div style="background: rgba(104,211,145,0.06); border: 0.5px solid rgba(104,211,145,0.2); border-radius: 12px; padding: 1.25rem;">
+        <div style="font-family: var(--head); font-weight: 700; color: var(--green); margin-bottom: 8px; font-size: 0.9rem;">✓ With MCP</div>
+        <ul style="list-style: none; font-size: 13px; color: var(--text2); line-height: 2;">
+          <li>→ N + M integrations (one per side)</li>
+          <li>→ Universal message format (JSON-RPC 2.0)</li>
+          <li>→ Stateful sessions preserve context</li>
+          <li>→ Built-in capability negotiation</li>
+          <li>→ Composable tool ecosystems</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 3rem;">
+    <h3 style="font-family: var(--head); font-size: 1.2rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--text);">Key Use Cases</h3>
+    <div class="usecase-grid">
+      <div class="usecase-pill"><span class="pill-icon">📁</span> File system access</div>
+      <div class="usecase-pill"><span class="pill-icon">🗄️</span> Database queries</div>
+      <div class="usecase-pill"><span class="pill-icon">🌐</span> Web browsing & scraping</div>
+      <div class="usecase-pill"><span class="pill-icon">💻</span> Code execution</div>
+      <div class="usecase-pill"><span class="pill-icon">📧</span> Email & calendar</div>
+      <div class="usecase-pill"><span class="pill-icon">🔗</span> API calls</div>
+      <div class="usecase-pill"><span class="pill-icon">🎨</span> Image generation</div>
+      <div class="usecase-pill"><span class="pill-icon">🔍</span> Semantic search</div>
+      <div class="usecase-pill"><span class="pill-icon">📊</span> Data analysis</div>
+      <div class="usecase-pill"><span class="pill-icon">🤖</span> Agent orchestration</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ARCHITECTURE -->
+<section id="architecture" class="wide fade-in">
+  <div class="section-label">// section 02</div>
+  <h2 class="section-title">Architecture</h2>
+  <p class="section-intro">MCP uses a client-server architecture where a host application manages one or more clients, each maintaining a dedicated connection to an MCP server.</p>
+
+  <div class="arch-diagram">
+    <div style="font-family: var(--mono); font-size: 11px; color: var(--text3); margin-bottom: 1.5rem; letter-spacing: 1px; text-transform: uppercase;">System Overview</div>
+    <div class="arch-flow">
+      <div class="arch-box host">
+        <div class="box-label">Host Process</div>
+        <div class="box-name">🖥️ MCP Host</div>
+        <ul class="box-items">
+          <li>Claude Desktop</li>
+          <li>VS Code + Copilot</li>
+          <li>Custom AI App</li>
+          <li>IDE Plugins</li>
+        </ul>
+        <div style="margin-top: 12px; background: var(--bg4); border-radius: 6px; padding: 8px;">
+          <div class="box-label" style="color: var(--purple);">MCP Client</div>
+          <div style="font-size: 11px; color: var(--text3); font-family: var(--mono);">1:1 per server connection<br>Manages protocol state<br>Routes messages</div>
+        </div>
+      </div>
+      <div class="arch-arrow">
+        <div class="proto">JSON-RPC 2.0</div>
+        <div class="line both"></div>
+        <div class="proto">stdio / SSE</div>
+      </div>
+      <div class="servers-col">
+        <div style="font-family: var(--mono); font-size: 11px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase;">MCP Servers</div>
+        <div class="servers-row">
+          <div class="arch-box server1">
+            <div class="box-label">Server A</div>
+            <div class="box-name">📁 Filesystem</div>
+            <ul class="box-items">
+              <li>Read/write files</li>
+              <li>Directory listing</li>
+              <li>File search</li>
+            </ul>
+          </div>
+          <div class="arch-box server2">
+            <div class="box-label">Server B</div>
+            <div class="box-name">🗄️ Database</div>
+            <ul class="box-items">
+              <li>SQL queries</li>
+              <li>Schema inspection</li>
+              <li>Transactions</li>
+            </ul>
+          </div>
+        </div>
+        <div class="servers-row">
+          <div class="arch-box server3">
+            <div class="box-label">Server C</div>
+            <div class="box-name">🌐 Web/APIs</div>
+            <ul class="box-items">
+              <li>HTTP requests</li>
+              <li>Web scraping</li>
+              <li>OAuth flows</li>
+            </ul>
+          </div>
+          <div class="arch-box" style="border-color: rgba(184,148,244,0.4);">
+            <div class="box-label" style="color: var(--purple);">Server N</div>
+            <div class="box-name">🔧 Custom</div>
+            <ul class="box-items">
+              <li>Any capability</li>
+              <li>Your tools</li>
+              <li>Business logic</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-warn">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-body"><strong>Important constraint:</strong> Servers <em>cannot</em> directly initiate contact with the host or access other servers. All communication flows through the host, preserving security and isolation.</div>
+  </div>
+
+  <h3 style="font-family: var(--head); font-size: 1.2rem; font-weight: 700; margin: 2rem 0 1rem; color: var(--text);">Connection Lifecycle</h3>
+
+  <div class="flow-explorer">
+    <div class="flow-title">MCP Session Lifecycle</div>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-actor actor-host">HOST</div>
+        <div class="flow-icon-wrap"><div class="flow-dot dot-host">🚀</div></div>
+        <div class="flow-msg">
+          <div class="flow-msg-type">initialize →</div>
+          <div class="flow-msg-desc">Host spawns server process or opens HTTP connection, sends protocol version and capabilities</div>
+          <div class="flow-msg-data">{ "protocolVersion": "2024-11-05", "capabilities": { "roots": {}, "sampling": {} } }</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-actor actor-server">SERVER</div>
+        <div class="flow-icon-wrap"><div class="flow-dot dot-server">📋</div></div>
+        <div class="flow-msg">
+          <div class="flow-msg-type">← InitializeResult</div>
+          <div class="flow-msg-desc">Server responds with its capabilities, supported protocol version, and server info</div>
+          <div class="flow-msg-data">{ "capabilities": { "tools": {}, "resources": { "subscribe": true }, "prompts": {} } }</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-actor actor-client">CLIENT</div>
+        <div class="flow-icon-wrap"><div class="flow-dot dot-client">✅</div></div>
+        <div class="flow-msg">
+          <div class="flow-msg-type">initialized (notification) →</div>
+          <div class="flow-msg-desc">Client confirms initialization is complete. Session is now active and ready for use.</div>
+          <div class="flow-msg-data">{ "method": "notifications/initialized" }</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-actor actor-host">HOST</div>
+        <div class="flow-icon-wrap"><div class="flow-dot dot-host">⚡</div></div>
+        <div class="flow-msg">
+          <div class="flow-msg-type">Normal operation</div>
+          <div class="flow-msg-desc">Host sends requests (tools/call, resources/read, prompts/get). Server sends responses and notifications.</div>
+          <div class="flow-msg-data">tools/call, tools/list, resources/read, resources/subscribe, prompts/get, sampling/createMessage</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-actor actor-host">HOST</div>
+        <div class="flow-icon-wrap"><div class="flow-dot dot-host">🔴</div></div>
+        <div class="flow-msg">
+          <div class="flow-msg-type">Shutdown</div>
+          <div class="flow-msg-desc">Host closes the connection. For stdio servers, the stdin pipe is closed. Servers should clean up resources.</div>
+          <div class="flow-msg-data">Close stdin / HTTP disconnect → server exits cleanly</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PRIMITIVES -->
+<section id="primitives" class="fade-in">
+  <div class="section-label">// section 03</div>
+  <h2 class="section-title">Core Primitives</h2>
+  <p class="section-intro">MCP defines five core primitives — the fundamental building blocks for every server. Understanding these is essential to designing effective MCP integrations.</p>
+
+  <div class="primitive-grid">
+    <div class="primitive prim-tools">
+      <div class="primitive-header">
+        <div class="prim-icon">🔧</div>
+        <div>
+          <div style="font-family: var(--head); font-weight: 700; color: var(--text);">Tools</div>
+          <div style="font-size: 11px; color: var(--text3);">Model-controlled actions</div>
+        </div>
+      </div>
+      <div class="primitive-body">
+        <p>Functions the AI can invoke to perform actions or retrieve computed information. The model decides when and how to call tools based on context.</p>
+        <p style="font-size: 12px; color: var(--text3);">Examples: run_query(), send_email(), create_file(), search_web()</p>
+        <span class="primitive-tag tag-server">server-exposed</span>
+        <span class="primitive-tag tag-client">model-invoked</span>
+      </div>
+    </div>
+    <div class="primitive prim-resources">
+      <div class="primitive-header">
+        <div class="prim-icon">📚</div>
+        <div>
+          <div style="font-family: var(--head); font-weight: 700; color: var(--text);">Resources</div>
+          <div style="font-size: 11px; color: var(--text3);">Data & content exposure</div>
+        </div>
+      </div>
+      <div class="primitive-body">
+        <p>Structured data (files, database rows, API responses) that servers expose for the AI to read. Application-controlled — the host decides what to include in context.</p>
+        <p style="font-size: 12px; color: var(--text3);">Identified by URIs: <code>file:///path/to/doc</code>, <code>db://table/row</code></p>
+        <span class="primitive-tag tag-server">server-exposed</span>
+        <span class="primitive-tag tag-both">app-controlled</span>
+      </div>
+    </div>
+    <div class="primitive prim-prompts">
+      <div class="primitive-header">
+        <div class="prim-icon">💬</div>
+        <div>
+          <div style="font-family: var(--head); font-weight: 700; color: var(--text);">Prompts</div>
+          <div style="font-size: 11px; color: var(--text3);">Reusable prompt templates</div>
+        </div>
+      </div>
+      <div class="primitive-body">
+        <p>Pre-built prompt templates and workflows that can accept dynamic arguments. User-controlled — surfaced in the UI as slash commands or menu options.</p>
+        <p style="font-size: 12px; color: var(--text3);">Examples: /summarize, /review-pr, /explain-code</p>
+        <span class="primitive-tag tag-server">server-defined</span>
+        <span class="primitive-tag tag-both">user-invoked</span>
+      </div>
+    </div>
+    <div class="primitive prim-sampling">
+      <div class="primitive-header">
+        <div class="prim-icon">🧠</div>
+        <div>
+          <div style="font-family: var(--head); font-weight: 700; color: var(--text);">Sampling</div>
+          <div style="font-size: 11px; color: var(--text3);">Server-initiated LLM calls</div>
+        </div>
+      </div>
+      <div class="primitive-body">
+        <p>Allows servers to request LLM completions through the client — enabling agentic server behaviors. The host maintains control and user approval.</p>
+        <p style="font-size: 12px; color: var(--text3);">Server → Client → LLM → Client → Server pipeline</p>
+        <span class="primitive-tag tag-client">client-facilitated</span>
+        <span class="primitive-tag tag-both">host-approved</span>
+      </div>
+    </div>
+    <div class="primitive prim-roots">
+      <div class="primitive-header">
+        <div class="prim-icon">🌲</div>
+        <div>
+          <div style="font-family: var(--head); font-weight: 700; color: var(--text);">Roots</div>
+          <div style="font-size: 11px; color: var(--text3);">Filesystem boundaries</div>
+        </div>
+      </div>
+      <div class="primitive-body">
+        <p>URI boundaries that define the scope of server access. The host exposes a list of "roots" (directories/URIs) the server is allowed to operate within.</p>
+        <p style="font-size: 12px; color: var(--text3);">Enables servers to understand project scope without arbitrary filesystem access.</p>
+        <span class="primitive-tag tag-client">client-exposed</span>
+        <span class="primitive-tag tag-server">server-informs</span>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-family: var(--head); font-size: 1.2rem; font-weight: 700; margin: 3rem 0 1rem; color: var(--text);">Tool Schema — JSON Format</h3>
+
+  <div class="formula-box">
+    <div class="formula-title">// Tool Definition Schema</div>
+    <div class="formula-row">
+      <span class="formula-field">"name"</span><span class="formula-sep">:</span><span class="formula-type"> string</span>
+      <span class="formula-desc">Unique identifier, snake_case</span>
+    </div>
+    <div class="formula-row">
+      <span class="formula-field">"description"</span><span class="formula-sep">:</span><span class="formula-type"> string</span>
+      <span class="formula-desc">Human-readable, used by model to decide when to call</span>
+    </div>
+    <div class="formula-row">
+      <span class="formula-field">"inputSchema"</span><span class="formula-sep">:</span><span class="formula-type"> JSONSchema</span>
+      <span class="formula-desc">JSON Schema object defining input parameters</span>
+    </div>
+    <div class="formula-row" style="margin-top: 12px; border-top: 0.5px solid var(--border); padding-top: 12px;">
+      <span class="formula-optional">Response includes:</span>
+    </div>
+    <div class="formula-row">
+      <span class="formula-field">"content"</span><span class="formula-sep">:</span><span class="formula-type"> ContentBlock[]</span>
+      <span class="formula-desc">Array of text, image, or resource content</span>
+    </div>
+    <div class="formula-row">
+      <span class="formula-field">"isError"</span><span class="formula-sep">:</span><span class="formula-type"> boolean?</span>
+      <span class="formula-desc">True if the tool call resulted in an error</span>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-lang">JSON</span>
+      <span class="code-filename">tool-definition.json</span>
+      <button class="code-copy" onclick="copyCode(this)">Copy</button>
+    </div>
+    <pre>{
+  <span class="n">"name"</span>: <span class="s">"get_weather"</span>,
+  <span class="n">"description"</span>: <span class="s">"Get current weather for a city. Returns temperature, conditions, and humidity."</span>,
+  <span class="n">"inputSchema"</span>: {
+    <span class="n">"type"</span>: <span class="s">"object"</span>,
+    <span class="n">"properties"</span>: {
+      <span class="n">"city"</span>: {
+        <span class="n">"type"</span>: <span class="s">"string"</span>,
+        <span class="n">"description"</span>: <span class="s">"City name, e.g. 'London' or 'New York'"</span>
+      },
+      <span class="n">"units"</span>: {
+        <span class="n">"type"</span>: <span class="s">"string"</span>,
+        <span class="n">"enum"</span>: [<span class="s">"celsius"</span>, <span class="s">"fahrenheit"</span>],
+        <span class="n">"default"</span>: <span class="s">"celsius"</span>
+      }
+    },
+    <span class="n">"required"</span>: [<span class="s">"city"</span>]
+  }
+}</pre>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PROTOCOL -->
+<section id="protocol" class="fade-in">
+  <div class="section-label">// section 04</div>
+  <h2 class="section-title">The Protocol</h2>
+  <p class="section-intro">MCP uses JSON-RPC 2.0 as its message format — a lightweight, stateless remote procedure call protocol encoded in JSON.</p>
+
+  <h3 style="font-family: var(--head); font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--text);">JSON-RPC 2.0 Message Types</h3>
+
+  <div class="formula-box">
+    <div class="formula-title">// Request (expects a Response)</div>
+    <div class="formula-row"><span class="formula-field">"jsonrpc"</span><span class="formula-sep">:</span><span class="formula-type"> "2.0"</span><span class="formula-desc">Always exactly "2.0"</span></div>
+    <div class="formula-row"><span class="formula-field">"id"</span><span class="formula-sep">:</span><span class="formula-type"> string | number</span><span class="formula-desc">Unique request ID for matching responses</span></div>
+    <div class="formula-row"><span class="formula-field">"method"</span><span class="formula-sep">:</span><span class="formula-type"> string</span><span class="formula-desc">Namespaced method: "tools/call", "resources/read"</span></div>
+    <div class="formula-row"><span class="formula-field">"params"</span><span class="formula-sep">:</span><span class="formula-type"> object?</span><span class="formula-desc">Optional method-specific parameters</span></div>
+  </div>
+
+  <div class="formula-box">
+    <div class="formula-title">// Response</div>
+    <div class="formula-row"><span class="formula-field">"jsonrpc"</span><span class="formula-sep">:</span><span class="formula-type"> "2.0"</span></div>
+    <div class="formula-row"><span class="formula-field">"id"</span><span class="formula-sep">:</span><span class="formula-type"> string | number</span><span class="formula-desc">Matches the request id</span></div>
+    <div class="formula-row"><span class="formula-field">"result"</span><span class="formula-sep">:</span><span class="formula-type"> any</span><span class="formula-desc">On success — method-specific result data</span></div>
+    <div class="formula-row"><span class="formula-field"><span class="formula-optional">OR</span> "error"</span><span class="formula-sep">:</span><span class="formula-type"> { code, message, data? }</span><span class="formula-desc">On failure — error details</span></div>
+  </div>
+
+  <div class="formula-box">
+    <div class="formula-title">// Notification (no Response expected)</div>
+    <div class="formula-row"><span class="formula-field">"jsonrpc"</span><span class="formula-sep">:</span><span class="formula-type"> "2.0"</span></div>
+    <div class="formula-row"><span class="formula-field">"method"</span><span class="formula-sep">:</span><span class="formula-type"> string</span><span class="formula-desc">e.g. "notifications/tools/list_changed"</span></div>
+    <div class="formula-row"><span class="formula-field">"params"</span><span class="formula-sep">:</span><span class="formula-type"> object?</span><span class="formula-desc">No "id" field — this is what makes it a notification</span></div>
+  </div>
+
+  <h3 style="font-family: var(--head); font-size: 1.1rem; font-weight: 700; margin: 2rem 0 1rem; color: var(--text);">Standard Error Codes</h3>
+  <table class="resources-table" style="margin-bottom: 2rem;">
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Name</th>
+        <th>When to Use</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>-32700</td><td>Parse error</td><td>Invalid JSON received</td></tr>
+      <tr><td>-32600</td><td>Invalid Request</td><td>JSON-RPC structure is invalid</td></tr>
+      <tr><td>-32601</td><td>Method not found</td><td>Requested method doesn't exist</td></tr>
+      <tr><td>-32602</td><td>Invalid params</td><td>Invalid method parameters</td></tr>
+      <tr><td>-32603</td><td>Internal error</td><td>Internal server error</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="font-family: var(--head); font-size: 1.1rem; font-weight: 700; margin: 2rem 0 1rem; color: var(--text);">All MCP Methods</h3>
+  <div class="tabs" id="methods-tabs">
+    <button class="tab active" onclick="switchTab('methods-tabs','tools-tab',this)">Tools</button>
+    <button class="tab" onclick="switchTab('methods-tabs','resources-tab',this)">Resources</button>
+    <button class="tab" onclick="switchTab('methods-tabs','prompts-tab',this)">Prompts</button>
+    <button class="tab" onclick="switchTab('methods-tabs','sampling-tab',this)">Sampling</button>
+    <button class="tab" onclick="switchTab('methods-tabs','util-tab',this)">Utilities</button>
+  </div>
+  <div class="tab-content active" id="tools-tab">
+    <table class="resources-table">
+      <thead><tr><th>Method</th><th>Direction</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>tools/list</td><td>C→S</td><td>List all available tools with their schemas</td></tr>
+        <tr><td>tools/call</td><td>C→S</td><td>Execute a tool by name with given arguments</td></tr>
+        <tr><td>notifications/tools/list_changed</td><td>S→C</td><td>Server notifies client when tool list changes</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="tab-content" id="resources-tab">
+    <table class="resources-table">
+      <thead><tr><th>Method</th><th>Direction</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>resources/list</td><td>C→S</td><td>List available resources (paginated)</td></tr>
+        <tr><td>resources/read</td><td>C→S</td><td>Read the content of a specific resource by URI</td></tr>
+        <tr><td>resources/templates/list</td><td>C→S</td><td>List URI templates for dynamic resources</td></tr>
+        <tr><td>resources/subscribe</td><td>C→S</td><td>Subscribe to updates for a resource URI</td></tr>
+        <tr><td>resources/unsubscribe</td><td>C→S</td><td>Cancel a resource subscription</td></tr>
+        <tr><td>notifications/resources/updated</td><td>S→C</td><td>Push update when subscribed resource changes</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="tab-content" id="prompts-tab">
+    <table class="resources-table">
+      <thead><tr><th>Method</th><th>Direction</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>prompts/list</td><td>C→S</td><td>List all available prompt templates</td></tr>
+        <tr><td>prompts/get</td><td>C→S</td><td>Get a rendered prompt with provided arguments</td></tr>
+        <tr><td>notifications/prompts/list_changed</td><td>S→C</td><td>Notify client when prompt list changes</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="tab-content" id="sampling-tab">
+    <table class="resources-table">
+      <thead><tr><th>Method</th><th>Direction</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>sampling/createMessage</td><td>S→C</td><td>Server requests an LLM completion through the client</td></tr>
+      </tbody>
+    </table>
+    <div class="callout callout-tip" style="margin-top: 1rem;">
+      <span class="callout-icon">🔄</span>
+      <div class="callout-body"><strong>Sampling flow:</strong> Server sends <code>sampling/createMessage</code> → Client forwards to LLM → LLM generates response → Client returns <code>CreateMessageResult</code> to server. The host can inspect/approve requests before forwarding.</div>
+    </div>
+  </div>
+  <div class="tab-content" id="util-tab">
+    <table class="resources-table">
+      <thead><tr><th>Method</th><th>Direction</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>initialize</td><td>C→S</td><td>Start session, exchange capabilities</td></tr>
+        <tr><td>notifications/initialized</td><td>C→S</td><td>Confirm initialization complete</td></tr>
+        <tr><td>ping</td><td>both</td><td>Health check — peer must respond with empty result</td></tr>
+        <tr><td>notifications/cancelled</td><td>both</td><td>Cancel a pending request by ID</td></tr>
+        <tr><td>notifications/progress</td><td>S→C</td><td>Progress updates for long-running operations</td></tr>
+        <tr><td>logging/setLevel</td><td>C→S</td><td>Set server log level</td></tr>
+        <tr><td>notifications/message</td><td>S→C</td><td>Server log message sent to client</td></tr>
+        <tr><td>roots/list</td><td>S→C</td><td>Server requests list of client's root URIs</td></tr>
+        <tr><td>notifications/roots/list_changed</td><td>C→S</td><td>Notify server when roots change</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TRANSPORTS -->
+<section id="transports" class="fade-in">
+  <div class="section-label">// section 05</div>
+  <h2 class="section-title">Transports</h2>
+  <p class="section-intro">MCP defines two official transport mechanisms for carrying JSON-RPC messages. The choice depends on where your server runs and how it's deployed.</p>
+
+  <div class="transport-grid">
+    <div class="transport-card transport-stdio">
+      <div class="transport-header">
+        <div class="transport-icon">⌨️</div>
+        <div>
+          <div class="transport-name">stdio</div>
+          <div class="transport-subtitle">Standard Input/Output</div>
+        </div>
+      </div>
+      <div class="transport-body">
+        <div class="transport-row"><span class="key">Deployment</span><span class="val good">Local process</span></div>
+        <div class="transport-row"><span class="key">Protocol</span><span class="val">Newline-delimited JSON</span></div>
+        <div class="transport-row"><span class="key">Bidirectional</span><span class="val good">Yes (stdin + stdout)</span></div>
+        <div class="transport-row"><span class="key">Latency</span><span class="val good">Very low</span></div>
+        <div class="transport-row"><span class="key">Auth needed</span><span class="val good">No (process isolation)</span></div>
+        <div class="transport-row"><span class="key">Best for</span><span class="val">CLI tools, local agents</span></div>
+        <div class="transport-row"><span class="key">stderr</span><span class="val">Server logs/debug output</span></div>
+      </div>
+    </div>
+    <div class="transport-card transport-sse">
+      <div class="transport-header">
+        <div class="transport-icon">🌐</div>
+        <div>
+          <div class="transport-name">HTTP + SSE</div>
+          <div class="transport-subtitle">Server-Sent Events</div>
+        </div>
+      </div>
+      <div class="transport-body">
+        <div class="transport-row"><span class="key">Deployment</span><span class="val warn">Remote server</span></div>
+        <div class="transport-row"><span class="key">Protocol</span><span class="val">HTTP POST + EventSource</span></div>
+        <div class="transport-row"><span class="key">Bidirectional</span><span class="val warn">POST→, SSE←</span></div>
+        <div class="transport-row"><span class="key">Latency</span><span class="val warn">Network dependent</span></div>
+        <div class="transport-row"><span class="key">Auth needed</span><span class="val warn">Yes (tokens/OAuth)</span></div>
+        <div class="transport-row"><span class="key">Best for</span><span class="val">Cloud services, SaaS</span></div>
+        <div class="transport-row"><span class="key">Endpoint</span><span class="val">/sse + /messages</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-info" style="margin-top: 1.5rem;">
+    <span class="callout-icon">📡</span>
+    <div class="callout-body"><strong>SSE mechanics:</strong> Client subscribes to <code>GET /sse</code> (persistent EventSource), server sends an endpoint URL. Client then POSTs messages to that URL; server sends responses via the SSE stream. This enables bidirectional communication over standard HTTP.</div>
+  </div>
+
+  <h3 style="font-family: var(--head); font-size: 1.1rem; font-weight: 700; margin: 2rem 0 1rem; color: var(--text);">stdio Transport Example</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-lang">BASH</span>
+      <span class="code-filename">How stdio works</span>
+      <button class="code-copy" onclick="copyCode(this)">Copy</button>
+    </div>
+    <pre><span class="c"># Host spawns server as a subprocess</span>
+<span class="c"># Each JSON-RPC message is terminated by a newline character</span>
+
+<span class="c"># Client → Server (via stdin)</span>
+<span class="s">{"jsonrpc":"2.0","id":1,"method":"initialize","params":{...}}</span>
+
+<span class="c"># Server → Client (via stdout)</span>
+<span class="s">{"jsonrpc":"2.0","id":1,"result":{"capabilities":{...}}}</span>
+
+<span class="c"># Server logs go to stderr (never to stdout!)</span>
+<span class="r">[2024-11-05 10:23:01] Server started, listening on stdio</span></pre>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- BUILDING -->
+<section id="building" class="fade-in">
+  <div class="section-label">// section 06</div>
+  <h2 class="section-title">Building MCP Servers</h2>
+  <p class="section-intro">Official SDKs are available for TypeScript and Python. Let's build a complete working server from scratch.</p>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+    <a href="https://github.com/modelcontextprotocol/typescript-sdk" target="_blank" style="text-decoration: none;">
+      <div style="background: var(--bg2); border: 0.5px solid var(--border); border-radius: 10px; padding: 14px 20px; display: flex; align-items: center; gap: 12px; transition: border-color 0.2s;" onmouseover="this.style.borderColor='rgba(99,179,237,0.4)'" onmouseout="this.style.borderColor='rgba(99,179,237,0.15)'">
+        <span style="font-size: 20px;">📦</span>
+        <div>
+          <div style="font-family: var(--head); font-weight: 700; font-size: 0.9rem; color: var(--text);">TypeScript SDK</div>
+          <div style="font-family: var(--mono); font-size: 11px; color: var(--text3);">@modelcontextprotocol/sdk</div>
+        </div>
+      </div>
+    </a>
+    <a href="https://github.com/modelcontextprotocol/python-sdk" target="_blank" style="text-decoration: none;">
+      <div style="background: var(--bg2); border: 0.5px solid var(--border); border-radius: 10px; padding: 14px 20px; display: flex; align-items: center; gap: 12px; transition: border-color 0.2s;" onmouseover="this.style.borderColor='rgba(99,179,237,0.4)'" onmouseout="this.style.borderColor='rgba(99,179,237,0.15)'">
+        <span style="font-size: 20px;">🐍</span>
+        <div>
+          <div style="font-family: var(--head); font-weight: 700; font-size: 0.9rem; color: var(--text);">Python SDK</div>
+          <div style="font-family: var(--mono); font-size: 11px; color: var(--text3);">mcp (PyPI)</div>
+        </div>
+      </div>
+    </a>
+    <a href="https://modelcontextprotocol.io/docs" target="_blank" style="text-decoration: none;">
+      <div style="background: var(--bg2); border: 0.5px solid var(--border); border-radius: 10px; padding: 14px 20px; display: flex; align-items: center; gap: 12px; transition: border-color 0.2s;" onmouseover="this.style.borderColor='rgba(99,179,237,0.4)'" onmouseout="this.style.borderColor='rgba(99,179,237,0.15)'">
+        <span style="font-size: 20px;">📖</span>
+        <div>
+          <div style="font-family: var(--head); font-weight: 700; font-size: 0.9rem; color: var(--text);">Official Docs</div>
+          <div style="font-family: var(--mono); font-size: 11px; color: var(--text3);">modelcontextprotocol.io</div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="tabs" id="build-tabs">
+    <button class="tab active" onclick="switchTab('build-tabs','ts-tab',this)">TypeScript</button>
+    <button class="tab" onclick="switchTab('build-tabs','py-tab',this)">Python</button>
+    <button class="tab" onclick="switchTab('build-tabs','config-tab',this)">Claude Config</button>
+    <button class="tab" onclick="switchTab('build-tabs','debug-tab',this)">Debugging</button>
+  </div>
+
+  <div class="tab-content active" id="ts-tab">
+    <div class="install-steps">
+      <div class="install-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Install</h4>
+          <p>Create a new Node.js project and install the SDK</p>
+        </div>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><span class="code-filename">terminal</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+      <pre>npm init -y
+npm install @modelcontextprotocol/sdk zod
+<span class="c"># TypeScript support (optional but recommended)</span>
+npm install -D typescript @types/node ts-node</pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">TypeScript</span><span class="code-filename">server.ts</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="k">import</span> { <span class="n">McpServer</span> } <span class="k">from</span> <span class="s">"@modelcontextprotocol/sdk/server/mcp.js"</span>;
+<span class="k">import</span> { <span class="n">StdioServerTransport</span> } <span class="k">from</span> <span class="s">"@modelcontextprotocol/sdk/server/stdio.js"</span>;
+<span class="k">import</span> { <span class="n">z</span> } <span class="k">from</span> <span class="s">"zod"</span>;
+
+<span class="c">// Create the server</span>
+<span class="k">const</span> server = <span class="k">new</span> <span class="t">McpServer</span>({
+  name: <span class="s">"my-server"</span>,
+  version: <span class="s">"1.0.0"</span>,
+});
+
+<span class="c">// Register a tool</span>
+server.<span class="n">tool</span>(
+  <span class="s">"get_word_count"</span>,
+  <span class="s">"Count words in a given text string"</span>,
+  {
+    text: <span class="n">z</span>.<span class="t">string</span>().<span class="n">describe</span>(<span class="s">"The text to count words in"</span>),
+  },
+  <span class="k">async</span> ({ text }) => {
+    <span class="k">const</span> count = text.<span class="n">trim</span>().<span class="n">split</span>(<span class="s">/\s+/</span>).<span class="n">filter</span>(<span class="n">Boolean</span>).<span class="n">length</span>;
+    <span class="k">return</span> {
+      content: [{ type: <span class="s">"text"</span>, text: <span class="s">`Word count: ${count}`</span> }],
+    };
+  }
+);
+
+<span class="c">// Register a resource</span>
+server.<span class="n">resource</span>(
+  <span class="s">"config"</span>,
+  <span class="s">"config://app"</span>,
+  <span class="k">async</span> (uri) => ({
+    contents: [{
+      uri: uri.<span class="n">href</span>,
+      mimeType: <span class="s">"application/json"</span>,
+      text: <span class="t">JSON</span>.<span class="n">stringify</span>({ version: <span class="s">"1.0"</span>, debug: <span class="k">false</span> }),
+    }],
+  })
+);
+
+<span class="c">// Register a prompt template</span>
+server.<span class="n">prompt</span>(
+  <span class="s">"code-review"</span>,
+  <span class="s">"Generate a code review for the provided code"</span>,
+  { code: <span class="n">z</span>.<span class="t">string</span>().<span class="n">describe</span>(<span class="s">"Code to review"</span>) },
+  ({ code }) => ({
+    messages: [{
+      role: <span class="s">"user"</span>,
+      content: { type: <span class="s">"text"</span>, text: <span class="s">`Please review this code:\n\n${code}`</span> }
+    }],
+  })
+);
+
+<span class="c">// Start the server on stdio</span>
+<span class="k">const</span> transport = <span class="k">new</span> <span class="t">StdioServerTransport</span>();
+<span class="k">await</span> server.<span class="n">connect</span>(transport);
+<span class="t">console</span>.<span class="n">error</span>(<span class="s">"Server running on stdio"</span>); <span class="c">// Use stderr for logs!</span></pre>
+    </div>
+  </div>
+
+  <div class="tab-content" id="py-tab">
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><span class="code-filename">terminal</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+      <pre>pip install mcp
+<span class="c"># Or with uv (recommended)</span>
+uv add mcp</pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Python</span><span class="code-filename">server.py</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="k">from</span> mcp.server.fastmcp <span class="k">import</span> <span class="n">FastMCP</span>
+<span class="k">from</span> mcp.types <span class="k">import</span> <span class="n">TextContent</span>
+
+<span class="c"># FastMCP: high-level, Pythonic API</span>
+mcp = <span class="t">FastMCP</span>(<span class="s">"my-python-server"</span>)
+
+<span class="a">@mcp.tool()</span>
+<span class="k">def</span> <span class="n">get_word_count</span>(text: <span class="t">str</span>) -> <span class="t">str</span>:
+    <span class="s">"""Count words in a given text string."""</span>
+    count = <span class="k">len</span>(text.<span class="n">split</span>())
+    <span class="k">return</span> <span class="s">f"Word count: {count}"</span>
+
+<span class="a">@mcp.resource("config://app")</span>
+<span class="k">def</span> <span class="n">get_config</span>() -> <span class="t">str</span>:
+    <span class="s">"""Application configuration"""</span>
+    <span class="k">import</span> json
+    <span class="k">return</span> json.<span class="n">dumps</span>({ <span class="s">"version"</span>: <span class="s">"1.0"</span>, <span class="s">"debug"</span>: <span class="k">False</span> })
+
+<span class="a">@mcp.prompt()</span>
+<span class="k">def</span> <span class="n">code_review</span>(code: <span class="t">str</span>) -> <span class="t">str</span>:
+    <span class="s">"""Generate a code review prompt for the provided code."""</span>
+    <span class="k">return</span> <span class="s">f"Please review this code:\n\n{code}"</span>
+
+<span class="c"># For advanced use, FastMCP also supports async</span>
+<span class="a">@mcp.tool()</span>
+<span class="k">async def</span> <span class="n">fetch_url</span>(url: <span class="t">str</span>) -> <span class="t">str</span>:
+    <span class="s">"""Fetch content from a URL"""</span>
+    <span class="k">import</span> httpx
+    <span class="k">async with</span> httpx.<span class="t">AsyncClient</span>() <span class="k">as</span> client:
+        response = <span class="k">await</span> client.<span class="n">get</span>(url)
+        <span class="k">return</span> response.<span class="n">text</span>[:<span class="num">2000</span>]  <span class="c"># limit output</span>
+
+<span class="c"># Run via stdio (default)</span>
+<span class="k">if</span> __name__ == <span class="s">"__main__"</span>:
+    mcp.<span class="n">run</span>()</pre>
+    </div>
+  </div>
+
+  <div class="tab-content" id="config-tab">
+    <p style="color: var(--text2); font-size: 14px; margin-bottom: 1rem;">To use your server with Claude Desktop, add it to the configuration file:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">JSON</span><span class="code-filename">~/Library/Application Support/Claude/claude_desktop_config.json</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+      <pre>{
+  <span class="n">"mcpServers"</span>: {
+    <span class="n">"my-server"</span>: {
+      <span class="n">"command"</span>: <span class="s">"node"</span>,
+      <span class="n">"args"</span>: [<span class="s">"/path/to/your/server.js"</span>],
+      <span class="n">"env"</span>: {
+        <span class="n">"API_KEY"</span>: <span class="s">"your-api-key-here"</span>
+      }
+    },
+    <span class="n">"python-server"</span>: {
+      <span class="n">"command"</span>: <span class="s">"python"</span>,
+      <span class="n">"args"</span>: [<span class="s">"/path/to/server.py"</span>]
+    },
+    <span class="n">"remote-server"</span>: {
+      <span class="n">"url"</span>: <span class="s">"https://my-server.example.com/sse"</span>,
+      <span class="n">"headers"</span>: {
+        <span class="n">"Authorization"</span>: <span class="s">"Bearer YOUR_TOKEN"</span>
+      }
+    }
+  }
+}</pre>
+    </div>
+    <div class="callout callout-tip">
+      <span class="callout-icon">📍</span>
+      <div class="callout-body"><strong>Config file locations:</strong><br>
+      macOS: <code>~/Library/Application Support/Claude/claude_desktop_config.json</code><br>
+      Windows: <code>%APPDATA%\Claude\claude_desktop_config.json</code><br>
+      Linux: <code>~/.config/Claude/claude_desktop_config.json</code></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="debug-tab">
+    <p style="color: var(--text2); font-size: 14px; margin-bottom: 1rem;">MCP provides an official inspector tool for debugging servers interactively:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><span class="code-filename">terminal</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="c"># Launch the MCP Inspector (opens browser UI)</span>
+npx @modelcontextprotocol/inspector
+
+<span class="c"># Or target a specific server</span>
+npx @modelcontextprotocol/inspector node /path/to/server.js
+
+<span class="c"># Python server</span>
+npx @modelcontextprotocol/inspector python server.py</pre>
+    </div>
+    <div class="card-grid" style="margin-top: 1rem;">
+      <div class="card">
+        <div class="card-icon" style="background: rgba(99,179,237,0.1);">🔍</div>
+        <h3>MCP Inspector</h3>
+        <p>Official browser-based debugging tool. Browse capabilities, call tools, read resources interactively. Available at localhost:5173.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background: rgba(104,211,145,0.1);">📝</div>
+        <h3>Claude Logs</h3>
+        <p>Check <code>~/Library/Logs/Claude/</code> on macOS for MCP connection logs, errors, and server output. Very useful for diagnosing startup failures.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-family: var(--head); font-size: 1.1rem; font-weight: 700; margin: 2.5rem 0 1rem; color: var(--text);">Interactive Message Sandbox</h3>
+  <p style="color: var(--text2); font-size: 14px; margin-bottom: 1rem;">Build and simulate MCP JSON-RPC messages to understand the protocol format:</p>
+
+  <div class="sandbox">
+    <div class="sandbox-header">
+      <div class="sandbox-dots">
+        <div class="sandbox-dot" style="background: #fc8181;"></div>
+        <div class="sandbox-dot" style="background: #f6ad55;"></div>
+        <div class="sandbox-dot" style="background: #68d391;"></div>
+      </div>
+      <div class="sandbox-title">MCP Message Sandbox</div>
+    </div>
+    <div class="sandbox-body">
+      <div class="sandbox-panel">
+        <div class="sandbox-panel-label">Build Request</div>
+        <div class="msg-builder">
+          <div>
+            <label>Method</label>
+            <select id="sb-method" onchange="updateSandbox()">
+              <option value="initialize">initialize</option>
+              <option value="tools/list">tools/list</option>
+              <option value="tools/call">tools/call</option>
+              <option value="resources/list">resources/list</option>
+              <option value="resources/read">resources/read</option>
+              <option value="prompts/list">prompts/list</option>
+              <option value="prompts/get">prompts/get</option>
+              <option value="ping">ping</option>
+            </select>
+          </div>
+          <div id="sb-params-area">
+            <label>Params (JSON)</label>
+            <textarea id="sb-params" rows="5" placeholder='{"name": "get_weather", "arguments": {"city": "London"}}'></textarea>
+          </div>
+          <button class="send-btn" onclick="sendSandbox()">▶ Simulate Request</button>
+        </div>
+      </div>
+      <div class="sandbox-panel">
+        <div class="sandbox-panel-label">Output</div>
+        <div id="sb-output" class="sandbox-output"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SECURITY -->
+<section id="security" class="fade-in">
+  <div class="section-label">// section 07</div>
+  <h2 class="section-title">Security & Trust</h2>
+  <p class="section-intro">Security is a first-class concern in MCP. The protocol defines clear trust boundaries and mandates explicit human oversight for sensitive operations.</p>
+
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+    <div style="background: var(--bg2); border-radius: 12px; padding: 1.25rem; text-align: center; border: 0.5px solid var(--border);">
+      <div style="font-size: 28px; margin-bottom: 8px;">👤</div>
+      <div style="font-family: var(--head); font-weight: 700; color: var(--text); margin-bottom: 4px;">User</div>
+      <div style="font-size: 12px; color: var(--text3);">Highest trust. Installs servers, provides credentials, approves sensitive actions.</div>
+    </div>
+    <div style="background: var(--bg2); border-radius: 12px; padding: 1.25rem; text-align: center; border: 0.5px solid var(--border);">
+      <div style="font-size: 28px; margin-bottom: 8px;">🖥️</div>
+      <div style="font-family: var(--head); font-weight: 700; color: var(--text); margin-bottom: 4px;">Host</div>
+      <div style="font-size: 12px; color: var(--text3);">Trusted by user. Enforces policy, presents consent dialogs, controls what LLM sees.</div>
+    </div>
+    <div style="background: var(--bg2); border-radius: 12px; padding: 1.25rem; text-align: center; border: 0.5px solid var(--border);">
+      <div style="font-size: 28px; margin-bottom: 8px;">🔌</div>
+      <div style="font-family: var(--head); font-weight: 700; color: var(--text); margin-bottom: 4px;">Server</div>
+      <div style="font-size: 12px; color: var(--text3);">Least trusted. Isolated. Cannot access other servers, cannot force actions without consent.</div>
+    </div>
+  </div>
+
+  <div class="security-grid">
+    <div class="security-item tip">
+      <h4>✓ Capability negotiation</h4>
+      <p>Servers declare what they can do upfront. Clients only grant the permissions they agree to. No hidden capabilities.</p>
+    </div>
+    <div class="security-item tip">
+      <h4>✓ Explicit consent</h4>
+      <p>Sampling requests (server → LLM) require host approval before any data is sent. Users can inspect and reject.</p>
+    </div>
+    <div class="security-item tip">
+      <h4>✓ Process isolation</h4>
+      <p>stdio servers run as separate processes. OS-level isolation prevents servers from accessing host memory.</p>
+    </div>
+    <div class="security-item warn">
+      <h4>⚠ Prompt injection</h4>
+      <p>Malicious servers may embed instructions in tool results. Hosts must sanitize content before passing to LLMs.</p>
+    </div>
+    <div class="security-item warn">
+      <h4>⚠ Tool confirmation</h4>
+      <p>Destructive tools (delete, send, execute) should require user confirmation. Never auto-approve irreversible actions.</p>
+    </div>
+    <div class="security-item warn">
+      <h4>⚠ Secret management</h4>
+      <p>Never hardcode credentials in server code. Use environment variables. Claude config supports env fields for this.</p>
+    </div>
+    <div class="security-item danger">
+      <h4>✗ Confused deputy</h4>
+      <p>A compromised server could try to invoke its own capabilities via the LLM. Hosts must enforce per-tool rate limits.</p>
+    </div>
+    <div class="security-item danger">
+      <h4>✗ Data exfiltration</h4>
+      <p>Servers could encode sensitive data in outbound requests. Constrain what servers can access with Roots primitive.</p>
+    </div>
+    <div class="security-item tip">
+      <h4>✓ Roots scoping</h4>
+      <p>Use the Roots primitive to limit server filesystem access to only the directories relevant to the task.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ECOSYSTEM -->
+<section id="ecosystem" class="fade-in">
+  <div class="section-label">// section 08</div>
+  <h2 class="section-title">Ecosystem & History</h2>
+  <p class="section-intro">MCP has grown from an internal Anthropic standard to an industry-wide protocol adopted by major AI companies and hundreds of developers.</p>
+
+  <h3 style="font-family: var(--head); font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--text);">Timeline</h3>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot filled"></div>
+      <div class="timeline-date">November 2024</div>
+      <div class="timeline-event">MCP Public Release</div>
+      <div class="timeline-desc">Anthropic open-sources MCP. Initial SDKs in TypeScript and Python. Claude Desktop becomes first major MCP host.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot filled"></div>
+      <div class="timeline-date">Late 2024</div>
+      <div class="timeline-event">Community Explosion</div>
+      <div class="timeline-desc">Hundreds of community MCP servers published. Popular integrations: GitHub, Slack, PostgreSQL, Filesystem, Puppeteer, SQLite.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot filled"></div>
+      <div class="timeline-date">Early 2025</div>
+      <div class="timeline-event">Industry Adoption</div>
+      <div class="timeline-desc">OpenAI announces MCP support. Google DeepMind adopts MCP. VS Code Copilot, Cursor, and Windsurf add MCP client support.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot filled"></div>
+      <div class="timeline-date">March 2025</div>
+      <div class="timeline-event">Protocol Spec v2025-03-26</div>
+      <div class="timeline-desc">OAuth 2.1 authentication standardized. Streamable HTTP transport replaces SSE. Elicitation primitive added (experimental).</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-date">Ongoing</div>
+      <div class="timeline-event">Growing Standard</div>
+      <div class="timeline-desc">MCP Registry emerging. Agent-to-agent communication patterns. Multi-modal content types expanding.</div>
+    </div>
+  </div>
+
+  <h3 style="font-family: var(--head); font-size: 1.1rem; font-weight: 700; margin: 2.5rem 0 1rem; color: var(--text);">Supported Hosts & Clients</h3>
+  <table class="resources-table">
+    <thead><tr><th>Host / Client</th><th>Type</th><th>Transport</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Claude Desktop</td><td>Desktop app</td><td>stdio</td><td><span class="badge badge-new">Stable</span></td></tr>
+      <tr><td>Claude.ai</td><td>Web / Mobile</td><td>HTTP+SSE</td><td><span class="badge badge-new">Stable</span></td></tr>
+      <tr><td>VS Code Copilot</td><td>IDE</td><td>stdio + SSE</td><td><span class="badge badge-new">Stable</span></td></tr>
+      <tr><td>Cursor</td><td>IDE</td><td>stdio</td><td><span class="badge badge-new">Stable</span></td></tr>
+      <tr><td>Windsurf</td><td>IDE</td><td>stdio</td><td><span class="badge badge-new">Stable</span></td></tr>
+      <tr><td>OpenAI ChatGPT</td><td>Web / App</td><td>HTTP</td><td><span class="badge badge-exp">Beta</span></td></tr>
+      <tr><td>Zed Editor</td><td>IDE</td><td>stdio</td><td><span class="badge badge-new">Stable</span></td></tr>
+      <tr><td>Claude Code</td><td>CLI</td><td>stdio + SSE</td><td><span class="badge badge-new">Stable</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="font-family: var(--head); font-size: 1.1rem; font-weight: 700; margin: 2.5rem 0 1rem; color: var(--text);">Popular Official Servers</h3>
+  <table class="resources-table">
+    <thead><tr><th>Server</th><th>Capability</th><th>Install</th></tr></thead>
+    <tbody>
+      <tr><td>@modelcontextprotocol/server-filesystem</td><td>Read/write local files</td><td><code>npx</code></td></tr>
+      <tr><td>@modelcontextprotocol/server-github</td><td>GitHub repos, issues, PRs</td><td><code>npx</code></td></tr>
+      <tr><td>@modelcontextprotocol/server-postgres</td><td>PostgreSQL queries</td><td><code>npx</code></td></tr>
+      <tr><td>@modelcontextprotocol/server-sqlite</td><td>SQLite database access</td><td><code>npx</code></td></tr>
+      <tr><td>@modelcontextprotocol/server-puppeteer</td><td>Browser automation</td><td><code>npx</code></td></tr>
+      <tr><td>@modelcontextprotocol/server-slack</td><td>Slack messages & channels</td><td><code>npx</code></td></tr>
+      <tr><td>@modelcontextprotocol/server-brave-search</td><td>Web search via Brave API</td><td><code>npx</code></td></tr>
+      <tr><td>mcp-server-fetch (Python)</td><td>HTTP URL fetching</td><td><code>uvx</code></td></tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top: 2rem;">
+    <h3 style="font-family: var(--head); font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--text);">Key Resources</h3>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <a href="https://modelcontextprotocol.io" target="_blank" style="text-decoration: none; display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg2); border: 0.5px solid var(--border); border-radius: 8px; transition: border-color 0.2s; color: var(--text2); font-size: 14px;" onmouseover="this.style.borderColor='rgba(99,179,237,0.4)'" onmouseout="this.style.borderColor='rgba(99,179,237,0.15)'">
+        <span style="color: var(--accent); font-family: var(--mono); font-size: 12px; width: 160px; flex-shrink: 0;">modelcontextprotocol.io</span>
+        Official specification, docs, and tutorials
+      </a>
+      <a href="https://github.com/modelcontextprotocol" target="_blank" style="text-decoration: none; display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg2); border: 0.5px solid var(--border); border-radius: 8px; transition: border-color 0.2s; color: var(--text2); font-size: 14px;" onmouseover="this.style.borderColor='rgba(99,179,237,0.4)'" onmouseout="this.style.borderColor='rgba(99,179,237,0.15)'">
+        <span style="color: var(--accent); font-family: var(--mono); font-size: 12px; width: 160px; flex-shrink: 0;">github.com/mcp</span>
+        SDKs, official servers, spec repository
+      </a>
+      <a href="https://glama.ai/mcp/servers" target="_blank" style="text-decoration: none; display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg2); border: 0.5px solid var(--border); border-radius: 8px; transition: border-color 0.2s; color: var(--text2); font-size: 14px;" onmouseover="this.style.borderColor='rgba(99,179,237,0.4)'" onmouseout="this.style.borderColor='rgba(99,179,237,0.15)'">
+        <span style="color: var(--accent); font-family: var(--mono); font-size: 12px; width: 160px; flex-shrink: 0;">glama.ai/mcp/servers</span>
+        Community MCP server registry (1000+ servers)
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- QUIZ -->
+<section id="quiz" class="fade-in">
+  <div class="section-label">// section 09</div>
+  <h2 class="section-title">Knowledge Check</h2>
+  <p class="section-intro">Test your understanding of Model Context Protocol fundamentals.</p>
+
+  <div class="quiz-card" id="quiz-container">
+    <div class="quiz-progress">
+      <span id="quiz-counter">Question 1 of 8</span>
+      <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quiz-fill" style="width: 12.5%"></div></div>
+      <span id="quiz-score">0 / 0</span>
+    </div>
+    <div class="quiz-q" id="quiz-q">Loading...</div>
+    <div class="quiz-options" id="quiz-opts"></div>
+    <div class="quiz-feedback" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <button class="quiz-btn next" id="quiz-next" onclick="nextQ()" style="display:none;">Next Question →</button>
+      <button class="quiz-btn reset" onclick="resetQuiz()">↺ Restart</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div style="margin-bottom: 8px;">
+    <strong style="color: var(--text);">Model Context Protocol</strong> — Open standard by
+    <a href="https://anthropic.com" target="_blank">Anthropic</a> ·
+    Spec: <a href="https://modelcontextprotocol.io" target="_blank">modelcontextprotocol.io</a> ·
+    GitHub: <a href="https://github.com/modelcontextprotocol" target="_blank">modelcontextprotocol</a>
+  </div>
+  <div>This interactive guide is for educational purposes. MCP evolves rapidly — always check official docs for the latest.</div>
+</footer>
+
+<script>
+// PROGRESS BAR
+window.addEventListener('scroll', () => {
+  const scroll = window.scrollY;
+  const total = document.body.scrollHeight - window.innerHeight;
+  document.getElementById('progress').style.width = (scroll / total * 100) + '%';
+  // Active nav
+  document.querySelectorAll('section[id]').forEach(sec => {
+    const top = sec.offsetTop - 80;
+    const bot = top + sec.offsetHeight;
+    const link = document.querySelector(`nav a[href="#${sec.id}"]`);
+    if (link) link.classList.toggle('active', scroll >= top && scroll < bot);
+  });
+});
+
+// FADE IN
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// TABS
+function switchTab(groupId, tabId, btn) {
+  const group = document.getElementById(groupId);
+  group.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  // find sibling tab-contents
+  const parent = group.parentElement;
+  parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+}
+
+// COPY CODE
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+  });
+}
+
+// SANDBOX
+let sbId = 1;
+const sbOutputEl = document.getElementById('sb-output');
+
+function updateSandbox() {
+  const method = document.getElementById('sb-method').value;
+  const defaults = {
+    'initialize': '{\n  "protocolVersion": "2024-11-05",\n  "capabilities": {\n    "roots": {},\n    "sampling": {}\n  },\n  "clientInfo": {\n    "name": "my-client",\n    "version": "1.0.0"\n  }\n}',
+    'tools/list': '{}',
+    'tools/call': '{\n  "name": "get_weather",\n  "arguments": {\n    "city": "London",\n    "units": "celsius"\n  }\n}',
+    'resources/list': '{}',
+    'resources/read': '{\n  "uri": "file:///home/user/notes.txt"\n}',
+    'prompts/list': '{}',
+    'prompts/get': '{\n  "name": "code-review",\n  "arguments": {\n    "code": "def hello():\\n  print(\'world\')"\n  }\n}',
+    'ping': '{}'
+  };
+  document.getElementById('sb-params').value = defaults[method] || '{}';
+}
+updateSandbox();
+
+function sendSandbox() {
+  const method = document.getElementById('sb-method').value;
+  let params;
+  try {
+    params = JSON.parse(document.getElementById('sb-params').value || '{}');
+  } catch(e) {
+    appendOutput('err', 'Invalid JSON in params: ' + e.message);
+    return;
+  }
+  const msg = { jsonrpc: '2.0', id: sbId++, method, params };
+  appendOutput('send', method, JSON.stringify(msg, null, 2));
+
+  // Simulate response
+  setTimeout(() => {
+    const resp = simulateResponse(method, params);
+    appendOutput('recv', method, JSON.stringify(resp, null, 2));
+  }, 300 + Math.random() * 400);
+}
+
+function simulateResponse(method, params) {
+  const id = sbId - 1;
+  const responses = {
+    'initialize': { jsonrpc: '2.0', id, result: { protocolVersion: '2024-11-05', capabilities: { tools: { listChanged: true }, resources: { subscribe: true, listChanged: true }, prompts: { listChanged: true } }, serverInfo: { name: 'example-server', version: '1.0.0' } } },
+    'tools/list': { jsonrpc: '2.0', id, result: { tools: [{ name: 'get_weather', description: 'Get weather for a city', inputSchema: { type: 'object', properties: { city: { type: 'string' } }, required: ['city'] } }, { name: 'get_word_count', description: 'Count words in text', inputSchema: { type: 'object', properties: { text: { type: 'string' } }, required: ['text'] } }] } },
+    'tools/call': { jsonrpc: '2.0', id, result: { content: [{ type: 'text', text: `Weather in ${params.arguments?.city || 'London'}: 18°C, Partly cloudy, Humidity: 65%` }], isError: false } },
+    'resources/list': { jsonrpc: '2.0', id, result: { resources: [{ uri: 'file:///home/user/notes.txt', name: 'notes.txt', mimeType: 'text/plain' }, { uri: 'config://app', name: 'App Config', mimeType: 'application/json' }] } },
+    'resources/read': { jsonrpc: '2.0', id, result: { contents: [{ uri: params.uri || 'file:///', mimeType: 'text/plain', text: 'Hello, this is the content of the resource.' }] } },
+    'prompts/list': { jsonrpc: '2.0', id, result: { prompts: [{ name: 'code-review', description: 'Review code for bugs and improvements', arguments: [{ name: 'code', description: 'Code to review', required: true }] }] } },
+    'prompts/get': { jsonrpc: '2.0', id, result: { description: 'Code review prompt', messages: [{ role: 'user', content: { type: 'text', text: `Please review this code:\n\n${params.arguments?.code || '# your code here'}` } }] } },
+    'ping': { jsonrpc: '2.0', id, result: {} }
+  };
+  return responses[method] || { jsonrpc: '2.0', id, error: { code: -32601, message: 'Method not found' } };
+}
+
+function appendOutput(type, method, data) {
+  const ts = new Date().toLocaleTimeString('en-US', { hour12: false });
+  const div = document.createElement('div');
+  div.style.cssText = 'border-bottom: 0.5px solid rgba(99,179,237,0.1); padding: 8px 0; margin-bottom: 8px;';
+
+  if (type === 'send') {
+    div.innerHTML = `<div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;"><span style="color:#fc8181;font-size:10px;">▶ SEND</span><span style="color:#63b3ed;font-size:11px;font-family:var(--mono);">${method}</span><span style="color:#4a5568;font-size:10px;margin-left:auto;">${ts}</span></div><pre style="font-size:10px;color:#718096;white-space:pre-wrap;word-break:break-all;margin:0;">${escapeHtml(data)}</pre>`;
+  } else if (type === 'recv') {
+    div.innerHTML = `<div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;"><span style="color:#68d391;font-size:10px;">◀ RECV</span><span style="color:#63b3ed;font-size:11px;font-family:var(--mono);">${method}</span><span style="color:#4a5568;font-size:10px;margin-left:auto;">${ts}</span></div><pre style="font-size:10px;color:#a0aec0;white-space:pre-wrap;word-break:break-all;margin:0;">${escapeHtml(data)}</pre>`;
+  } else {
+    div.innerHTML = `<span style="color:#fc8181;font-size:11px;">Error: ${escapeHtml(method)}</span>`;
+  }
+  sbOutputEl.appendChild(div);
+  sbOutputEl.scrollTop = sbOutputEl.scrollHeight;
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// QUIZ
+const questions = [
+  {
+    q: "What underlying protocol does MCP use for message framing?",
+    opts: ["REST/HTTP", "GraphQL", "JSON-RPC 2.0", "gRPC / Protocol Buffers"],
+    ans: 2,
+    exp: "MCP uses JSON-RPC 2.0 as its message format — a lightweight remote procedure call protocol encoded in JSON. All messages (requests, responses, notifications) follow the JSON-RPC 2.0 structure."
+  },
+  {
+    q: "Which MCP primitive allows a SERVER to request an LLM completion through the client?",
+    opts: ["Tools", "Resources", "Prompts", "Sampling"],
+    ans: 3,
+    exp: "Sampling is the primitive that enables server-initiated LLM completions. The server sends a sampling/createMessage request to the client, which forwards it to the LLM (with host approval) and returns the result."
+  },
+  {
+    q: "In stdio transport, where should a server write its logs and debug output?",
+    opts: ["stdout (alongside JSON messages)", "A separate log file only", "stderr", "A dedicated logging endpoint"],
+    ans: 2,
+    exp: "Servers MUST write logs to stderr, never to stdout. Stdout is reserved exclusively for JSON-RPC messages. Mixing log output with JSON on stdout would corrupt the message stream."
+  },
+  {
+    q: "What is the correct JSON-RPC 2.0 version string that MUST appear in every MCP message?",
+    opts: ['"2.0"', '"jsonrpc2"', '"1.0"', '"mcp/1.0"'],
+    ans: 0,
+    exp: 'Every JSON-RPC 2.0 message must include exactly "jsonrpc": "2.0". Any other value is invalid.'
+  },
+  {
+    q: "Which MCP primitive is 'application-controlled' — meaning the HOST (not the model) decides what to include in context?",
+    opts: ["Tools", "Resources", "Prompts", "Sampling"],
+    ans: 1,
+    exp: "Resources are application-controlled. The host application decides which resources to attach to the context window. In contrast, Tools are model-controlled (the AI decides when to call them) and Prompts are user-controlled."
+  },
+  {
+    q: "What distinguishes a JSON-RPC Notification from a Request?",
+    opts: ["Notifications use a different URL endpoint", "Notifications have no 'id' field and expect no response", "Notifications must use HTTP GET", "Notifications are sent over SSE only"],
+    ans: 1,
+    exp: "A JSON-RPC Notification lacks an 'id' field. Because there's no ID, the sender expects no response. This is used for fire-and-forget events like notifications/initialized or notifications/tools/list_changed."
+  },
+  {
+    q: "What is the primary purpose of the 'Roots' primitive in MCP?",
+    opts: [
+      "Define the root tool that all other tools inherit from",
+      "Set the root URL for HTTP transport",
+      "Define URI boundaries that limit the server's access scope",
+      "Specify the root prompt template for a server"
+    ],
+    ans: 2,
+    exp: "Roots define URI boundaries (e.g., file system directories) that the host exposes to the server. This scopes the server's access and helps it understand the relevant project context without arbitrary filesystem access."
+  },
+  {
+    q: "When building an MCP server for Claude Desktop, which JSON error code means 'method not found'?",
+    opts: ["-32700", "-32601", "-32602", "-32603"],
+    ans: 1,
+    exp: "-32601 is the JSON-RPC 2.0 standard error code for 'Method not found'. The full set: -32700 Parse error, -32600 Invalid Request, -32601 Method not found, -32602 Invalid params, -32603 Internal error."
+  }
+];
+
+let qIdx = 0, score = 0, answered = false;
+
+function renderQ() {
+  const q = questions[qIdx];
+  document.getElementById('quiz-q').textContent = q.q;
+  document.getElementById('quiz-counter').textContent = `Question ${qIdx + 1} of ${questions.length}`;
+  document.getElementById('quiz-fill').style.width = ((qIdx + 1) / questions.length * 100) + '%';
+  document.getElementById('quiz-score').textContent = `${score} / ${qIdx}`;
+  const opts = document.getElementById('quiz-opts');
+  opts.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-option';
+    div.innerHTML = `<div class="quiz-option-letter">${String.fromCharCode(65+i)}</div> ${opt}`;
+    div.onclick = () => selectAnswer(i, div);
+    opts.appendChild(div);
+  });
+  document.getElementById('quiz-feedback').className = 'quiz-feedback';
+  document.getElementById('quiz-next').style.display = 'none';
+  answered = false;
+}
+
+function selectAnswer(i, el) {
+  if (answered) return;
+  answered = true;
+  const q = questions[qIdx];
+  const fb = document.getElementById('quiz-feedback');
+  document.querySelectorAll('.quiz-option').forEach((opt, idx) => {
+    opt.style.pointerEvents = 'none';
+    if (idx === q.ans) opt.classList.add('correct');
+    else if (idx === i) opt.classList.add('wrong');
+  });
+  if (i === q.ans) {
+    score++;
+    fb.className = 'quiz-feedback show good';
+    fb.innerHTML = `✓ Correct! ${q.exp}`;
+  } else {
+    fb.className = 'quiz-feedback show bad';
+    fb.innerHTML = `✗ Not quite. ${q.exp}`;
+  }
+  document.getElementById('quiz-score').textContent = `${score} / ${qIdx + 1}`;
+  document.getElementById('quiz-next').style.display = qIdx < questions.length - 1 ? 'inline-block' : 'none';
+  if (qIdx === questions.length - 1) {
+    setTimeout(() => {
+      const fb2 = document.getElementById('quiz-feedback');
+      fb2.innerHTML += `<br><br><strong>🎉 Quiz complete! You scored ${score}/${questions.length}.</strong> ${score >= 6 ? "Excellent understanding of MCP!" : score >= 4 ? "Good job! Review the sections above to solidify your knowledge." : "Keep studying — the guide above has everything you need!"}`;
+    }, 500);
+  }
+}
+
+function nextQ() {
+  qIdx++;
+  renderQ();
+}
+
+function resetQuiz() {
+  qIdx = 0; score = 0;
+  renderQ();
+}
+
+renderQ();
+</script>
+</body>
+</html>

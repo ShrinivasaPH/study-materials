@@ -804,7 +804,439 @@
                 </div>
 
                 <div class="concept">
-                    <div class="concept-title">Big O Notation - The Scale</div>
+                    <div class="concept-title">
+                        Understanding Big O Notation - Decoding the Symbols
+                        <span class="complexity-badge complexity-easy">Easy</span>
+                    </div>
+                    
+                    <div class="explanation">
+                        Big O notation looks intimidating but it's actually simple! The "O" stands for "Order of" and describes how your algorithm's runtime GROWS as the input gets bigger. Let's break down what each symbol means.
+                    </div>
+
+                    <div class="fun-fact">
+                        <strong>🎓 Why "O"?</strong> It comes from mathematics. The "Order of magnitude" tells you the dominant behavior. For example, O(n) means "approximately n" and O(n²) means "approximately n squared".
+                    </div>
+
+                    <div class="code-section">
+                        <div class="code-title">Breaking Down the Notation: O(n)</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="comment"># What does O(n) actually mean?</span>
+
+<span class="comment"># O = "Order of" (growth rate)</span>
+<span class="comment"># ( ) = function notation</span>
+<span class="comment"># n = the input size</span>
+
+<span class="comment"># So O(n) means: "Operations grow LINEARLY with input size"</span>
+
+<span class="keyword">def</span> <span class="function">linear_search</span>(arr, target):
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="keyword">range</span>(<span class="keyword">len</span>(arr)):  <span class="comment"># Loop runs n times</span>
+        <span class="keyword">if</span> arr[i] == target:
+            <span class="keyword">return</span> i
+    <span class="keyword">return</span> <span class="number">-1</span>
+
+<span class="comment"># Examples:</span>
+<span class="comment"># - If arr has 10 items → ~10 comparisons (best case: 1, worst: 10)</span>
+<span class="comment"># - If arr has 100 items → ~100 comparisons</span>
+<span class="comment"># - If arr has 1,000,000 items → ~1,000,000 comparisons</span>
+<span class="comment"># The number of operations DIRECTLY MATCHES the input size!</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="code-section">
+                        <div class="code-title">Visual Comparison: Different Big O Terms</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="comment">=== O(1) - CONSTANT TIME ===</span>
+<span class="keyword">def</span> <span class="function">get_first</span>(arr):
+    <span class="keyword">return</span> arr[<span class="number">0</span>]  <span class="comment"># Always 1 operation, no matter array size!</span>
+
+<span class="comment"># n=10 → 1 operation</span>
+<span class="comment"># n=100 → 1 operation</span>
+<span class="comment"># n=1,000,000 → 1 operation ⚡ INSTANT!</span>
+
+<span class="comment">=== O(log n) - LOGARITHMIC ===</span>
+<span class="keyword">def</span> <span class="function">binary_search</span>(arr, target):
+    left, right = <span class="number">0</span>, <span class="keyword">len</span>(arr) - <span class="number">1</span>
+    <span class="keyword">while</span> left <= right:
+        mid = (left + right) // <span class="number">2</span>
+        <span class="keyword">if</span> arr[mid] == target:
+            <span class="keyword">return</span> mid
+        <span class="keyword">elif</span> arr[mid] < target:
+            left = mid + <span class="number">1</span>  <span class="comment"># ELIMINATE HALF</span>
+        <span class="keyword">else</span>:
+            right = mid - <span class="number">1</span>  <span class="comment"># ELIMINATE HALF</span>
+    <span class="keyword">return</span> <span class="number">-1</span>
+
+<span class="comment"># n=10 → ~3-4 checks</span>
+<span class="comment"># n=100 → ~6-7 checks</span>
+<span class="comment"># n=1,000,000 → ~20 checks 🚀 WOW!</span>
+
+<span class="comment">=== O(n) - LINEAR ===</span>
+<span class="keyword">def</span> <span class="function">find_max</span>(arr):
+    max_val = arr[<span class="number">0</span>]
+    <span class="keyword">for</span> num <span class="keyword">in</span> arr:  <span class="comment"># Goes through EVERY element</span>
+        <span class="keyword">if</span> num > max_val:
+            max_val = num
+    <span class="keyword">return</span> max_val
+
+<span class="comment"># n=10 → 10 operations</span>
+<span class="comment"># n=100 → 100 operations</span>
+<span class="comment"># n=1,000,000 → 1,000,000 operations</span>
+
+<span class="comment">=== O(n²) - QUADRATIC ===</span>
+<span class="keyword">def</span> <span class="function">bubble_sort</span>(arr):
+    n = <span class="keyword">len</span>(arr)
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="keyword">range</span>(n):
+        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="keyword">range</span>(n - <span class="number">1</span>):  <span class="comment"># NESTED LOOP!</span>
+            <span class="keyword">if</span> arr[j] > arr[j + <span class="number">1</span>]:
+                arr[j], arr[j + <span class="number">1</span>] = arr[j + <span class="number">1</span>], arr[j]
+    <span class="keyword">return</span> arr
+
+<span class="comment"># n=10 → 100 operations (10 × 10)</span>
+<span class="comment"># n=100 → 10,000 operations (100 × 100) ⚠️</span>
+<span class="comment"># n=1,000 → 1,000,000 operations ⚠️⚠️</span>
+
+<span class="comment">=== O(2ⁿ) - EXPONENTIAL ===</span>
+<span class="keyword">def</span> <span class="function">fibonacci_slow</span>(n):
+    <span class="keyword">if</span> n <= <span class="number">1</span>:
+        <span class="keyword">return</span> n
+    <span class="keyword">return</span> <span class="function">fibonacci_slow</span>(n - <span class="number">1</span>) + <span class="function">fibonacci_slow</span>(n - <span class="number">2</span>)
+
+<span class="comment"># n=5 → 32 operations</span>
+<span class="comment"># n=10 → 1,024 operations</span>
+<span class="comment"># n=50 → 1,125,899,906,842,624 operations 🚫 NEVER!</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="fun-fact">
+                        <strong>🎓 The Naming Pattern:</strong>
+                        - O(1): No loop = constant
+                        - O(n): One loop = linear
+                        - O(n²): Two nested loops = quadratic
+                        - O(n³): Three nested loops = cubic
+                        - O(log n): Divide and conquer = logarithmic
+                        - O(2ⁿ): Double recursion = exponential
+                    </div>
+                </div>
+
+                <div class="concept">
+                    <div class="concept-title">Each Big O Term Explained in Detail</div>
+                    
+                    <div class="code-section">
+                        <div class="code-title">📌 O(1) - Constant Time</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="string">"""
+🏃 SPEED: Fastest possible!
+💾 Same runtime regardless of input size
+⚡ Example: Array access by index
+"""</span>
+
+<span class="keyword">def</span> <span class="function">get_element</span>(arr, index):
+    <span class="keyword">return</span> arr[index]  <span class="comment"># O(1) - Direct access!</span>
+
+<span class="keyword">def</span> <span class="function">get_first_and_last</span>(arr):
+    first = arr[<span class="number">0</span>]      <span class="comment"># O(1)</span>
+    last = arr[<span class="number">-1</span>]     <span class="comment"># O(1)</span>
+    <span class="keyword">return</span> first, last   <span class="comment"># Total: O(1) + O(1) = O(1)</span>
+
+<span class="keyword">def</span> <span class="function">check_dict_key</span>(my_dict, key):
+    <span class="keyword">return</span> key <span class="keyword">in</span> my_dict  <span class="comment"># O(1) - Hash lookup</span>
+
+<span class="comment"># ✅ Perfect for large data! No slowdown!</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="code-section">
+                        <div class="code-title">📌 O(log n) - Logarithmic Time</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="string">"""
+🚀 SPEED: Very fast! Grows very slowly
+💾 Halves the problem with each step
+⚡ Example: Binary search on sorted data
+"""</span>
+
+<span class="keyword">def</span> <span class="function">binary_search</span>(arr, target):
+    left, right = <span class="number">0</span>, <span class="keyword">len</span>(arr) - <span class="number">1</span>
+    
+    <span class="keyword">while</span> left <= right:
+        mid = (left + right) // <span class="number">2</span>
+        
+        <span class="keyword">if</span> arr[mid] == target:
+            <span class="keyword">return</span> mid
+        <span class="keyword">elif</span> arr[mid] < target:
+            left = mid + <span class="number">1</span>  <span class="comment"># Eliminate left half</span>
+        <span class="keyword">else</span>:
+            right = mid - <span class="number">1</span>  <span class="comment"># Eliminate right half</span>
+    
+    <span class="keyword">return</span> <span class="number">-1</span>
+
+<span class="comment"># Why O(log n)?</span>
+<span class="comment"># We cut the search space in half each time:</span>
+<span class="comment"># n → n/2 → n/4 → n/8 → ... → 1</span>
+<span class="comment"># That's log₂(n) steps!</span>
+
+<span class="comment"># Real numbers:</span>
+<span class="comment"># Searching 1 million items: ~20 steps!</span>
+<span class="comment"># Searching 1 billion items: ~30 steps!</span>
+
+<span class="keyword">def</span> <span class="function">is_power_of_two</span>(n):
+    <span class="string">"""Another O(log n) example"""</span>
+    count = <span class="number">0</span>
+    <span class="keyword">while</span> n > <span class="number">1</span>:
+        n = n // <span class="number">2</span>  <span class="comment"># Divide by 2 each time</span>
+        count += <span class="number">1</span>
+    <span class="keyword">return</span> count  <span class="comment"># How many times we divided</span>
+
+<span class="comment"># ✅ Excellent scaling! Nearly as fast as O(1) but works on larger data</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="code-section">
+                        <div class="code-title">📌 O(n) - Linear Time</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="string">"""
+⚡ SPEED: Good, but scales with input
+💾 Must examine each element at least once
+⚡ Example: Finding element in unsorted array
+"""</span>
+
+<span class="keyword">def</span> <span class="function">linear_search</span>(arr, target):
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="keyword">range</span>(<span class="keyword">len</span>(arr)):  <span class="comment"># Goes through EACH element</span>
+        <span class="keyword">if</span> arr[i] == target:
+            <span class="keyword">return</span> i
+    <span class="keyword">return</span> <span class="number">-1</span>
+
+<span class="keyword">def</span> <span class="function">sum_array</span>(arr):
+    <span class="string">"""Must visit every element"""</span>
+    total = <span class="number">0</span>
+    <span class="keyword">for</span> num <span class="keyword">in</span> arr:  <span class="comment"># O(n)</span>
+        total += num
+    <span class="keyword">return</span> total
+
+<span class="keyword">def</span> <span class="function">duplicate_array</span>(arr):
+    <span class="string">"""Creating new array requires visiting all elements"""</span>
+    new_arr = []
+    <span class="keyword">for</span> item <span class="keyword">in</span> arr:  <span class="comment"># O(n)</span>
+        new_arr.<span class="function">append</span>(item)
+    <span class="keyword">return</span> new_arr
+
+<span class="comment"># Multiple sequential loops are still O(n):</span>
+<span class="keyword">def</span> <span class="function">example</span>(arr):
+    <span class="keyword">for</span> x <span class="keyword">in</span> arr:  <span class="comment"># O(n)</span>
+        <span class="function">print</span>(x)
+    
+    <span class="keyword">for</span> y <span class="keyword">in</span> arr:  <span class="comment"># O(n)</span>
+        <span class="function">print</span>(y)
+    
+    <span class="comment"># Total: O(n) + O(n) = O(2n) = O(n)</span>
+    <span class="comment"># (We drop the constant 2)</span>
+
+<span class="comment"># ✅ Good! Reasonable for most data sizes</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="code-section">
+                        <div class="code-title">📌 O(n²) - Quadratic Time</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="string">"""
+🐢 SPEED: Slow with large data!
+💾 Usually means nested loops
+⚠️ Example: Bubble sort, checking all pairs
+"""</span>
+
+<span class="keyword">def</span> <span class="function">bubble_sort</span>(arr):
+    <span class="string">"""Compare each pair - O(n²)"""</span>
+    n = <span class="keyword">len</span>(arr)
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="keyword">range</span>(n):              <span class="comment"># Outer loop: n times</span>
+        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="keyword">range</span>(n - <span class="number">1</span>):      <span class="comment"># Inner loop: n times</span>
+            <span class="keyword">if</span> arr[j] > arr[j + <span class="number">1</span>]:   <span class="comment"># Total: n × n = n²</span>
+                arr[j], arr[j + <span class="number">1</span>] = arr[j + <span class="number">1</span>], arr[j]
+    <span class="keyword">return</span> arr
+
+<span class="keyword">def</span> <span class="function">print_pairs</span>(arr):
+    <span class="string">"""Print all pairs - O(n²)"""</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="keyword">range</span>(<span class="keyword">len</span>(arr)):
+        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="keyword">range</span>(<span class="keyword">len</span>(arr)):
+            <span class="function">print</span>(f<span class="string">"{arr[i]}, {arr[j]}"</span>)
+
+<span class="comment"># Growth is EXPLOSIVE:</span>
+<span class="comment"># n=10 → 100 operations</span>
+<span class="comment"># n=100 → 10,000 operations</span>
+<span class="comment"># n=1,000 → 1,000,000 operations ⚠️</span>
+<span class="comment"># n=10,000 → 100,000,000 operations ⚠️⚠️</span>
+
+<span class="keyword">def</span> <span class="function">has_duplicates_slow</span>(arr):
+    <span class="string">"""Check all pairs for duplicates - O(n²)"""</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="keyword">range</span>(<span class="keyword">len</span>(arr)):
+        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="keyword">range</span>(i + <span class="number">1</span>, <span class="keyword">len</span>(arr)):
+            <span class="keyword">if</span> arr[i] == arr[j]:
+                <span class="keyword">return</span> <span class="keyword">True</span>
+    <span class="keyword">return</span> <span class="keyword">False</span>
+
+<span class="comment"># ⚠️ Avoid for large inputs! Use O(n) with hash set instead</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="code-section">
+                        <div class="code-title">📌 O(n³) - Cubic Time & Beyond</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="string">"""
+🚫 SPEED: Very slow! Rarely acceptable
+💾 Triple nested loops or similar
+⚠️ Example: Some matrix operations
+"""</span>
+
+<span class="keyword">def</span> <span class="function">matrix_multiply</span>(A, B):
+    <span class="string">"""Multiply two matrices - O(n³)"""</span>
+    n = <span class="keyword">len</span>(A)
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="keyword">range</span>(n):              <span class="comment"># Outer loop</span>
+        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="keyword">range</span>(n):          <span class="comment"># Middle loop</span>
+            <span class="keyword">for</span> k <span class="keyword">in</span> <span class="keyword">range</span>(n):      <span class="comment"># Inner loop</span>
+                <span class="comment"># Do computation</span>
+                pass
+
+<span class="comment"># Growth is TERRIBLE:</span>
+<span class="comment"># n=10 → 1,000 operations</span>
+<span class="comment"># n=100 → 1,000,000 operations</span>
+<span class="comment"># n=1,000 → 1,000,000,000 operations</span>
+<span class="comment"># n=10,000 → 1,000,000,000,000 operations 🚫</span>
+
+<span class="comment"># ⚠️ Avoid unless absolutely necessary!</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="code-section">
+                        <div class="code-title">📌 O(2ⁿ) - Exponential Time</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="string">"""
+🚫🚫 SPEED: EXTREMELY slow! Nearly never acceptable!
+💾 Usually recursive algorithms that branch
+⚠️ Example: Recursive Fibonacci, subset generation
+"""</span>
+
+<span class="keyword">def</span> <span class="function">fibonacci_slow</span>(n):
+    <span class="string">"""Calculate Fibonacci recursively - O(2ⁿ)"""</span>
+    <span class="keyword">if</span> n <= <span class="number">1</span>:
+        <span class="keyword">return</span> n
+    <span class="keyword">return</span> <span class="function">fibonacci_slow</span>(n - <span class="number">1</span>) + <span class="function">fibonacci_slow</span>(n - <span class="number">2</span>)
+    <span class="comment"># Each call branches into TWO calls!</span>
+    <span class="comment"># That's 2^n total calls in worst case</span>
+
+<span class="keyword">def</span> <span class="function">generate_subsets</span>(arr):
+    <span class="string">"""Generate all subsets - O(2ⁿ)"""</span>
+    <span class="comment"># For array of n items, there are 2ⁿ subsets</span>
+    result = []
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="keyword">range</span>(<span class="number">2</span> ** <span class="keyword">len</span>(arr)):
+        subset = []
+        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="keyword">range</span>(<span class="keyword">len</span>(arr)):
+            <span class="keyword">if</span> i & (<span class="number">1</span> << j):
+                subset.<span class="function">append</span>(arr[j])
+        result.<span class="function">append</span>(subset)
+    <span class="keyword">return</span> result
+
+<span class="comment"># THE PROBLEM:</span>
+<span class="comment"># n=5 → 32 operations</span>
+<span class="comment"># n=10 → 1,024 operations</span>
+<span class="comment"># n=20 → 1,048,576 operations</span>
+<span class="comment"># n=30 → 1,073,741,824 operations (over 1 BILLION!)</span>
+<span class="comment"># n=50 → 1,125,899,906,842,624 operations (1 QUADRILLION!)</span>
+<span class="comment"># n=60 → Your computer will take YEARS</span>
+
+<span class="comment"># ✅ Better: Use memoization for Fibonacci</span>
+<span class="keyword">def</span> <span class="function">fibonacci_fast</span>(n, memo=<span class="keyword">None</span>):
+    <span class="string">"""With memoization - O(n)"""</span>
+    <span class="keyword">if</span> memo <span class="keyword">is</span> <span class="keyword">None</span>:
+        memo = {}
+    
+    <span class="keyword">if</span> n <span class="keyword">in</span> memo:
+        <span class="keyword">return</span> memo[n]
+    
+    <span class="keyword">if</span> n <= <span class="number">1</span>:
+        <span class="keyword">return</span> n
+    
+    memo[n] = (<span class="function">fibonacci_fast</span>(n - <span class="number">1</span>, memo) + 
+               <span class="function">fibonacci_fast</span>(n - <span class="number">2</span>, memo))
+    <span class="keyword">return</span> memo[n]
+
+<span class="comment"># fib(50) with O(2ⁿ): Takes FOREVER</span>
+<span class="comment"># fib(50) with O(n): Instant!</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="fun-fact">
+                        <strong>🎓 The Golden Rule:</strong> Always optimize exponential (O(2ⁿ), O(n!)) to polynomial (O(n³), O(n²), O(n)). The difference is life-changing for large inputs!
+                    </div>
+                </div>
+
+                <div class="concept">
+                    <div class="concept-title">Quick Visual: Growth Rates Compared</div>
+                    
+                    <div class="explanation">
+                        Here's how these complexities compare side by side. Notice how the differences grow dramatically as n increases:
+                    </div>
+
+                    <table class="comparison-table">
+                        <tr>
+                            <th style="width: 12%;">n</th>
+                            <th style="width: 12%;">O(1)</th>
+                            <th style="width: 12%;">O(log n)</th>
+                            <th style="width: 12%;">O(n)</th>
+                            <th style="width: 12%;">O(n log n)</th>
+                            <th style="width: 12%;">O(n²)</th>
+                            <th style="width: 12%;">O(2ⁿ)</th>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>1</td>
+                            <td>3</td>
+                            <td>10</td>
+                            <td>33</td>
+                            <td>100</td>
+                            <td>1K</td>
+                        </tr>
+                        <tr>
+                            <td>100</td>
+                            <td>1</td>
+                            <td>7</td>
+                            <td>100</td>
+                            <td>664</td>
+                            <td>10K</td>
+                            <td>HUGE</td>
+                        </tr>
+                        <tr>
+                            <td>1,000</td>
+                            <td>1</td>
+                            <td>10</td>
+                            <td>1K</td>
+                            <td>10K</td>
+                            <td>1M</td>
+                            <td>HUGE</td>
+                        </tr>
+                        <tr>
+                            <td>10,000</td>
+                            <td>1</td>
+                            <td>13</td>
+                            <td>10K</td>
+                            <td>133K</td>
+                            <td>100M</td>
+                            <td>HUGE</td>
+                        </tr>
+                        <tr>
+                            <td>100,000</td>
+                            <td>1</td>
+                            <td>17</td>
+                            <td>100K</td>
+                            <td>1.7M</td>
+                            <td>10B</td>
+                            <td>HUGE</td>
+                        </tr>
+                    </table>
+
+                    <div class="fun-fact">
+                        <strong>🎓 Key Insight:</strong> O(1) stays at 1 forever. O(log n) barely increases. O(n) and O(n log n) are manageable. But O(n²) and O(2ⁿ) explode!
+                    </div>
+                </div>
+
+                
                     
                     <div class="explanation">
                         Big O describes the worst-case scenario - how an algorithm behaves when given the most challenging input. It focuses on the dominant term, ignoring constants and smaller terms. For example, O(2n + 5) simplifies to O(n) because n's growth matters, not the constant multiplier.

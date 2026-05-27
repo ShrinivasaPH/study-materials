@@ -3,320 +3,1944 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DSA Academy - Comprehensive Learning Resource</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <title>DSA Mastery - Interactive Data Structures & Algorithms Learning Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --primary: #2563EB; --primary-light: #DBEAFE; --primary-dark: #1E40AF;
-            --accent: #10B981; --accent-light: #D1FAE5;
-            --warning: #F59E0B; --warning-light: #FEF3C7;
-            --danger: #EF4444; --danger-light: #FEE2E2;
-            --bg: #FFFFFF; --bg-secondary: #F9FAFB; --bg-tertiary: #F3F4F6;
-            --text-primary: #111827; --text-secondary: #4B5563;
-            --border: #E5E7EB; --border-strong: #D1D5DB;
+            --primary: #00d4ff;
+            --primary-dark: #0099cc;
+            --secondary: #ff006e;
+            --accent: #ffbe0b;
+            --success: #06ffa5;
+            --warning: #ff6b35;
+            --danger: #ff006e;
+            
+            --dark-bg: #0a0e27;
+            --surface-1: #1a1f3a;
+            --surface-2: #252d45;
+            --surface-3: #303850;
+            --text-primary: #e8eef5;
+            --text-secondary: #9ca3af;
+            --border: #404855;
+            
+            --shadow-sm: 0 4px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 12px 24px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.5);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text-primary); line-height: 1.8; font-size: 16px; }
-        header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; backdrop-filter: blur(10px); }
-        .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 1.5rem; }
-        .logo-icon { width: 44px; height: 44px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 22px; }
-        h1 { font-size: 1.6rem; font-weight: 700; color: var(--text-primary); margin: 0; }
-        .header-meta { font-size: 0.9rem; color: var(--text-secondary); }
-        .nav-container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; border-bottom: 1px solid var(--border); }
-        .nav-tabs { display: flex; gap: 0.5rem; padding: 1rem 0; overflow-x: auto; }
-        .tab-btn { padding: 0.8rem 1.2rem; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; font-weight: 500; font-size: 0.95rem; border-bottom: 2px solid transparent; transition: all 0.2s ease; white-space: nowrap; }
-        .tab-btn:hover { color: var(--text-primary); }
-        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
-        .container { max-width: 950px; margin: 0 auto; padding: 0 2rem 5rem 2rem; }
-        .content-section { display: none; animation: fadeIn 0.4s ease; }
-        .content-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .card { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 3rem; margin-bottom: 2.5rem; }
-        h2 { font-size: 2.3rem; font-weight: 800; margin-bottom: 1.5rem; color: var(--text-primary); }
-        h3 { font-size: 1.6rem; font-weight: 700; margin-top: 3rem; margin-bottom: 1.3rem; color: var(--text-primary); }
-        h4 { font-size: 1.2rem; font-weight: 650; margin-top: 2.2rem; margin-bottom: 1rem; color: var(--text-primary); }
-        p, li { color: var(--text-primary); margin-bottom: 1.3rem; font-size: 1.05rem; line-height: 1.8; }
-        ul, ol { margin-left: 2.5rem; margin-bottom: 1.5rem; }
-        li { margin-bottom: 1.1rem; }
-        .story-box, .fun-fact, .pro-tip, .warning-box { border-left: 4px solid; border-radius: 8px; padding: 1.8rem; margin: 2.2rem 0; font-size: 1.02rem; line-height: 1.8; }
-        .story-box { background: var(--primary-light); border-color: var(--primary); border-top: 1px solid #BFDBFE; border-right: 1px solid #BFDBFE; border-bottom: 1px solid #BFDBFE; }
-        .fun-fact { background: var(--accent-light); border-color: var(--accent); border-top: 1px solid #A7F3D0; border-right: 1px solid #A7F3D0; border-bottom: 1px solid #A7F3D0; }
-        .pro-tip { background: var(--warning-light); border-color: var(--warning); border-top: 1px solid #FED7AA; border-right: 1px solid #FED7AA; border-bottom: 1px solid #FED7AA; }
-        .warning-box { background: var(--danger-light); border-color: var(--danger); border-top: 1px solid #FECACA; border-right: 1px solid #FECACA; border-bottom: 1px solid #FECACA; }
-        .code-block { background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.8rem 0; overflow-x: auto; position: relative; }
-        .code-label { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; font-family: 'JetBrains Mono', monospace; }
-        .code-block code { font-family: 'JetBrains Mono', monospace; color: var(--text-primary); font-size: 0.88rem; line-height: 1.7; display: block; white-space: pre; }
-        .copy-btn { position: absolute; top: 1rem; right: 1rem; background: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: all 0.2s ease; }
-        .copy-btn:hover { background: var(--primary-dark); }
-        .keyword { color: #D946EF; font-weight: 600; }
-        .string { color: #059669; }
-        .comment { color: #6B7280; font-style: italic; }
-        .function { color: var(--primary); }
-        .number { color: var(--warning); }
-        .complexity-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 2rem; margin: 2.5rem 0; }
-        .complexity-item { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; padding: 2rem; text-align: center; transition: all 0.2s ease; }
-        .complexity-item:hover { border-color: var(--primary); background: var(--primary-light); }
-        .complexity-item h4 { margin-top: 0; color: var(--primary); font-size: 1.1rem; }
-        .complexity-value { font-size: 2rem; font-weight: 800; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; margin: 1rem 0; }
-        .complexity-desc { font-size: 0.98rem; color: var(--text-secondary); line-height: 1.7; }
-        .badge { display: inline-block; background: var(--primary-light); color: var(--primary-dark); padding: 0.45rem 0.9rem; border-radius: 20px; font-weight: 600; font-size: 0.85rem; margin: 0.3rem; }
-        table { width: 100%; border-collapse: collapse; margin: 2.2rem 0; font-size: 0.96rem; }
-        table thead { background: var(--bg-secondary); border-bottom: 2px solid var(--border); }
-        table th { padding: 1.2rem; text-align: left; font-weight: 650; color: var(--text-primary); }
-        table td { padding: 1.1rem 1.2rem; border-bottom: 1px solid var(--border); color: var(--text-primary); }
-        table tbody tr:hover { background: var(--bg-secondary); }
-        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 2.2rem; margin: 2.5rem 0; }
-        .grid-2 > div { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; padding: 2.2rem; }
-        .inline-code { background: #f3f4f6; padding: 2px 6px; border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; }
-        footer { text-align: center; padding: 3.5rem 2rem; border-top: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-secondary); margin-top: 4rem; }
-        footer p { margin: 0.9rem 0; }
-        footer p:first-child { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated background gradient */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 0, 110, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ===== HEADER & NAVIGATION ===== */
+        header {
+            background: linear-gradient(135deg, var(--surface-1) 0%, var(--surface-2) 100%);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: 'Space Mono', monospace;
+            letter-spacing: -1px;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--text-primary);
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            max-width: 1400px;
+            margin: 4rem auto 2rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+            background: linear-gradient(135deg, var(--primary), var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 1rem auto 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+
+        .btn-secondary {
+            background: var(--surface-2);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: var(--dark-bg);
+            transform: translateY(-3px);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section {
+            margin-bottom: 4rem;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            color: var(--primary);
+            font-family: 'Space Mono', monospace;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary);
+            display: inline-block;
+        }
+
+        /* ===== TOPIC CARDS ===== */
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .topic-card {
+            background: linear-gradient(135deg, var(--surface-1) 0%, var(--surface-2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .topic-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.2) 0%, transparent 70%);
+            transition: all 0.3s ease;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+        }
+
+        .topic-card:hover::before {
+            right: -30%;
+            top: -30%;
+        }
+
+        .topic-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+            position: relative;
+            z-index: 1;
+        }
+
+        .topic-card p {
+            color: var(--text-secondary);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== CONCEPT CARDS ===== */
+        .concept {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .concept-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .complexity-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .complexity-easy {
+            background: rgba(6, 255, 165, 0.2);
+            color: var(--success);
+        }
+
+        .complexity-medium {
+            background: rgba(255, 190, 11, 0.2);
+            color: var(--accent);
+        }
+
+        .complexity-hard {
+            background: rgba(255, 107, 53, 0.2);
+            color: var(--warning);
+        }
+
+        .explanation {
+            color: var(--text-secondary);
+            line-height: 1.9;
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+            letter-spacing: 0.3px;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            color: var(--primary);
+            font-family: 'Space Mono', monospace;
+            padding-bottom: 1.2rem;
+            border-bottom: 3px solid var(--primary);
+            display: inline-block;
+            line-height: 1.2;
+        }
+
+        .concept-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            line-height: 1.3;
+        }
+
+        .complexity-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+            margin: 1.75rem 0;
+            background: var(--surface-2);
+            padding: 1.75rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .complexity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            line-height: 1.6;
+        }
+
+        .complexity-item strong {
+            color: var(--primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            margin-right: 1rem;
+        }
+
+        .complexity-item span {
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        .fun-fact {
+            background: linear-gradient(135deg, rgba(255, 190, 11, 0.1), rgba(255, 0, 110, 0.1));
+            border-left: 4px solid var(--accent);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            line-height: 1.8;
+        }
+
+        .fun-fact strong {
+            color: var(--accent);
+            display: block;
+            margin-bottom: 0.75rem;
+            font-size: 1.05rem;
+        }
+
+        /* ===== CODE BLOCKS ===== */
+        .code-section {
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .code-title {
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .code-block {
+            background: rgba(5, 5, 15, 0.8);
+            border: 1px solid var(--surface-3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+            position: relative;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .code-block::before {
+            content: attr(data-language);
+            position: absolute;
+            top: 0.75rem;
+            right: 1.25rem;
+            font-size: 0.7rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            opacity: 0.7;
+        }
+
+        pre {
+            margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            line-height: 1.7;
+            letter-spacing: 0.3px;
+            display: block;
+        }
+
+        /* Syntax highlighting with better contrast */
+        .keyword { 
+            color: #00d4ff;
+            font-weight: 600;
+        }
+        .string { 
+            color: #06ffa5;
+        }
+        .number { 
+            color: #ffbe0b;
+            font-weight: 600;
+        }
+        .function { 
+            color: #ff006e;
+            font-weight: 600;
+        }
+        .comment { 
+            color: #6b7280;
+            font-style: italic;
+        }
+        .operator { 
+            color: #00d4ff;
+        }
+
+        /* ===== VISUALIZATION CANVAS ===== */
+        .canvas-container {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+        }
+
+        .canvas-container canvas {
+            display: block;
+            border-radius: 4px;
+        }
+
+        /* ===== INTERACTIVE SECTIONS ===== */
+        .interactive-section {
+            background: var(--surface-2);
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            padding: 1.75rem;
+            margin: 1.75rem 0;
+        }
+
+        .interactive-title {
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            font-size: 1.15rem;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            flex: 1;
+            min-width: 150px;
+            padding: 0.85rem;
+            background: var(--surface-1);
+            border: 1.5px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]::placeholder,
+        input[type="number"]::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+            background: var(--surface-1);
+        }
+
+        .result-box {
+            background: rgba(6, 255, 165, 0.15);
+            border-left: 4px solid var(--success);
+            padding: 1.25rem;
+            border-radius: 6px;
+            color: var(--success);
+            font-family: 'JetBrains Mono', monospace;
+            word-break: break-word;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        /* ===== COMPARISON TABLE ===== */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            overflow: hidden;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .comparison-table th {
+            background: var(--surface-2);
+            color: var(--primary);
+            padding: 1.25rem;
+            text-align: left;
+            font-weight: 700;
+            border-bottom: 2px solid var(--border);
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .comparison-table td {
+            padding: 1.2rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .comparison-table tr:hover {
+            background: var(--surface-2);
+            transition: background 0.2s ease;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.6s ease;
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-weight: 600;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .tab::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            color: var(--primary);
+        }
+
+        .tab.active::after {
+            width: 100%;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--surface-1);
+            border-top: 1px solid var(--border);
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            margin-top: 4rem;
+        }
+
+        footer p {
+            margin-bottom: 1rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            h2 { font-size: 1.9rem; }
-            h3 { font-size: 1.35rem; }
-            .container { padding: 0 1rem 3rem 1rem; }
-            .card { padding: 1.5rem; }
+            nav {
+                gap: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .topics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 2rem 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .content {
+                padding: 1rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .comparison-table {
+                font-size: 0.9rem;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 0.75rem;
+            }
         }
     </style>
 </head>
 <body>
     <header>
         <div class="header-content">
-            <div class="logo-icon">DS</div>
-            <div>
-                <h1>DSA Academy</h1>
-                <div class="header-meta">Comprehensive Data Structures & Algorithms Resource</div>
-            </div>
+            <div class="logo">⚡ DSA MASTERY</div>
+            <nav>
+                <a href="#arrays">Arrays</a>
+                <a href="#linked-lists">Linked Lists</a>
+                <a href="#stacks-queues">Stacks & Queues</a>
+                <a href="#trees">Trees</a>
+                <a href="#sorting">Sorting</a>
+                <a href="#searching">Searching</a>
+            </nav>
         </div>
     </header>
 
-    <div class="nav-container">
-        <div class="nav-tabs">
-            <button class="tab-btn active" data-tab="intro">Intro</button>
-            <button class="tab-btn" data-tab="arrays">Arrays</button>
-            <button class="tab-btn" data-tab="linked">Linked Lists</button>
-            <button class="tab-btn" data-tab="stacks">Stacks & Queues</button>
-            <button class="tab-btn" data-tab="trees">Trees</button>
-            <button class="tab-btn" data-tab="graphs">Graphs</button>
-            <button class="tab-btn" data-tab="hash">Hashing</button>
-            <button class="tab-btn" data-tab="sort">Sorting</button>
-            <button class="tab-btn" data-tab="search">Searching</button>
-            <button class="tab-btn" data-tab="dp">DP</button>
-        </div>
-    </div>
-
     <div class="container">
-        <!-- INTRODUCTION - COMPREHENSIVE -->
-        <div id="intro" class="content-section active">
-            <div class="card">
-                <h2>Why Data Structures & Algorithms Matter</h2>
-                
-                <p>Data Structures and Algorithms (DSA) form the absolute foundation of computer science and professional software engineering. They determine whether your code works correctly, how fast it runs, whether it can handle millions of users, and whether you can solve problems that seem mathematically impossible.</p>
-
-                <h3>The Real-World Impact Story</h3>
-                
-                <div class="story-box">
-                    <strong>The Google Search Catastrophe (2010):</strong> One engineer at Google implemented a search algorithm that was accidentally O(n²) instead of the intended O(log n). This wasn't a minor performance issue—it was catastrophic for a system handling billions of queries. Searching through 2 billion web pages took HOURS instead of MILLISECONDS. The company burned millions of dollars in wasted electricity. Users experienced timeouts and abandoned Google for competitors. One algorithm choice. Massive business impact. This is real engineering, not theory.
-                </div>
-
-                <h3>Concrete Performance Numbers That Show Why This Matters</h3>
-                
-                <p>Here are realistic numbers showing the difference between O(log n), O(n), and O(n²):</p>
-                
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Data Size</th>
-                            <th>O(log n)</th>
-                            <th>O(n)</th>
-                            <th>O(n²)</th>
-                            <th>Practical Impact</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>1,000 items</strong></td>
-                            <td>~10 ops</td>
-                            <td>1,000 ops</td>
-                            <td>1,000,000 ops</td>
-                            <td>All acceptable</td>
-                        </tr>
-                        <tr>
-                            <td><strong>1,000,000 items</strong></td>
-                            <td>~20 ops</td>
-                            <td>1,000,000 ops</td>
-                            <td>1,000,000,000,000 ops (16+ min)</td>
-                            <td>O(n²) becomes impractical</td>
-                        </tr>
-                        <tr>
-                            <td><strong>1,000,000,000 items</strong></td>
-                            <td>~30 ops</td>
-                            <td>1 billion ops (1 sec)</td>
-                            <td>Impossible (years of computation)</td>
-                            <td>Only O(log n) scales</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <p>This difference translates to real outcomes:</p>
-                <ul>
-                    <li>O(log n): Google search returns results in milliseconds</li>
-                    <li>O(n²): Your search times out after 5 seconds</li>
-                    <li>O(n²): With billions of users, infrastructure costs become impossible</li>
-                </ul>
-
-                <h3>Big-O Notation: The Language of Scalability</h3>
-                
-                <p>Big-O describes how an algorithm's time or space requirements grow as input size increases. It's the universal language that lets engineers reason about and compare performance objectively.</p>
-
-                <div class="complexity-grid">
-                    <div class="complexity-item">
-                        <h4>O(1)</h4>
-                        <div class="complexity-value">Constant</div>
-                        <div class="complexity-desc">Time is always the same. Dictionary lookup, array access by index. 1 operation for 10 items or 10 billion items. The holy grail.</div>
-                    </div>
-                    <div class="complexity-item">
-                        <h4>O(log n)</h4>
-                        <div class="complexity-value">Logarithmic</div>
-                        <div class="complexity-desc">Problem size halves each step. Binary search: finding a target among 1 billion items takes ~30 steps. Extremely efficient and highly scalable.</div>
-                    </div>
-                    <div class="complexity-item">
-                        <h4>O(n)</h4>
-                        <div class="complexity-value">Linear</div>
-                        <div class="complexity-desc">Scales linearly with input. Check each element once. Fast enough for tens of millions of items. Acceptable baseline performance.</div>
-                    </div>
-                    <div class="complexity-item">
-                        <h4>O(n log n)</h4>
-                        <div class="complexity-value">Linearithmic</div>
-                        <div class="complexity-desc">Gold standard for general sorting. Fast enough for hundreds of millions of items. Merge sort, quicksort, heap sort achieve this.</div>
-                    </div>
-                    <div class="complexity-item">
-                        <h4>O(n²)</h4>
-                        <div class="complexity-value">Quadratic</div>
-                        <div class="complexity-desc">Nested loops. Breaks down around 10,000 items. Acceptable only for small datasets. Single-threaded processing becomes painful at scale.</div>
-                    </div>
-                    <div class="complexity-item">
-                        <h4>O(2ⁿ)</h4>
-                        <div class="complexity-value">Exponential</div>
-                        <div class="complexity-desc">Problem size DOUBLES with each additional item. Only viable for tiny inputs (n < 20). This is why brute force doesn't scale.</div>
-                    </div>
-                </div>
-
-                <h3>The Core Decision: Choosing the Right Data Structure</h3>
-                
-                <p>Every programming problem is fundamentally a trade-off. The core skill is choosing the optimal data structure for your constraints:</p>
-                
-                <ul>
-                    <li><strong>Need instant lookups by key?</strong> → Hash Table (O(1) average case)</li>
-                    <li><strong>Need to process in order added?</strong> → Queue with O(1) operations</li>
-                    <li><strong>Need LIFO (last in, first out)?</strong> → Stack with O(1) operations</li>
-                    <li><strong>Need fast insertion/deletion in the middle?</strong> → Linked List (O(1) if you have the position)</li>
-                    <li><strong>Need sorted data with fast search?</strong> → Binary Search Tree (O(log n) average) or Array + Binary Search</li>
-                    <li><strong>Need to express hierarchies?</strong> → Tree (parent-child relationships)</li>
-                    <li><strong>Need flexible connections between nodes?</strong> → Graph (general relationships)</li>
-                    <li><strong>Need to solve exponential problems efficiently?</strong> → Dynamic Programming</li>
-                </ul>
-
-                <h3>Course Structure & What You'll Learn</h3>
-                
-                <p>For each data structure and algorithm, you'll get comprehensive coverage:</p>
-                
-                <ul>
-                    <li><strong>Mental Model:</strong> A clear, memorable analogy you can visualize</li>
-                    <li><strong>Deep Explanation:</strong> Exactly how and why it works</li>
-                    <li><strong>Operations & Complexity:</strong> Complete time and space complexity analysis</li>
-                    <li><strong>Full Implementation:</strong> Complete, working Python code</li>
-                    <li><strong>Real-World Applications:</strong> Where companies actually use this in production</li>
-                    <li><strong>Common Pitfalls:</strong> Mistakes even experienced engineers make</li>
-                    <li><strong>Interview Problems:</strong> Classic LeetCode-style questions</li>
-                    <li><strong>Trade-offs:</strong> When to use vs. alternatives, and what you sacrifice</li>
-                </ul>
-
-                <div class="pro-tip">
-                    <strong>The Learning Principle That Works:</strong> Don't memorize data structures or algorithms. Understand the INTUITION. When you truly understand WHY something works (not just HOW to implement it), you remember it forever and can adapt it to novel problems you've never seen. This is the difference between someone who can pass a test and someone who can architect production systems.
-                </div>
-
-                <h3>Mastery Unlocks These Capabilities</h3>
-                
-                <ul>
-                    <li>Analyze time/space complexity accurately and predict real-world performance</li>
-                    <li>Know exactly when to use each major data structure</li>
-                    <li>Implement fundamental structures from scratch (and know why you built each part)</li>
-                    <li>Recognize patterns that solve 80% of real-world algorithm problems</li>
-                    <li>Make informed trade-offs between time, space, and implementation complexity</li>
-                    <li>Solve "impossible" problems using Dynamic Programming and algorithmic tricks</li>
-                    <li>ACE technical interviews at top companies (Google, Apple, Microsoft, Meta, etc.)</li>
-                    <li>Build the foundation to learn ANY advanced topic (databases, graphics, AI, etc.)</li>
-                </ul>
-
+        <section class="hero">
+            <h1>Master Data Structures & Algorithms</h1>
+            <p>Learn DSA concepts interactively with visualizations, Python code examples, and real-world applications</p>
+            <div class="hero-buttons">
+                <button class="btn-primary" onclick="scrollToSection('arrays')">Start Learning</button>
+                <button class="btn-secondary" onclick="alert('Bookmark this page! 🔖')">Save Progress</button>
             </div>
-        </div>
+        </section>
 
-        <div id="arrays" class="content-section">
-            <div class="card"><h2>Arrays: Random Access Foundation</h2><p>Contiguous memory. O(1) access via direct calculation. O(n) insertion/deletion in middle. Resizing doubling strategy makes amortized O(1) append. Use when: need random access. Avoid when: frequent middle insertions.</p></div>
-        </div>
+        <section class="content">
+            <!-- ARRAYS SECTION -->
+            <section id="arrays" class="section">
+                <h2 class="section-title">🎯 Arrays & Lists</h2>
+                
+                <div class="topics-grid">
+                    <div class="topic-card">
+                        <h3>Static Arrays</h3>
+                        <p>Fixed-size collections stored in contiguous memory locations</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Dynamic Arrays</h3>
+                        <p>Resizable arrays that grow and shrink automatically</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>2D Arrays</h3>
+                        <p>Multi-dimensional arrays for matrix and grid problems</p>
+                    </div>
+                </div>
 
-        <div id="linked" class="content-section">
-            <div class="card"><h2>Linked Lists: Pointer Chains</h2><p>Chain of nodes with pointers. O(n) access, O(1) insertion/deletion at known position. Trade RAM access speed for insertion/deletion speed. Use when: frequent middle insertions. Avoid: slow cache, poor random access.</p></div>
-        </div>
+                <div class="concept">
+                    <div class="concept-title">
+                        What are Arrays?
+                        <span class="complexity-badge complexity-easy">Easy</span>
+                    </div>
+                    
+                    <div class="explanation">
+                        Arrays are the most fundamental data structure. They store multiple elements of the same type in contiguous memory locations, allowing O(1) random access. Think of them as a row of boxes where each box holds a value and can be accessed instantly using its index.
+                    </div>
 
-        <div id="stacks" class="content-section">
-            <div class="card"><h2>Stacks & Queues</h2><p>Stack (LIFO): push/pop O(1). Queue (FIFO): enqueue/dequeue O(1). Both restrict access to enforce processing order. Use deque for queues, not list. Applications: undo, scheduling, DFS/BFS, expression parsing.</p></div>
-        </div>
+                    <div class="complexity-info">
+                        <div class="complexity-item">
+                            <strong>Access:</strong>
+                            <span>O(1)</span>
+                        </div>
+                        <div class="complexity-item">
+                            <strong>Search:</strong>
+                            <span>O(n)</span>
+                        </div>
+                        <div class="complexity-item">
+                            <strong>Insertion:</strong>
+                            <span>O(n)</span>
+                        </div>
+                        <div class="complexity-item">
+                            <strong>Deletion:</strong>
+                            <span>O(n)</span>
+                        </div>
+                    </div>
 
-        <div id="trees" class="content-section">
-            <div class="card"><h2>Trees: Hierarchical Structure</h2><p>Acyclic connected graph. BST: O(log n) search if balanced, O(n) if not. Heaps: priority queue. Tries: prefix search. Applications: file systems, databases, expressions, games.</p></div>
-        </div>
+                    <div class="code-section">
+                        <div class="code-title">Creating and Accessing Arrays</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="comment"># Method 1: Using list literal</span>
+arr = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]
 
-        <div id="graphs" class="content-section">
-            <div class="card"><h2>Graphs: General Connections</h2><p>Nodes and edges with cycles allowed. BFS/DFS: O(V+E) traversal. Dijkstra/Bellman: shortest paths. Applications: social networks, GPS, web, recommendations, games.</p></div>
-        </div>
+<span class="comment"># Method 2: Using list constructor</span>
+arr = <span class="function">list</span>(<span class="string">"hello"</span>)  <span class="comment"># ['h', 'e', 'l', 'l', 'o']</span>
 
-        <div id="hash" class="content-section">
-            <div class="card"><h2>Hashing: O(1) Lookups</h2><p>Hash function converts key to index. Average O(1). Worst O(n) with collisions. Collision handling: chaining or open addressing. Load factor management with resizing. Interview optimization: use hash tables to convert O(n²) nested loops to O(n).</p></div>
-        </div>
+<span class="comment"># Access elements (0-indexed)</span>
+first = arr[<span class="number">0</span>]  <span class="comment"># 1</span>
+last = arr[<span class="number">-1</span>]  <span class="comment"># 5 (negative indexing from end)</span>
 
-        <div id="sort" class="content-section">
-            <div class="card"><h2>Sorting Algorithms</h2><p>Bubble: O(n²) educational. Merge: O(n log n) guaranteed, stable. Quick: O(n log n) average, fast. Heap: O(n log n) guaranteed. Timsort: Python default. Don't implement—use built-in sort(). Know algorithms conceptually.</p></div>
-        </div>
+<span class="comment"># Slicing (returns new array)</span>
+subset = arr[<span class="number">1</span>:<span class="number">4</span>]  <span class="comment"># [2, 3, 4]</span></code></pre>
+                        </div>
+                    </div>
 
-        <div id="search" class="content-section">
-            <div class="card"><h2>Searching</h2><p>Linear: O(n) on unsorted data. Binary: O(log n) on sorted data. 1 billion items: binary takes 30 steps vs linear's 500M. Always prefer binary when data is sorted. Applications: element lookup, insertion position, counting.</p></div>
-        </div>
+                    <div class="fun-fact">
+                        <strong>🎓 Fun Fact:</strong> The concept of zero-based indexing was chosen by Ada Lovelace's colleague, and it stuck! Early programming languages like FORTRAN used 1-based indexing, but C popularized 0-based indexing due to how pointer arithmetic works.
+                    </div>
 
-        <div id="dp" class="content-section">
-            <div class="card"><h2>Dynamic Programming</h2><p>Solve overlapping subproblems once, memoize. Transforms exponential to polynomial. Fibonacci: O(2ⁿ) naive → O(n) with DP. Two approaches: top-down (memoization) or bottom-up (tabulation). Recognize by: exponential brute force or recalculated subproblems.</p></div>
-        </div>
+                    <div class="code-section">
+                        <div class="code-title">Common Array Operations</div>
+                        <div class="code-block" data-language="python">
+<pre><code>arr = [<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>]
 
+<span class="comment"># Add element (O(1) amortized)</span>
+arr.<span class="function">append</span>(<span class="number">40</span>)  <span class="comment"># [10, 20, 30, 40]</span>
+
+<span class="comment"># Insert at specific position (O(n))</span>
+arr.<span class="function">insert</span>(<span class="number">1</span>, <span class="number">15</span>)  <span class="comment"># [10, 15, 20, 30, 40]</span>
+
+<span class="comment"># Remove element (O(n))</span>
+arr.<span class="function">remove</span>(<span class="number">20</span>)  <span class="comment"># [10, 15, 30, 40]</span>
+
+<span class="comment"># Pop from end (O(1))</span>
+last = arr.<span class="function">pop</span>()  <span class="comment"># last = 40</span>
+
+<span class="comment"># Extend array with another array</span>
+arr.<span class="function">extend</span>([<span class="number">50</span>, <span class="number">60</span>])  <span class="comment"># [10, 15, 30, 50, 60]</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="interactive-section">
+                        <div class="interactive-title">🎮 Interactive: Find Maximum Element</div>
+                        <div class="input-group">
+                            <input type="text" id="arrInput" placeholder="Enter numbers separated by commas (e.g., 5,2,8,1,9)" value="5,2,8,1,9">
+                            <button class="btn-primary" onclick="findMax()">Find Max</button>
+                        </div>
+                        <div id="arrResult" class="result-box" style="display:none;"></div>
+                    </div>
+
+                    <div class="code-section">
+                        <div class="code-title">Finding Maximum Element - Two Approaches</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="comment"># Approach 1: Built-in function (Pythonic)</span>
+<span class="keyword">def</span> <span class="function">find_max_builtin</span>(arr):
+    <span class="keyword">return</span> <span class="function">max</span>(arr)
+
+<span class="comment"># Time: O(n), Space: O(1)</span>
+
+<span class="comment"># Approach 2: Manual iteration (Better for interviews)</span>
+<span class="keyword">def</span> <span class="function">find_max_manual</span>(arr):
+    <span class="keyword">if</span> <span class="keyword">not</span> arr:
+        <span class="keyword">return</span> <span class="keyword">None</span>
+    
+    max_val = arr[<span class="number">0</span>]
+    <span class="keyword">for</span> num <span class="keyword">in</span> arr[<span class="number">1</span>:]:
+        <span class="keyword">if</span> num > max_val:
+            max_val = num
+    
+    <span class="keyword">return</span> max_val</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LINKED LISTS SECTION -->
+            <section id="linked-lists" class="section">
+                <h2 class="section-title">🔗 Linked Lists</h2>
+                
+                <div class="concept">
+                    <div class="concept-title">
+                        Understanding Linked Lists
+                        <span class="complexity-badge complexity-medium">Medium</span>
+                    </div>
+                    
+                    <div class="explanation">
+                        Linked Lists are linear data structures where elements (nodes) are stored in a chain. Unlike arrays, linked lists don't require contiguous memory. Each node contains data and a reference to the next node. This makes insertion/deletion at known positions O(1), but accessing elements requires traversal.
+                    </div>
+
+                    <div class="canvas-container">
+                        <canvas id="linkedListCanvas" width="800" height="150"></canvas>
+                    </div>
+
+                    <div class="complexity-info">
+                        <div class="complexity-item">
+                            <strong>Access:</strong>
+                            <span>O(n)</span>
+                        </div>
+                        <div class="complexity-item">
+                            <strong>Search:</strong>
+                            <span>O(n)</span>
+                        </div>
+                        <div class="complexity-item">
+                            <strong>Insertion:</strong>
+                            <span>O(1)*</span>
+                        </div>
+                        <div class="complexity-item">
+                            <strong>Deletion:</strong>
+                            <span>O(1)*</span>
+                        </div>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: -1rem;">*At known position with reference</p>
+
+                    <div class="code-section">
+                        <div class="code-title">Node and LinkedList Implementation</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="keyword">class</span> <span class="function">Node</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, data):
+        self.data = data
+        self.next = <span class="keyword">None</span>
+
+<span class="keyword">class</span> <span class="function">LinkedList</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(self):
+        self.head = <span class="keyword">None</span>
+    
+    <span class="keyword">def</span> <span class="function">append</span>(self, data):
+        <span class="string">"""Add element at end"""</span>
+        new_node = <span class="function">Node</span>(data)
+        
+        <span class="keyword">if</span> <span class="keyword">not</span> self.head:
+            self.head = new_node
+            <span class="keyword">return</span>
+        
+        current = self.head
+        <span class="keyword">while</span> current.next:
+            current = current.next
+        current.next = new_node
+    
+    <span class="keyword">def</span> <span class="function">display</span>(self):
+        <span class="string">"""Print all elements"""</span>
+        elements = []
+        current = self.head
+        <span class="keyword">while</span> current:
+            elements.<span class="function">append</span>(current.data)
+            current = current.next
+        <span class="keyword">return</span> <span class="string">" → "</span>.<span class="function">join</span>(<span class="function">map</span>(<span class="function">str</span>, elements))</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="fun-fact">
+                        <strong>🎓 Fun Fact:</strong> Linked lists were invented to handle the problem of dynamic memory allocation. Before dynamic memory, programmers had to guess array sizes in advance. A wrong guess meant either wasted memory or a crash!
+                    </div>
+
+                    <div class="code-section">
+                        <div class="code-title">Reversing a Linked List (Classic Interview Question!)</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="comment"># Iterative approach (O(n) time, O(1) space)</span>
+<span class="keyword">def</span> <span class="function">reverse_linked_list</span>(head):
+    prev = <span class="keyword">None</span>
+    current = head
+    
+    <span class="keyword">while</span> current:
+        <span class="comment"># Store next node</span>
+        next_temp = current.next
+        
+        <span class="comment"># Reverse the link</span>
+        current.next = prev
+        
+        <span class="comment"># Move pointers forward</span>
+        prev = current
+        current = next_temp
+    
+    <span class="keyword">return</span> prev  <span class="comment"># New head</span>
+
+<span class="comment"># Example: 1 → 2 → 3 becomes 3 → 2 → 1</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concept">
+                    <div class="concept-title">Types of Linked Lists</div>
+                    
+                    <table class="comparison-table">
+                        <tr>
+                            <th>Type</th>
+                            <th>Structure</th>
+                            <th>Reverse?</th>
+                            <th>Use Case</th>
+                        </tr>
+                        <tr>
+                            <td>Singly Linked</td>
+                            <td>A → B → C → None</td>
+                            <td>Yes (reverse traversal)</td>
+                            <td>Stack, Basic chains</td>
+                        </tr>
+                        <tr>
+                            <td>Doubly Linked</td>
+                            <td>None ← A ↔ B ↔ C → None</td>
+                            <td>Both directions</td>
+                            <td>Deques, Browser history</td>
+                        </tr>
+                        <tr>
+                            <td>Circular Linked</td>
+                            <td>A → B → C → A (loops)</td>
+                            <td>Careful iteration</td>
+                            <td>Round-robin scheduling</td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+
+            <!-- STACKS & QUEUES SECTION -->
+            <section id="stacks-queues" class="section">
+                <h2 class="section-title">⚖️ Stacks & Queues</h2>
+
+                <div class="concept">
+                    <div class="concept-title">
+                        Stacks: Last-In-First-Out (LIFO)
+                        <span class="complexity-badge complexity-easy">Easy</span>
+                    </div>
+                    
+                    <div class="explanation">
+                        A Stack follows the LIFO principle: the last element added is the first one removed. Imagine a stack of plates - you add and remove from the top. Perfect for problems involving matching pairs, undo functionality, and depth-first traversal.
+                    </div>
+
+                    <div class="canvas-container">
+                        <canvas id="stackCanvas" width="400" height="300"></canvas>
+                    </div>
+
+                    <div class="complexity-info">
+                        <div class="complexity-item">
+                            <strong>Push:</strong>
+                            <span>O(1)</span>
+                        </div>
+                        <div class="complexity-item">
+                            <strong>Pop:</strong>
+                            <span>O(1)</span>
+                        </div>
+                        <div class="complexity-item">
+                            <strong>Peek:</strong>
+                            <span>O(1)</span>
+                        </div>
+                        <div class="complexity-item">
+                            <strong>Space:</strong>
+                            <span>O(n)</span>
+                        </div>
+                    </div>
+
+                    <div class="code-section">
+                        <div class="code-title">Stack Implementation and Usage</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="comment"># Method 1: Using list (Python)</span>
+stack = []
+stack.<span class="function">append</span>(<span class="number">1</span>)      <span class="comment"># push</span>
+stack.<span class="function">append</span>(<span class="number">2</span>)      
+stack.<span class="function">append</span>(<span class="number">3</span>)      
+top = stack.<span class="function">pop</span>()     <span class="comment"># pop → 3</span>
+
+<span class="comment"># Method 2: Custom Stack class</span>
+<span class="keyword">class</span> <span class="function">Stack</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(self):
+        self.items = []
+    
+    <span class="keyword">def</span> <span class="function">push</span>(self, item):
+        self.items.<span class="function">append</span>(item)
+    
+    <span class="keyword">def</span> <span class="function">pop</span>(self):
+        <span class="keyword">return</span> self.items.<span class="function">pop</span>() <span class="keyword">if</span> self.items <span class="keyword">else</span> <span class="keyword">None</span>
+    
+    <span class="keyword">def</span> <span class="function">peek</span>(self):
+        <span class="keyword">return</span> self.items[<span class="number">-1</span>] <span class="keyword">if</span> self.items <span class="keyword">else</span> <span class="keyword">None</span>
+    
+    <span class="keyword">def</span> <span class="function">is_empty</span>(self):
+        <span class="keyword">return</span> <span class="keyword">len</span>(self.items) == <span class="number">0</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="fun-fact">
+                        <strong>🎓 Fun Fact:</strong> The "Undo" functionality in every text editor uses a stack! Each action is pushed onto the stack, and Ctrl+Z pops the most recent action to undo it.
+                    </div>
+
+                    <div class="code-section">
+                        <div class="code-title">Classic Problem: Balanced Parentheses</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="keyword">def</span> <span class="function">is_balanced</span>(s):
+    <span class="string">"""Check if parentheses/brackets are balanced"""</span>
+    stack = []
+    matching = {
+        <span class="string">')'</span>: <span class="string">'('</span>, 
+        <span class="string">']'</span>: <span class="string">'['</span>, 
+        <span class="string">'}'</span>: <span class="string">'{'</span>
+    }
+    
+    <span class="keyword">for</span> char <span class="keyword">in</span> s:
+        <span class="keyword">if</span> char <span class="keyword">in</span> <span class="string">'([{'</span>:
+            stack.<span class="function">append</span>(char)
+        <span class="keyword">elif</span> char <span class="keyword">in</span> <span class="string">')]}'</span>:
+            <span class="keyword">if</span> <span class="keyword">not</span> stack <span class="keyword">or</span> stack.<span class="function">pop</span>() != matching[char]:
+                <span class="keyword">return</span> <span class="keyword">False</span>
+    
+    <span class="keyword">return</span> <span class="keyword">len</span>(stack) == <span class="number">0</span>
+
+<span class="comment"># Tests</span>
+<span class="function">is_balanced</span>(<span class="string">"({[]})"</span>)  <span class="comment"># True</span>
+<span class="function">is_balanced</span>(<span class="string">"([)]"</span>)    <span class="comment"># False</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concept">
+                    <div class="concept-title">
+                        Queues: First-In-First-Out (FIFO)
+                        <span class="complexity-badge complexity-easy">Easy</span>
+                    </div>
+                    
+                    <div class="explanation">
+                        A Queue follows the FIFO principle: the first element added is the first one removed. Like a real queue at a store - you serve the person who arrived first. Essential for BFS traversal and handling tasks in order.
+                    </div>
+
+                    <div class="complexity-info">
+                        <div class="complexity-item">
+                            <strong>Enqueue:</strong>
+                            <span>O(1)</span>
+                        </div>
+                        <div class="complexity-item">
+                            <strong>Dequeue:</strong>
+                            <span>O(1)</span>
+                        </div>
+                        <div class="complexity-item">
+                            <strong>Peek:</strong>
+                            <span>O(1)</span>
+                        </div>
+                        <div class="complexity-item">
+                            <strong>Space:</strong>
+                            <span>O(n)</span>
+                        </div>
+                    </div>
+
+                    <div class="code-section">
+                        <div class="code-title">Queue Implementation</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="keyword">from</span> collections <span class="keyword">import</span> deque
+
+<span class="comment"># Method 1: Using collections.deque (Recommended)</span>
+queue = <span class="function">deque</span>()
+queue.<span class="function">append</span>(<span class="number">1</span>)       <span class="comment"># enqueue</span>
+queue.<span class="function">append</span>(<span class="number">2</span>)
+queue.<span class="function">append</span>(<span class="number">3</span>)
+first = queue.<span class="function">popleft</span>()  <span class="comment"># dequeue → 1</span>
+
+<span class="comment"># Method 2: Custom Queue class</span>
+<span class="keyword">class</span> <span class="function">Queue</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(self):
+        self.items = <span class="function">deque</span>()
+    
+    <span class="keyword">def</span> <span class="function">enqueue</span>(self, item):
+        self.items.<span class="function">append</span>(item)
+    
+    <span class="keyword">def</span> <span class="function">dequeue</span>(self):
+        <span class="keyword">return</span> self.items.<span class="function">popleft</span>() <span class="keyword">if</span> self.items <span class="keyword">else</span> <span class="keyword">None</span>
+    
+    <span class="keyword">def</span> <span class="function">is_empty</span>(self):
+        <span class="keyword">return</span> <span class="keyword">len</span>(self.items) == <span class="number">0</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TREES SECTION -->
+            <section id="trees" class="section">
+                <h2 class="section-title">🌳 Trees & Binary Search Trees</h2>
+
+                <div class="concept">
+                    <div class="concept-title">
+                        Tree Fundamentals
+                        <span class="complexity-badge complexity-medium">Medium</span>
+                    </div>
+                    
+                    <div class="explanation">
+                        Trees are hierarchical data structures with a root node and zero or more child nodes. Each node (except root) has exactly one parent. Trees are crucial for organizing hierarchical data, searching, and recursive algorithms. Binary trees restrict each node to at most 2 children.
+                    </div>
+
+                    <div class="canvas-container">
+                        <canvas id="treeCanvas" width="800" height="300"></canvas>
+                    </div>
+
+                    <div class="code-section">
+                        <div class="code-title">Tree Node and Binary Tree Implementation</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="keyword">class</span> <span class="function">TreeNode</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, val):
+        self.val = val
+        self.left = <span class="keyword">None</span>
+        self.right = <span class="keyword">None</span>
+
+<span class="comment"># Create a simple tree:</span>
+<span class="comment">#       1</span>
+<span class="comment">#      / \</span>
+<span class="comment">#     2   3</span>
+
+root = <span class="function">TreeNode</span>(<span class="number">1</span>)
+root.left = <span class="function">TreeNode</span>(<span class="number">2</span>)
+root.right = <span class="function">TreeNode</span>(<span class="number">3</span>)</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab(event, 'inorder')">Inorder</button>
+                        <button class="tab" onclick="switchTab(event, 'preorder')">Preorder</button>
+                        <button class="tab" onclick="switchTab(event, 'postorder')">Postorder</button>
+                    </div>
+
+                    <div id="inorder" class="tab-content active">
+                        <div class="code-section">
+                            <div class="code-title">Inorder Traversal (Left → Root → Right)</div>
+                            <div class="code-block" data-language="python">
+<pre><code><span class="keyword">def</span> <span class="function">inorder</span>(root):
+    <span class="string">"""Left subtree → Node → Right subtree"""</span>
+    <span class="keyword">if</span> <span class="keyword">not</span> root:
+        <span class="keyword">return</span>
+    
+    <span class="function">inorder</span>(root.left)
+    <span class="function">print</span>(root.val, <span class="keyword">end</span>=<span class="string">' '</span>)  <span class="comment"># Process node</span>
+    <span class="function">inorder</span>(root.right)
+
+<span class="comment"># For BST, inorder gives sorted sequence!</span>
+<span class="comment"># Useful for: Getting sorted data from BST</span></code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="preorder" class="tab-content">
+                        <div class="code-section">
+                            <div class="code-title">Preorder Traversal (Root → Left → Right)</div>
+                            <div class="code-block" data-language="python">
+<pre><code><span class="keyword">def</span> <span class="function">preorder</span>(root):
+    <span class="string">"""Node → Left subtree → Right subtree"""</span>
+    <span class="keyword">if</span> <span class="keyword">not</span> root:
+        <span class="keyword">return</span>
+    
+    <span class="function">print</span>(root.val, <span class="keyword">end</span>=<span class="string">' '</span>)  <span class="comment"># Process node</span>
+    <span class="function">preorder</span>(root.left)
+    <span class="function">preorder</span>(root.right)
+
+<span class="comment"># Useful for: Copying tree, getting root first</span>
+<span class="comment"># Example output: 1 2 4 5 3</span></code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="postorder" class="tab-content">
+                        <div class="code-section">
+                            <div class="code-title">Postorder Traversal (Left → Right → Root)</div>
+                            <div class="code-block" data-language="python">
+<pre><code><span class="keyword">def</span> <span class="function">postorder</span>(root):
+    <span class="string">"""Left subtree → Right subtree → Node"""</span>
+    <span class="keyword">if</span> <span class="keyword">not</span> root:
+        <span class="keyword">return</span>
+    
+    <span class="function">postorder</span>(root.left)
+    <span class="function">postorder</span>(root.right)
+    <span class="function">print</span>(root.val, <span class="keyword">end</span>=<span class="string">' '</span>)  <span class="comment"># Process node</span>
+
+<span class="comment"># Useful for: Deleting tree, post-processing</span>
+<span class="comment"># Example output: 4 5 2 3 1</span></code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fun-fact">
+                        <strong>🎓 Fun Fact:</strong> The three traversal methods (Inorder, Preorder, Postorder) can reconstruct a unique binary tree if combined! But be careful - two traversals alone might not be enough.
+                    </div>
+                </div>
+
+                <div class="concept">
+                    <div class="concept-title">
+                        Binary Search Trees (BST)
+                        <span class="complexity-badge complexity-medium">Medium</span>
+                    </div>
+                    
+                    <div class="explanation">
+                        A Binary Search Tree maintains the BST property: for every node, all values in the left subtree are smaller, and all values in the right subtree are larger. This enables fast searching, insertion, and deletion compared to unsorted arrays.
+                    </div>
+
+                    <div class="complexity-info">
+                        <div class="complexity-item">
+                            <strong>Search:</strong>
+                            <span>O(log n) avg</span>
+                        </div>
+                        <div class="complexity-item">
+                            <strong>Insert:</strong>
+                            <span>O(log n) avg</span>
+                        </div>
+                        <div class="complexity-item">
+                            <strong>Delete:</strong>
+                            <span>O(log n) avg</span>
+                        </div>
+                        <div class="complexity-item">
+                            <strong>Worst Case:</strong>
+                            <span>O(n) unbalanced</span>
+                        </div>
+                    </div>
+
+                    <div class="code-section">
+                        <div class="code-title">BST Search and Insert</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="keyword">class</span> <span class="function">BST</span>:
+    <span class="keyword">def</span> <span class="function">search</span>(self, root, val):
+        <span class="string">"""Search for value in BST"""</span>
+        <span class="keyword">if</span> <span class="keyword">not</span> root:
+            <span class="keyword">return</span> <span class="keyword">False</span>
+        
+        <span class="keyword">if</span> root.val == val:
+            <span class="keyword">return</span> <span class="keyword">True</span>
+        <span class="keyword">elif</span> val < root.val:
+            <span class="keyword">return</span> self.<span class="function">search</span>(root.left, val)
+        <span class="keyword">else</span>:
+            <span class="keyword">return</span> self.<span class="function">search</span>(root.right, val)
+    
+    <span class="keyword">def</span> <span class="function">insert</span>(self, root, val):
+        <span class="string">"""Insert value maintaining BST property"""</span>
+        <span class="keyword">if</span> <span class="keyword">not</span> root:
+            <span class="keyword">return</span> <span class="function">TreeNode</span>(val)
+        
+        <span class="keyword">if</span> val < root.val:
+            root.left = self.<span class="function">insert</span>(root.left, val)
+        <span class="keyword">elif</span> val > root.val:
+            root.right = self.<span class="function">insert</span>(root.right, val)
+        
+        <span class="keyword">return</span> root</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SORTING SECTION -->
+            <section id="sorting" class="section">
+                <h2 class="section-title">📊 Sorting Algorithms</h2>
+
+                <div class="concept">
+                    <div class="concept-title">
+                        Sorting Algorithm Comparison
+                        <span class="complexity-badge complexity-hard">Hard</span>
+                    </div>
+                    
+                    <div class="explanation">
+                        Sorting is arranging elements in ascending or descending order. Different algorithms have different tradeoffs between time complexity, space complexity, and stability. Understanding when to use each is crucial for interviews.
+                    </div>
+
+                    <table class="comparison-table">
+                        <tr>
+                            <th>Algorithm</th>
+                            <th>Time (Best)</th>
+                            <th>Time (Avg)</th>
+                            <th>Time (Worst)</th>
+                            <th>Space</th>
+                            <th>Stable?</th>
+                        </tr>
+                        <tr>
+                            <td>Bubble Sort</td>
+                            <td>O(n)</td>
+                            <td>O(n²)</td>
+                            <td>O(n²)</td>
+                            <td>O(1)</td>
+                            <td>✓ Yes</td>
+                        </tr>
+                        <tr>
+                            <td>Selection Sort</td>
+                            <td>O(n²)</td>
+                            <td>O(n²)</td>
+                            <td>O(n²)</td>
+                            <td>O(1)</td>
+                            <td>✗ No</td>
+                        </tr>
+                        <tr>
+                            <td>Insertion Sort</td>
+                            <td>O(n)</td>
+                            <td>O(n²)</td>
+                            <td>O(n²)</td>
+                            <td>O(1)</td>
+                            <td>✓ Yes</td>
+                        </tr>
+                        <tr>
+                            <td>Merge Sort</td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                            <td>O(n)</td>
+                            <td>✓ Yes</td>
+                        </tr>
+                        <tr>
+                            <td>Quick Sort</td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                            <td>O(n²)</td>
+                            <td>O(log n)</td>
+                            <td>✗ No</td>
+                        </tr>
+                        <tr>
+                            <td>Heap Sort</td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                            <td>O(n log n)</td>
+                            <td>O(1)</td>
+                            <td>✗ No</td>
+                        </tr>
+                    </table>
+
+                    <div class="code-section">
+                        <div class="code-title">Merge Sort - Divide & Conquer O(n log n)</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="keyword">def</span> <span class="function">merge_sort</span>(arr):
+    <span class="string">"""Divide array, recursively sort, then merge"""</span>
+    <span class="keyword">if</span> <span class="keyword">len</span>(arr) <= <span class="number">1</span>:
+        <span class="keyword">return</span> arr
+    
+    mid = <span class="keyword">len</span>(arr) // <span class="number">2</span>
+    left = <span class="function">merge_sort</span>(arr[:mid])
+    right = <span class="function">merge_sort</span>(arr[mid:])
+    
+    <span class="keyword">return</span> <span class="function">merge</span>(left, right)
+
+<span class="keyword">def</span> <span class="function">merge</span>(left, right):
+    <span class="string">"""Merge two sorted arrays"""</span>
+    result = []
+    i = j = <span class="number">0</span>
+    
+    <span class="keyword">while</span> i < <span class="keyword">len</span>(left) <span class="keyword">and</span> j < <span class="keyword">len</span>(right):
+        <span class="keyword">if</span> left[i] <= right[j]:
+            result.<span class="function">append</span>(left[i])
+            i += <span class="number">1</span>
+        <span class="keyword">else</span>:
+            result.<span class="function">append</span>(right[j])
+            j += <span class="number">1</span>
+    
+    result.<span class="function">extend</span>(left[i:])
+    result.<span class="function">extend</span>(right[j:])
+    <span class="keyword">return</span> result</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="fun-fact">
+                        <strong>🎓 Fun Fact:</strong> Python's built-in sort uses Timsort - a hybrid of merge sort and insertion sort! It was created by Tim Peters in 2002 and is incredibly efficient for real-world data.
+                    </div>
+
+                    <div class="code-section">
+                        <div class="code-title">Quick Sort - Fast Average Case O(n log n)</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="keyword">def</span> <span class="function">quick_sort</span>(arr):
+    <span class="string">"""Choose pivot, partition, recursively sort"""</span>
+    <span class="keyword">if</span> <span class="keyword">len</span>(arr) <= <span class="number">1</span>:
+        <span class="keyword">return</span> arr
+    
+    <span class="comment"># Choose middle element as pivot</span>
+    pivot = arr[<span class="keyword">len</span>(arr) // <span class="number">2</span>]
+    left = [x <span class="keyword">for</span> x <span class="keyword">in</span> arr <span class="keyword">if</span> x < pivot]
+    middle = [x <span class="keyword">for</span> x <span class="keyword">in</span> arr <span class="keyword">if</span> x == pivot]
+    right = [x <span class="keyword">for</span> x <span class="keyword">in</span> arr <span class="keyword">if</span> x > pivot]
+    
+    <span class="keyword">return</span> (<span class="function">quick_sort</span>(left) + middle + 
+            <span class="function">quick_sort</span>(right))
+
+<span class="comment"># In-place version (interview preferred):</span>
+<span class="keyword">def</span> <span class="function">quick_sort_inplace</span>(arr, low, high):
+    <span class="keyword">if</span> low < high:
+        pi = <span class="function">partition</span>(arr, low, high)
+        <span class="function">quick_sort_inplace</span>(arr, low, pi - <span class="number">1</span>)
+        <span class="function">quick_sort_inplace</span>(arr, pi + <span class="number">1</span>, high)</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEARCHING SECTION -->
+            <section id="searching" class="section">
+                <h2 class="section-title">🔍 Searching Algorithms</h2>
+
+                <div class="concept">
+                    <div class="concept-title">
+                        Linear Search vs Binary Search
+                        <span class="complexity-badge complexity-easy">Easy</span>
+                    </div>
+                    
+                    <div class="explanation">
+                        Linear search checks every element sequentially - simple but slow. Binary search works on sorted arrays by eliminating half the remaining elements with each comparison - much faster but requires sorted data. Understanding when to use each is fundamental.
+                    </div>
+
+                    <div class="complexity-info">
+                        <div class="complexity-item">
+                            <strong>Linear Search:</strong>
+                            <span>O(n)</span>
+                        </div>
+                        <div class="complexity-item">
+                            <strong>Binary Search:</strong>
+                            <span>O(log n)</span>
+                        </div>
+                    </div>
+
+                    <div class="code-section">
+                        <div class="code-title">Binary Search Implementation</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="comment"># Recursive approach</span>
+<span class="keyword">def</span> <span class="function">binary_search_recursive</span>(arr, target, left, right):
+    <span class="keyword">if</span> left > right:
+        <span class="keyword">return</span> <span class="number">-1</span>  <span class="comment"># Not found</span>
+    
+    mid = (left + right) // <span class="number">2</span>
+    
+    <span class="keyword">if</span> arr[mid] == target:
+        <span class="keyword">return</span> mid
+    <span class="keyword">elif</span> arr[mid] > target:
+        <span class="keyword">return</span> <span class="function">binary_search_recursive</span>(arr, target, 
+                                        left, mid - <span class="number">1</span>)
+    <span class="keyword">else</span>:
+        <span class="keyword">return</span> <span class="function">binary_search_recursive</span>(arr, target, 
+                                        mid + <span class="number">1</span>, right)
+
+<span class="comment"># Iterative approach (more efficient, no stack overhead)</span>
+<span class="keyword">def</span> <span class="function">binary_search</span>(arr, target):
+    left, right = <span class="number">0</span>, <span class="keyword">len</span>(arr) - <span class="number">1</span>
+    
+    <span class="keyword">while</span> left <= right:
+        mid = (left + right) // <span class="number">2</span>
+        
+        <span class="keyword">if</span> arr[mid] == target:
+            <span class="keyword">return</span> mid
+        <span class="keyword">elif</span> arr[mid] < target:
+            left = mid + <span class="number">1</span>
+        <span class="keyword">else</span>:
+            right = mid - <span class="number">1</span>
+    
+    <span class="keyword">return</span> <span class="number">-1</span>  <span class="comment"># Not found</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="interactive-section">
+                        <div class="interactive-title">🎮 Interactive: Binary Search Visualizer</div>
+                        <div class="input-group">
+                            <input type="number" id="searchTarget" placeholder="Enter target (1-20)" min="1" max="20" value="7">
+                            <button class="btn-primary" onclick="performBinarySearch()">Search</button>
+                        </div>
+                        <div id="searchResult" class="result-box" style="display:none;"></div>
+                    </div>
+
+                    <div class="fun-fact">
+                        <strong>🎓 Fun Fact:</strong> Donald Knuth calculated that binary search was misimplemented in most programs for over 20 years! The bug was in computing the middle index. Using mid = left + (right - left) // 2 prevents integer overflow.
+                    </div>
+                </div>
+            </section>
+
+            <!-- GRAPH SECTION -->
+            <section class="section">
+                <h2 class="section-title">🕸️ Graphs & Traversal</h2>
+
+                <div class="concept">
+                    <div class="concept-title">
+                        Graph Representations
+                        <span class="complexity-badge complexity-hard">Hard</span>
+                    </div>
+                    
+                    <div class="explanation">
+                        Graphs consist of vertices (nodes) and edges (connections). They model relationships like social networks, transportation routes, and web links. Choosing the right representation affects algorithm efficiency.
+                    </div>
+
+                    <table class="comparison-table">
+                        <tr>
+                            <th>Representation</th>
+                            <th>Space</th>
+                            <th>Edge Lookup</th>
+                            <th>Edge Insertion</th>
+                            <th>Best For</th>
+                        </tr>
+                        <tr>
+                            <td>Adjacency Matrix</td>
+                            <td>O(V²)</td>
+                            <td>O(1)</td>
+                            <td>O(1)</td>
+                            <td>Dense graphs</td>
+                        </tr>
+                        <tr>
+                            <td>Adjacency List</td>
+                            <td>O(V+E)</td>
+                            <td>O(degree)</td>
+                            <td>O(1)</td>
+                            <td>Sparse graphs</td>
+                        </tr>
+                        <tr>
+                            <td>Edge List</td>
+                            <td>O(E)</td>
+                            <td>O(E)</td>
+                            <td>O(1)</td>
+                            <td>Iterating edges</td>
+                        </tr>
+                    </table>
+
+                    <div class="code-section">
+                        <div class="code-title">Graph Traversal: BFS vs DFS</div>
+                        <div class="code-block" data-language="python">
+<pre><code><span class="keyword">from</span> collections <span class="keyword">import</span> deque
+
+<span class="comment"># Breadth-First Search (BFS) - Level order</span>
+<span class="keyword">def</span> <span class="function">bfs</span>(graph, start):
+    visited = <span class="function">set</span>()
+    queue = <span class="function">deque</span>([start])
+    visited.<span class="function">add</span>(start)
+    
+    <span class="keyword">while</span> queue:
+        node = queue.<span class="function">popleft</span>()
+        <span class="function">print</span>(node, <span class="keyword">end</span>=<span class="string">' '</span>)
+        
+        <span class="keyword">for</span> neighbor <span class="keyword">in</span> graph[node]:
+            <span class="keyword">if</span> neighbor <span class="keyword">not</span> <span class="keyword">in</span> visited:
+                visited.<span class="function">add</span>(neighbor)
+                queue.<span class="function">append</span>(neighbor)
+
+<span class="comment"># Depth-First Search (DFS) - Go deep</span>
+<span class="keyword">def</span> <span class="function">dfs</span>(graph, node, visited):
+    visited.<span class="function">add</span>(node)
+    <span class="function">print</span>(node, <span class="keyword">end</span>=<span class="string">' '</span>)
+    
+    <span class="keyword">for</span> neighbor <span class="keyword">in</span> graph[node]:
+        <span class="keyword">if</span> neighbor <span class="keyword">not</span> <span class="keyword">in</span> visited:
+            <span class="function">dfs</span>(graph, neighbor, visited)</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="fun-fact">
+                        <strong>🎓 Fun Fact:</strong> BFS and DFS are like two ways of exploring a maze: BFS explores level by level (like expanding in circles), while DFS goes as deep as possible before backtracking (like following a wall).
+                    </div>
+                </div>
+            </section>
+        </section>
     </div>
 
     <footer>
-        <p>Master Data Structures & Algorithms</p>
-        <p>These patterns power every technology: social networks, GPS, databases, AI. Understanding them deeply is the skill that separates engineers from great engineers. Keep learning, keep coding, keep solving problems.</p>
+        <p>💡 <strong>Remember:</strong> Understanding WHY a data structure or algorithm works matters more than memorizing code.</p>
+        <p>🚀 Practice on LeetCode, HackerRank, or CodeSignal to master these concepts!</p>
+        <p style="margin-top: 2rem; color: var(--text-secondary);">Built with ❤️ for DSA learners | All code examples are executable in Python 3.8+</p>
     </footer>
 
     <script>
-        document.querySelectorAll(".tab-btn").forEach(btn => {
-            btn.addEventListener("click", (e) => {
-                const tabName = e.target.dataset.tab;
-                document.querySelectorAll(".content-section").forEach(s => s.classList.remove("active"));
-                document.getElementById(tabName).classList.add("active");
-                document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-                e.target.classList.add("active");
-                window.scrollTo({top: 0, behavior: "smooth"});
+        // ===== NAVIGATION & TABS =====
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            section?.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function switchTab(event, tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // ===== INTERACTIVE: FIND MAX =====
+        function findMax() {
+            const input = document.getElementById('arrInput').value;
+            const result = document.getElementById('arrResult');
+            
+            try {
+                const arr = input.split(',').map(x => parseInt(x.trim()));
+                
+                if (arr.some(isNaN)) {
+                    throw new Error('Invalid input');
+                }
+                
+                const max = Math.max(...arr);
+                const steps = `
+Array: [${arr.join(', ')}]
+Maximum Element: ${max}
+Time Complexity: O(n) - visited each element once
+Space Complexity: O(1) - no extra space used
+                `.trim();
+                
+                result.textContent = steps;
+                result.style.display = 'block';
+            } catch (e) {
+                result.textContent = '❌ Error: ' + e.message;
+                result.style.display = 'block';
+            }
+        }
+
+        // ===== INTERACTIVE: BINARY SEARCH =====
+        function performBinarySearch() {
+            const target = parseInt(document.getElementById('searchTarget').value);
+            const result = document.getElementById('searchResult');
+            
+            if (isNaN(target)) {
+                result.textContent = '❌ Please enter a valid number';
+                result.style.display = 'block';
+                return;
+            }
+            
+            const arr = Array.from({length: 20}, (_, i) => i + 1);
+            let left = 0, right = arr.length - 1, steps = 0;
+            
+            while (left <= right) {
+                const mid = Math.floor((left + right) / 2);
+                steps++;
+                
+                if (arr[mid] === target) {
+                    result.textContent = `✅ Found ${target} at index ${mid} in ${steps} step(s)!
+Compared with: [${arr.slice(Math.max(0, mid-2), mid+3).join(', ')}]
+Without binary search would take up to 20 comparisons!`;
+                    result.style.display = 'block';
+                    return;
+                } else if (arr[mid] < target) {
+                    left = mid + 1;
+                } else {
+                    right = mid - 1;
+                }
+            }
+            
+            result.textContent = `❌ ${target} not found in array [1-20] after ${steps} step(s)`;
+            result.style.display = 'block';
+        }
+
+        // ===== CANVAS VISUALIZATIONS =====
+        function drawLinkedList() {
+            const canvas = document.getElementById('linkedListCanvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#1a1f3a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const nodeRadius = 25;
+            const nodes = [10, 20, 30, 40];
+            const startX = 80;
+            const spacing = 150;
+            const y = 75;
+            
+            // Draw nodes and arrows
+            nodes.forEach((val, index) => {
+                const x = startX + index * spacing;
+                
+                // Node circle
+                ctx.fillStyle = '#00d4ff';
+                ctx.beginPath();
+                ctx.arc(x, y, nodeRadius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Node value
+                ctx.fillStyle = '#0a0e27';
+                ctx.font = 'bold 16px Outfit';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(val, x, y);
+                
+                // Arrow to next node
+                if (index < nodes.length - 1) {
+                    const nextX = x + spacing - nodeRadius;
+                    ctx.strokeStyle = '#ffbe0b';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(x + nodeRadius, y);
+                    ctx.lineTo(nextX - nodeRadius, y);
+                    ctx.stroke();
+                    
+                    // Arrow head
+                    ctx.fillStyle = '#ffbe0b';
+                    ctx.beginPath();
+                    ctx.moveTo(nextX, y);
+                    ctx.lineTo(nextX - 10, y - 5);
+                    ctx.lineTo(nextX - 10, y + 5);
+                    ctx.closePath();
+                    ctx.fill();
+                }
             });
+            
+            // Draw null pointer
+            const lastX = startX + (nodes.length - 1) * spacing;
+            ctx.fillStyle = '#ff006e';
+            ctx.font = 'bold 14px Outfit';
+            ctx.textAlign = 'center';
+            ctx.fillText('None', lastX + 60, y);
+        }
+
+        function drawStack() {
+            const canvas = document.getElementById('stackCanvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#1a1f3a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const items = ['3', '2', '1'];
+            const boxWidth = 80;
+            const boxHeight = 60;
+            const startX = 160;
+            const startY = 200;
+            
+            items.forEach((item, index) => {
+                const y = startY - (index * boxHeight);
+                
+                // Box
+                ctx.fillStyle = '#00d4ff';
+                ctx.fillRect(startX, y - boxHeight, boxWidth, boxHeight);
+                
+                // Border
+                ctx.strokeStyle = '#ffbe0b';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(startX, y - boxHeight, boxWidth, boxHeight);
+                
+                // Value
+                ctx.fillStyle = '#0a0e27';
+                ctx.font = 'bold 24px Outfit';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(item, startX + boxWidth/2, y - boxHeight/2);
+            });
+            
+            // Top arrow (push/pop)
+            ctx.strokeStyle = '#06ffa5';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(startX + boxWidth/2, 80);
+            ctx.lineTo(startX + boxWidth/2, 120);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#06ffa5';
+            ctx.font = 'bold 14px Outfit';
+            ctx.textAlign = 'center';
+            ctx.fillText('LIFO - Last added (3) comes first', startX + boxWidth/2, 50);
+        }
+
+        function drawTree() {
+            const canvas = document.getElementById('treeCanvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#1a1f3a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const nodeRadius = 25;
+            const centerX = 400;
+            
+            // Draw nodes
+            const nodes = [
+                {x: 400, y: 50, val: '1', color: '#00d4ff'},
+                {x: 250, y: 150, val: '2', color: '#ff006e'},
+                {x: 550, y: 150, val: '3', color: '#ff006e'},
+                {x: 150, y: 250, val: '4', color: '#ffbe0b'},
+                {x: 350, y: 250, val: '5', color: '#ffbe0b'}
+            ];
+            
+            // Draw edges
+            ctx.strokeStyle = '#9ca3af';
+            ctx.lineWidth = 2;
+            
+            // 1 to 2
+            ctx.beginPath();
+            ctx.moveTo(400, 75);
+            ctx.lineTo(250, 125);
+            ctx.stroke();
+            
+            // 1 to 3
+            ctx.beginPath();
+            ctx.moveTo(400, 75);
+            ctx.lineTo(550, 125);
+            ctx.stroke();
+            
+            // 2 to 4
+            ctx.beginPath();
+            ctx.moveTo(250, 175);
+            ctx.lineTo(150, 225);
+            ctx.stroke();
+            
+            // 2 to 5
+            ctx.beginPath();
+            ctx.moveTo(250, 175);
+            ctx.lineTo(350, 225);
+            ctx.stroke();
+            
+            // Draw nodes
+            nodes.forEach(node => {
+                ctx.fillStyle = node.color;
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, nodeRadius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#0a0e27';
+                ctx.font = 'bold 16px Outfit';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(node.val, node.x, node.y);
+            });
+            
+            // Add labels
+            ctx.fillStyle = '#9ca3af';
+            ctx.font = '12px Outfit';
+            ctx.textAlign = 'left';
+            ctx.fillText('Root', 420, 50);
+            ctx.fillText('Left child', 200, 150);
+            ctx.fillText('Right child', 560, 150);
+        }
+
+        // Initialize canvas drawings
+        window.addEventListener('load', () => {
+            drawLinkedList();
+            drawStack();
+            drawTree();
         });
 
-        document.querySelectorAll(".copy-btn").forEach(btn => {
-            btn.addEventListener("click", (e) => {
-                const code = e.target.nextElementSibling.textContent;
-                navigator.clipboard.writeText(code).then(() => {
-                    const orig = e.target.textContent;
-                    e.target.textContent = "✓ Copied!";
-                    setTimeout(() => { e.target.textContent = orig; }, 2000);
-                });
+        // Allow Enter key to search
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                if (document.activeElement.id === 'arrInput') findMax();
+                if (document.activeElement.id === 'searchTarget') performBinarySearch();
+            }
+        });
+
+        // Smooth animations on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
             });
+        }, observerOptions);
+
+        document.querySelectorAll('.concept, .section').forEach(el => {
+            observer.observe(el);
         });
     </script>
 </body>

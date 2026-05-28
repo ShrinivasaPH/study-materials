@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyTorch Mastery - Interactive Learning Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0f62fe;
+            --primary-light: #e3f2fd;
+            --accent: #00bcd4;
+            --accent-light: #e0f7fa;
+            --success: #34a853;
+            --warning: #fbbc04;
+            --danger: #ea4335;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #f0f2f5;
+            --text-primary: #1a1a1a;
+            --text-secondary: #4a4a4a;
+            --text-tertiary: #6d6d6d;
+            --border: #e8e8e8;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            background-attachment: fixed;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'Courier New', monospace;
+            letter-spacing: -1px;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        nav a {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        nav a.active {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 3rem;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .sidebar h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-tertiary);
+            margin-bottom: 1.2rem;
+            font-weight: 700;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 0.8rem;
+        }
+
+        .sidebar a {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: 0.6rem 0.8rem;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            border-radius: 4px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            color: var(--primary);
+            border-left-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        main {
+            min-height: 100vh;
+        }
+
+        .section {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .section > h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section > h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 2px;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin: 2rem 0 1rem 0;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        h4 {
+            font-size: 1.1rem;
+            margin: 1.5rem 0 0.8rem 0;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 1.2rem;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            padding: 4rem 3rem;
+            border-radius: 12px;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* ===== CODE BLOCKS ===== */
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .code-block code {
+            font-family: 'Courier New', monospace;
+            color: #e8e8e8;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            display: block;
+            white-space: pre;
+        }
+
+        .code-label {
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        /* SYNTAX HIGHLIGHTING */
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .number { color: #b5cea8; }
+        .comment { color: #6a9955; }
+        .function { color: #dcdcaa; }
+        .type { color: #4ec9b0; }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+
+        .card.info {
+            border-left: 4px solid var(--primary);
+            background: var(--primary-light);
+        }
+
+        .card.tip {
+            border-left: 4px solid var(--accent);
+            background: var(--accent-light);
+        }
+
+        .card.warning {
+            border-left: 4px solid var(--warning);
+            background: #fffbf0;
+        }
+
+        .card.success {
+            border-left: 4px solid var(--success);
+            background: #f0f7f4;
+        }
+
+        .card h4 {
+            margin-top: 0;
+            color: var(--text-primary);
+        }
+
+        .card p {
+            margin-bottom: 0;
+            font-size: 0.95rem;
+        }
+
+        /* ===== INTERACTIVE BOXES ===== */
+        .interactive-box {
+            background: var(--bg-secondary);
+            border: 2px dashed var(--primary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .interactive-box input,
+        .interactive-box select {
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            margin-right: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .interactive-box button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .interactive-box button:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .output {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            overflow-x: auto;
+        }
+
+        /* ===== TABLES ===== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        thead {
+            background: var(--primary-light);
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 700;
+            color: var(--primary);
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        tbody tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        /* ===== COMPARISON BOXES ===== */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .comparison-item {
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .comparison-item.right {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .comparison-item h4 {
+            margin-top: 0;
+        }
+
+        /* ===== VISUAL ELEMENTS ===== */
+        .visual-diagram {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* ===== LISTS ===== */
+        ul, ol {
+            margin: 1.5rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* ===== BADGES ===== */
+        .badge {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge.advanced {
+            background: linear-gradient(135deg, var(--primary-light), var(--accent-light));
+            color: var(--primary);
+        }
+
+        /* ===== FUN FACTS ===== */
+        .fun-fact {
+            background: linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%);
+            border-left: 4px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            border: 1px solid var(--border);
+        }
+
+        .fun-fact strong {
+            color: var(--warning);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .sidebar {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 1rem;
+                position: relative;
+                top: 0;
+                max-height: none;
+            }
+
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .section > h2 {
+                font-size: 1.6rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .section {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .section > h2 {
+                font-size: 1.3rem;
+            }
+
+            nav {
+                gap: 1rem;
+            }
+
+            nav a {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.85rem;
+            }
+
+            .hero {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">⚡ PyTorch</div>
+            <nav>
+                <a href="#fundamentals" class="nav-link active">Fundamentals</a>
+                <a href="#tensors" class="nav-link">Tensors</a>
+                <a href="#autograd" class="nav-link">Autograd</a>
+                <a href="#nn" class="nav-link">Neural Networks</a>
+                <a href="#training" class="nav-link">Training</a>
+                <a href="#advanced" class="nav-link">Advanced</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <h3>Getting Started</h3>
+            <ul>
+                <li><a href="#what-is-pytorch">What is PyTorch?</a></li>
+                <li><a href="#installation">Installation</a></li>
+                <li><a href="#gpu-setup">GPU Setup</a></li>
+            </ul>
+
+            <h3>Core Concepts</h3>
+            <ul>
+                <li><a href="#tensors">Tensors Basics</a></li>
+                <li><a href="#tensor-ops">Tensor Operations</a></li>
+                <li><a href="#indexing">Indexing & Slicing</a></li>
+            </ul>
+
+            <h3>Deep Learning</h3>
+            <ul>
+                <li><a href="#autograd">Autograd System</a></li>
+                <li><a href="#nn-module">NN Modules</a></li>
+                <li><a href="#optimization">Optimization</a></li>
+            </ul>
+
+            <h3>Practical Guide</h3>
+            <ul>
+                <li><a href="#complete-example">Complete Example</a></li>
+                <li><a href="#best-practices">Best Practices</a></li>
+                <li><a href="#debugging">Debugging Tips</a></li>
+            </ul>
+        </aside>
+
+        <main>
+            <!-- HERO SECTION -->
+            <section class="hero">
+                <div class="hero-content">
+                    <h1>Master PyTorch: From Tensors to Transformers</h1>
+                    <p>A comprehensive, interactive guide to understanding and building deep learning models with PyTorch. Learn through detailed explanations, visualizations, and hands-on code examples.</p>
+                </div>
+            </section>
+
+            <!-- FUNDAMENTALS SECTION -->
+            <section id="fundamentals" class="section">
+                <h2>Fundamentals</h2>
+
+                <h3 id="what-is-pytorch">What is PyTorch? 🔥</h3>
+                <p>PyTorch is an open-source machine learning library developed by Meta (formerly Facebook) that provides:</p>
+                <ul>
+                    <li><strong>Tensors</strong>: GPU-accelerated arrays for numerical computing</li>
+                    <li><strong>Autograd</strong>: Automatic differentiation for backpropagation</li>
+                    <li><strong>Neural Network APIs</strong>: High-level modules for building deep learning models</li>
+                    <li><strong>Production Ready</strong>: Deploy models at scale with TorchServe</li>
+                </ul>
+
+                <div class="card info">
+                    <h4>💡 Why PyTorch?</h4>
+                    <p>PyTorch's dynamic computational graphs allow you to change network architecture on-the-fly, making it perfect for research and prototyping. Its intuitive Python-like syntax makes deep learning accessible to everyone.</p>
+                </div>
+
+                <h3 id="installation">Installation & Setup</h3>
+                <p>Getting started with PyTorch is straightforward:</p>
+
+                <div class="code-block">
+                    <div class="code-label">Python Terminal</div>
+                    <code><span class="comment"># Using pip (recommended for most users)</span>
+pip install torch torchvision torchaudio
+
+<span class="comment"># Using conda (useful for managing dependencies)</span>
+conda install pytorch torchvision torchaudio -c pytorch
+
+<span class="comment"># GPU support (CUDA 12.1 - check your CUDA version)</span>
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121</span></code>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <div class="card warning">
+                    <h4>⚠️ CUDA Compatibility</h4>
+                    <p>Make sure your CUDA version matches your PyTorch installation. Check your CUDA version with <code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px;">nvidia-smi</code> or <code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px;">nvcc --version</code></p>
+                </div>
+
+                <h3 id="gpu-setup">GPU Setup</h3>
+                <p>PyTorch automatically detects and uses GPU when available. Here's how to verify your setup:</p>
+
+                <div class="code-block">
+                    <div class="code-label">Python Code</div>
+                    <code><span class="keyword">import</span> <span class="type">torch</span>
+
+<span class="comment"># Check if GPU is available</span>
+<span class="function">print</span>(torch.cuda.is_available())  <span class="comment"># True if GPU is detected</span>
+
+<span class="comment"># Check number of GPUs</span>
+<span class="function">print</span>(torch.cuda.device_count())  <span class="comment"># e.g., 2</span>
+
+<span class="comment"># Get current GPU name</span>
+<span class="function">print</span>(torch.cuda.get_device_name(<span class="number">0</span>))  <span class="comment"># e.g., 'NVIDIA A100'</span>
+
+<span class="comment"># Get PyTorch version</span>
+<span class="function">print</span>(torch.__version__)  <span class="comment"># e.g., '2.0.0'</span></span></code>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <div class="fun-fact">
+                    <strong>🎯 Fun Fact:</strong> PyTorch's name comes from the combination of "Python" and "Torch" (another deep learning framework). The logo flame (⚡) represents the dynamic nature of PyTorch's computational graphs!
+                </div>
+            </section>
+
+            <!-- TENSORS SECTION -->
+            <section id="tensors" class="section">
+                <h2>Tensors: The Foundation</h2>
+
+                <p>Tensors are the fundamental data structure in PyTorch. Think of them as n-dimensional arrays that can run on GPUs. They're similar to NumPy arrays but with superpowers!</p>
+
+                <h3 id="tensor-basics">Understanding Tensor Dimensions</h3>
+                <p>Let's explore the different shapes and dimensions of tensors:</p>
+
+                <div class="visual-diagram">
+                    <svg viewBox="0 0 800 300" style="max-width: 100%;">
+                        <!-- 0D Tensor (Scalar) -->
+                        <g>
+                            <text x="50" y="20" style="font-weight: bold; font-size: 14px; fill: #0f62fe;">0D Tensor (Scalar)</text>
+                            <rect x="20" y="40" width="60" height="60" fill="#e3f2fd" stroke="#0f62fe" stroke-width="2"/>
+                            <text x="50" y="75" text-anchor="middle" style="font-size: 24px; fill: #0f62fe;">5</text>
+                            <text x="50" y="120" text-anchor="middle" style="font-size: 12px; fill: #4a4a4a;">shape: ()</text>
+                        </g>
+
+                        <!-- 1D Tensor (Vector) -->
+                        <g>
+                            <text x="200" y="20" style="font-weight: bold; font-size: 14px; fill: #0f62fe;">1D Tensor (Vector)</text>
+                            <rect x="140" y="40" width="30" height="60" fill="#e3f2fd" stroke="#0f62fe" stroke-width="2"/>
+                            <rect x="170" y="40" width="30" height="60" fill="#e3f2fd" stroke="#0f62fe" stroke-width="2"/>
+                            <rect x="200" y="40" width="30" height="60" fill="#e3f2fd" stroke="#0f62fe" stroke-width="2"/>
+                            <rect x="230" y="40" width="30" height="60" fill="#e3f2fd" stroke="#0f62fe" stroke-width="2"/>
+                            <text x="155" y="75" text-anchor="middle" style="font-size: 18px; fill: #0f62fe;">1</text>
+                            <text x="185" y="75" text-anchor="middle" style="font-size: 18px; fill: #0f62fe;">2</text>
+                            <text x="215" y="75" text-anchor="middle" style="font-size: 18px; fill: #0f62fe;">3</text>
+                            <text x="245" y="75" text-anchor="middle" style="font-size: 18px; fill: #0f62fe;">4</text>
+                            <text x="190" y="120" text-anchor="middle" style="font-size: 12px; fill: #4a4a4a;">shape: (4,)</text>
+                        </g>
+
+                        <!-- 2D Tensor (Matrix) -->
+                        <g>
+                            <text x="520" y="20" style="font-weight: bold; font-size: 14px; fill: #0f62fe;">2D Tensor (Matrix)</text>
+                            <rect x="450" y="40" width="25" height="25" fill="#e3f2fd" stroke="#0f62fe" stroke-width="1.5"/>
+                            <rect x="475" y="40" width="25" height="25" fill="#e3f2fd" stroke="#0f62fe" stroke-width="1.5"/>
+                            <rect x="500" y="40" width="25" height="25" fill="#e3f2fd" stroke="#0f62fe" stroke-width="1.5"/>
+                            <rect x="450" y="65" width="25" height="25" fill="#e3f2fd" stroke="#0f62fe" stroke-width="1.5"/>
+                            <rect x="475" y="65" width="25" height="25" fill="#e3f2fd" stroke="#0f62fe" stroke-width="1.5"/>
+                            <rect x="500" y="65" width="25" height="25" fill="#e3f2fd" stroke="#0f62fe" stroke-width="1.5"/>
+                            <rect x="450" y="90" width="25" height="25" fill="#e3f2fd" stroke="#0f62fe" stroke-width="1.5"/>
+                            <rect x="475" y="90" width="25" height="25" fill="#e3f2fd" stroke="#0f62fe" stroke-width="1.5"/>
+                            <rect x="500" y="90" width="25" height="25" fill="#e3f2fd" stroke="#0f62fe" stroke-width="1.5"/>
+                            <text x="475" y="120" text-anchor="middle" style="font-size: 12px; fill: #4a4a4a;">shape: (3, 3)</text>
+                        </g>
+
+                        <!-- 3D Tensor -->
+                        <g>
+                            <text x="720" y="20" style="font-weight: bold; font-size: 14px; fill: #00bcd4;">3D Tensor</text>
+                            <!-- Front layer -->
+                            <rect x="680" y="50" width="20" height="20" fill="#e0f7fa" stroke="#00bcd4" stroke-width="1.5"/>
+                            <rect x="700" y="50" width="20" height="20" fill="#e0f7fa" stroke="#00bcd4" stroke-width="1.5"/>
+                            <rect x="680" y="70" width="20" height="20" fill="#e0f7fa" stroke="#00bcd4" stroke-width="1.5"/>
+                            <rect x="700" y="70" width="20" height="20" fill="#e0f7fa" stroke="#00bcd4" stroke-width="1.5"/>
+                            <!-- Back layer (offset) -->
+                            <rect x="690" y="40" width="20" height="20" fill="#b2ebf2" stroke="#00bcd4" stroke-width="1.5"/>
+                            <rect x="710" y="40" width="20" height="20" fill="#b2ebf2" stroke="#00bcd4" stroke-width="1.5"/>
+                            <rect x="690" y="60" width="20" height="20" fill="#b2ebf2" stroke="#00bcd4" stroke-width="1.5"/>
+                            <rect x="710" y="60" width="20" height="20" fill="#b2ebf2" stroke="#00bcd4" stroke-width="1.5"/>
+                            <!-- Connecting lines -->
+                            <line x1="680" y1="50" x2="690" y2="40" stroke="#00bcd4" stroke-width="1" stroke-dasharray="2,2"/>
+                            <line x1="700" y1="50" x2="710" y2="40" stroke="#00bcd4" stroke-width="1" stroke-dasharray="2,2"/>
+                            <line x1="680" y1="70" x2="690" y2="60" stroke="#00bcd4" stroke-width="1" stroke-dasharray="2,2"/>
+                            <text x="710" y="120" text-anchor="middle" style="font-size: 12px; fill: #4a4a4a;">shape: (2, 2, 2)</text>
+                        </g>
+                    </svg>
+                </div>
+
+                <h3 id="tensor-creation">Creating Tensors</h3>
+                <p>There are multiple ways to create tensors in PyTorch. Let's explore the most common methods:</p>
+
+                <div class="code-block">
+                    <div class="code-label">Creating from Data</div>
+                    <code><span class="keyword">import</span> <span class="type">torch</span>
+
+<span class="comment"># From Python lists</span>
+x = torch.tensor([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>])  <span class="comment"># 1D tensor</span>
+y = torch.tensor([[<span class="number">1</span>, <span class="number">2</span>], [<span class="number">3</span>, <span class="number">4</span>]])  <span class="comment"># 2D tensor</span>
+
+<span class="comment"># From NumPy arrays</span>
+<span class="keyword">import</span> <span class="type">numpy</span> <span class="keyword">as</span> <span class="type">np</span>
+np_array = np.array([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>])
+z = torch.from_numpy(np_array)
+
+<span class="comment"># Zeros and Ones</span>
+zeros = torch.zeros(<span class="number">3</span>, <span class="number">4</span>)  <span class="comment"># 3x4 matrix of zeros</span>
+ones = torch.ones(<span class="number">2</span>, <span class="number">3</span>)    <span class="comment"># 2x3 matrix of ones</span>
+
+<span class="comment"># Random tensors</span>
+random = torch.rand(<span class="number">2</span>, <span class="number">3</span>)         <span class="comment"># Random [0, 1)</span>
+normal = torch.randn(<span class="number">2</span>, <span class="number">3</span>)        <span class="comment"># Random normal distribution</span>
+
+<span class="comment"># Identity matrix</span>
+identity = torch.eye(<span class="number">3</span>)  <span class="comment"># 3x3 identity matrix</span>
+
+<span class="comment"># Range tensors</span>
+range_tensor = torch.arange(<span class="number">0</span>, <span class="number">10</span>, <span class="number">2</span>)  <span class="comment"># [0, 2, 4, 6, 8]</span>
+linspace = torch.linspace(<span class="number">0</span>, <span class="number">1</span>, <span class="number">5</span>)  <span class="comment"># 5 evenly spaced values</span></span></code>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <h3 id="tensor-ops">Essential Tensor Operations</h3>
+                <p>PyTorch provides comprehensive operations for manipulating tensors:</p>
+
+                <div class="code-block">
+                    <div class="code-label">Basic Operations</div>
+                    <code><span class="comment"># Arithmetic Operations</span>
+a = torch.tensor([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>])
+b = torch.tensor([<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>])
+
+add = a + b              <span class="comment"># Element-wise addition</span>
+sub = a - b              <span class="comment"># Element-wise subtraction</span>
+mul = a * b              <span class="comment"># Element-wise multiplication</span>
+div = a / b              <span class="comment"># Element-wise division</span>
+power = a ** <span class="number">2</span>          <span class="comment"># Element-wise power</span>
+
+<span class="comment"># Matrix operations</span>
+x = torch.randn(<span class="number">3</span>, <span class="number">4</span>)
+y = torch.randn(<span class="number">4</span>, <span class="number">2</span>)
+result = torch.matmul(x, y)  <span class="comment"># Matrix multiplication (3x2)</span>
+<span class="comment"># or equivalently: result = x @ y</span>
+
+<span class="comment"># Reshaping operations</span>
+x = torch.randn(<span class="number">6</span>)
+reshaped = x.view(<span class="number">2</span>, <span class="number">3</span>)  <span class="comment"># Reshape to (2, 3)</span>
+squeezed = x.unsqueeze(<span class="number">0</span>)  <span class="comment"># Add dimension: (1, 6)</span>
+flattened = reshaped.reshape(-<span class="number">1</span>)  <span class="comment"># Flatten to 1D</span></span></code>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <div class="comparison">
+                    <div class="comparison-item right">
+                        <h4>📊 Common Reductions</h4>
+                        <code style="font-size: 0.85rem; color: var(--text-secondary);">x.sum()      <span class="comment"># Sum all elements</span>
+x.mean()     <span class="comment"># Mean</span>
+x.std()      <span class="comment"># Standard deviation</span>
+x.max()      <span class="comment"># Maximum value</span>
+x.min()      <span class="comment"># Minimum value</span>
+x.prod()     <span class="comment"># Product of elements</span></code>
+                    </div>
+                    <div class="comparison-item right">
+                        <h4>🔄 Dimension Operations</h4>
+                        <code style="font-size: 0.85rem; color: var(--text-secondary);">x.T          <span class="comment"># Transpose</span>
+x.permute()  <span class="comment"># Reorder dimensions</span>
+x.expand()   <span class="comment"># Expand dimensions</span>
+x.repeat()   <span class="comment"># Repeat tensor</span>
+x.unsqueeze()<span class="comment"># Add dimension</span>
+x.squeeze()  <span class="comment"># Remove dimension</span></code>
+                    </div>
+                </div>
+
+                <h3 id="indexing">Indexing & Slicing</h3>
+                <p>Access specific elements or sub-tensors using familiar Python-like indexing:</p>
+
+                <div class="code-block">
+                    <div class="code-label">Indexing Examples</div>
+                    <code><span class="keyword">import</span> <span class="type">torch</span>
+
+<span class="comment"># Create a 2D tensor</span>
+x = torch.arange(<span class="number">12</span>).reshape(<span class="number">3</span>, <span class="number">4</span>)
+<span class="comment"># x = [[0, 1, 2, 3],
+#      [4, 5, 6, 7],
+#      [8, 9, 10, 11]]</span>
+
+<span class="comment"># Basic indexing</span>
+first_row = x[<span class="number">0</span>]          <span class="comment"># [0, 1, 2, 3]</span>
+element = x[<span class="number">0</span>, <span class="number">2</span>]         <span class="comment"># 2 (row 0, col 2)</span>
+
+<span class="comment"># Slicing</span>
+subset = x[<span class="number">1</span>:<span class="number">3</span>, <span class="number">1</span>:<span class="number">4</span>]   <span class="comment"># [[5, 6, 7], [9, 10, 11]]</span>
+last_col = x[:, -<span class="number">1</span>]        <span class="comment"># [3, 7, 11] - last column</span>
+
+<span class="comment"># Advanced indexing</span>
+condition = x > <span class="number">5</span>           <span class="comment"># Boolean mask</span>
+filtered = x[x > <span class="number">5</span>]       <span class="comment"># [6, 7, 8, 9, 10, 11]</span>
+
+<span class="comment"># Multi-dimensional indexing</span>
+y = torch.randn(<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)  <span class="comment"># 4D tensor</span>
+subset = y[<span class="number">0</span>, :, <span class="number">2</span>, <span class="number">1</span>:<span class="number">4</span>]  <span class="comment"># Complex indexing</span></span></code>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <div class="card success">
+                    <h4>✅ Tensor Properties</h4>
+                    <p>Every tensor has important properties you should know: <code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px;">shape</code> (dimensions), <code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px;">dtype</code> (data type like float32), <code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px;">device</code> (CPU or CUDA GPU), and <code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px;">requires_grad</code> (for automatic differentiation).</p>
+                </div>
+
+                <h3>Device Management (CPU vs GPU)</h3>
+                <p>Moving tensors between CPU and GPU is crucial for performance:</p>
+
+                <div class="code-block">
+                    <div class="code-label">Device Handling</div>
+                    <code><span class="comment"># Check device availability</span>
+device = <span class="string">"cuda"</span> <span class="keyword">if</span> torch.cuda.is_available() <span class="keyword">else</span> <span class="string">"cpu"</span>
+
+<span class="comment"># Create tensor on specific device</span>
+x = torch.randn(<span class="number">3</span>, <span class="number">4</span>, device=device)
+
+<span class="comment"># Move existing tensor to device</span>
+x = torch.randn(<span class="number">3</span>, <span class="number">4</span>)
+x = x.to(device)  <span class="comment"># or x.cuda() / x.cpu()</span>
+
+<span class="comment"># Check tensor device</span>
+<span class="function">print</span>(x.device)  <span class="comment"># cpu or cuda:0</span>
+
+<span class="comment"># Best practice: device-agnostic code</span>
+model = <span class="type">MyModel</span>().to(device)
+data = data.to(device)</span></code>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <div class="fun-fact">
+                    <strong>⚡ Fun Fact:</strong> GPU computation can be 50-100x faster than CPU for deep learning! A single NVIDIA A100 GPU can perform over 300 trillion floating-point operations per second. That's faster than doing mental math for the rest of your life! 🚀
+                </div>
+            </section>
+
+            <!-- AUTOGRAD SECTION -->
+            <section id="autograd" class="section">
+                <h2>Autograd: Automatic Differentiation</h2>
+
+                <p>Autograd is PyTorch's automatic differentiation engine. It automatically computes gradients for you, which is essential for training neural networks.</p>
+
+                <h3 id="what-is-autograd">Understanding Autograd</h3>
+                <p>When you perform operations on tensors with <code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px;">requires_grad=True</code>, PyTorch builds a computational graph. This graph tracks all operations and allows you to compute gradients automatically!</p>
+
+                <div class="visual-diagram">
+                    <svg viewBox="0 0 700 350" style="max-width: 100%;">
+                        <!-- Forward pass visualization -->
+                        <text x="50" y="25" style="font-weight: bold; font-size: 14px; fill: #0f62fe;">Forward Pass: Computing Loss</text>
+                        
+                        <!-- Input -->
+                        <circle cx="100" cy="80" r="30" fill="#e3f2fd" stroke="#0f62fe" stroke-width="2"/>
+                        <text x="100" y="90" text-anchor="middle" style="font-size: 12px; fill: #0f62fe;">x</text>
+                        
+                        <!-- Weights -->
+                        <circle cx="100" cy="150" r="30" fill="#e3f2fd" stroke="#0f62fe" stroke-width="2"/>
+                        <text x="100" y="160" text-anchor="middle" style="font-size: 12px; fill: #0f62fe;">w</text>
+
+                        <!-- Linear layer -->
+                        <rect x="200" y="100" width="60" height="50" fill="#fff9e6" stroke="#fbbc04" stroke-width="2" rx="5"/>
+                        <text x="230" y="132" text-anchor="middle" style="font-size: 11px; fill: #fbbc04;">y = x·w</text>
+
+                        <!-- Loss -->
+                        <rect x="330" y="100" width="60" height="50" fill="#ffebee" stroke="#ea4335" stroke-width="2" rx="5"/>
+                        <text x="360" y="132" text-anchor="middle" style="font-size: 11px; fill: #ea4335;">Loss</text>
+
+                        <!-- Arrows -->
+                        <path d="M 130 80 L 200 115" stroke="#0f62fe" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        <path d="M 130 150 L 200 130" stroke="#0f62fe" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        <path d="M 260 125 L 330 125" stroke="#fbbc04" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+                        <!-- Backward pass -->
+                        <text x="50" y="240" style="font-weight: bold; font-size: 14px; fill: #00bcd4;">Backward Pass: Computing Gradients</text>
+
+                        <!-- Gradient flow -->
+                        <circle cx="360" cy="280" r="25" fill="#e0f7fa" stroke="#00bcd4" stroke-width="2"/>
+                        <text x="360" y="290" text-anchor="middle" style="font-size: 10px; fill: #00bcd4;">dL/dy</text>
+
+                        <circle cx="230" cy="280" r="25" fill="#e0f7fa" stroke="#00bcd4" stroke-width="2"/>
+                        <text x="230" y="290" text-anchor="middle" style="font-size: 10px; fill: #00bcd4;">dL/dw</text>
+
+                        <circle cx="100" cy="280" r="25" fill="#e0f7fa" stroke="#00bcd4" stroke-width="2"/>
+                        <text x="100" y="290" text-anchor="middle" style="font-size: 10px; fill: #00bcd4;">dL/dx</text>
+
+                        <!-- Backward arrows -->
+                        <path d="M 330 280 L 255 280" stroke="#00bcd4" stroke-width="2" fill="none" marker-end="url(#arrowhead2)"/>
+                        <path d="M 205 280 L 125 280" stroke="#00bcd4" stroke-width="2" fill="none" marker-end="url(#arrowhead2)"/>
+
+                        <!-- SVG Arrow markers -->
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#0f62fe"/>
+                            </marker>
+                            <marker id="arrowhead2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#00bcd4"/>
+                            </marker>
+                        </defs>
+                    </svg>
+                </div>
+
+                <h3>Basic Autograd Example</h3>
+
+                <div class="code-block">
+                    <div class="code-label">Computing Gradients</div>
+                    <code><span class="keyword">import</span> <span class="type">torch</span>
+
+<span class="comment"># Create tensors with gradient tracking</span>
+x = torch.tensor([<span class="number">2.0</span>], requires_grad=<span class="keyword">True</span>)
+
+<span class="comment"># Forward pass</span>
+y = x ** <span class="number">2</span> + <span class="number">3</span> * x + <span class="number">2</span>  <span class="comment"># y = x² + 3x + 2</span>
+
+<span class="comment"># Backward pass (compute gradients)</span>
+y.backward()
+
+<span class="comment"># Access the gradient dy/dx</span>
+<span class="function">print</span>(x.grad)  <span class="comment"># Gradient at x=2: 2*2 + 3 = 7</span>
+
+<span class="comment"># Multi-variable example</span>
+a = torch.tensor([<span class="number">3.0</span>], requires_grad=<span class="keyword">True</span>)
+b = torch.tensor([<span class="number">4.0</span>], requires_grad=<span class="keyword">True</span>)
+
+<span class="comment"># Create a scalar output (required for .backward())</span>
+loss = (a ** <span class="number">2</span>) + (b ** <span class="number">2</span>)  <span class="comment"># loss = a² + b²</span>
+
+<span class="comment"># Compute all gradients</span>
+loss.backward()
+
+<span class="function">print</span>(a.grad)  <span class="comment"># 2*a = 6.0</span>
+<span class="function">print</span>(b.grad)  <span class="comment"># 2*b = 8.0</span></span></code>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <h3>Gradient Accumulation & Zeroing</h3>
+                <p>Important! Gradients accumulate by default in PyTorch. You must explicitly zero them between iterations:</p>
+
+                <div class="code-block">
+                    <div class="code-label">Gradient Management</div>
+                    <code><span class="comment"># Problem: Gradients accumulate!</span>
+x = torch.tensor([<span class="number">2.0</span>], requires_grad=<span class="keyword">True</span>)
+
+<span class="comment"># First iteration</span>
+y = x ** <span class="number">2</span>
+y.backward()
+<span class="function">print</span>(x.grad)  <span class="comment"># 4.0</span>
+
+<span class="comment"># Second iteration (without zeroing!)</span>
+y = x ** <span class="number">2</span>
+y.backward()
+<span class="function">print</span>(x.grad)  <span class="comment"># 8.0 (accumulated!)</span>
+
+<span class="comment"># ✅ SOLUTION: Zero gradients before backward pass</span>
+optimizer.zero_grad()  <span class="comment"># or x.grad.zero_()</span>
+loss.backward()
+<span class="comment"># Now gradient is correct</span></span></code>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <div class="card tip">
+                    <h4>💡 Common Autograd Patterns</h4>
+                    <p><strong>Detach:</strong> Use <code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px;">tensor.detach()</code> to stop gradient tracking for a tensor.</p>
+                    <p><strong>No Grad Context:</strong> Use <code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px;">with torch.no_grad():</code> during evaluation to save memory and speed up computation.</p>
+                    <p><strong>Retain Graph:</strong> Use <code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px;">loss.backward(retain_graph=True)</code> if you need to call backward multiple times.</p>
+                </div>
+
+                <h3>Advanced: Custom Gradients</h3>
+                <p>For more control, PyTorch allows you to define custom backward functions:</p>
+
+                <div class="code-block">
+                    <div class="code-label">Custom Autograd Function</div>
+                    <code><span class="class">class</span> <span class="function">CustomSquare</span>(torch.autograd.<span class="type">Function</span>):
+    <span class="decorator">@staticmethod</span>
+    <span class="keyword">def</span> forward(ctx, x):
+        <span class="comment"># Save tensor for backward pass</span>
+        ctx.save_for_backward(x)
+        <span class="keyword">return</span> x ** <span class="number">2</span>
+
+    <span class="decorator">@staticmethod</span>
+    <span class="keyword">def</span> backward(ctx, grad_output):
+        x, = ctx.saved_tensors
+        <span class="keyword">return</span> grad_output * <span class="number">2</span> * x
+
+<span class="comment"># Use custom function</span>
+y = <span class="type">CustomSquare</span>.apply(x)</span></code>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <div class="fun-fact">
+                    <strong>🎓 Fun Fact:</strong> PyTorch's autograd is based on reverse-mode automatic differentiation (also called backpropagation). This is the same technique used in all modern deep learning frameworks! It's so powerful that it can compute gradients for millions of parameters in seconds.
+                </div>
+            </section>
+
+            <!-- NEURAL NETWORKS SECTION -->
+            <section id="nn" class="section">
+                <h2>Building Neural Networks</h2>
+
+                <p>PyTorch provides a high-level module called <code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px;">torch.nn</code> for building neural networks easily.</p>
+
+                <h3 id="nn-module">The nn.Module Class</h3>
+                <p>All neural network layers in PyTorch inherit from <code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px;">nn.Module</code>. This base class provides essential functionality for managing parameters and submodules:</p>
+
+                <div class="code-block">
+                    <div class="code-label">Creating a Simple Neural Network</div>
+                    <code><span class="keyword">import</span> <span class="type">torch</span>
+<span class="keyword">import</span> <span class="type">torch.nn</span> <span class="keyword">as</span> <span class="type">nn</span>
+
+<span class="class">class</span> <span class="function">SimpleNetwork</span>(nn.<span class="type">Module</span>):
+    <span class="keyword">def</span> __init__(self):
+        super().<span class="function">__init__</span>()
+        <span class="comment"># Define layers</span>
+        self.fc1 = nn.<span class="function">Linear</span>(<span class="number">784</span>, <span class="number">128</span>)  <span class="comment"># 784 → 128</span>
+        self.relu = nn.<span class="function">ReLU</span>()
+        self.fc2 = nn.<span class="function">Linear</span>(<span class="number">128</span>, <span class="number">64</span>)   <span class="comment"># 128 → 64</span>
+        self.fc3 = nn.<span class="function">Linear</span>(<span class="number">64</span>, <span class="number">10</span>)    <span class="comment"># 64 → 10 (output)</span>
+
+    <span class="keyword">def</span> forward(self, x):
+        <span class="comment"># Forward pass</span>
+        x = self.<span class="function">fc1</span>(x)
+        x = self.<span class="function">relu</span>(x)
+        x = self.<span class="function">fc2</span>(x)
+        x = self.<span class="function">relu</span>(x)
+        x = self.<span class="function">fc3</span>(x)
+        <span class="keyword">return</span> x
+
+<span class="comment"># Create model instance</span>
+model = <span class="type">SimpleNetwork</span>()</span></code>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <h3>Essential Layers</h3>
+                <p>Let's explore the most important layers used in neural networks:</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Layer</th>
+                            <th>Purpose</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Linear</strong></td>
+                            <td>Fully connected layer (y = xW + b)</td>
+                            <td><code>nn.Linear(input_size, output_size)</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Conv2d</strong></td>
+                            <td>2D Convolution (for images)</td>
+                            <td><code>nn.Conv2d(in_channels, out_channels, kernel_size)</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>ReLU</strong></td>
+                            <td>Activation: max(0, x)</td>
+                            <td><code>nn.ReLU()</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>BatchNorm2d</strong></td>
+                            <td>Batch normalization</td>
+                            <td><code>nn.BatchNorm2d(num_features)</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Dropout</strong></td>
+                            <td>Regularization (randomly zero units)</td>
+                            <td><code>nn.Dropout(p=0.5)</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>LSTM</strong></td>
+                            <td>Recurrent layer for sequences</td>
+                            <td><code>nn.LSTM(input_size, hidden_size)</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Embedding</strong></td>
+                            <td>Converts integers to dense vectors</td>
+                            <td><code>nn.Embedding(vocab_size, embedding_dim)</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Activation Functions</h3>
+                <p>Activation functions introduce non-linearity, enabling neural networks to learn complex patterns:</p>
+
+                <div class="visual-diagram">
+                    <svg viewBox="0 0 800 250" style="max-width: 100%;">
+                        <!-- ReLU -->
+                        <g>
+                            <text x="80" y="20" text-anchor="middle" style="font-weight: bold; font-size: 12px; fill: #0f62fe;">ReLU: max(0, x)</text>
+                            <line x1="20" y1="120" x2="140" y2="120" stroke="#e8e8e8" stroke-width="1"/>
+                            <line x1="80" y1="60" x2="80" y2="180" stroke="#e8e8e8" stroke-width="1"/>
+                            <polyline points="20,120 80,120 140,60" fill="none" stroke="#0f62fe" stroke-width="2"/>
+                            <text x="80" y="210" text-anchor="middle" style="font-size: 10px; fill: #4a4a4a;">Most used in hidden layers</text>
+                        </g>
+
+                        <!-- Sigmoid -->
+                        <g>
+                            <text x="280" y="20" text-anchor="middle" style="font-weight: bold; font-size: 12px; fill: #00bcd4;">Sigmoid: 1/(1+e^-x)</text>
+                            <line x1="220" y1="120" x2="340" y2="120" stroke="#e8e8e8" stroke-width="1"/>
+                            <line x1="280" y1="60" x2="280" y2="180" stroke="#e8e8e8" stroke-width="1"/>
+                            <path d="M 220 115 Q 280 65 340 130" fill="none" stroke="#00bcd4" stroke-width="2"/>
+                            <text x="280" y="210" text-anchor="middle" style="font-size: 10px; fill: #4a4a4a;">For binary classification</text>
+                        </g>
+
+                        <!-- Tanh -->
+                        <g>
+                            <text x="480" y="20" text-anchor="middle" style="font-weight: bold; font-size: 12px; fill: #34a853;">Tanh: (e^x - e^-x)/(e^x + e^-x)</text>
+                            <line x1="420" y1="120" x2="540" y2="120" stroke="#e8e8e8" stroke-width="1"/>
+                            <line x1="480" y1="60" x2="480" y2="180" stroke="#e8e8e8" stroke-width="1"/>
+                            <path d="M 420 145 Q 480 70 540 100" fill="none" stroke="#34a853" stroke-width="2"/>
+                            <text x="480" y="210" text-anchor="middle" style="font-size: 10px; fill: #4a4a4a;">Similar to sigmoid, range [-1, 1]</text>
+                        </g>
+
+                        <!-- Softmax -->
+                        <g>
+                            <text x="680" y="20" text-anchor="middle" style="font-weight: bold; font-size: 12px; fill: #fbbc04;">Softmax (multi-class)</text>
+                            <rect x="650" y="70" width="15" height="50" fill="#fbbc04" opacity="0.3" stroke="#fbbc04" stroke-width="2"/>
+                            <rect x="670" y="85" width="15" height="35" fill="#fbbc04" opacity="0.5" stroke="#fbbc04" stroke-width="2"/>
+                            <rect x="690" y="60" width="15" height="60" fill="#fbbc04" opacity="0.8" stroke="#fbbc04" stroke-width="2"/>
+                            <rect x="710" y="90" width="15" height="30" fill="#fbbc04" opacity="0.4" stroke="#fbbc04" stroke-width="2"/>
+                            <text x="680" y="210" text-anchor="middle" style="font-size: 10px; fill: #4a4a4a;">Outputs sum to 1 (probabilities)</text>
+                        </g>
+                    </svg>
+                </div>
+
+                <h3>Container Modules (Sequential vs ModuleList)</h3>
+                <p>For simple architectures, use <code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px;">Sequential</code>. For complex ones, subclass <code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px;">Module</code>:</p>
+
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <h4>Sequential (Simple)</h4>
+                        <div class="code-block" style="margin-bottom: 0;">
+                            <code style="font-size: 0.85rem;"><span class="type">model</span> = nn.<span class="function">Sequential</span>(
+    nn.<span class="function">Linear</span>(<span class="number">784</span>, <span class="number">128</span>),
+    nn.<span class="function">ReLU</span>(),
+    nn.<span class="function">Linear</span>(<span class="number">128</span>, <span class="number">10</span>)
+)</span></code>
+                        </div>
+                    </div>
+                    <div class="comparison-item right">
+                        <h4>Subclassing (Flexible)</h4>
+                        <div class="code-block" style="margin-bottom: 0;">
+                            <code style="font-size: 0.85rem;"><span class="class">class</span> <span class="type">Net</span>(nn.<span class="type">Module</span>):
+    <span class="keyword">def</span> forward(self, x):
+        <span class="comment"># Complex logic here</span>
+        <span class="keyword">return</span> x</span></code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card success">
+                    <h4>✅ Parameter Inspection</h4>
+                    <p>Access model parameters easily:</p>
+                    <code style="background: var(--bg-secondary); padding: 0.4rem; border-radius: 4px; display: block; font-size: 0.9rem;">
+model.parameters()     <span class="comment"># Iterator of all parameters</span><br>
+model.state_dict()     <span class="comment"># Dictionary of parameters</span><br>
+model.named_parameters()  <span class="comment"># (name, parameter) pairs</span><br>
+<span class="function">sum</span>(p.numel() <span class="keyword">for</span> p <span class="keyword">in</span> model.parameters())  <span class="comment"># Total params</span>
+                    </code>
+                </div>
+            </section>
+
+            <!-- TRAINING SECTION -->
+            <section id="training" class="section">
+                <h2>Training Neural Networks</h2>
+
+                <p>Now let's put it all together and train a neural network! A typical training loop involves: data → forward pass → loss → backward pass → parameter update.</p>
+
+                <h3 id="optimization">Optimizers & Loss Functions</h3>
+                <p>Choose the right optimizer and loss function for your task:</p>
+
+                <div class="comparison">
+                    <div class="comparison-item right">
+                        <h4>📍 Common Optimizers</h4>
+                        <ul style="padding-left: 1rem;">
+                            <li><strong>SGD</strong>: Classic choice, good for some tasks</li>
+                            <li><strong>Adam</strong>: Great default, often works well</li>
+                            <li><strong>RMSprop</strong>: Good for RNNs</li>
+                            <li><strong>AdamW</strong>: Improved Adam with weight decay</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item right">
+                        <h4>🎯 Common Loss Functions</h4>
+                        <ul style="padding-left: 1rem;">
+                            <li><strong>MSELoss</strong>: Regression tasks</li>
+                            <li><strong>CrossEntropyLoss</strong>: Classification</li>
+                            <li><strong>BCELoss</strong>: Binary classification</li>
+                            <li><strong>L1Loss</strong>: More robust to outliers</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 id="complete-example">Complete Training Loop</h3>
+                <p>Here's a comprehensive example of training a neural network:</p>
+
+                <div class="code-block">
+                    <div class="code-label">Full Training Loop</div>
+                    <code><span class="keyword">import</span> <span class="type">torch</span>
+<span class="keyword">import</span> <span class="type">torch.nn</span> <span class="keyword">as</span> <span class="type">nn</span>
+<span class="keyword">from</span> <span class="type">torch.optim</span> <span class="keyword">import</span> <span class="type">Adam</span>
+
+<span class="comment"># Hyperparameters</span>
+device = <span class="string">"cuda"</span> <span class="keyword">if</span> torch.cuda.is_available() <span class="keyword">else</span> <span class="string">"cpu"</span>
+learning_rate = <span class="number">0.001</span>
+epochs = <span class="number">10</span>
+batch_size = <span class="number">32</span>
+
+<span class="comment"># Create model, loss, optimizer</span>
+model = <span class="type">SimpleNetwork</span>().to(device)
+criterion = nn.<span class="function">CrossEntropyLoss</span>()
+optimizer = <span class="type">Adam</span>(model.parameters(), lr=learning_rate)
+
+<span class="comment"># Training loop</span>
+<span class="keyword">for</span> epoch <span class="keyword">in</span> <span class="function">range</span>(epochs):
+    <span class="keyword">for</span> batch_idx, (images, labels) <span class="keyword">in</span> <span class="function">enumerate</span>(train_loader):
+        <span class="comment"># Move to device</span>
+        images = images.to(device)
+        labels = labels.to(device)
+
+        <span class="comment"># Forward pass</span>
+        outputs = model(images)
+        loss = <span class="function">criterion</span>(outputs, labels)
+
+        <span class="comment"># Backward pass</span>
+        optimizer.<span class="function">zero_grad</span>()  <span class="comment"># Clear old gradients</span>
+        loss.<span class="function">backward</span>()       <span class="comment"># Compute new gradients</span>
+        optimizer.<span class="function">step</span>()        <span class="comment"># Update parameters</span>
+
+        <span class="comment"># Print progress</span>
+        <span class="keyword">if</span> (batch_idx + <span class="number">1</span>) % <span class="number">100</span> == <span class="number">0</span>:
+            <span class="function">print</span>(<span class="string">f"Epoch {epoch}, Step {batch_idx}, Loss: {loss:.4f}"</span>)
+
+<span class="function">print</span>(<span class="string">"Training complete!"</span>)</span></code>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <h3>Evaluation Mode (Inference)</h3>
+                <p>When evaluating your model, you need to disable dropout and batch normalization updates:</p>
+
+                <div class="code-block">
+                    <div class="code-label">Evaluation Loop</div>
+                    <code><span class="comment"># Set to evaluation mode (disables dropout, batch norm)</span>
+model.<span class="function">eval</span>()
+
+<span class="comment"># Disable gradient computation for speed</span>
+<span class="keyword">with</span> torch.no_grad():
+    <span class="keyword">for</span> images, labels <span class="keyword">in</span> test_loader:
+        images = images.to(device)
+        labels = labels.to(device)
+
+        <span class="comment"># Forward pass only (no backward)</span>
+        outputs = model(images)
+        predictions = torch.<span class="function">argmax</span>(outputs, dim=<span class="number">1</span>)
+
+        <span class="comment"># Calculate accuracy</span>
+        accuracy = (predictions == labels).<span class="function">sum</span>().item() / len(labels)
+        <span class="function">print</span>(<span class="string">f"Accuracy: {accuracy:.4f}"</span>)
+
+<span class="comment"># Don't forget to set back to training mode!</span>
+model.<span class="function">train</span>()</span></code>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <h3>Checkpointing & Model Saving</h3>
+                <p>Always save your trained models for later use:</p>
+
+                <div class="code-block">
+                    <div class="code-label">Save & Load Models</div>
+                    <code><span class="comment"># Save entire model</span>
+torch.<span class="function">save</span>(model, <span class="string">"model.pth"</span>)
+loaded_model = torch.<span class="function">load</span>(<span class="string">"model.pth"</span>)
+
+<span class="comment"># Save only parameters (recommended)</span>
+torch.<span class="function">save</span>(model.state_dict(), <span class="string">"model_weights.pth"</span>)
+
+<span class="comment"># Load parameters</span>
+model.load_state_dict(torch.<span class="function">load</span>(<span class="string">"model_weights.pth"</span>))
+
+<span class="comment"># Save checkpoint with optimizer state</span>
+checkpoint = {
+    <span class="string">"model_state"</span>: model.state_dict(),
+    <span class="string">"optimizer_state"</span>: optimizer.state_dict(),
+    <span class="string">"epoch"</span>: epoch
+}
+torch.<span class="function">save</span>(checkpoint, <span class="string">"checkpoint.pth"</span>)
+
+<span class="comment"># Resume training</span>
+checkpoint = torch.<span class="function">load</span>(<span class="string">"checkpoint.pth"</span>)
+model.load_state_dict(checkpoint[<span class="string">"model_state"</span>])
+optimizer.load_state_dict(checkpoint[<span class="string">"optimizer_state"</span>])
+start_epoch = checkpoint[<span class="string">"epoch"</span>]</span></code>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <div class="card info">
+                    <h4>💡 Training Best Practices</h4>
+                    <ul style="margin-bottom: 0; padding-left: 1rem;">
+                        <li><strong>Normalize inputs:</strong> Use mean/std for better convergence</li>
+                        <li><strong>Learning rate scheduling:</strong> Reduce LR over time with <code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px;">torch.optim.lr_scheduler</code></li>
+                        <li><strong>Monitor metrics:</strong> Use tools like Weights & Biases or TensorBoard</li>
+                        <li><strong>Batch normalization:</strong> Speeds up training and improves stability</li>
+                        <li><strong>Early stopping:</strong> Stop if validation loss stops improving</li>
+                    </ul>
+                </div>
+
+                <div class="fun-fact">
+                    <strong>🚀 Fun Fact:</strong> The Adam optimizer (Adaptive Moment Estimation) has become the default choice for deep learning. It was introduced in 2014 and has since become the go-to optimizer for practitioners. It combines the benefits of both momentum-based methods and adaptive learning rates!
+                </div>
+            </section>
+
+            <!-- ADVANCED SECTION -->
+            <section id="advanced" class="section">
+                <h2>Advanced Topics</h2>
+
+                <h3>Data Loading with DataLoader</h3>
+                <p>PyTorch's <code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px;">DataLoader</code> handles batching, shuffling, and parallel loading:</p>
+
+                <div class="code-block">
+                    <div class="code-label">Using DataLoader</div>
+                    <code><span class="keyword">from</span> <span class="type">torch.utils.data</span> <span class="keyword">import</span> <span class="type">DataLoader, TensorDataset</span>
+
+<span class="comment"># Create a dataset</span>
+X = torch.randn(<span class="number">1000</span>, <span class="number">28</span>, <span class="number">28</span>)  <span class="comment"># 1000 images, 28x28</span>
+y = torch.randint(<span class="number">0</span>, <span class="number">10</span>, (<span class="number">1000</span>,))  <span class="comment"># 10 classes</span>
+dataset = <span class="type">TensorDataset</span>(X, y)
+
+<span class="comment"># Create DataLoader with batching</span>
+train_loader = <span class="type">DataLoader</span>(
+    dataset,
+    batch_size=<span class="number">32</span>,
+    shuffle=<span class="keyword">True</span>,
+    num_workers=<span class="number">4</span>,  <span class="comment"># Parallel loading (CPU cores)</span>
+    pin_memory=<span class="keyword">True</span>  <span class="comment"># Faster GPU transfer on CUDA</span>
+)
+
+<span class="comment"># Iterate through batches</span>
+<span class="keyword">for</span> batch_X, batch_y <span class="keyword">in</span> train_loader:
+    outputs = model(batch_X)
+    loss = criterion(outputs, batch_y)</span></code>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <h3>Transfer Learning</h3>
+                <p>Leverage pre-trained models for faster training and better results:</p>
+
+                <div class="code-block">
+                    <div class="code-label">Transfer Learning Example</div>
+                    <code><span class="keyword">import</span> <span class="type">torchvision.models</span> <span class="keyword">as</span> <span class="type">models</span>
+
+<span class="comment"># Load pre-trained ResNet50</span>
+model = models.<span class="function">resnet50</span>(pretrained=<span class="keyword">True</span>)
+
+<span class="comment"># Freeze all feature layers</span>
+<span class="keyword">for</span> param <span class="keyword">in</span> model.parameters():
+    param.requires_grad = <span class="keyword">False</span>
+
+<span class="comment"># Replace final classification layer</span>
+num_classes = <span class="number">10</span>
+model.fc = nn.<span class="function">Linear</span>(model.fc.in_features, num_classes)
+
+<span class="comment"># Only train the new layer</span>
+optimizer = <span class="type">Adam</span>(model.fc.parameters(), lr=<span class="number">0.001</span>)
+
+<span class="comment"># Training proceeds normally...</span></span></code>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <h3>Distributed Training</h3>
+                <p>Train on multiple GPUs with minimal code changes:</p>
+
+                <div class="code-block">
+                    <div class="code-label">Data Parallel Training</div>
+                    <code><span class="comment"># Simple multi-GPU training</span>
+<span class="keyword">if</span> torch.cuda.device_count() > <span class="number">1</span>:
+    <span class="function">print</span>(<span class="string">f"Using {torch.cuda.device_count()} GPUs"</span>)
+    model = nn.<span class="function">DataParallel</span>(model)
+
+model = model.to(device)
+
+<span class="comment"># Training loop remains the same!</span>
+<span class="keyword">for</span> epoch <span class="keyword">in</span> <span class="function">range</span>(epochs):
+    <span class="keyword">for</span> batch_X, batch_y <span class="keyword">in</span> train_loader:
+        outputs = model(batch_X)
+        loss = criterion(outputs, batch_y)
+        <span class="comment"># ... backward pass and optimizer step</span></span></code>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <h3>Mixed Precision Training</h3>
+                <p>Train faster with lower precision (float16) while maintaining accuracy:</p>
+
+                <div class="code-block">
+                    <div class="code-label">Automatic Mixed Precision</div>
+                    <code><span class="keyword">from</span> <span class="type">torch.cuda.amp</span> <span class="keyword">import</span> <span class="type">autocast, GradScaler</span>
+
+scaler = <span class="type">GradScaler</span>()
+
+<span class="keyword">for</span> epoch <span class="keyword">in</span> <span class="function">range</span>(epochs):
+    <span class="keyword">for</span> batch_X, batch_y <span class="keyword">in</span> train_loader:
+        optimizer.<span class="function">zero_grad</span>()
+
+        <span class="comment"># Cast to float16 for speed</span>
+        <span class="keyword">with</span> <span class="function">autocast</span>():
+            outputs = model(batch_X)
+            loss = criterion(outputs, batch_y)
+
+        <span class="comment"># Scale loss to prevent underflow</span>
+        scaler.<span class="function">scale</span>(loss).<span class="function">backward</span>()
+        scaler.<span class="function">step</span>(optimizer)
+        scaler.<span class="function">update</span>()</span></code>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <div class="card success">
+                    <h4>✅ Performance Tips</h4>
+                    <ul style="margin-bottom: 0; padding-left: 1rem;">
+                        <li><strong>Profile your code:</strong> Use PyTorch Profiler to find bottlenecks</li>
+                        <li><strong>Reduce memory usage:</strong> Use gradient accumulation for larger effective batch size</li>
+                        <li><strong>Compile models:</strong> Use <code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px;">torch.compile()</code> for 1-2x speedup</li>
+                        <li><strong>Quantization:</strong> Reduce model size and improve inference speed</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- BEST PRACTICES & DEBUGGING -->
+            <section id="best-practices" class="section">
+                <h2>Best Practices & Debugging</h2>
+
+                <h3 id="debugging">Common Issues & Solutions</h3>
+
+                <div class="card warning">
+                    <h4>⚠️ Issue: CUDA out of memory</h4>
+                    <p><strong>Solution:</strong> Reduce batch size, use gradient accumulation, enable mixed precision, or enable gradient checkpointing with <code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px;">torch.utils.checkpoint</code></p>
+                </div>
+
+                <div class="card warning">
+                    <h4>⚠️ Issue: NaN or Inf losses</h4>
+                    <p><strong>Solution:</strong> Check for gradient explosion (reduce learning rate), ensure inputs are normalized, verify loss function is appropriate for your outputs</p>
+                </div>
+
+                <div class="card warning">
+                    <h4>⚠️ Issue: Model not learning (loss stuck)</h4>
+                    <p><strong>Solution:</strong> Check learning rate (often too small), verify gradients are flowing (print x.grad), ensure you're calling backward(), check for dead ReLUs</p>
+                </div>
+
+                <div class="card warning">
+                    <h4>⚠️ Issue: Slow training</h4>
+                    <p><strong>Solution:</strong> Reduce num_workers in DataLoader (maybe set to 0), move model to GPU, use smaller batch size for debugging, enable cuDNN benchmarking</p>
+                </div>
+
+                <h3>Debugging Techniques</h3>
+
+                <div class="code-block">
+                    <div class="code-label">Debugging Utilities</div>
+                    <code><span class="comment"># Check tensor shapes throughout network</span>
+x = torch.randn(<span class="number">32</span>, <span class="number">3</span>, <span class="number">224</span>, <span class="number">224</span>)
+<span class="function">print</span>(f<span class="string">"Input shape: {x.shape}"</span>)
+
+x = model.conv1(x)
+<span class="function">print</span>(f<span class="string">"After conv1: {x.shape}"</span>)
+
+<span class="comment"># Check for NaN and Inf</span>
+<span class="function">assert</span> <span class="keyword">not</span> torch.<span class="function">isnan</span>(x).any(), <span class="string">"NaN detected!"</span>
+<span class="function">assert</span> <span class="keyword">not</span> torch.<span class="function">isinf</span>(x).any(), <span class="string">"Inf detected!"</span>
+
+<span class="comment"># Check gradient flow</span>
+<span class="keyword">for</span> name, param <span class="keyword">in</span> model.named_parameters():
+    <span class="keyword">if</span> param.grad <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:
+        <span class="function">print</span>(f<span class="string">"{name}: grad_mean={param.grad.mean():.6f}"</span>)
+
+<span class="comment"># Monitor loss during training</span>
+<span class="keyword">if</span> torch.<span class="function">isnan</span>(loss):
+    <span class="function">print</span>(<span class="string">"NaN loss! Stopping training."</span>)
+    <span class="keyword">break</span></span></code>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <h3>Reproducibility</h3>
+                <p>Set seeds for reproducible results:</p>
+
+                <div class="code-block">
+                    <div class="code-label">Seed Everything</div>
+                    <code><span class="comment"># Set random seeds for reproducibility</span>
+<span class="keyword">import</span> <span class="type">random</span>
+<span class="keyword">import</span> <span class="type">numpy</span> <span class="keyword">as</span> <span class="type">np</span>
+<span class="keyword">import</span> <span class="type">torch</span>
+
+seed = <span class="number">42</span>
+<span class="function">random</span>.<span class="function">seed</span>(seed)
+np.<span class="function">random</span>.<span class="function">seed</span>(seed)
+torch.<span class="function">manual_seed</span>(seed)
+torch.cuda.<span class="function">manual_seed</span>(seed)
+torch.cuda.<span class="function">manual_seed_all</span>(seed)
+
+<span class="comment"># For complete reproducibility (slower)</span>
+torch.backends.cudnn.deterministic = <span class="keyword">True</span>
+torch.backends.cudnn.benchmark = <span class="keyword">False</span></span></code>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <div class="fun-fact">
+                    <strong>🎯 Fun Fact:</strong> Despite all modern deep learning frameworks, getting identical results across runs is surprisingly hard due to GPU non-determinism. Even tiny floating-point rounding differences accumulate through millions of operations! That's why reproducibility is so valued in research.
+                </div>
+            </section>
+
+            <!-- RESOURCES SECTION -->
+            <section class="section">
+                <h2>Quick Reference & Resources</h2>
+
+                <h3>Essential PyTorch Cheat Sheet</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>Code</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Create tensor</td>
+                            <td><code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem;">torch.tensor([...])</code></td>
+                        </tr>
+                        <tr>
+                            <td>Tensor shape</td>
+                            <td><code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem;">x.shape or x.size()</code></td>
+                        </tr>
+                        <tr>
+                            <td>Reshape tensor</td>
+                            <td><code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem;">x.view() or x.reshape()</code></td>
+                        </tr>
+                        <tr>
+                            <td>Move to GPU</td>
+                            <td><code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem;">x.to('cuda') or x.cuda()</code></td>
+                        </tr>
+                        <tr>
+                            <td>Matrix multiply</td>
+                            <td><code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem;">torch.matmul(a, b) or a @ b</code></td>
+                        </tr>
+                        <tr>
+                            <td>Element-wise multiply</td>
+                            <td><code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem;">a * b</code></td>
+                        </tr>
+                        <tr>
+                            <td>Create model</td>
+                            <td><code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem;">class Model(nn.Module):</code></td>
+                        </tr>
+                        <tr>
+                            <td>Forward pass</td>
+                            <td><code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem;">output = model(input)</code></td>
+                        </tr>
+                        <tr>
+                            <td>Backward pass</td>
+                            <td><code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem;">loss.backward()</code></td>
+                        </tr>
+                        <tr>
+                            <td>Update parameters</td>
+                            <td><code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem;">optimizer.step()</code></td>
+                        </tr>
+                        <tr>
+                            <td>Save model</td>
+                            <td><code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem;">torch.save(model.state_dict(), path)</code></td>
+                        </tr>
+                        <tr>
+                            <td>Load model</td>
+                            <td><code style="background: var(--bg-secondary); padding: 0.2rem 0.4rem;">model.load_state_dict(torch.load(path))</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Recommended Learning Path</h3>
+                <ol style="padding-left: 2rem;">
+                    <li><strong>Tensors:</strong> Master tensor creation, indexing, and operations</li>
+                    <li><strong>Autograd:</strong> Understand gradients and how backpropagation works</li>
+                    <li><strong>Simple Networks:</strong> Build and train linear and simple models</li>
+                    <li><strong>CNN:</strong> Learn convolutional neural networks for images</li>
+                    <li><strong>RNN/LSTM:</strong> Master sequence models for text and time series</li>
+                    <li><strong>Transfer Learning:</strong> Leverage pre-trained models</li>
+                    <li><strong>Transformers:</strong> Study attention mechanism and modern architectures</li>
+                </ol>
+
+                <h3>Useful Resources</h3>
+                <ul>
+                    <li><strong>Official Docs:</strong> pytorch.org/docs - Complete API reference</li>
+                    <li><strong>Tutorials:</strong> pytorch.org/tutorials - Interactive guides and examples</li>
+                    <li><strong>GitHub:</strong> github.com/pytorch/examples - Official PyTorch examples</li>
+                    <li><strong>Papers:</strong> Papers with Code - Implementations of latest research</li>
+                    <li><strong>Community:</strong> PyTorch Forums and Stack Overflow for questions</li>
+                </ul>
+
+                <div class="card success">
+                    <h4>🎓 Next Steps</h4>
+                    <p>Now that you understand PyTorch fundamentals, explore advanced topics like:</p>
+                    <ul style="margin-bottom: 0; padding-left: 1rem;">
+                        <li>Vision Transformers for computer vision</li>
+                        <li>Language models and large language models (LLMs)</li>
+                        <li>Diffusion models for generative AI</li>
+                        <li>Reinforcement learning with PyTorch</li>
+                        <li>Federated learning and privacy-preserving ML</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- FINAL THOUGHTS -->
+            <section class="section" style="background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent-light) 100%); border: 2px solid var(--primary);">
+                <h2 style="color: var(--primary);">Congratulations! 🎉</h2>
+                <p>You've completed this comprehensive PyTorch guide! You now understand:</p>
+                <ul>
+                    <li>✅ Tensor fundamentals and operations</li>
+                    <li>✅ Automatic differentiation with Autograd</li>
+                    <li>✅ Building neural networks with nn.Module</li>
+                    <li>✅ Complete training loops and optimization</li>
+                    <li>✅ Advanced techniques for production-grade models</li>
+                </ul>
+                <p style="margin-top: 2rem; font-weight: 600;">The best way to learn PyTorch is by <strong>building projects</strong>. Start with simple tasks and gradually tackle more complex challenges. Happy coding! 🚀</p>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Smooth scrolling and active nav link
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href !== '#') {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                        updateActiveLink(href);
+                    }
+                }
+            });
+        });
+
+        // Update active link on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('[id]');
+            let current = '';
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            updateActiveLink('#' + current);
+        });
+
+        function updateActiveLink(href) {
+            document.querySelectorAll('a[href^="#"]').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === href) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // Copy code to clipboard
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const codeBlock = this.parentElement.querySelector('code');
+                const text = codeBlock.textContent;
+
+                navigator.clipboard.writeText(text).then(() => {
+                    const originalText = this.textContent;
+                    this.textContent = 'Copied! ✓';
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                    }, 2000);
+                });
+            });
+        });
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateActiveLink(window.location.hash || '#fundamentals');
+        });
+    </script>
+</body>
+</html>

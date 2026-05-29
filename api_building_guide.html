@@ -1,0 +1,2376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API Academy — Build APIs Like a Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,800;1,9..144,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #faf7f2;
+    --paper: #f4f0e8;
+    --white: #ffffff;
+    --amber: #e8820c;
+    --amber-light: #fef3e2;
+    --amber-mid: #f59f35;
+    --teal: #0d9488;
+    --teal-light: #e0f2f1;
+    --rose: #e11d48;
+    --rose-light: #fff1f5;
+    --violet: #7c3aed;
+    --violet-light: #f5f3ff;
+    --ink: #1a1208;
+    --ink-70: #47392a;
+    --ink-40: #9c8a74;
+    --ink-20: #ccc0ac;
+    --border: #e8dfd0;
+    --code-bg: #1e1b16;
+    --code-fg: #f4e8c8;
+    --shadow-sm: 0 1px 3px rgba(26,18,8,.07), 0 1px 2px rgba(26,18,8,.06);
+    --shadow-md: 0 4px 16px rgba(26,18,8,.10), 0 2px 4px rgba(26,18,8,.06);
+    --shadow-lg: 0 12px 40px rgba(26,18,8,.13), 0 4px 12px rgba(26,18,8,.07);
+    --radius: 12px;
+    --radius-sm: 7px;
+    --radius-lg: 20px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(250,247,242,.92);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+  }
+  .nav-inner {
+    max-width: 1180px; margin: 0 auto;
+    display: flex; align-items: center; gap: 2rem;
+    height: 60px;
+  }
+  .nav-logo {
+    font-family: 'Fraunces', serif;
+    font-weight: 800; font-size: 1.25rem;
+    color: var(--amber); text-decoration: none;
+    letter-spacing: -0.03em;
+  }
+  .nav-logo span { color: var(--ink); }
+  .nav-links { display: flex; gap: 1.5rem; margin-left: auto; }
+  .nav-links a {
+    font-size: .85rem; font-weight: 500;
+    color: var(--ink-70); text-decoration: none;
+    padding: .25rem .5rem; border-radius: 5px;
+    transition: all .2s;
+  }
+  .nav-links a:hover { color: var(--amber); background: var(--amber-light); }
+  .nav-pill {
+    background: var(--amber); color: white !important;
+    padding: .3rem .9rem !important; border-radius: 20px !important;
+  }
+  .nav-pill:hover { background: #d4730a !important; color: white !important; }
+
+  /* ─── HERO ─── */
+  .hero {
+    max-width: 1180px; margin: 0 auto;
+    padding: 80px 2rem 60px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: var(--amber-light); border: 1px solid #f5d49a;
+    color: var(--amber); border-radius: 20px;
+    font-size: .8rem; font-weight: 600;
+    padding: .3rem .8rem; margin-bottom: 1.2rem;
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 800; font-size: 3.6rem;
+    line-height: 1.05; letter-spacing: -0.04em;
+    margin-bottom: 1.2rem; color: var(--ink);
+  }
+  .hero h1 em { font-style: italic; color: var(--amber); }
+  .hero p {
+    font-size: 1.1rem; color: var(--ink-70);
+    line-height: 1.75; margin-bottom: 2rem;
+  }
+  .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--amber); color: white;
+    border: none; padding: .75rem 1.6rem;
+    border-radius: 8px; font-family: 'DM Sans', sans-serif;
+    font-size: .95rem; font-weight: 600;
+    cursor: pointer; transition: all .2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover { background: #d4730a; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(232,130,12,.3); }
+  .btn-outline {
+    background: transparent; color: var(--ink);
+    border: 1.5px solid var(--border); padding: .75rem 1.6rem;
+    border-radius: 8px; font-family: 'DM Sans', sans-serif;
+    font-size: .95rem; font-weight: 500;
+    cursor: pointer; transition: all .2s; text-decoration: none; display: inline-block;
+  }
+  .btn-outline:hover { border-color: var(--amber); color: var(--amber); background: var(--amber-light); }
+
+  .hero-visual {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+  }
+  .hero-visual-header {
+    background: var(--code-bg); padding: .75rem 1rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+  .hero-visual-header span {
+    margin-left: .5rem; color: #888; font-size: .75rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .hero-code { background: var(--code-bg); padding: 1.2rem 1.4rem; }
+  .hero-code pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .8rem; line-height: 1.8; color: var(--code-fg);
+  }
+  .kw { color: #f59f35; }
+  .fn { color: #7dd3fc; }
+  .st { color: #86efac; }
+  .cm { color: #6b7280; font-style: italic; }
+  .dc { color: #c084fc; }
+  .nm { color: #fda4af; }
+  .op { color: #f4e8c8; opacity: .6; }
+
+  /* ─── STATS ROW ─── */
+  .stats {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--white);
+    padding: 1.5rem 2rem;
+  }
+  .stats-inner {
+    max-width: 1180px; margin: 0 auto;
+    display: flex; gap: 3rem; justify-content: center; flex-wrap: wrap;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Fraunces', serif; font-size: 2rem;
+    font-weight: 800; color: var(--amber);
+  }
+  .stat-label { font-size: .8rem; color: var(--ink-40); font-weight: 500; margin-top: .1rem; }
+
+  /* ─── SECTION ─── */
+  .section {
+    max-width: 1180px; margin: 0 auto;
+    padding: 70px 2rem;
+  }
+  .section-header { margin-bottom: 3rem; }
+  .section-tag {
+    display: inline-block;
+    background: var(--teal-light); color: var(--teal);
+    border-radius: 4px; padding: .2rem .65rem;
+    font-size: .75rem; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+    margin-bottom: .8rem;
+  }
+  .section-tag.amber { background: var(--amber-light); color: var(--amber); }
+  .section-tag.violet { background: var(--violet-light); color: var(--violet); }
+  .section-tag.rose { background: var(--rose-light); color: var(--rose); }
+  .section-h2 {
+    font-family: 'Fraunces', serif; font-weight: 800;
+    font-size: 2.4rem; line-height: 1.1; letter-spacing: -0.03em;
+    color: var(--ink);
+  }
+  .section-h2 em { font-style: italic; color: var(--amber); }
+  .section-desc { font-size: 1.05rem; color: var(--ink-70); margin-top: .7rem; max-width: 600px; }
+
+  /* ─── CONCEPT CARDS ─── */
+  .concept-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; }
+  .concept-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.5rem;
+    box-shadow: var(--shadow-sm); transition: all .25s;
+    cursor: default;
+  }
+  .concept-card:hover {
+    box-shadow: var(--shadow-md); transform: translateY(-3px);
+    border-color: var(--amber-mid);
+  }
+  .concept-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; margin-bottom: 1rem;
+  }
+  .concept-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: .4rem; }
+  .concept-card p { font-size: .88rem; color: var(--ink-70); line-height: 1.6; }
+
+  /* ─── DIVIDER ─── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 0 2rem; }
+
+  /* ─── TABS ─── */
+  .tab-container { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); }
+  .tab-header {
+    display: flex; border-bottom: 1px solid var(--border);
+    background: var(--paper); padding: .5rem .5rem 0;
+    gap: .25rem; overflow-x: auto;
+  }
+  .tab-btn {
+    padding: .6rem 1.2rem; border: none; background: transparent;
+    font-family: 'DM Sans', sans-serif; font-size: .88rem; font-weight: 500;
+    color: var(--ink-40); cursor: pointer; border-radius: 8px 8px 0 0;
+    transition: all .2s; white-space: nowrap;
+  }
+  .tab-btn.active { background: var(--white); color: var(--amber); font-weight: 600; }
+  .tab-btn:hover:not(.active) { color: var(--ink); background: rgba(255,255,255,.6); }
+  .tab-pane { display: none; padding: 2rem; }
+  .tab-pane.active { display: block; }
+
+  /* ─── CODE BLOCK ─── */
+  .code-block { background: var(--code-bg); border-radius: var(--radius); overflow: hidden; margin: 1.2rem 0; }
+  .code-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .6rem 1rem; background: rgba(255,255,255,.05);
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  .code-lang {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .7rem; color: #888; font-weight: 600;
+    letter-spacing: .05em; text-transform: uppercase;
+  }
+  .copy-btn {
+    background: rgba(255,255,255,.1); border: none;
+    color: #aaa; font-size: .75rem; padding: .2rem .6rem;
+    border-radius: 4px; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all .2s;
+  }
+  .copy-btn:hover { background: rgba(255,255,255,.2); color: white; }
+  .copy-btn.copied { color: #86efac; }
+  .code-block pre {
+    padding: 1.2rem 1.4rem; overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .82rem; line-height: 1.85;
+    color: var(--code-fg);
+  }
+
+  /* ─── FUN FACT ─── */
+  .fun-fact {
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    border: 1px solid #f5d49a; border-left: 4px solid var(--amber);
+    border-radius: var(--radius); padding: 1.2rem 1.4rem;
+    margin: 1.5rem 0; display: flex; gap: 1rem; align-items: flex-start;
+  }
+  .fun-fact-icon { font-size: 1.5rem; flex-shrink: 0; line-height: 1; }
+  .fun-fact-body {}
+  .fun-fact-label {
+    font-size: .7rem; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--amber); margin-bottom: .25rem;
+  }
+  .fun-fact-body p { font-size: .9rem; color: var(--ink-70); }
+
+  /* ─── INFO BOX ─── */
+  .info-box {
+    background: var(--teal-light); border: 1px solid #99d6d2;
+    border-left: 4px solid var(--teal);
+    border-radius: var(--radius); padding: 1.1rem 1.4rem; margin: 1.2rem 0;
+  }
+  .info-box p { font-size: .9rem; color: #0f5f59; }
+  .warn-box {
+    background: var(--rose-light); border: 1px solid #fca5a5;
+    border-left: 4px solid var(--rose);
+    border-radius: var(--radius); padding: 1.1rem 1.4rem; margin: 1.2rem 0;
+  }
+  .warn-box p { font-size: .9rem; color: #9f1239; }
+
+  /* ─── COMPARISON TABLE ─── */
+  .compare-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: .9rem; }
+  .compare-table th {
+    background: var(--paper); padding: .75rem 1rem;
+    text-align: left; font-weight: 600;
+    border-bottom: 2px solid var(--border); color: var(--ink-70);
+  }
+  .compare-table td { padding: .75rem 1rem; border-bottom: 1px solid var(--border); }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr:hover td { background: var(--paper); }
+  .badge {
+    display: inline-block; padding: .15rem .5rem; border-radius: 4px;
+    font-size: .75rem; font-weight: 600;
+  }
+  .badge-green { background: #d1fae5; color: #065f46; }
+  .badge-amber { background: var(--amber-light); color: var(--amber); }
+  .badge-red { background: var(--rose-light); color: var(--rose); }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+
+  /* ─── HTTP METHODS EXPLORER ─── */
+  .method-explorer { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .method-card {
+    border: 1.5px solid var(--border); border-radius: var(--radius);
+    padding: 1.2rem; cursor: pointer; transition: all .2s;
+    background: var(--white);
+  }
+  .method-card:hover { border-color: var(--amber-mid); background: var(--amber-light); }
+  .method-card.active { border-color: var(--amber); background: var(--amber-light); }
+  .method-pill {
+    display: inline-block; padding: .2rem .7rem; border-radius: 5px;
+    font-family: 'JetBrains Mono', monospace; font-size: .8rem; font-weight: 600;
+    margin-bottom: .6rem;
+  }
+  .GET { background: #d1fae5; color: #065f46; }
+  .POST { background: #dbeafe; color: #1e40af; }
+  .PUT { background: #fef3c7; color: #92400e; }
+  .PATCH { background: #f5f3ff; color: #5b21b6; }
+  .DELETE { background: #fee2e2; color: #991b1b; }
+  .method-card h4 { font-size: .9rem; font-weight: 600; margin-bottom: .3rem; }
+  .method-card p { font-size: .82rem; color: var(--ink-70); }
+  .method-detail {
+    border: 1.5px solid var(--amber); border-radius: var(--radius);
+    padding: 1.5rem; background: var(--white); display: none;
+    grid-column: 1 / -1;
+  }
+  .method-detail.visible { display: block; }
+  .method-detail h4 { font-size: 1rem; font-weight: 600; margin-bottom: .5rem; }
+
+  /* ─── FRAMEWORK PICKER ─── */
+  .fw-tabs { display: flex; gap: .5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .fw-btn {
+    padding: .45rem 1rem; border: 1.5px solid var(--border);
+    background: var(--white); border-radius: 7px;
+    font-family: 'DM Sans', sans-serif; font-size: .85rem; font-weight: 500;
+    cursor: pointer; transition: all .2s; color: var(--ink-70);
+  }
+  .fw-btn.active { border-color: var(--amber); color: var(--amber); background: var(--amber-light); font-weight: 600; }
+  .fw-pane { display: none; }
+  .fw-pane.active { display: block; }
+
+  /* ─── STATUS CODES ─── */
+  .status-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: .75rem; }
+  .status-card {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: .9rem; text-align: center; cursor: pointer;
+    transition: all .2s; background: var(--white);
+  }
+  .status-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+  .status-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 1.3rem;
+    font-weight: 600; display: block; margin-bottom: .3rem;
+  }
+  .status-name { font-size: .72rem; color: var(--ink-40); font-weight: 500; }
+  .s2 .status-num { color: #059669; }
+  .s3 .status-num { color: #0284c7; }
+  .s4 .status-num { color: #d97706; }
+  .s5 .status-num { color: #dc2626; }
+  .status-tooltip {
+    display: none; position: fixed;
+    background: var(--ink); color: white;
+    padding: .6rem 1rem; border-radius: 8px;
+    font-size: .82rem; max-width: 250px;
+    z-index: 200; pointer-events: none;
+    box-shadow: var(--shadow-lg);
+  }
+  .status-tooltip.visible { display: block; }
+
+  /* ─── INTERACTIVE PLAYGROUND ─── */
+  .playground {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+  .playground-header {
+    background: var(--paper); border-bottom: 1px solid var(--border);
+    padding: 1rem 1.5rem; display: flex; align-items: center; gap: 1rem;
+  }
+  .playground-header h3 { font-size: 1rem; font-weight: 600; }
+  .playground-header span {
+    font-size: .8rem; color: var(--ink-40);
+    background: var(--border); padding: .2rem .6rem; border-radius: 4px;
+  }
+  .playground-body { display: grid; grid-template-columns: 1fr 1fr; }
+  .playground-left, .playground-right { padding: 1.5rem; }
+  .playground-left { border-right: 1px solid var(--border); }
+  .playground-right { background: var(--paper); }
+  .pg-label {
+    font-size: .75rem; font-weight: 700; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--ink-40); margin-bottom: .6rem;
+  }
+  .pg-select {
+    width: 100%; padding: .6rem .8rem; border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); background: var(--white);
+    font-family: 'DM Sans', sans-serif; font-size: .9rem; color: var(--ink);
+    margin-bottom: 1rem; outline: none;
+  }
+  .pg-select:focus { border-color: var(--amber); }
+  .pg-input {
+    width: 100%; padding: .6rem .8rem; border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); background: var(--white);
+    font-family: 'JetBrains Mono', monospace; font-size: .8rem; color: var(--ink);
+    margin-bottom: 1rem; resize: vertical; outline: none;
+  }
+  .pg-input:focus { border-color: var(--amber); }
+  .pg-send {
+    background: var(--amber); color: white; border: none;
+    padding: .6rem 1.4rem; border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 600;
+    cursor: pointer; transition: all .2s;
+  }
+  .pg-send:hover { background: #d4730a; }
+  .pg-response {
+    font-family: 'JetBrains Mono', monospace; font-size: .78rem;
+    line-height: 1.7; color: var(--ink);
+    white-space: pre; overflow-x: auto; min-height: 120px;
+  }
+  .pg-status-bar {
+    display: flex; gap: .5rem; margin-bottom: .8rem; flex-wrap: wrap;
+  }
+  .pg-stat-badge {
+    font-size: .75rem; font-weight: 600; padding: .2rem .6rem;
+    border-radius: 4px; font-family: 'JetBrains Mono', monospace;
+  }
+  .pg-stat-ok { background: #d1fae5; color: #065f46; }
+  .pg-stat-err { background: #fee2e2; color: #991b1b; }
+  .pg-stat-warn { background: #fef3c7; color: #92400e; }
+
+  /* ─── QUIZ ─── */
+  .quiz-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 2rem;
+    box-shadow: var(--shadow-sm); max-width: 700px; margin: 0 auto;
+  }
+  .quiz-progress {
+    display: flex; gap: .4rem; margin-bottom: 1.5rem;
+  }
+  .quiz-dot {
+    height: 5px; flex: 1; border-radius: 3px; background: var(--border);
+    transition: background .3s;
+  }
+  .quiz-dot.done { background: var(--teal); }
+  .quiz-dot.active { background: var(--amber); }
+  .quiz-q { font-size: 1.1rem; font-weight: 600; margin-bottom: 1.2rem; color: var(--ink); }
+  .quiz-options { display: flex; flex-direction: column; gap: .6rem; margin-bottom: 1.4rem; }
+  .quiz-opt {
+    padding: .75rem 1.1rem; border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); cursor: pointer;
+    font-size: .92rem; color: var(--ink-70);
+    transition: all .2s; background: var(--white); text-align: left;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .quiz-opt:hover { border-color: var(--amber-mid); color: var(--ink); background: var(--amber-light); }
+  .quiz-opt.correct { border-color: var(--teal); background: var(--teal-light); color: #0f5f59; font-weight: 600; }
+  .quiz-opt.wrong { border-color: var(--rose); background: var(--rose-light); color: var(--rose); }
+  .quiz-feedback {
+    padding: .8rem 1rem; border-radius: var(--radius-sm);
+    font-size: .88rem; margin-bottom: 1rem; display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok { background: var(--teal-light); color: #0f5f59; border: 1px solid #99d6d2; }
+  .quiz-feedback.bad { background: var(--rose-light); color: #9f1239; border: 1px solid #fca5a5; }
+  .quiz-next {
+    background: var(--amber); color: white; border: none;
+    padding: .65rem 1.5rem; border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: .92rem; font-weight: 600;
+    cursor: pointer; transition: all .2s; display: none;
+  }
+  .quiz-next:hover { background: #d4730a; }
+  .quiz-next.show { display: inline-block; }
+  .quiz-score {
+    text-align: center; display: none; padding: 1.5rem 0;
+  }
+  .quiz-score.show { display: block; }
+  .quiz-score-num {
+    font-family: 'Fraunces', serif; font-size: 3.5rem;
+    font-weight: 800; color: var(--amber);
+  }
+  .quiz-score p { font-size: 1rem; color: var(--ink-70); margin-top: .4rem; }
+  #quiz-restart {
+    background: var(--amber); color: white; border: none;
+    padding: .65rem 1.5rem; border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: .92rem; font-weight: 600;
+    cursor: pointer; transition: all .2s; margin-top: 1.2rem;
+  }
+  #quiz-restart:hover { background: #d4730a; }
+
+  /* ─── STEP FLOW ─── */
+  .steps { display: flex; flex-direction: column; gap: 0; position: relative; margin: 1.5rem 0; }
+  .steps::before {
+    content: ''; position: absolute; left: 19px; top: 10px;
+    width: 2px; height: calc(100% - 20px);
+    background: linear-gradient(to bottom, var(--amber), var(--teal));
+  }
+  .step { display: flex; gap: 1.2rem; padding-bottom: 1.8rem; position: relative; }
+  .step:last-child { padding-bottom: 0; }
+  .step-num {
+    width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+    background: var(--amber); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: .85rem; z-index: 1;
+    box-shadow: 0 0 0 4px var(--cream);
+  }
+  .step-body { padding-top: .4rem; }
+  .step-body h4 { font-size: .95rem; font-weight: 600; margin-bottom: .3rem; }
+  .step-body p { font-size: .87rem; color: var(--ink-70); }
+
+  /* ─── CHEAT SHEET ─── */
+  .cheat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .cheat-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.2rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .cheat-card h4 {
+    font-size: .85rem; font-weight: 700; letter-spacing: .05em;
+    text-transform: uppercase; color: var(--amber); margin-bottom: .8rem;
+  }
+  .cheat-row { display: flex; justify-content: space-between; align-items: center; padding: .35rem 0; border-bottom: 1px solid var(--border); }
+  .cheat-row:last-child { border-bottom: none; }
+  .cheat-key { font-family: 'JetBrains Mono', monospace; font-size: .8rem; color: var(--ink); }
+  .cheat-val { font-size: .8rem; color: var(--ink-40); max-width: 55%; text-align: right; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--ink); color: rgba(255,255,255,.5);
+    text-align: center; padding: 2.5rem 2rem;
+    font-size: .85rem;
+  }
+  footer strong { color: var(--amber); }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fadeUp .55s ease both; }
+  .fade-up-1 { animation-delay: .1s; }
+  .fade-up-2 { animation-delay: .22s; }
+  .fade-up-3 { animation-delay: .34s; }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .5; }
+  }
+  .live-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #22c55e; display: inline-block;
+    animation: pulse 1.5s ease infinite;
+  }
+
+  /* inline bold */
+  strong { font-weight: 600; }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .83em; background: var(--paper);
+    border: 1px solid var(--border); padding: .1em .35em;
+    border-radius: 4px; color: var(--amber);
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-visual { display: none; }
+    .concept-grid { grid-template-columns: 1fr 1fr; }
+    .method-explorer { grid-template-columns: 1fr; }
+    .status-grid { grid-template-columns: repeat(3,1fr); }
+    .playground-body { grid-template-columns: 1fr; }
+    .playground-right { border-top: 1px solid var(--border); }
+    .cheat-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 2.4rem; }
+    .concept-grid { grid-template-columns: 1fr; }
+    .status-grid { grid-template-columns: repeat(2,1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">API<span> Academy</span></a>
+    <div class="nav-links">
+      <a href="#concepts">Concepts</a>
+      <a href="#frameworks">Frameworks</a>
+      <a href="#playground">Playground</a>
+      <a href="#quiz">Quiz</a>
+      <a href="#cheatsheet" class="nav-pill">Cheat Sheet</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section style="background: var(--cream);">
+  <div class="hero">
+    <div class="fade-up">
+      <div class="hero-badge">🚀 The Complete API Building Guide</div>
+      <h1>Build APIs that <em>people</em> actually love to use</h1>
+      <p>From zero to production — learn FastAPI, Flask, REST principles, HTTP methods, authentication, and more. Comprehensive, hands-on, and actually fun.</p>
+      <div class="hero-cta">
+        <a href="#concepts" class="btn-primary">Start Learning →</a>
+        <a href="#playground" class="btn-outline">Try Playground</a>
+      </div>
+    </div>
+    <div class="fade-up fade-up-2">
+      <div class="hero-visual">
+        <div class="hero-visual-header">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+          <span>main.py — FastAPI</span>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:.4rem"><div class="live-dot"></div><span style="color:#22c55e;font-size:.7rem">running on :8000</span></div>
+        </div>
+        <div class="hero-code">
+<pre><span class="cm"># Your first FastAPI application ✨</span>
+<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
+
+app <span class="op">=</span> <span class="fn">FastAPI</span>(title<span class="op">=</span><span class="st">"My Awesome API"</span>)
+
+<span class="kw">class</span> <span class="dc">Item</span>(BaseModel):
+    name<span class="op">:</span> str
+    price<span class="op">:</span> float
+    in_stock<span class="op">:</span> bool <span class="op">=</span> <span class="kw">True</span>
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">get</span>(<span class="st">"/"</span>)
+<span class="kw">async def</span> <span class="fn">root</span>():
+    <span class="kw">return</span> {<span class="st">"message"</span><span class="op">:</span> <span class="st">"Hello World 🌍"</span>}
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">post</span>(<span class="st">"/items"</span>)
+<span class="kw">async def</span> <span class="fn">create_item</span>(item<span class="op">:</span> <span class="dc">Item</span>):
+    <span class="kw">return</span> {<span class="st">"id"</span><span class="op">:</span> <span class="nm">42</span>, <span class="op">**</span>item<span class="op">.</span>dict()}
+
+<span class="cm"># 🎯 That's it! Docs at /docs</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stats-inner">
+    <div class="stat"><div class="stat-num">7</div><div class="stat-label">HTTP Methods</div></div>
+    <div class="stat"><div class="stat-num">3</div><div class="stat-label">Frameworks Covered</div></div>
+    <div class="stat"><div class="stat-num">40+</div><div class="stat-label">Code Examples</div></div>
+    <div class="stat"><div class="stat-num">15</div><div class="stat-label">Quiz Questions</div></div>
+    <div class="stat"><div class="stat-num">10</div><div class="stat-label">Playground Scenarios</div></div>
+  </div>
+</div>
+
+<!-- SECTION 1: WHAT IS AN API -->
+<section class="section" id="concepts">
+  <div class="section-header">
+    <div class="section-tag">Chapter 1</div>
+    <h2 class="section-h2">What <em>exactly</em> is an API?</h2>
+    <p class="section-desc">Before writing a single line of code, let's build rock-solid mental models.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem;align-items:start">
+    <div>
+      <p style="margin-bottom:1rem">An <strong>API (Application Programming Interface)</strong> is a contract between two pieces of software. It defines <em>how</em> they talk to each other — what you can ask for, how to ask, and what you'll get back.</p>
+      <p style="margin-bottom:1rem">Think of a restaurant 🍽️. You (the client) don't go into the kitchen and cook your own food. Instead, you talk to the <strong>waiter (the API)</strong> who takes your order, passes it to the kitchen (the server), and brings back exactly what you asked for.</p>
+      <p>A <strong>REST API</strong> is a specific style of API that runs over HTTP — the same protocol your browser uses. It's stateless, meaning every request is self-contained and carries all the info needed.</p>
+      <div class="fun-fact">
+        <div class="fun-fact-icon">🤯</div>
+        <div class="fun-fact-body">
+          <div class="fun-fact-label">Fun Fact</div>
+          <p>Roy Fielding coined the term "REST" in his 2000 PhD dissertation. He was also one of the principal authors of the HTTP spec. Talk about one productive thesis!</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="concept-grid" style="grid-template-columns:1fr">
+        <div class="concept-card">
+          <div class="concept-icon" style="background:#fef3c7">🌐</div>
+          <h3>REST API</h3>
+          <p>Uses HTTP verbs (GET, POST…) and URLs. Stateless. Returns JSON/XML. The most popular style today.</p>
+        </div>
+        <div class="concept-card">
+          <div class="concept-icon" style="background:#dbeafe">⚡</div>
+          <h3>GraphQL API</h3>
+          <p>Query exactly what you need, nothing more. Single endpoint. Developed by Facebook in 2012.</p>
+        </div>
+        <div class="concept-card">
+          <div class="concept-icon" style="background:#f5f3ff">🔌</div>
+          <h3>WebSocket API</h3>
+          <p>Persistent two-way connection. Great for real-time apps: chat, live scores, stock tickers.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-box">
+    <p>💡 <strong>REST vs HTTP:</strong> HTTP is the <em>transport protocol</em>. REST is a set of <em>architectural constraints</em> that use HTTP. All REST APIs use HTTP, but not all HTTP APIs are RESTful!</p>
+  </div>
+
+  <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:1rem;margin-top:2rem">The Anatomy of an HTTP Request</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">HTTP Request</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre>POST /api/v1/users HTTP/1.1
+Host: api.example.com
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+Accept: application/json
+
+{
+  "name": "Shrinivasa",
+  "email": "shrinivasa@example.com",
+  "role": "admin"
+}
+</pre>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:1.5rem">
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center">
+      <div style="font-size:1.4rem;margin-bottom:.4rem">🎯</div>
+      <div style="font-size:.8rem;font-weight:700;color:var(--amber);margin-bottom:.3rem">METHOD</div>
+      <div style="font-size:.82rem;color:var(--ink-70)">POST — what action to perform</div>
+    </div>
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center">
+      <div style="font-size:1.4rem;margin-bottom:.4rem">📍</div>
+      <div style="font-size:.8rem;font-weight:700;color:var(--teal);margin-bottom:.3rem">URL / ENDPOINT</div>
+      <div style="font-size:.82rem;color:var(--ink-70)">/api/v1/users — where to send it</div>
+    </div>
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center">
+      <div style="font-size:1.4rem;margin-bottom:.4rem">📋</div>
+      <div style="font-size:.8rem;font-weight:700;color:var(--violet);margin-bottom:.3rem">HEADERS</div>
+      <div style="font-size:.82rem;color:var(--ink-70)">Metadata — auth, content type, etc.</div>
+    </div>
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center">
+      <div style="font-size:1.4rem;margin-bottom:.4rem">📦</div>
+      <div style="font-size:.8rem;font-weight:700;color:var(--rose);margin-bottom:.3rem">BODY</div>
+      <div style="font-size:.82rem;color:var(--ink-70)">The actual data (JSON, form, etc.)</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 2: HTTP METHODS -->
+<section class="section" id="http-methods">
+  <div class="section-header">
+    <div class="section-tag amber">Chapter 2</div>
+    <h2 class="section-h2">The 5 <em>HTTP Methods</em> you must know</h2>
+    <p class="section-desc">These verbs tell the server <em>what you want to do</em>. Click each one to explore.</p>
+  </div>
+
+  <div class="method-explorer" id="methodExplorer">
+    <div class="method-card active" onclick="showMethod(event,'GET')">
+      <div class="method-pill GET">GET</div>
+      <h4>Read / Retrieve</h4>
+      <p>Fetch data. Safe &amp; idempotent. Never changes server state.</p>
+    </div>
+    <div class="method-card" onclick="showMethod(event,'POST')">
+      <div class="method-pill POST">POST</div>
+      <h4>Create</h4>
+      <p>Submit new data. Not idempotent. Response: 201 Created.</p>
+    </div>
+    <div class="method-card" onclick="showMethod(event,'PUT')">
+      <div class="method-pill PUT">PUT</div>
+      <h4>Full Replace</h4>
+      <p>Fully replace a resource. Idempotent. Must send all fields.</p>
+    </div>
+    <div class="method-card" onclick="showMethod(event,'PATCH')">
+      <div class="method-pill PATCH">PATCH</div>
+      <h4>Partial Update</h4>
+      <p>Update only specific fields. More efficient than PUT.</p>
+    </div>
+    <div class="method-card" onclick="showMethod(event,'DELETE')">
+      <div class="method-pill DELETE">DELETE</div>
+      <h4>Remove</h4>
+      <p>Delete a resource. Idempotent. Returns 204 or 200.</p>
+    </div>
+
+    <div class="method-detail visible" id="method-detail">
+      <div id="method-detail-content"></div>
+    </div>
+  </div>
+
+  <div class="fun-fact" style="margin-top:2rem">
+    <div class="fun-fact-icon">💡</div>
+    <div class="fun-fact-body">
+      <div class="fun-fact-label">Key Concept: Idempotency</div>
+      <p>An operation is <strong>idempotent</strong> if doing it multiple times gives the same result as doing it once. DELETE /users/5 ten times still results in user 5 being gone — the first call does the work, the rest are no-ops.</p>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.2rem;font-weight:700;margin:2rem 0 1rem">PUT vs PATCH — What's the Difference?</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+    <div>
+      <div style="font-weight:700;margin-bottom:.5rem;color:var(--ink)">🔄 PUT — Full Replace</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">PUT /users/5</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="cm">// You MUST send all fields</span>
+{
+  <span class="st">"name"</span>: <span class="st">"Shrinivasa"</span>,
+  <span class="st">"email"</span>: <span class="st">"new@email.com"</span>,
+  <span class="st">"role"</span>: <span class="st">"admin"</span>,
+  <span class="st">"age"</span>: <span class="nm">30</span>
+}
+<span class="cm">// Missing fields get nulled/defaulted!</span></pre>
+      </div>
+    </div>
+    <div>
+      <div style="font-weight:700;margin-bottom:.5rem;color:var(--ink)">🎯 PATCH — Partial Update</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">PATCH /users/5</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="cm">// Send ONLY what changed</span>
+{
+  <span class="st">"email"</span>: <span class="st">"new@email.com"</span>
+}
+<span class="cm">// Other fields unchanged ✅</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.2rem;font-weight:700;margin:2.5rem 0 1rem">HEAD &amp; OPTIONS — the underrated two</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem">
+    <div class="concept-card">
+      <div class="concept-icon" style="background:#dbeafe">🔭</div>
+      <h3>HEAD</h3>
+      <p>Like GET, but the server returns <strong>headers only — no body</strong>. Use it to check if a resource exists, get its <code>Content-Length</code> before downloading, or validate caching headers without wasting bandwidth.</p>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon" style="background:#f5f3ff">🤝</div>
+      <h3>OPTIONS</h3>
+      <p>Ask the server "what methods do you support here?" Browsers send this automatically as a <strong>CORS preflight</strong> before cross-origin requests. Returns an <code>Allow</code> header listing valid methods.</p>
+    </div>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">HEAD &amp; OPTIONS examples</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="cm"># HEAD — check a file exists and get its size before downloading</span>
+HEAD /api/v1/exports/report-2025.pdf HTTP/1.1
+
+<span class="cm"># Response (no body)</span>
+HTTP/1.1 200 OK
+Content-Length: 52428800
+Content-Type: application/pdf
+Last-Modified: Thu, 29 May 2025 09:00:00 GMT
+
+<span class="cm"># OPTIONS — discover allowed methods (browsers use for CORS)</span>
+OPTIONS /api/v1/products HTTP/1.1
+Origin: https://myapp.com
+
+<span class="cm"># Response</span>
+HTTP/1.1 200 OK
+Allow: GET, POST, HEAD, OPTIONS
+Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE
+Access-Control-Allow-Origin: https://myapp.com</pre>
+  </div>
+
+  <h3 style="font-size:1.2rem;font-weight:700;margin:2.5rem 0 1rem">All 7 Methods at a Glance</h3>
+  <table class="compare-table">
+    <thead><tr><th>Method</th><th>Action</th><th>Body?</th><th>Safe?</th><th>Idempotent?</th><th>Typical Status</th></tr></thead>
+    <tbody>
+      <tr><td><span class="method-pill GET" style="font-size:.75rem">GET</span></td><td>Read resource(s)</td><td>❌ No</td><td>✅ Yes</td><td>✅ Yes</td><td>200</td></tr>
+      <tr><td><span class="method-pill POST" style="font-size:.75rem">POST</span></td><td>Create resource</td><td>✅ Yes</td><td>❌ No</td><td>❌ No</td><td>201</td></tr>
+      <tr><td><span class="method-pill PUT" style="font-size:.75rem">PUT</span></td><td>Full replace</td><td>✅ Yes</td><td>❌ No</td><td>✅ Yes</td><td>200</td></tr>
+      <tr><td><span class="method-pill PATCH" style="font-size:.75rem">PATCH</span></td><td>Partial update</td><td>✅ Yes</td><td>❌ No</td><td>✅ Yes</td><td>200</td></tr>
+      <tr><td><span class="method-pill DELETE" style="font-size:.75rem">DELETE</span></td><td>Delete resource</td><td>❌ Usually no</td><td>❌ No</td><td>✅ Yes</td><td>204</td></tr>
+      <tr><td><span style="font-family:'JetBrains Mono',monospace;font-size:.8rem;background:#dbeafe;color:#1e40af;padding:.2rem .5rem;border-radius:4px">HEAD</span></td><td>Headers only</td><td>❌ No</td><td>✅ Yes</td><td>✅ Yes</td><td>200</td></tr>
+      <tr><td><span style="font-family:'JetBrains Mono',monospace;font-size:.8rem;background:#f5f3ff;color:#5b21b6;padding:.2rem .5rem;border-radius:4px">OPTIONS</span></td><td>Capabilities</td><td>❌ No</td><td>✅ Yes</td><td>✅ Yes</td><td>200/204</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 3: HTTP STATUS CODES -->
+<section class="section" id="status-codes">
+  <div class="section-header">
+    <div class="section-tag">Chapter 3</div>
+    <h2 class="section-h2">HTTP Status Codes — <em>the server's language</em></h2>
+    <p class="section-desc">Every response has a 3-digit code. Hover over each one to learn what it means.</p>
+  </div>
+
+  <div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:.5rem;font-size:.85rem"><div style="width:12px;height:12px;border-radius:3px;background:#059669"></div>2xx Success</div>
+    <div style="display:flex;align-items:center;gap:.5rem;font-size:.85rem"><div style="width:12px;height:12px;border-radius:3px;background:#0284c7"></div>3xx Redirection</div>
+    <div style="display:flex;align-items:center;gap:.5rem;font-size:.85rem"><div style="width:12px;height:12px;border-radius:3px;background:#d97706"></div>4xx Client Error</div>
+    <div style="display:flex;align-items:center;gap:.5rem;font-size:.85rem"><div style="width:12px;height:12px;border-radius:3px;background:#dc2626"></div>5xx Server Error</div>
+  </div>
+
+  <div class="status-grid">
+    <div class="status-card s2" data-tip="✅ 200 OK — Standard success. The request was processed and data is in the body. The most common code you'll see." onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">200</span><div class="status-name">OK</div></div>
+    <div class="status-card s2" data-tip="🎉 201 Created — Resource successfully created (use for POST). Always include a Location header pointing to the new resource." onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">201</span><div class="status-name">Created</div></div>
+    <div class="status-card s2" data-tip="⏳ 202 Accepted — Request received and queued, but not yet processed. Use for async jobs: 'We got it, we'll do it in the background.'" onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">202</span><div class="status-name">Accepted</div></div>
+    <div class="status-card s2" data-tip="🔕 204 No Content — Success but nothing to return. Standard for DELETE. The response body MUST be empty." onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">204</span><div class="status-name">No Content</div></div>
+    <div class="status-card s2" data-tip="📦 206 Partial Content — Used for range requests and streaming. Client asked for bytes X–Y of a large file." onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">206</span><div class="status-name">Partial</div></div>
+    <div class="status-card s3" data-tip="↪️ 301 Moved Permanently — Resource URL changed forever. Clients should update bookmarks. Browser follows automatically." onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">301</span><div class="status-name">Moved Perm.</div></div>
+    <div class="status-card s3" data-tip="↩️ 302 Found — Temporary redirect. Client should follow but keep using the original URL next time." onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">302</span><div class="status-name">Found</div></div>
+    <div class="status-card s3" data-tip="📦 304 Not Modified — Cached copy is still valid. Saves bandwidth. Client sends ETag/If-None-Match headers." onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">304</span><div class="status-name">Not Modified</div></div>
+    <div class="status-card s4" data-tip="🤷 400 Bad Request — Malformed syntax or invalid parameters. Check your request body, query params, and headers." onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">400</span><div class="status-name">Bad Request</div></div>
+    <div class="status-card s4" data-tip="🔐 401 Unauthorized — Not authenticated. Token is missing, expired, or invalid. 'Who are you? Show ID first.'" onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">401</span><div class="status-name">Unauthorized</div></div>
+    <div class="status-card s4" data-tip="🚫 403 Forbidden — Authenticated but not authorized. 'I know who you are, you just can't come in here.'" onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">403</span><div class="status-name">Forbidden</div></div>
+    <div class="status-card s4" data-tip="🔍 404 Not Found — No resource at this URL. Check the path and ID. Could also be used to hide existence (instead of 403)." onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">404</span><div class="status-name">Not Found</div></div>
+    <div class="status-card s4" data-tip="📵 405 Method Not Allowed — The HTTP verb is wrong for this endpoint. e.g. sending GET to a POST-only route." onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">405</span><div class="status-name">Not Allowed</div></div>
+    <div class="status-card s4" data-tip="⚔️ 409 Conflict — State conflict. Creating a user with an email that already exists. Unique constraint violation." onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">409</span><div class="status-name">Conflict</div></div>
+    <div class="status-card s4" data-tip="📏 413 Payload Too Large — Request body exceeds the server's size limit. Check your file upload max size config." onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">413</span><div class="status-name">Too Large</div></div>
+    <div class="status-card s4" data-tip="⚠️ 422 Unprocessable — Valid JSON syntax, but fails semantic validation. FastAPI's default for Pydantic errors." onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">422</span><div class="status-name">Unprocessable</div></div>
+    <div class="status-card s4" data-tip="⏱️ 429 Too Many Requests — Rate limit exceeded. Include Retry-After header so clients know when to back off." onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">429</span><div class="status-name">Rate Limited</div></div>
+    <div class="status-card s5" data-tip="💥 500 Internal Server Error — Unhandled exception on your server. Check the logs immediately." onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">500</span><div class="status-name">Server Error</div></div>
+    <div class="status-card s5" data-tip="🔗 502 Bad Gateway — Your server got an invalid response from an upstream service (DB, cache, microservice)." onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">502</span><div class="status-name">Bad Gateway</div></div>
+    <div class="status-card s5" data-tip="🔧 503 Service Unavailable — Server down or overloaded. Return Retry-After header. Add health checks!" onmousemove="showTip(event,this)" onmouseleave="hideTip()"><span class="status-num">503</span><div class="status-name">Unavailable</div></div>
+  </div>
+  <div class="status-tooltip" id="tooltip"></div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 4: FRAMEWORKS -->
+<section class="section" id="frameworks">
+  <div class="section-header">
+    <div class="section-tag amber">Chapter 4</div>
+    <h2 class="section-h2">FastAPI, Flask & Django REST — <em>Pick Your Fighter</em></h2>
+    <p class="section-desc">Three excellent frameworks, each with its own sweet spot. See the same API built three ways.</p>
+  </div>
+
+  <table class="compare-table" style="margin-bottom:2rem">
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th>FastAPI</th>
+        <th>Flask</th>
+        <th>Django REST</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Speed</strong></td>
+        <td><span class="badge badge-green">Very Fast</span></td>
+        <td><span class="badge badge-amber">Moderate</span></td>
+        <td><span class="badge badge-amber">Moderate</span></td>
+      </tr>
+      <tr>
+        <td><strong>Learning Curve</strong></td>
+        <td><span class="badge badge-green">Easy</span></td>
+        <td><span class="badge badge-green">Very Easy</span></td>
+        <td><span class="badge badge-red">Steeper</span></td>
+      </tr>
+      <tr>
+        <td><strong>Auto Docs</strong></td>
+        <td><span class="badge badge-green">Built-in ✨</span></td>
+        <td><span class="badge badge-amber">Plugin needed</span></td>
+        <td><span class="badge badge-amber">Built-in</span></td>
+      </tr>
+      <tr>
+        <td><strong>Async Support</strong></td>
+        <td><span class="badge badge-green">Native</span></td>
+        <td><span class="badge badge-amber">Partial</span></td>
+        <td><span class="badge badge-amber">Partial</span></td>
+      </tr>
+      <tr>
+        <td><strong>Type Safety</strong></td>
+        <td><span class="badge badge-green">Pydantic</span></td>
+        <td><span class="badge badge-red">Manual</span></td>
+        <td><span class="badge badge-blue">Serializers</span></td>
+      </tr>
+      <tr>
+        <td><strong>Best For</strong></td>
+        <td>Microservices, ML APIs</td>
+        <td>Quick prototypes</td>
+        <td>Full-stack Django apps</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="fw-tabs">
+    <button class="fw-btn active" onclick="switchFW('fastapi',this)">⚡ FastAPI</button>
+    <button class="fw-btn" onclick="switchFW('flask',this)">🍶 Flask</button>
+    <button class="fw-btn" onclick="switchFW('django',this)">🎸 Django REST</button>
+  </div>
+
+  <!-- FASTAPI -->
+  <div class="fw-pane active" id="fw-fastapi">
+    <div class="tab-container">
+      <div class="tab-header">
+        <button class="tab-btn active" onclick="switchTab('fapi','setup',this)">Setup</button>
+        <button class="tab-btn" onclick="switchTab('fapi','crud',this)">CRUD Operations</button>
+        <button class="tab-btn" onclick="switchTab('fapi','validation',this)">Validation</button>
+        <button class="tab-btn" onclick="switchTab('fapi','auth',this)">Auth / JWT</button>
+        <button class="tab-btn" onclick="switchTab('fapi','async',this)">Async</button>
+      </div>
+      <div class="tab-pane active" id="fapi-setup">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Getting Started with FastAPI</h3>
+        <p style="font-size:.9rem;color:var(--ink-70);margin-bottom:1rem">FastAPI is a modern, blazing-fast web framework built on <strong>Starlette</strong> (ASGI) and <strong>Pydantic</strong> (validation). It auto-generates OpenAPI/Swagger docs!</p>
+        <div class="steps" style="margin-bottom:1.5rem">
+          <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Install</h4><p>FastAPI + uvicorn (the ASGI server)</p></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Create app</h4><p>Instantiate FastAPI and define routes with decorators</p></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Run</h4><p><code>uvicorn main:app --reload</code> for hot-reloading</p></div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Docs</h4><p>Visit <code>/docs</code> for Swagger UI, <code>/redoc</code> for ReDoc</p></div></div>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre>pip install fastapi uvicorn[standard]
+
+<span class="cm"># Run your app</span>
+uvicorn main:app --reload --port 8000
+
+<span class="cm"># Auto-generated docs available at:</span>
+<span class="cm"># http://localhost:8000/docs  (Swagger UI)</span>
+<span class="cm"># http://localhost:8000/redoc (ReDoc)</span></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">python — main.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, HTTPException, Query
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field
+<span class="kw">from</span> typing <span class="kw">import</span> Optional, List
+<span class="kw">import</span> uvicorn
+
+app <span class="op">=</span> <span class="fn">FastAPI</span>(
+    title<span class="op">=</span><span class="st">"Products API"</span>,
+    description<span class="op">=</span><span class="st">"A sample REST API built with FastAPI"</span>,
+    version<span class="op">=</span><span class="st">"1.0.0"</span>
+)
+
+<span class="cm"># In-memory "database"</span>
+db: dict[int, dict] <span class="op">=</span> {}
+counter <span class="op">=</span> <span class="nm">1</span>
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">get</span>(<span class="st">"/"</span>, tags<span class="op">=</span>[<span class="st">"Health"</span>])
+<span class="kw">async def</span> <span class="fn">health_check</span>():
+    <span class="st">"""Health check endpoint"""</span>
+    <span class="kw">return</span> {<span class="st">"status"</span>: <span class="st">"healthy"</span>, <span class="st">"version"</span>: <span class="st">"1.0.0"</span>}
+
+<span class="kw">if</span> __name__ <span class="op">==</span> <span class="st">"__main__"</span>:
+    uvicorn<span class="op">.</span><span class="fn">run</span>(<span class="st">"main:app"</span>, host<span class="op">=</span><span class="st">"0.0.0.0"</span>, port<span class="op">=</span><span class="nm">8000</span>, reload<span class="op">=</span><span class="kw">True</span>)</pre>
+        </div>
+      </div>
+
+      <div class="tab-pane" id="fapi-crud">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Full CRUD with FastAPI</h3>
+        <p style="font-size:.9rem;color:var(--ink-70);margin-bottom:1rem"><strong>CRUD</strong> = Create, Read, Update, Delete. The four fundamental operations of any data-driven API.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">python — Full CRUD</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, HTTPException, status
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field
+<span class="kw">from</span> typing <span class="kw">import</span> Optional, List
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+
+app <span class="op">=</span> <span class="fn">FastAPI</span>()
+
+<span class="kw">class</span> <span class="dc">ProductCreate</span>(BaseModel):
+    name: str <span class="op">=</span> <span class="fn">Field</span>(..., min_length<span class="op">=</span><span class="nm">2</span>, max_length<span class="op">=</span><span class="nm">100</span>)
+    price: float <span class="op">=</span> <span class="fn">Field</span>(..., gt<span class="op">=</span><span class="nm">0</span>)
+    category: str
+    in_stock: bool <span class="op">=</span> <span class="kw">True</span>
+
+<span class="kw">class</span> <span class="dc">Product</span>(ProductCreate):
+    id: int
+    created_at: str
+
+products_db: dict[int, Product] <span class="op">=</span> {}
+_id <span class="op">=</span> <span class="nm">0</span>
+
+<span class="cm"># ─── CREATE ───────────────────────────────</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">post</span>(<span class="st">"/products"</span>, response_model<span class="op">=</span>Product,
+         status_code<span class="op">=</span>status<span class="op">.</span>HTTP_201_CREATED)
+<span class="kw">async def</span> <span class="fn">create_product</span>(product: ProductCreate):
+    <span class="kw">global</span> _id
+    _id <span class="op">+=</span> <span class="nm">1</span>
+    new_product <span class="op">=</span> <span class="fn">Product</span>(
+        id<span class="op">=</span>_id,
+        created_at<span class="op">=</span>datetime<span class="op">.</span><span class="fn">now</span>()<span class="op">.</span><span class="fn">isoformat</span>(),
+        <span class="op">**</span>product<span class="op">.</span><span class="fn">dict</span>()
+    )
+    products_db[_id] <span class="op">=</span> new_product
+    <span class="kw">return</span> new_product
+
+<span class="cm"># ─── READ ALL ─────────────────────────────</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">get</span>(<span class="st">"/products"</span>, response_model<span class="op">=</span>List[Product])
+<span class="kw">async def</span> <span class="fn">list_products</span>(
+    skip: int <span class="op">=</span> <span class="nm">0</span>,
+    limit: int <span class="op">=</span> <span class="fn">Query</span>(default<span class="op">=</span><span class="nm">10</span>, le<span class="op">=</span><span class="nm">100</span>),
+    category: Optional[str] <span class="op">=</span> <span class="kw">None</span>
+):
+    items <span class="op">=</span> <span class="fn">list</span>(products_db<span class="op">.</span><span class="fn">values</span>())
+    <span class="kw">if</span> category:
+        items <span class="op">=</span> [p <span class="kw">for</span> p <span class="kw">in</span> items <span class="kw">if</span> p<span class="op">.</span>category <span class="op">==</span> category]
+    <span class="kw">return</span> items[skip : skip <span class="op">+</span> limit]
+
+<span class="cm"># ─── READ ONE ─────────────────────────────</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">get</span>(<span class="st">"/products/{product_id}"</span>, response_model<span class="op">=</span>Product)
+<span class="kw">async def</span> <span class="fn">get_product</span>(product_id: int):
+    <span class="kw">if</span> product_id <span class="kw">not in</span> products_db:
+        <span class="kw">raise</span> <span class="fn">HTTPException</span>(
+            status_code<span class="op">=</span><span class="nm">404</span>,
+            detail<span class="op">=</span><span class="fn">f</span><span class="st">"Product {product_id} not found"</span>
+        )
+    <span class="kw">return</span> products_db[product_id]
+
+<span class="cm"># ─── UPDATE (PATCH) ───────────────────────</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">patch</span>(<span class="st">"/products/{product_id}"</span>, response_model<span class="op">=</span>Product)
+<span class="kw">async def</span> <span class="fn">update_product</span>(product_id: int, updates: dict):
+    <span class="kw">if</span> product_id <span class="kw">not in</span> products_db:
+        <span class="kw">raise</span> <span class="fn">HTTPException</span>(status_code<span class="op">=</span><span class="nm">404</span>, detail<span class="op">=</span><span class="st">"Not found"</span>)
+    product <span class="op">=</span> products_db[product_id]
+    updated <span class="op">=</span> product<span class="op">.</span><span class="fn">dict</span>()<span class="op">.</span><span class="fn">update</span>(updates)
+    products_db[product_id] <span class="op">=</span> Product(<span class="op">**</span>updated)
+    <span class="kw">return</span> products_db[product_id]
+
+<span class="cm"># ─── DELETE ───────────────────────────────</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">delete</span>(<span class="st">"/products/{product_id}"</span>,
+           status_code<span class="op">=</span>status<span class="op">.</span>HTTP_204_NO_CONTENT)
+<span class="kw">async def</span> <span class="fn">delete_product</span>(product_id: int):
+    <span class="kw">if</span> product_id <span class="kw">not in</span> products_db:
+        <span class="kw">raise</span> <span class="fn">HTTPException</span>(status_code<span class="op">=</span><span class="nm">404</span>, detail<span class="op">=</span><span class="st">"Not found"</span>)
+    <span class="kw">del</span> products_db[product_id]</pre>
+        </div>
+      </div>
+
+      <div class="tab-pane" id="fapi-validation">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Data Validation with Pydantic</h3>
+        <p style="font-size:.9rem;color:var(--ink-70);margin-bottom:1rem">Pydantic is FastAPI's superpower. Define your data models once and get validation, serialization, and documentation for free.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">python — Pydantic Models</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field, validator, EmailStr
+<span class="kw">from</span> typing <span class="kw">import</span> Optional, List
+<span class="kw">from</span> enum <span class="kw">import</span> Enum
+
+<span class="kw">class</span> <span class="dc">Role</span>(str, Enum):
+    admin  <span class="op">=</span> <span class="st">"admin"</span>
+    user   <span class="op">=</span> <span class="st">"user"</span>
+    viewer <span class="op">=</span> <span class="st">"viewer"</span>
+
+<span class="kw">class</span> <span class="dc">UserCreate</span>(BaseModel):
+    username: str <span class="op">=</span> <span class="fn">Field</span>(
+        ...,
+        min_length<span class="op">=</span><span class="nm">3</span>,
+        max_length<span class="op">=</span><span class="nm">50</span>,
+        pattern<span class="op">=</span><span class="st">r"^[a-zA-Z0-9_]+$"</span>,
+        example<span class="op">=</span><span class="st">"shrinivasa_ph"</span>
+    )
+    email: EmailStr
+    age: Optional[int] <span class="op">=</span> <span class="fn">Field</span>(<span class="kw">None</span>, ge<span class="op">=</span><span class="nm">13</span>, le<span class="op">=</span><span class="nm">120</span>)
+    role: Role <span class="op">=</span> Role<span class="op">.</span>user
+    tags: List[str] <span class="op">=</span> []
+
+    <span class="dc">@validator</span>(<span class="st">"username"</span>)
+    <span class="kw">def</span> <span class="fn">username_not_reserved</span>(cls, v):
+        reserved <span class="op">=</span> [<span class="st">"admin"</span>, <span class="st">"root"</span>, <span class="st">"system"</span>]
+        <span class="kw">if</span> v<span class="op">.</span><span class="fn">lower</span>() <span class="kw">in</span> reserved:
+            <span class="kw">raise</span> <span class="fn">ValueError</span>(<span class="st">"Username is reserved"</span>)
+        <span class="kw">return</span> v
+
+    <span class="kw">class</span> Config:
+        schema_extra <span class="op">=</span> {
+            <span class="st">"example"</span>: {
+                <span class="st">"username"</span>: <span class="st">"john_doe"</span>,
+                <span class="st">"email"</span>: <span class="st">"john@example.com"</span>,
+                <span class="st">"age"</span>: <span class="nm">28</span>,
+                <span class="st">"role"</span>: <span class="st">"user"</span>
+            }
+        }
+
+<span class="cm"># FastAPI automatically returns 422 Unprocessable Entity</span>
+<span class="cm"># with detailed error messages when validation fails!</span></pre>
+        </div>
+        <div class="fun-fact">
+          <div class="fun-fact-icon">🧙</div>
+          <div class="fun-fact-body">
+            <div class="fun-fact-label">Pydantic Magic</div>
+            <p>Field validators like <code>ge</code> (greater than or equal), <code>le</code> (less than or equal), <code>min_length</code>, <code>max_length</code>, and <code>pattern</code> are checked <em>automatically</em> before your route function even runs. No manual if-else validation needed!</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane" id="fapi-auth">
+        <h3 style="font-weight:700;margin-bottom:.5rem">JWT Authentication</h3>
+        <p style="font-size:.9rem;color:var(--ink-70);margin-bottom:1rem"><strong>JWT (JSON Web Tokens)</strong> are the industry standard for stateless API authentication. The server issues a token, and the client sends it with every request.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">python — JWT Auth</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, Depends, HTTPException, status
+<span class="kw">from</span> fastapi.security <span class="kw">import</span> OAuth2PasswordBearer, OAuth2PasswordRequestForm
+<span class="kw">from</span> jose <span class="kw">import</span> JWTError, jwt
+<span class="kw">from</span> passlib.context <span class="kw">import</span> CryptContext
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime, timedelta
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
+
+<span class="cm"># pip install python-jose passlib[bcrypt]</span>
+
+SECRET_KEY <span class="op">=</span> <span class="st">"your-secret-key-keep-it-safe!"</span>
+ALGORITHM  <span class="op">=</span> <span class="st">"HS256"</span>
+TOKEN_EXPIRE_MINUTES <span class="op">=</span> <span class="nm">30</span>
+
+pwd_context <span class="op">=</span> <span class="fn">CryptContext</span>(schemes<span class="op">=</span>[<span class="st">"bcrypt"</span>])
+oauth2_scheme <span class="op">=</span> <span class="fn">OAuth2PasswordBearer</span>(tokenUrl<span class="op">=</span><span class="st">"token"</span>)
+app <span class="op">=</span> <span class="fn">FastAPI</span>()
+
+<span class="kw">def</span> <span class="fn">create_token</span>(data: dict) <span class="op">-></span> str:
+    payload <span class="op">=</span> data<span class="op">.</span><span class="fn">copy</span>()
+    payload[<span class="st">"exp"</span>] <span class="op">=</span> datetime<span class="op">.</span><span class="fn">utcnow</span>() <span class="op">+</span> <span class="fn">timedelta</span>(minutes<span class="op">=</span>TOKEN_EXPIRE_MINUTES)
+    <span class="kw">return</span> jwt<span class="op">.</span><span class="fn">encode</span>(payload, SECRET_KEY, algorithm<span class="op">=</span>ALGORITHM)
+
+<span class="kw">async def</span> <span class="fn">get_current_user</span>(token: str <span class="op">=</span> <span class="fn">Depends</span>(oauth2_scheme)):
+    credentials_exception <span class="op">=</span> <span class="fn">HTTPException</span>(
+        status_code<span class="op">=</span>status<span class="op">.</span>HTTP_401_UNAUTHORIZED,
+        detail<span class="op">=</span><span class="st">"Invalid credentials"</span>,
+        headers<span class="op">=</span>{<span class="st">"WWW-Authenticate"</span>: <span class="st">"Bearer"</span>}
+    )
+    <span class="kw">try</span>:
+        payload <span class="op">=</span> jwt<span class="op">.</span><span class="fn">decode</span>(token, SECRET_KEY, algorithms<span class="op">=</span>[ALGORITHM])
+        username: str <span class="op">=</span> payload<span class="op">.</span><span class="fn">get</span>(<span class="st">"sub"</span>)
+        <span class="kw">if not</span> username:
+            <span class="kw">raise</span> credentials_exception
+    <span class="kw">except</span> JWTError:
+        <span class="kw">raise</span> credentials_exception
+    <span class="kw">return</span> username
+
+<span class="cm"># 🔐 Protected route — requires valid JWT</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">get</span>(<span class="st">"/me"</span>)
+<span class="kw">async def</span> <span class="fn">read_me</span>(user: str <span class="op">=</span> <span class="fn">Depends</span>(get_current_user)):
+    <span class="kw">return</span> {<span class="st">"username"</span>: user, <span class="st">"msg"</span>: <span class="st">"Authenticated!"</span>}</pre>
+        </div>
+        <div class="info-box">
+          <p>🔑 <strong>How JWT Works:</strong> Header.Payload.Signature — all base64 encoded. The signature is created using your SECRET_KEY, so only your server can verify it. <em>Never store sensitive data in the payload — it's not encrypted, just encoded!</em></p>
+        </div>
+      </div>
+
+      <div class="tab-pane" id="fapi-async">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Async FastAPI — Handle 10,000 requests/sec</h3>
+        <p style="font-size:.9rem;color:var(--ink-70);margin-bottom:1rem">FastAPI is built on <strong>asyncio</strong>. Use <code>async/await</code> for I/O-bound operations (DB queries, external APIs) to handle massive concurrency.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">python — Async Routes</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="kw">import</span> asyncio, httpx
+<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> databases <span class="kw">import</span> Database
+
+app <span class="op">=</span> <span class="fn">FastAPI</span>()
+db <span class="op">=</span> <span class="fn">Database</span>(<span class="st">"postgresql://user:pass@localhost/mydb"</span>)
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">on_event</span>(<span class="st">"startup"</span>)
+<span class="kw">async def</span> <span class="fn">startup</span>():
+    <span class="kw">await</span> db<span class="op">.</span><span class="fn">connect</span>()
+
+<span class="cm"># ✅ Async DB query — non-blocking</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">get</span>(<span class="st">"/users"</span>)
+<span class="kw">async def</span> <span class="fn">get_users</span>():
+    query <span class="op">=</span> <span class="st">"SELECT * FROM users LIMIT 50"</span>
+    <span class="kw">return await</span> db<span class="op">.</span><span class="fn">fetch_all</span>(query)
+
+<span class="cm"># ✅ Fan-out: call 3 external APIs concurrently</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">get</span>(<span class="st">"/dashboard/{user_id}"</span>)
+<span class="kw">async def</span> <span class="fn">get_dashboard</span>(user_id: int):
+    <span class="kw">async with</span> httpx<span class="op">.</span><span class="fn">AsyncClient</span>() <span class="kw">as</span> client:
+        profile, orders, notifications <span class="op">=</span> <span class="kw">await</span> asyncio<span class="op">.</span><span class="fn">gather</span>(
+            client<span class="op">.</span><span class="fn">get</span>(<span class="fn">f</span><span class="st">"/profile/{user_id}"</span>),
+            client<span class="op">.</span><span class="fn">get</span>(<span class="fn">f</span><span class="st">"/orders/{user_id}"</span>),
+            client<span class="op">.</span><span class="fn">get</span>(<span class="fn">f</span><span class="st">"/notifications/{user_id}"</span>)
+        )
+    <span class="kw">return</span> {
+        <span class="st">"profile"</span>: profile<span class="op">.</span><span class="fn">json</span>(),
+        <span class="st">"orders"</span>: orders<span class="op">.</span><span class="fn">json</span>(),
+        <span class="st">"notifications"</span>: notifications<span class="op">.</span><span class="fn">json</span>()
+    }
+<span class="cm"># Three API calls in parallel, not serial!</span>
+<span class="cm"># 3 × 100ms = 100ms, not 300ms 🔥</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLASK -->
+  <div class="fw-pane" id="fw-flask">
+    <div class="tab-container">
+      <div class="tab-header">
+        <button class="tab-btn active" onclick="switchTab('flask','setup',this)">Setup</button>
+        <button class="tab-btn" onclick="switchTab('flask','crud',this)">CRUD</button>
+        <button class="tab-btn" onclick="switchTab('flask','blueprints',this)">Blueprints</button>
+        <button class="tab-btn" onclick="switchTab('flask','middleware',this)">Middleware</button>
+      </div>
+      <div class="tab-pane active" id="flask-setup">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Flask — The Micro Framework</h3>
+        <p style="font-size:.9rem;color:var(--ink-70);margin-bottom:1rem">Flask is minimal by design. You get routing and request handling out of the box, and you choose what to add. Perfect for learning and quick prototypes.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre>pip install flask flask-sqlalchemy flask-jwt-extended
+
+<span class="cm"># Run your app</span>
+python app.py
+<span class="cm"># or</span>
+flask run --debug</pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">python — Flask basics</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="kw">from</span> flask <span class="kw">import</span> Flask, request, jsonify
+<span class="kw">from</span> functools <span class="kw">import</span> wraps
+
+app <span class="op">=</span> <span class="fn">Flask</span>(__name__)
+app<span class="op">.</span>config[<span class="st">"JSON_SORT_KEYS"</span>] <span class="op">=</span> <span class="kw">False</span>
+
+<span class="cm"># Simple GET route</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">route</span>(<span class="st">"/"</span>)
+<span class="kw">def</span> <span class="fn">index</span>():
+    <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"status"</span>: <span class="st">"ok"</span>, <span class="st">"framework"</span>: <span class="st">"Flask"</span>})
+
+<span class="cm"># Route with URL parameter + method restriction</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">route</span>(<span class="st">"/users/&lt;int:user_id&gt;"</span>, methods<span class="op">=</span>[<span class="st">"GET"</span>, <span class="st">"DELETE"</span>])
+<span class="kw">def</span> <span class="fn">user</span>(user_id):
+    <span class="kw">if</span> request<span class="op">.</span>method <span class="op">==</span> <span class="st">"GET"</span>:
+        <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"id"</span>: user_id})
+    <span class="kw">elif</span> request<span class="op">.</span>method <span class="op">==</span> <span class="st">"DELETE"</span>:
+        <span class="kw">return</span> <span class="st">""</span>, <span class="nm">204</span>  <span class="cm"># No content</span>
+
+<span class="cm"># POST with JSON body</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">route</span>(<span class="st">"/users"</span>, methods<span class="op">=</span>[<span class="st">"POST"</span>])
+<span class="kw">def</span> <span class="fn">create_user</span>():
+    data <span class="op">=</span> request<span class="op">.</span><span class="fn">get_json</span>()
+    <span class="kw">if not</span> data <span class="kw">or</span> <span class="st">"name"</span> <span class="kw">not in</span> data:
+        <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"error"</span>: <span class="st">"name is required"</span>}), <span class="nm">400</span>
+    <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"id"</span>: <span class="nm">1</span>, <span class="op">**</span>data}), <span class="nm">201</span>
+
+<span class="cm"># Error handlers</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">errorhandler</span>(<span class="nm">404</span>)
+<span class="kw">def</span> <span class="fn">not_found</span>(e):
+    <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"error"</span>: <span class="st">"not found"</span>}), <span class="nm">404</span>
+
+<span class="kw">if</span> __name__ <span class="op">==</span> <span class="st">"__main__"</span>:
+    app<span class="op">.</span><span class="fn">run</span>(debug<span class="op">=</span><span class="kw">True</span>, port<span class="op">=</span><span class="nm">5000</span>)</pre>
+        </div>
+      </div>
+      <div class="tab-pane" id="flask-crud">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Flask CRUD with SQLAlchemy</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">python — Flask + SQLAlchemy CRUD</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="kw">from</span> flask <span class="kw">import</span> Flask, request, jsonify
+<span class="kw">from</span> flask_sqlalchemy <span class="kw">import</span> SQLAlchemy
+
+app <span class="op">=</span> <span class="fn">Flask</span>(__name__)
+app<span class="op">.</span>config[<span class="st">"SQLALCHEMY_DATABASE_URI"</span>] <span class="op">=</span> <span class="st">"sqlite:///products.db"</span>
+db <span class="op">=</span> <span class="fn">SQLAlchemy</span>(app)
+
+<span class="kw">class</span> <span class="dc">Product</span>(db<span class="op">.</span>Model):
+    id       <span class="op">=</span> db<span class="op">.</span><span class="fn">Column</span>(db<span class="op">.</span>Integer, primary_key<span class="op">=</span><span class="kw">True</span>)
+    name     <span class="op">=</span> db<span class="op">.</span><span class="fn">Column</span>(db<span class="op">.</span>String(<span class="nm">100</span>), nullable<span class="op">=</span><span class="kw">False</span>)
+    price    <span class="op">=</span> db<span class="op">.</span><span class="fn">Column</span>(db<span class="op">.</span>Float, nullable<span class="op">=</span><span class="kw">False</span>)
+    in_stock <span class="op">=</span> db<span class="op">.</span><span class="fn">Column</span>(db<span class="op">.</span>Boolean, default<span class="op">=</span><span class="kw">True</span>)
+
+    <span class="kw">def</span> <span class="fn">to_dict</span>(self):
+        <span class="kw">return</span> {
+            <span class="st">"id"</span>: self<span class="op">.</span>id, <span class="st">"name"</span>: self<span class="op">.</span>name,
+            <span class="st">"price"</span>: self<span class="op">.</span>price, <span class="st">"in_stock"</span>: self<span class="op">.</span>in_stock
+        }
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">route</span>(<span class="st">"/products"</span>, methods<span class="op">=</span>[<span class="st">"GET"</span>])
+<span class="kw">def</span> <span class="fn">list_products</span>():
+    page <span class="op">=</span> request<span class="op">.</span>args<span class="op">.</span><span class="fn">get</span>(<span class="st">"page"</span>, <span class="nm">1</span>, type<span class="op">=</span>int)
+    per_page <span class="op">=</span> request<span class="op">.</span>args<span class="op">.</span><span class="fn">get</span>(<span class="st">"per_page"</span>, <span class="nm">10</span>, type<span class="op">=</span>int)
+    paginated <span class="op">=</span> Product<span class="op">.</span>query<span class="op">.</span><span class="fn">paginate</span>(page<span class="op">=</span>page, per_page<span class="op">=</span>per_page)
+    <span class="kw">return</span> <span class="fn">jsonify</span>({
+        <span class="st">"items"</span>: [p<span class="op">.</span><span class="fn">to_dict</span>() <span class="kw">for</span> p <span class="kw">in</span> paginated<span class="op">.</span>items],
+        <span class="st">"total"</span>: paginated<span class="op">.</span>total,
+        <span class="st">"pages"</span>: paginated<span class="op">.</span>pages
+    })
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">route</span>(<span class="st">"/products"</span>, methods<span class="op">=</span>[<span class="st">"POST"</span>])
+<span class="kw">def</span> <span class="fn">create_product</span>():
+    data <span class="op">=</span> request<span class="op">.</span><span class="fn">get_json</span>()
+    product <span class="op">=</span> <span class="fn">Product</span>(<span class="op">**</span>data)
+    db<span class="op">.</span>session<span class="op">.</span><span class="fn">add</span>(product)
+    db<span class="op">.</span>session<span class="op">.</span><span class="fn">commit</span>()
+    <span class="kw">return</span> <span class="fn">jsonify</span>(product<span class="op">.</span><span class="fn">to_dict</span>()), <span class="nm">201</span></pre>
+        </div>
+      </div>
+      <div class="tab-pane" id="flask-blueprints">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Blueprints — Organize Large Apps</h3>
+        <p style="font-size:.9rem;color:var(--ink-70);margin-bottom:1rem">As your app grows, keep routes organized with <strong>Blueprints</strong>. Each blueprint is like a mini-application with its own routes, templates, and static files.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">python — blueprints/users.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="kw">from</span> flask <span class="kw">import</span> Blueprint, jsonify, request
+
+users_bp <span class="op">=</span> <span class="fn">Blueprint</span>(<span class="st">"users"</span>, __name__, url_prefix<span class="op">=</span><span class="st">"/api/v1/users"</span>)
+
+<span class="dc">@users_bp</span><span class="op">.</span><span class="fn">route</span>(<span class="st">"/"</span>)
+<span class="kw">def</span> <span class="fn">list_users</span>(): ...
+
+<span class="dc">@users_bp</span><span class="op">.</span><span class="fn">route</span>(<span class="st">"/<int:id>"</span>)
+<span class="kw">def</span> <span class="fn">get_user</span>(id): ...
+
+<span class="cm"># ─── app.py ───────────────────────────────</span>
+<span class="kw">from</span> flask <span class="kw">import</span> Flask
+<span class="kw">from</span> blueprints.users <span class="kw">import</span> users_bp
+<span class="kw">from</span> blueprints.products <span class="kw">import</span> products_bp
+
+app <span class="op">=</span> <span class="fn">Flask</span>(__name__)
+app<span class="op">.</span><span class="fn">register_blueprint</span>(users_bp)
+app<span class="op">.</span><span class="fn">register_blueprint</span>(products_bp)
+
+<span class="cm"># Result: /api/v1/users/ and /api/v1/products/</span></pre>
+        </div>
+      </div>
+      <div class="tab-pane" id="flask-middleware">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Middleware & Decorators</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">python — Middleware</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="kw">from</span> flask <span class="kw">import</span> Flask, request, g
+<span class="kw">import</span> time, logging
+
+app <span class="op">=</span> <span class="fn">Flask</span>(__name__)
+
+<span class="cm"># Before every request</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">before_request</span>
+<span class="kw">def</span> <span class="fn">start_timer</span>():
+    g<span class="op">.</span>start <span class="op">=</span> time<span class="op">.</span><span class="fn">time</span>()
+
+<span class="cm"># After every request</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">after_request</span>
+<span class="kw">def</span> <span class="fn">log_request</span>(response):
+    elapsed <span class="op">=</span> time<span class="op">.</span><span class="fn">time</span>() <span class="op">-</span> g<span class="op">.</span>start
+    logging<span class="op">.</span><span class="fn">info</span>(<span class="fn">f</span><span class="st">"{request.method} {request.path} → {response.status_code} ({elapsed:.3f}s)"</span>)
+    response<span class="op">.</span>headers[<span class="st">"X-Response-Time"</span>] <span class="op">=</span> <span class="fn">f</span><span class="st">"{elapsed:.3f}s"</span>
+    <span class="kw">return</span> response
+
+<span class="cm"># Custom auth decorator</span>
+<span class="kw">from</span> functools <span class="kw">import</span> wraps
+
+<span class="kw">def</span> <span class="fn">require_api_key</span>(f):
+    <span class="dc">@wraps</span>(f)
+    <span class="kw">def</span> <span class="fn">decorated</span>(<span class="op">*</span>args, <span class="op">**</span>kwargs):
+        key <span class="op">=</span> request<span class="op">.</span>headers<span class="op">.</span><span class="fn">get</span>(<span class="st">"X-API-Key"</span>)
+        <span class="kw">if</span> key <span class="op">!=</span> <span class="st">"secret-key-123"</span>:
+            <span class="kw">return</span> {<span class="st">"error"</span>: <span class="st">"Invalid API key"</span>}, <span class="nm">401</span>
+        <span class="kw">return</span> <span class="fn">f</span>(<span class="op">*</span>args, <span class="op">**</span>kwargs)
+    <span class="kw">return</span> decorated
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">route</span>(<span class="st">"/secret"</span>)
+<span class="dc">@require_api_key</span>
+<span class="kw">def</span> <span class="fn">secret_endpoint</span>():
+    <span class="kw">return</span> {<span class="st">"data"</span>: <span class="st">"🔐 Super secret!"</span>}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DJANGO REST -->
+  <div class="fw-pane" id="fw-django">
+    <div class="tab-container">
+      <div class="tab-header">
+        <button class="tab-btn active" onclick="switchTab('drf','setup',this)">Setup</button>
+        <button class="tab-btn" onclick="switchTab('drf','serializers',this)">Serializers</button>
+        <button class="tab-btn" onclick="switchTab('drf','viewsets',this)">ViewSets</button>
+        <button class="tab-btn" onclick="switchTab('drf','permissions',this)">Permissions</button>
+      </div>
+      <div class="tab-pane active" id="drf-setup">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Django REST Framework</h3>
+        <p style="font-size:.9rem;color:var(--ink-70);margin-bottom:1rem">DRF is the gold standard for Django APIs. It comes with browsable API, authentication classes, serializers, and ViewSets that can generate entire CRUD APIs with minimal code.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre>pip install django djangorestframework
+
+django-admin startproject myapi .
+python manage.py startapp products</pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">python — settings.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre>INSTALLED_APPS <span class="op">=</span> [
+    <span class="cm">...existing apps...</span>
+    <span class="st">"rest_framework"</span>,
+    <span class="st">"products"</span>,
+]
+
+REST_FRAMEWORK <span class="op">=</span> {
+    <span class="st">"DEFAULT_AUTHENTICATION_CLASSES"</span>: [
+        <span class="st">"rest_framework_simplejwt.authentication.JWTAuthentication"</span>,
+    ],
+    <span class="st">"DEFAULT_PERMISSION_CLASSES"</span>: [
+        <span class="st">"rest_framework.permissions.IsAuthenticated"</span>,
+    ],
+    <span class="st">"DEFAULT_PAGINATION_CLASS"</span>: <span class="st">"rest_framework.pagination.PageNumberPagination"</span>,
+    <span class="st">"PAGE_SIZE"</span>: <span class="nm">20</span>,
+    <span class="st">"DEFAULT_THROTTLE_CLASSES"</span>: [
+        <span class="st">"rest_framework.throttling.AnonRateThrottle"</span>,
+    ],
+    <span class="st">"DEFAULT_THROTTLE_RATES"</span>: {<span class="st">"anon"</span>: <span class="st">"100/day"</span>},
+}</pre>
+        </div>
+      </div>
+      <div class="tab-pane" id="drf-serializers">
+        <h3 style="font-weight:700;margin-bottom:.5rem">DRF Serializers — Your Data's Bodyguard</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">python — serializers.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="kw">from</span> rest_framework <span class="kw">import</span> serializers
+<span class="kw">from</span> <span class="op">.</span>models <span class="kw">import</span> Product, Category
+
+<span class="kw">class</span> <span class="dc">CategorySerializer</span>(serializers<span class="op">.</span>ModelSerializer):
+    <span class="kw">class</span> Meta:
+        model <span class="op">=</span> Category
+        fields <span class="op">=</span> [<span class="st">"id"</span>, <span class="st">"name"</span>]
+
+<span class="kw">class</span> <span class="dc">ProductSerializer</span>(serializers<span class="op">.</span>ModelSerializer):
+    <span class="cm"># Nested serializer — includes full category object</span>
+    category <span class="op">=</span> <span class="fn">CategorySerializer</span>(read_only<span class="op">=</span><span class="kw">True</span>)
+    category_id <span class="op">=</span> serializers<span class="op">.</span><span class="fn">IntegerField</span>(write_only<span class="op">=</span><span class="kw">True</span>)
+    
+    <span class="cm"># Computed field</span>
+    full_name <span class="op">=</span> serializers<span class="op">.</span><span class="fn">SerializerMethodField</span>()
+
+    <span class="kw">def</span> <span class="fn">get_full_name</span>(self, obj):
+        <span class="kw">return</span> <span class="fn">f</span><span class="st">"{obj.category.name} — {obj.name}"</span>
+
+    <span class="kw">def</span> <span class="fn">validate_price</span>(self, value):
+        <span class="kw">if</span> value <span class="op"><=</span> <span class="nm">0</span>:
+            <span class="kw">raise</span> serializers<span class="op">.</span><span class="fn">ValidationError</span>(<span class="st">"Price must be positive"</span>)
+        <span class="kw">return</span> value
+
+    <span class="kw">class</span> Meta:
+        model <span class="op">=</span> Product
+        fields <span class="op">=</span> [<span class="st">"id"</span>, <span class="st">"name"</span>, <span class="st">"price"</span>, <span class="st">"category"</span>, <span class="st">"category_id"</span>, <span class="st">"full_name"</span>]
+        read_only_fields <span class="op">=</span> [<span class="st">"id"</span>, <span class="st">"full_name"</span>]</pre>
+        </div>
+      </div>
+      <div class="tab-pane" id="drf-viewsets">
+        <h3 style="font-weight:700;margin-bottom:.5rem">ViewSets — Maximum Power, Minimum Code</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">python — views.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="kw">from</span> rest_framework <span class="kw">import</span> viewsets, filters
+<span class="kw">from</span> rest_framework<span class="op">.</span>decorators <span class="kw">import</span> action
+<span class="kw">from</span> rest_framework<span class="op">.</span>response <span class="kw">import</span> Response
+<span class="kw">from</span> django_filters<span class="op">.</span>rest_framework <span class="kw">import</span> DjangoFilterBackend
+
+<span class="kw">class</span> <span class="dc">ProductViewSet</span>(viewsets<span class="op">.</span>ModelViewSet):
+    <span class="st">"""
+    Automatically provides:
+    GET    /products/         → list()
+    POST   /products/         → create()
+    GET    /products/{id}/    → retrieve()
+    PUT    /products/{id}/    → update()
+    PATCH  /products/{id}/    → partial_update()
+    DELETE /products/{id}/    → destroy()
+    """</span>
+    queryset <span class="op">=</span> Product<span class="op">.</span>objects<span class="op">.</span><span class="fn">all</span>()
+    serializer_class <span class="op">=</span> ProductSerializer
+    filter_backends <span class="op">=</span> [DjangoFilterBackend, filters<span class="op">.</span>SearchFilter]
+    filterset_fields <span class="op">=</span> [<span class="st">"category"</span>, <span class="st">"in_stock"</span>]
+    search_fields <span class="op">=</span> [<span class="st">"name"</span>, <span class="st">"description"</span>]
+
+    <span class="cm"># Custom action: POST /products/{id}/toggle_stock/</span>
+    <span class="dc">@action</span>(detail<span class="op">=</span><span class="kw">True</span>, methods<span class="op">=</span>[<span class="st">"post"</span>])
+    <span class="kw">def</span> <span class="fn">toggle_stock</span>(self, request, pk<span class="op">=</span><span class="kw">None</span>):
+        product <span class="op">=</span> self<span class="op">.</span><span class="fn">get_object</span>()
+        product<span class="op">.</span>in_stock <span class="op">=</span> <span class="kw">not</span> product<span class="op">.</span>in_stock
+        product<span class="op">.</span><span class="fn">save</span>()
+        <span class="kw">return</span> <span class="fn">Response</span>({<span class="st">"in_stock"</span>: product<span class="op">.</span>in_stock})</pre>
+        </div>
+      </div>
+      <div class="tab-pane" id="drf-permissions">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Custom Permissions</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">python — permissions.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="kw">from</span> rest_framework.permissions <span class="kw">import</span> BasePermission
+
+<span class="kw">class</span> <span class="dc">IsOwnerOrReadOnly</span>(BasePermission):
+    <span class="st">"""Allow owners to edit; everyone else read-only."""</span>
+    <span class="kw">def</span> <span class="fn">has_object_permission</span>(self, request, view, obj):
+        <span class="kw">if</span> request<span class="op">.</span>method <span class="kw">in</span> (<span class="st">"GET"</span>, <span class="st">"HEAD"</span>, <span class="st">"OPTIONS"</span>):
+            <span class="kw">return True</span>
+        <span class="kw">return</span> obj<span class="op">.</span>owner <span class="op">==</span> request<span class="op">.</span>user
+
+<span class="kw">class</span> <span class="dc">IsAdminOrReadOnly</span>(BasePermission):
+    <span class="kw">def</span> <span class="fn">has_permission</span>(self, request, view):
+        <span class="kw">if</span> request<span class="op">.</span>method <span class="kw">in</span> (<span class="st">"GET"</span>, <span class="st">"HEAD"</span>, <span class="st">"OPTIONS"</span>):
+            <span class="kw">return True</span>
+        <span class="kw">return</span> request<span class="op">.</span>user<span class="op">.</span>is_staff</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 5: API DESIGN BEST PRACTICES -->
+<section class="section" id="best-practices">
+  <div class="section-header">
+    <div class="section-tag violet">Chapter 5</div>
+    <h2 class="section-h2">API Design <em>Best Practices</em></h2>
+    <p class="section-desc">Good APIs are intuitive, consistent, and pleasant to use. Follow these principles.</p>
+  </div>
+
+  <div class="concept-grid" style="margin-bottom:2rem">
+    <div class="concept-card">
+      <div class="concept-icon" style="background:#f5f3ff">📐</div>
+      <h3>Use Nouns for Endpoints</h3>
+      <p>Resources should be nouns: <code>/users</code>, <code>/products</code>. <strong>Not</strong> <code>/getUsers</code> or <code>/createProduct</code> — that's what HTTP methods are for.</p>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon" style="background:#fef3c7">🔢</div>
+      <h3>Version Your API</h3>
+      <p>Always version: <code>/api/v1/users</code>. When you break things (and you will), v2 lets old clients keep working while new ones upgrade.</p>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon" style="background:#d1fae5">📦</div>
+      <h3>Use Plural Nouns</h3>
+      <p><code>/users</code> not <code>/user</code>. <code>/products/42</code> not <code>/product/42</code>. Consistency beats cleverness every time.</p>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon" style="background:#dbeafe">🔗</div>
+      <h3>Nested Resources</h3>
+      <p><code>/users/42/orders</code> expresses "orders belonging to user 42". Keep nesting shallow — max 2 levels deep.</p>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon" style="background:#fee2e2">📋</div>
+      <h3>Consistent Responses</h3>
+      <p>Always return the same shape. Wrap everything: <code>{"data":…, "meta":…, "errors":…}</code>. Never surprise your clients.</p>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon" style="background:#fce7f3">⚡</div>
+      <h3>Paginate Everything</h3>
+      <p>Never return unbounded lists. Use <code>?page=1&per_page=20</code> or cursor-based pagination. Your database (and clients) will thank you.</p>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:1rem">Good vs Bad API Design 👇</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+    <div>
+      <div style="color:var(--rose);font-weight:700;margin-bottom:.5rem;font-size:.9rem">❌ Anti-patterns to Avoid</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Bad API Design</span></div>
+<pre><span class="cm"># Action verbs in URLs</span>
+GET /getUser?id=5
+POST /createUser
+GET /deleteUser?id=5
+
+<span class="cm"># Inconsistent naming</span>
+GET /Users       <span class="cm"># PascalCase</span>
+GET /user_orders <span class="cm"># snake_case</span>
+GET /productList <span class="cm"># camelCase</span>
+
+<span class="cm"># Returning 200 for errors</span>
+GET /users/999
+→ 200 OK
+  {"success": false, "msg": "not found"}</pre>
+      </div>
+    </div>
+    <div>
+      <div style="color:var(--teal);font-weight:700;margin-bottom:.5rem;font-size:.9rem">✅ Best Practices</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Good API Design</span></div>
+<pre><span class="cm"># Resource-based URLs</span>
+GET    /api/v1/users/5
+POST   /api/v1/users
+DELETE /api/v1/users/5
+
+<span class="cm"># Consistent kebab-case</span>
+GET /api/v1/users
+GET /api/v1/user-orders
+GET /api/v1/product-categories
+
+<span class="cm"># Proper status codes</span>
+GET /api/v1/users/999
+→ 404 Not Found
+  {"error": "User not found", "code": "USER_NOT_FOUND"}</pre>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.1rem;font-weight:700;margin:2rem 0 1rem">Standard Response Envelope</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">JSON — Standard Response Format</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="cm">// ✅ Success response (list)</span>
+{
+  <span class="st">"data"</span>: [
+    { <span class="st">"id"</span>: <span class="nm">1</span>, <span class="st">"name"</span>: <span class="st">"Product A"</span> },
+    { <span class="st">"id"</span>: <span class="nm">2</span>, <span class="st">"name"</span>: <span class="st">"Product B"</span> }
+  ],
+  <span class="st">"meta"</span>: {
+    <span class="st">"total"</span>: <span class="nm">152</span>, <span class="st">"page"</span>: <span class="nm">1</span>,
+    <span class="st">"per_page"</span>: <span class="nm">20</span>, <span class="st">"total_pages"</span>: <span class="nm">8</span>
+  }
+}
+
+<span class="cm">// ❌ Error response</span>
+{
+  <span class="st">"error"</span>: {
+    <span class="st">"code"</span>: <span class="st">"VALIDATION_FAILED"</span>,
+    <span class="st">"message"</span>: <span class="st">"Validation failed"</span>,
+    <span class="st">"details"</span>: [
+      { <span class="st">"field"</span>: <span class="st">"email"</span>, <span class="st">"issue"</span>: <span class="st">"Invalid email format"</span> },
+      { <span class="st">"field"</span>: <span class="st">"price"</span>, <span class="st">"issue"</span>: <span class="st">"Must be greater than 0"</span> }
+    ]
+  }
+}</pre>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 6: PLAYGROUND -->
+<section class="section" id="playground">
+  <div class="section-header">
+    <div class="section-tag amber">Chapter 6</div>
+    <h2 class="section-h2">Interactive <em>API Playground</em></h2>
+    <p class="section-desc">Simulate API calls and see what responses look like in real-time.</p>
+  </div>
+
+  <div class="playground">
+    <div class="playground-header">
+      <h3>🧪 API Request Simulator</h3>
+      <span>Try it yourself</span>
+    </div>
+    <div class="playground-body">
+      <div class="playground-left">
+        <div class="pg-label">HTTP Method</div>
+        <select class="pg-select" id="pg-method">
+          <option>GET</option>
+          <option>POST</option>
+          <option>PUT</option>
+          <option>PATCH</option>
+          <option>DELETE</option>
+        </select>
+        <div class="pg-label">Scenario</div>
+        <select class="pg-select" id="pg-endpoint">
+          <option value="list">GET /api/v1/products — list all</option>
+          <option value="get">GET /api/v1/products/42 — get one</option>
+          <option value="create">POST /api/v1/products — create → 201</option>
+          <option value="patch">PATCH /api/v1/products/42 — partial update</option>
+          <option value="delete">DELETE /api/v1/products/42 — delete → 204</option>
+          <option value="notfound">GET /api/v1/products/9999 — 404 not found</option>
+          <option value="error">POST /api/v1/products — 422 validation error</option>
+          <option value="auth">GET /api/v1/admin — 401 unauthorized</option>
+          <option value="ratelimit">POST /auth/token — 429 rate limited</option>
+          <option value="conflict">POST /api/v1/users — 409 email conflict</option>
+        </select>
+        <div class="pg-label">Request Body (for POST/PUT/PATCH)</div>
+        <textarea class="pg-input" id="pg-body" rows="5">{
+  "name": "Python Handbook",
+  "price": 29.99,
+  "category": "books",
+  "in_stock": true
+}</textarea>
+        <button class="pg-send" onclick="sendRequest()">▶ Send Request</button>
+      </div>
+      <div class="playground-right">
+        <div class="pg-label">Response</div>
+        <div class="pg-status-bar" id="pg-status-bar"></div>
+        <pre class="pg-response" id="pg-response">// Click "Send Request" to see the response here ✨</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SECTION 7: SECURITY -->
+<section class="section" id="security">
+  <div class="section-header">
+    <div class="section-tag rose">Chapter 7</div>
+    <h2 class="section-h2">API Security — <em>Don't skip this</em></h2>
+    <p class="section-desc">Security isn't optional. Here are the must-knows before you go to production.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem">
+    <div>
+      <h3 style="font-size:1rem;font-weight:700;margin-bottom:.8rem">🔐 Authentication Methods</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num" style="background:var(--violet)">1</div>
+          <div class="step-body">
+            <h4>API Keys</h4>
+            <p>Simple. Pass in header: <code>X-API-Key: abc123</code>. Good for server-to-server. No expiry by default.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:var(--teal)">2</div>
+          <div class="step-body">
+            <h4>JWT (Bearer Tokens)</h4>
+            <p><code>Authorization: Bearer eyJ...</code>. Self-contained, stateless, expirable. Industry standard for user auth.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:var(--amber)">3</div>
+          <div class="step-body">
+            <h4>OAuth 2.0</h4>
+            <p>Delegated access ("Login with Google"). Complex but necessary for third-party integrations.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:var(--rose)">4</div>
+          <div class="step-body">
+            <h4>mTLS</h4>
+            <p>Mutual TLS — both client AND server verify certificates. Gold standard for microservices security.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3 style="font-size:1rem;font-weight:700;margin-bottom:.8rem">🛡️ Security Checklist</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">python — FastAPI Security Headers</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> fastapi.middleware.cors <span class="kw">import</span> CORSMiddleware
+<span class="kw">from</span> slowapi <span class="kw">import</span> Limiter
+<span class="kw">from</span> slowapi.util <span class="kw">import</span> get_remote_address
+
+app <span class="op">=</span> <span class="fn">FastAPI</span>()
+limiter <span class="op">=</span> <span class="fn">Limiter</span>(key_func<span class="op">=</span>get_remote_address)
+
+<span class="cm"># ✅ CORS — control who can call your API</span>
+app<span class="op">.</span><span class="fn">add_middleware</span>(
+    CORSMiddleware,
+    allow_origins<span class="op">=</span>[<span class="st">"https://myapp.com"</span>],  <span class="cm"># NOT "*"!</span>
+    allow_methods<span class="op">=</span>[<span class="st">"GET"</span>, <span class="st">"POST"</span>],
+    allow_headers<span class="op">=</span>[<span class="st">"Authorization"</span>],
+)
+
+<span class="cm"># ✅ Rate limiting — prevent abuse</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">get</span>(<span class="st">"/login"</span>)
+<span class="dc">@limiter</span><span class="op">.</span><span class="fn">limit</span>(<span class="st">"5/minute"</span>)
+<span class="kw">async def</span> <span class="fn">login</span>():
+    ...
+
+<span class="cm"># ✅ Always validate input (Pydantic)
+# ✅ Never store plain-text passwords (use bcrypt)
+# ✅ Use HTTPS everywhere
+# ✅ Rotate secrets regularly
+# ✅ Log suspicious activity</span></pre>
+      </div>
+      <div class="warn-box">
+        <p>⚠️ <strong>Never</strong> log authorization headers, passwords, or tokens. One log leak can compromise your entire system.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- CHEAT SHEET -->
+<section class="section" id="cheatsheet">
+  <div class="section-header">
+    <div class="section-tag">Reference</div>
+    <h2 class="section-h2">Quick <em>Cheat Sheet</em></h2>
+    <p class="section-desc">Everything you need, one glance away. Bookmark this!</p>
+  </div>
+  <div class="cheat-grid">
+    <div class="cheat-card">
+      <h4>HTTP Methods</h4>
+      <div class="cheat-row"><span class="cheat-key">GET</span><span class="cheat-val">Read / fetch data</span></div>
+      <div class="cheat-row"><span class="cheat-key">POST</span><span class="cheat-val">Create new resource</span></div>
+      <div class="cheat-row"><span class="cheat-key">PUT</span><span class="cheat-val">Replace full resource</span></div>
+      <div class="cheat-row"><span class="cheat-key">PATCH</span><span class="cheat-val">Partial update</span></div>
+      <div class="cheat-row"><span class="cheat-key">DELETE</span><span class="cheat-val">Remove resource</span></div>
+    </div>
+    <div class="cheat-card">
+      <h4>Status Codes</h4>
+      <div class="cheat-row"><span class="cheat-key">200</span><span class="cheat-val">OK — success</span></div>
+      <div class="cheat-row"><span class="cheat-key">201</span><span class="cheat-val">Created — POST success</span></div>
+      <div class="cheat-row"><span class="cheat-key">204</span><span class="cheat-val">No Content — DELETE</span></div>
+      <div class="cheat-row"><span class="cheat-key">400</span><span class="cheat-val">Bad Request</span></div>
+      <div class="cheat-row"><span class="cheat-key">401</span><span class="cheat-val">Unauthorized</span></div>
+      <div class="cheat-row"><span class="cheat-key">403</span><span class="cheat-val">Forbidden</span></div>
+      <div class="cheat-row"><span class="cheat-key">404</span><span class="cheat-val">Not Found</span></div>
+      <div class="cheat-row"><span class="cheat-key">422</span><span class="cheat-val">Validation Error</span></div>
+      <div class="cheat-row"><span class="cheat-key">500</span><span class="cheat-val">Server Error</span></div>
+    </div>
+    <div class="cheat-card">
+      <h4>FastAPI Decorators</h4>
+      <div class="cheat-row"><span class="cheat-key">@app.get()</span><span class="cheat-val">GET route</span></div>
+      <div class="cheat-row"><span class="cheat-key">@app.post()</span><span class="cheat-val">POST route</span></div>
+      <div class="cheat-row"><span class="cheat-key">@app.put()</span><span class="cheat-val">PUT route</span></div>
+      <div class="cheat-row"><span class="cheat-key">@app.patch()</span><span class="cheat-val">PATCH route</span></div>
+      <div class="cheat-row"><span class="cheat-key">@app.delete()</span><span class="cheat-val">DELETE route</span></div>
+      <div class="cheat-row"><span class="cheat-key">Depends()</span><span class="cheat-val">Dependency injection</span></div>
+    </div>
+    <div class="cheat-card">
+      <h4>Pydantic Field Validators</h4>
+      <div class="cheat-row"><span class="cheat-key">gt / lt</span><span class="cheat-val">Greater / less than</span></div>
+      <div class="cheat-row"><span class="cheat-key">ge / le</span><span class="cheat-val">≥ / ≤ (inclusive)</span></div>
+      <div class="cheat-row"><span class="cheat-key">min_length</span><span class="cheat-val">Min string length</span></div>
+      <div class="cheat-row"><span class="cheat-key">max_length</span><span class="cheat-val">Max string length</span></div>
+      <div class="cheat-row"><span class="cheat-key">pattern</span><span class="cheat-val">Regex pattern match</span></div>
+      <div class="cheat-row"><span class="cheat-key">@validator</span><span class="cheat-val">Custom validation logic</span></div>
+    </div>
+    <div class="cheat-card">
+      <h4>URL Design Rules</h4>
+      <div class="cheat-row"><span class="cheat-key">/users</span><span class="cheat-val">Plural nouns</span></div>
+      <div class="cheat-row"><span class="cheat-key">/api/v1/</span><span class="cheat-val">Version prefix</span></div>
+      <div class="cheat-row"><span class="cheat-key">/users/5</span><span class="cheat-val">Resource by ID</span></div>
+      <div class="cheat-row"><span class="cheat-key">/users/5/orders</span><span class="cheat-val">Nested resources</span></div>
+      <div class="cheat-row"><span class="cheat-key">kebab-case</span><span class="cheat-val">Use for multi-word</span></div>
+    </div>
+    <div class="cheat-card">
+      <h4>Headers You Must Know</h4>
+      <div class="cheat-row"><span class="cheat-key">Content-Type</span><span class="cheat-val">Body format (application/json)</span></div>
+      <div class="cheat-row"><span class="cheat-key">Authorization</span><span class="cheat-val">Bearer &lt;token&gt;</span></div>
+      <div class="cheat-row"><span class="cheat-key">Accept</span><span class="cheat-val">Expected response format</span></div>
+      <div class="cheat-row"><span class="cheat-key">X-API-Key</span><span class="cheat-val">API key auth</span></div>
+      <div class="cheat-row"><span class="cheat-key">Cache-Control</span><span class="cheat-val">Caching directives</span></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- QUIZ -->
+<section class="section" id="quiz">
+  <div class="section-header">
+    <div class="section-tag violet">Chapter 8</div>
+    <h2 class="section-h2">Test Your <em>Knowledge</em></h2>
+    <p class="section-desc">10 questions covering everything we've learned. How many can you get right?</p>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-progress" id="quiz-progress"></div>
+    <div id="quiz-body">
+      <div class="quiz-q" id="quiz-q"></div>
+      <div class="quiz-options" id="quiz-opts"></div>
+      <div class="quiz-feedback" id="quiz-feedback"></div>
+      <button class="quiz-next" id="quiz-next" onclick="nextQuestion()">Next Question →</button>
+    </div>
+    <div class="quiz-score" id="quiz-score">
+      <div class="quiz-score-num" id="score-num"></div>
+      <p id="score-msg"></p>
+      <button id="quiz-restart" onclick="restartQuiz()">🔄 Try Again</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  Built with ❤️ for learning. <strong>API Academy</strong> — Your complete guide to building great APIs. 🚀
+</footer>
+
+<!-- TOOLTIP -->
+<div class="status-tooltip" id="tooltip"></div>
+
+<script>
+// ─── COPY CODE ─────────────────────────────────────────────────
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ─── TABS ──────────────────────────────────────────────────────
+function switchTab(prefix, name, btn) {
+  const container = btn.closest('.tab-container');
+  container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  container.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  const pane = container.querySelector('#' + prefix + '-' + name);
+  if (pane) pane.classList.add('active');
+}
+
+// ─── FRAMEWORK SWITCHER ────────────────────────────────────────
+function switchFW(fw, btn) {
+  document.querySelectorAll('.fw-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.fw-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('fw-' + fw).classList.add('active');
+}
+
+// ─── HTTP METHODS ──────────────────────────────────────────────
+const methodData = {
+  GET: {
+    code: `GET /api/v1/products?category=books&page=1 HTTP/1.1
+Host: api.example.com
+Authorization: Bearer eyJhbGci...
+Accept: application/json
+
+# No request body for GET requests!
+
+# Response:
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "data": [
+    {"id": 1, "name": "Python Crash Course", "price": 29.99},
+    {"id": 2, "name": "Clean Code", "price": 34.99}
+  ],
+  "meta": {"total": 42, "page": 1, "per_page": 20}
+}`,
+    note: '🔒 GET is <strong>safe</strong> (no side effects) and <strong>idempotent</strong> (same result every time). Never use GET to modify data!'
+  },
+  POST: {
+    code: `POST /api/v1/products HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "FastAPI Handbook",
+  "price": 24.99,
+  "category": "books"
+}
+
+# Response:
+HTTP/1.1 201 Created
+Location: /api/v1/products/43
+
+{
+  "id": 43,
+  "name": "FastAPI Handbook",
+  "price": 24.99,
+  "created_at": "2025-01-15T10:30:00Z"
+}`,
+    note: '📦 POST creates a <strong>new resource</strong>. Not idempotent — calling it twice creates two resources. Return 201 Created with Location header.'
+  },
+  PUT: {
+    code: `PUT /api/v1/products/43 HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "FastAPI Complete Guide",
+  "price": 34.99,
+  "category": "books",
+  "in_stock": true
+}
+# ⚠️ All fields required! Missing = null/default
+
+# Response: 200 OK with updated resource`,
+    note: '🔄 PUT <strong>replaces the entire resource</strong>. You must send all fields. Idempotent — doing it 10 times has same effect as once.'
+  },
+  PATCH: {
+    code: `PATCH /api/v1/products/43 HTTP/1.1
+Content-Type: application/json
+
+{
+  "price": 34.99
+}
+# ✅ Only send what changed!
+# name, category, in_stock untouched
+
+# Response: 200 OK with full updated resource
+{
+  "id": 43,
+  "name": "FastAPI Handbook",  // unchanged
+  "price": 34.99,              // updated
+  "category": "books"          // unchanged
+}`,
+    note: '🎯 PATCH does <strong>partial updates</strong>. More efficient than PUT. Send only changed fields. Use JSON Merge Patch or JSON Patch RFC for standardization.'
+  },
+  DELETE: {
+    code: `DELETE /api/v1/products/43 HTTP/1.1
+Authorization: Bearer eyJhbGci...
+
+# No request body needed
+
+# Success: 204 No Content (most common)
+HTTP/1.1 204 No Content
+
+# Or: 200 OK with deleted resource info
+HTTP/1.1 200 OK
+{"message": "Product 43 deleted", "id": 43}
+
+# Calling DELETE on already-deleted resource:
+# Also returns 204 (idempotent!)`,
+    note: '🗑️ DELETE is <strong>idempotent</strong> — deleting something twice is fine. Use 204 No Content for "silent" delete, or 200 OK if you want to return the deleted resource.'
+  }
+};
+
+// FIX: accept (e, method) — never rely on implicit global `event`.
+// When called from DOMContentLoaded there is no click event (e is null),
+// so we fall back to a querySelector to find the right card.
+function showMethod(e, method) {
+  document.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
+  const card = (e && e.currentTarget)
+    ? e.currentTarget
+    : document.querySelector(`.method-card[onclick*="'${method}'"]`);
+  if (card) card.classList.add('active');
+
+  const detail = document.getElementById('method-detail');
+  const data = methodData[method];
+  const labels = {
+    GET:'Read / Retrieve', POST:'Create', PUT:'Full Replace',
+    PATCH:'Partial Update', DELETE:'Remove'
+  };
+  detail.innerHTML = `
+    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:1rem">
+      <span class="method-pill ${method}">${method}</span>
+      <h4 style="font-size:1rem;font-weight:700">${labels[method]}</h4>
+    </div>
+    <div class="code-block"><div class="code-header"><span class="code-lang">HTTP Example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>${data.code}</pre></div>
+    <div class="info-box" style="margin-top:.8rem"><p>${data.note}</p></div>
+  `;
+  detail.classList.add('visible');
+}
+
+// FIX: use DOMContentLoaded and pass null as the event — no crash.
+window.addEventListener('DOMContentLoaded', () => showMethod(null, 'GET'));
+
+// ─── STATUS TOOLTIP ────────────────────────────────────────────
+const tooltip = document.getElementById('tooltip');
+function showTip(e, el) {
+  tooltip.textContent = el.dataset.tip;
+  tooltip.classList.add('visible');
+  tooltip.style.left = (e.clientX + 12) + 'px';
+  tooltip.style.top  = (e.clientY - 10) + 'px';
+}
+function hideTip() { tooltip.classList.remove('visible'); }
+
+// ─── PLAYGROUND ────────────────────────────────────────────────
+const mockData = {
+  list: {
+    status: 200, label: '200 OK', ok: true,
+    body: {
+      data: [
+        {id:1,name:"Python Crash Course",price:29.99,category:"books",in_stock:true,created_at:"2025-01-10T09:00:00Z"},
+        {id:2,name:"Clean Code",price:34.99,category:"books",in_stock:true,created_at:"2025-02-05T14:22:00Z"},
+        {id:3,name:"Designing Data APIs",price:44.99,category:"books",in_stock:false,created_at:"2025-03-18T11:00:00Z"}
+      ],
+      meta: {total:42, page:1, per_page:20, total_pages:3}
+    }
+  },
+  get: {
+    status: 200, label: '200 OK', ok: true,
+    body: {data:{id:42,name:"FastAPI Handbook",price:24.99,category:"books",in_stock:true,created_at:"2025-01-10T09:00:00Z"}}
+  },
+  create: {
+    status: 201, label: '201 Created', ok: true,
+    body: {data:{id:43,name:"Python Handbook",price:29.99,category:"books",in_stock:true,created_at:new Date().toISOString()},message:"Product created successfully"}
+  },
+  patch: {
+    status: 200, label: '200 OK', ok: true,
+    body: {data:{id:42,name:"FastAPI Handbook",price:19.99,category:"books",in_stock:true,created_at:"2025-01-10T09:00:00Z"},message:"Product updated"}
+  },
+  delete: {
+    status: 204, label: '204 No Content', ok: true,
+    body: null
+  },
+  notfound: {
+    status: 404, label: '404 Not Found', ok: false,
+    body: {error:{code:"PRODUCT_NOT_FOUND",message:"Product with id 9999 not found",docs:"/api/v1/docs"}}
+  },
+  error: {
+    status: 422, label: '422 Unprocessable Entity', ok: false,
+    body: {
+      error: {
+        code: "VALIDATION_FAILED",
+        message: "Request validation failed",
+        details: [
+          {field:"name",issue:"Field required",type:"missing"},
+          {field:"price",issue:"Must be greater than 0",type:"value_error"}
+        ]
+      }
+    }
+  },
+  auth: {
+    status: 401, label: '401 Unauthorized', ok: false,
+    body: {error:{code:"UNAUTHORIZED",message:"Bearer token is missing or invalid",hint:"Add header: Authorization: Bearer <your_token>"}}
+  },
+  ratelimit: {
+    status: 429, label: '429 Too Many Requests', ok: false,
+    body: {error:{code:"RATE_LIMIT_EXCEEDED",message:"Too many requests. Slow down!",retry_after_seconds:60,limit:"100 req/min"}}
+  },
+  conflict: {
+    status: 409, label: '409 Conflict', ok: false,
+    body: {error:{code:"EMAIL_ALREADY_EXISTS",message:"User with email 'john@example.com' already exists",field:"email"}}
+  }
+};
+
+function sendRequest() {
+  const method = document.getElementById('pg-method').value;
+  const endpoint = document.getElementById('pg-endpoint').value;
+  const statusBar = document.getElementById('pg-status-bar');
+  const response = document.getElementById('pg-response');
+
+  response.textContent = '⏳ Sending request...';
+  statusBar.innerHTML = '';
+
+  setTimeout(() => {
+    const mock = mockData[endpoint] || mockData.list;
+    const colorClass = mock.ok ? 'pg-stat-ok' : (mock.status >= 500 ? 'pg-stat-err' : 'pg-stat-warn');
+    const duration = Math.floor(Math.random() * 80 + 30);
+    const bodyStr = mock.body ? JSON.stringify(mock.body) : '';
+    const size = bodyStr ? bodyStr.length + ' B' : '0 B';
+
+    statusBar.innerHTML = `
+      <span class="pg-stat-badge ${colorClass}">${mock.label}</span>
+      <span class="pg-stat-badge" style="background:var(--paper);color:var(--ink-70)">${duration}ms</span>
+      <span class="pg-stat-badge" style="background:var(--paper);color:var(--ink-70)">${method}</span>
+      <span class="pg-stat-badge" style="background:var(--paper);color:var(--ink-40)">${size}</span>
+    `;
+    response.textContent = mock.body === null
+      ? '// 204 No Content — empty body is correct for DELETE ✅'
+      : JSON.stringify(mock.body, null, 2);
+  }, 400);
+}
+
+// ─── QUIZ ──────────────────────────────────────────────────────
+const questions = [
+  {
+    q: "Which HTTP method is idempotent AND safe (has no side effects)?",
+    opts: ["POST","GET","PUT","DELETE"],
+    ans: 1,
+    exp: "✅ GET is both safe (doesn't modify data) and idempotent (same result every call). POST is neither, PUT/DELETE are idempotent but not safe."
+  },
+  {
+    q: "You create a new user via POST /users. What status code should the server return?",
+    opts: ["200 OK","204 No Content","201 Created","202 Accepted"],
+    ans: 2,
+    exp: "✅ 201 Created is the correct response for a successful resource creation. Include a Location header pointing to the new resource!"
+  },
+  {
+    q: "What's the key difference between PUT and PATCH?",
+    opts: ["PUT is faster","PATCH sends the full resource, PUT sends partial","PUT replaces the full resource, PATCH does partial update","They're identical"],
+    ans: 2,
+    exp: "✅ PUT replaces the entire resource (all fields). PATCH only updates the fields you send. PATCH is more network-efficient for small changes."
+  },
+  {
+    q: "A user is logged in but tries to access an admin-only endpoint. What status code?",
+    opts: ["401 Unauthorized","404 Not Found","403 Forbidden","400 Bad Request"],
+    ans: 2,
+    exp: "✅ 403 Forbidden = you're authenticated but not authorized. 401 Unauthorized = not authenticated at all (bad/missing token)."
+  },
+  {
+    q: "Which FastAPI feature automatically generates Swagger documentation?",
+    opts: ["SQLAlchemy","Pydantic models + OpenAPI","Uvicorn","asyncio"],
+    ans: 1,
+    exp: "✅ FastAPI uses Pydantic models and the OpenAPI spec to auto-generate interactive docs at /docs (Swagger UI) and /redoc (ReDoc)."
+  },
+  {
+    q: "Which URL design follows REST best practices?",
+    opts: ["/getProductById/5","/api/v1/products/5","/api/v1/product/5","/api/products/getById?id=5"],
+    ans: 1,
+    exp: "✅ /api/v1/products/5 is correct: versioned API, plural nouns, resource ID in path. Never use verbs in REST URLs!"
+  },
+  {
+    q: "What does JWT stand for?",
+    opts: ["JavaScript Web Token","JSON Web Token","Java Web Token","Just Web Transfer"],
+    ans: 1,
+    exp: "✅ JSON Web Token! JWTs have 3 parts: Header.Payload.Signature, all base64-encoded. The signature is cryptographically verified."
+  },
+  {
+    q: "You call DELETE /products/42, and the product doesn't exist. What should you return?",
+    opts: ["404 Not Found","500 Server Error","204 No Content (idempotent)","Both 404 or 204 are acceptable"],
+    ans: 3,
+    exp: "✅ Both are valid! Since DELETE is idempotent, returning 204 (as if it succeeded) is acceptable. Some APIs prefer 404 to indicate the resource wasn't found. Depends on your API contract."
+  },
+  {
+    q: "What is the purpose of CORS in API development?",
+    opts: ["Compress API responses","Control which domains can call your API from a browser","Cache API responses","Validate request bodies"],
+    ans: 1,
+    exp: "✅ CORS (Cross-Origin Resource Sharing) tells browsers which external domains are allowed to make requests to your API. It's a browser security mechanism."
+  },
+  {
+    q: "In FastAPI, what does Depends() do?",
+    opts: ["Imports an external library","Marks a route as async","Dependency injection — reusable logic shared across routes","Creates a database connection"],
+    ans: 2,
+    exp: "✅ Depends() is FastAPI's dependency injection system. Use it to share authentication, database sessions, or any reusable logic across multiple routes without repeating code."
+  },
+  {
+    q: "Which Pydantic Field constraint ensures a number is ≥ 0 (allows zero)?",
+    opts: ["gt=0","gt=-1","ge=0","min_value=0"],
+    ans: 2,
+    exp: "✅ ge=0 means 'greater than or equal to 0' (inclusive — 0 is valid). gt=0 means strictly greater than 0, so 0 would fail. ge/gt/le/lt are the four numeric constraints."
+  },
+  {
+    q: "A user tries to register with an email that already exists. What status code?",
+    opts: ["400 Bad Request","404 Not Found","422 Unprocessable Entity","409 Conflict"],
+    ans: 3,
+    exp: "✅ 409 Conflict is correct — the request is well-formed, but it conflicts with the current state (duplicate unique field). 422 is for schema/type validation errors, not business logic conflicts."
+  },
+  {
+    q: "FastAPI's default status code for a Pydantic validation failure is…",
+    opts: ["400 Bad Request","404 Not Found","422 Unprocessable Entity","500 Internal Server Error"],
+    ans: 2,
+    exp: "✅ FastAPI returns 422 Unprocessable Entity automatically when Pydantic validation fails. The response body contains a 'detail' array describing every field that failed and why."
+  },
+  {
+    q: "What is an API that is 'idempotent'?",
+    opts: [
+      "It always returns JSON",
+      "Calling it multiple times gives the same result as calling it once",
+      "It requires authentication on every call",
+      "It compresses responses automatically"
+    ],
+    ans: 1,
+    exp: "✅ Idempotent = same effect no matter how many times you call it. DELETE, PUT, PATCH, GET, HEAD, OPTIONS are all idempotent. POST is NOT — calling POST /users five times creates five users!"
+  }
+];
+
+let current = 0, score = 0, answered = false;
+
+function renderQuiz() {
+  const q = questions[current];
+  document.getElementById('quiz-q').textContent = `Q${current+1}. ${q.q}`;
+  const optsEl = document.getElementById('quiz-opts');
+  optsEl.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt';
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(i);
+    optsEl.appendChild(btn);
+  });
+  const feedback = document.getElementById('quiz-feedback');
+  feedback.className = 'quiz-feedback';
+  feedback.textContent = '';
+  document.getElementById('quiz-next').classList.remove('show');
+
+  const prog = document.getElementById('quiz-progress');
+  prog.innerHTML = questions.map((_,i) =>
+    `<div class="quiz-dot ${i < current ? 'done' : i === current ? 'active' : ''}"></div>`
+  ).join('');
+  answered = false;
+}
+
+function selectAnswer(i) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const opts = document.querySelectorAll('.quiz-opt');
+  opts.forEach((btn, idx) => {
+    if (idx === q.ans) btn.classList.add('correct');
+    else if (idx === i && i !== q.ans) btn.classList.add('wrong');
+  });
+  const feedback = document.getElementById('quiz-feedback');
+  if (i === q.ans) {
+    score++;
+    feedback.className = 'quiz-feedback show ok';
+    feedback.innerHTML = q.exp;
+  } else {
+    feedback.className = 'quiz-feedback show bad';
+    feedback.innerHTML = `❌ Not quite! ${q.exp}`;
+  }
+  document.getElementById('quiz-next').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) {
+    showScore();
+  } else {
+    renderQuiz();
+  }
+}
+
+function showScore() {
+  document.getElementById('quiz-body').style.display = 'none';
+  const scoreEl = document.getElementById('quiz-score');
+  scoreEl.classList.add('show');
+  document.getElementById('score-num').textContent = `${score}/${questions.length}`;
+  const pct = score / questions.length;
+  const msgs = [
+    [0.93, "🏆 API Master! You clearly know your REST. Ship it!"],
+    [0.80, "⚡ Excellent work! A couple more rounds and you'll be unstoppable."],
+    [0.60, "🌱 Good start! Review the HTTP methods and status codes chapters."],
+    [0.40, "📖 Keep going — re-read the guide and try again. You'll get there!"],
+    [0,    "💪 Every expert started here. Read the guide, then try again!"]
+  ];
+  document.getElementById('score-msg').textContent = msgs.find(([t]) => pct >= t)[1];
+}
+
+function restartQuiz() {
+  current = 0; score = 0;
+  document.getElementById('quiz-body').style.display = 'block';
+  document.getElementById('quiz-score').classList.remove('show');
+  renderQuiz();
+}
+
+renderQuiz();
+</script>
+</body>
+</html>

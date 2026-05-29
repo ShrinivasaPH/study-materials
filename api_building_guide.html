@@ -601,6 +601,7 @@
     <div class="nav-links">
       <a href="#concepts">Concepts</a>
       <a href="#frameworks">Frameworks</a>
+      <a href="#ml-apis">ML APIs</a>
       <a href="#playground">Playground</a>
       <a href="#quiz">Quiz</a>
       <a href="#cheatsheet" class="nav-pill">Cheat Sheet</a>
@@ -1760,10 +1761,1090 @@ GET /api/v1/users/999
 
 <hr class="divider">
 
+<!-- ═══════════════════ ML MODELS AS APIS ═══════════════════════ -->
+<section class="section" id="ml-apis">
+  <div class="section-header">
+    <div class="section-tag" style="background:#fdf4ff;color:#9333ea">Chapter 7 — ML APIs</div>
+    <h2 class="section-h2">Turning ML Models into <em>Production APIs</em></h2>
+    <p class="section-desc">You trained the model. Now ship it. FastAPI + scikit-learn/PyTorch → real-world REST API in minutes.</p>
+  </div>
+
+  <div class="fun-fact">
+    <div class="fun-fact-icon">🤖</div>
+    <div class="fun-fact-body">
+      <div class="fun-fact-label">The ML API Pattern</div>
+      <p>A model is just a function: <strong>features in → prediction out</strong>. An API wraps that function with HTTP, adds input validation, error handling, versioning, and observability. That's the entire job.</p>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2.5rem">
+    <div class="concept-card"><div class="concept-icon" style="background:#fdf4ff">📈</div><h3>Regression</h3><p>Predict a continuous value — house price, salary, demand forecast, stock return.</p></div>
+    <div class="concept-card"><div class="concept-icon" style="background:#dbeafe">🏷️</div><h3>Classification</h3><p>Predict a category — spam/ham, churn/retain, disease/healthy, sentiment.</p></div>
+    <div class="concept-card"><div class="concept-icon" style="background:#d1fae5">🔵</div><h3>Clustering</h3><p>Group unlabelled data — customer segments, anomaly detection, document topics.</p></div>
+    <div class="concept-card"><div class="concept-icon" style="background:#fff1f5">🧠</div><h3>Deep Learning</h3><p>Image classification, NLP, time-series — PyTorch/TF models served the same way.</p></div>
+  </div>
+
+  <!-- SUB-TABS for ML types -->
+  <div class="fw-tabs" id="ml-tabs">
+    <button class="fw-btn active" onclick="switchML('regression',this)">📈 Regression</button>
+    <button class="fw-btn" onclick="switchML('classification',this)">🏷️ Classification</button>
+    <button class="fw-btn" onclick="switchML('clustering',this)">🔵 Clustering</button>
+    <button class="fw-btn" onclick="switchML('nlp',this)">💬 NLP / Text</button>
+    <button class="fw-btn" onclick="switchML('deeplearning',this)">🧠 Deep Learning</button>
+    <button class="fw-btn" onclick="switchML('bestpractices',this)">🏭 Production Tips</button>
+  </div>
+
+  <!-- ══════════════ REGRESSION ══════════════ -->
+  <div class="fw-pane active" id="ml-regression">
+    <div class="tab-container">
+      <div class="tab-header">
+        <button class="tab-btn active" onclick="switchTab('reg','train',this)">Train &amp; Save</button>
+        <button class="tab-btn" onclick="switchTab('reg','serve',this)">FastAPI Endpoint</button>
+        <button class="tab-btn" onclick="switchTab('reg','schema',this)">Pydantic Schema</button>
+        <button class="tab-btn" onclick="switchTab('reg','test',this)">Testing</button>
+      </div>
+
+      <div class="tab-pane active" id="reg-train">
+        <h3 style="font-weight:700;margin-bottom:.5rem">House Price Regressor — Train &amp; Persist</h3>
+        <p style="color:var(--ink-70);font-size:.9rem;margin-bottom:1rem">Train once, serve forever. Always save <strong>the full pipeline</strong> (scaler + model together) so you can't accidentally skip preprocessing at inference time.</p>
+        <div class="code-block"><div class="code-header"><span class="code-lang">python — train_regression.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> fetch_california_housing
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> GradientBoostingRegressor
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> mean_absolute_error, r2_score
+<span class="kw">import</span> joblib, json
+
+<span class="cm"># ─── Load &amp; split ─────────────────────────────────────</span>
+data <span class="op">=</span> <span class="fn">fetch_california_housing</span>(as_frame<span class="op">=</span><span class="kw">True</span>)
+X_train, X_test, y_train, y_test <span class="op">=</span> <span class="fn">train_test_split</span>(
+    data<span class="op">.</span>data, data<span class="op">.</span>target, test_size<span class="op">=</span><span class="nm">0.2</span>, random_state<span class="op">=</span><span class="nm">42</span>
+)
+
+<span class="cm"># ─── Build pipeline (scaler + model) ──────────────────</span>
+<span class="cm"># 🔑 Key insight: always bundle preprocessing into the pipeline.</span>
+<span class="cm"># If you scale separately, you WILL forget to scale at inference.</span>
+pipeline <span class="op">=</span> <span class="fn">Pipeline</span>([
+    (<span class="st">"scaler"</span>, <span class="fn">StandardScaler</span>()),
+    (<span class="st">"model"</span>,  <span class="fn">GradientBoostingRegressor</span>(
+        n_estimators<span class="op">=</span><span class="nm">200</span>, max_depth<span class="op">=</span><span class="nm">4</span>,
+        learning_rate<span class="op">=</span><span class="nm">0.1</span>, random_state<span class="op">=</span><span class="nm">42</span>
+    ))
+])
+
+pipeline<span class="op">.</span><span class="fn">fit</span>(X_train, y_train)
+
+<span class="cm"># ─── Evaluate ─────────────────────────────────────────</span>
+preds <span class="op">=</span> pipeline<span class="op">.</span><span class="fn">predict</span>(X_test)
+print(<span class="fn">f</span><span class="st">"MAE  : {mean_absolute_error(y_test, preds):.4f}"</span>)
+print(<span class="fn">f</span><span class="st">"R²   : {r2_score(y_test, preds):.4f}"</span>)
+
+<span class="cm"># ─── Save artefacts ───────────────────────────────────</span>
+joblib<span class="op">.</span><span class="fn">dump</span>(pipeline, <span class="st">"models/house_price_pipeline.joblib"</span>)
+
+<span class="cm"># Save feature names alongside the model — the API needs them</span>
+metadata <span class="op">=</span> {
+    <span class="st">"features"</span>: <span class="fn">list</span>(data<span class="op">.</span>data<span class="op">.</span>columns),
+    <span class="st">"target_unit"</span>: <span class="st">"100k USD"</span>,
+    <span class="st">"model_version"</span>: <span class="st">"1.0.0"</span>,
+    <span class="st">"sklearn_version"</span>: <span class="kw">__import__</span>(<span class="st">"sklearn"</span>)<span class="op">.</span>__version__,
+}
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"models/house_price_metadata.json"</span>, <span class="st">"w"</span>) <span class="kw">as</span> f:
+    json<span class="op">.</span><span class="fn">dump</span>(metadata, f, indent<span class="op">=</span><span class="nm">2</span>)
+
+print(<span class="st">"✅ Pipeline saved to models/house_price_pipeline.joblib"</span>)</pre></div>
+      </div>
+
+      <div class="tab-pane" id="reg-serve">
+        <h3 style="font-weight:700;margin-bottom:.5rem">FastAPI Regression Endpoint</h3>
+        <div class="code-block"><div class="code-header"><span class="code-lang">python — app.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, HTTPException
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field
+<span class="kw">from</span> contextlib <span class="kw">import</span> asynccontextmanager
+<span class="kw">import</span> joblib, numpy <span class="kw">as</span> np, json
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="cm"># ─── Lifespan: load model ONCE at startup ─────────────</span>
+<span class="cm"># Never load inside the route — that's 200ms of disk I/O per request!</span>
+MODEL <span class="op">=</span> {}
+
+<span class="dc">@asynccontextmanager</span>
+<span class="kw">async def</span> <span class="fn">lifespan</span>(app: FastAPI):
+    MODEL[<span class="st">"pipeline"</span>] <span class="op">=</span> joblib<span class="op">.</span><span class="fn">load</span>(<span class="st">"models/house_price_pipeline.joblib"</span>)
+    <span class="kw">with</span> <span class="fn">open</span>(<span class="st">"models/house_price_metadata.json"</span>) <span class="kw">as</span> f:
+        MODEL[<span class="st">"meta"</span>] <span class="op">=</span> json<span class="op">.</span><span class="fn">load</span>(f)
+    print(<span class="st">"✅ Model loaded"</span>)
+    <span class="kw">yield</span>          <span class="cm"># app runs here</span>
+    MODEL<span class="op">.</span><span class="fn">clear</span>()  <span class="cm"># cleanup on shutdown</span>
+
+app <span class="op">=</span> <span class="fn">FastAPI</span>(
+    title<span class="op">=</span><span class="st">"House Price Prediction API"</span>,
+    version<span class="op">=</span><span class="st">"1.0.0"</span>,
+    lifespan<span class="op">=</span>lifespan
+)
+
+<span class="cm"># ─── Schemas ──────────────────────────────────────────</span>
+<span class="kw">class</span> <span class="dc">HouseFeatures</span>(BaseModel):
+    MedInc:     <span class="fn">float</span> <span class="op">=</span> <span class="fn">Field</span>(..., gt<span class="op">=</span><span class="nm">0</span>,   example<span class="op">=</span><span class="nm">5.5</span>,   description<span class="op">=</span><span class="st">"Median income in $10k"</span>)
+    HouseAge:   <span class="fn">float</span> <span class="op">=</span> <span class="fn">Field</span>(..., ge<span class="op">=</span><span class="nm">0</span>,   example<span class="op">=</span><span class="nm">20.0</span>,  description<span class="op">=</span><span class="st">"Median house age (years)"</span>)
+    AveRooms:   <span class="fn">float</span> <span class="op">=</span> <span class="fn">Field</span>(..., gt<span class="op">=</span><span class="nm">0</span>,   example<span class="op">=</span><span class="nm">5.2</span>,   description<span class="op">=</span><span class="st">"Average rooms per household"</span>)
+    AveBedrms:  <span class="fn">float</span> <span class="op">=</span> <span class="fn">Field</span>(..., gt<span class="op">=</span><span class="nm">0</span>,   example<span class="op">=</span><span class="nm">1.1</span>)
+    Population: <span class="fn">float</span> <span class="op">=</span> <span class="fn">Field</span>(..., gt<span class="op">=</span><span class="nm">0</span>,   example<span class="op">=</span><span class="nm">800.0</span>)
+    AveOccup:   <span class="fn">float</span> <span class="op">=</span> <span class="fn">Field</span>(..., gt<span class="op">=</span><span class="nm">0</span>,   example<span class="op">=</span><span class="nm">3.0</span>)
+    Latitude:   <span class="fn">float</span> <span class="op">=</span> <span class="fn">Field</span>(..., ge<span class="op">=</span><span class="nm">32</span>, le<span class="op">=</span><span class="nm">42</span>, example<span class="op">=</span><span class="nm">37.5</span>)
+    Longitude:  <span class="fn">float</span> <span class="op">=</span> <span class="fn">Field</span>(..., ge<span class="op">=</span><span class="op">-</span><span class="nm">124</span>, le<span class="op">=</span><span class="op">-</span><span class="nm">114</span>, example<span class="op">=</span><span class="op">-</span><span class="nm">122.4</span>)
+
+<span class="kw">class</span> <span class="dc">PredictionResponse</span>(BaseModel):
+    predicted_price_usd: <span class="fn">float</span>
+    predicted_price_100k: <span class="fn">float</span>
+    confidence_note: str
+    model_version: str
+
+<span class="cm"># ─── Routes ───────────────────────────────────────────</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">post</span>(<span class="st">"/predict"</span>,
+    response_model<span class="op">=</span>PredictionResponse,
+    summary<span class="op">=</span><span class="st">"Predict house price"</span>,
+    tags<span class="op">=</span>[<span class="st">"Predictions"</span>])
+<span class="kw">async def</span> <span class="fn">predict_price</span>(features: HouseFeatures):
+    pipeline <span class="op">=</span> MODEL[<span class="st">"pipeline"</span>]
+    meta     <span class="op">=</span> MODEL[<span class="st">"meta"</span>]
+
+    <span class="cm"># Build input array in the EXACT column order the model was trained on</span>
+    X <span class="op">=</span> np<span class="op">.</span><span class="fn">array</span>([[
+        features<span class="op">.</span>MedInc, features<span class="op">.</span>HouseAge, features<span class="op">.</span>AveRooms,
+        features<span class="op">.</span>AveBedrms, features<span class="op">.</span>Population, features<span class="op">.</span>AveOccup,
+        features<span class="op">.</span>Latitude, features<span class="op">.</span>Longitude
+    ]])
+
+    raw <span class="op">=</span> <span class="fn">float</span>(pipeline<span class="op">.</span><span class="fn">predict</span>(X)[<span class="nm">0</span>])
+    <span class="kw">return</span> PredictionResponse(
+        predicted_price_100k<span class="op">=</span><span class="fn">round</span>(raw, <span class="nm">4</span>),
+        predicted_price_usd<span class="op">=</span><span class="fn">round</span>(raw <span class="op">*</span> <span class="nm">100_000</span>, <span class="nm">2</span>),
+        confidence_note<span class="op">=</span><span class="st">"GBR point estimate — no prediction interval"</span>,
+        model_version<span class="op">=</span>meta[<span class="st">"model_version"</span>],
+    )
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">post</span>(<span class="st">"/predict/batch"</span>, summary<span class="op">=</span><span class="st">"Batch predictions"</span>, tags<span class="op">=</span>[<span class="st">"Predictions"</span>])
+<span class="kw">async def</span> <span class="fn">predict_batch</span>(rows: <span class="fn">list</span>[HouseFeatures]):
+    <span class="kw">if</span> <span class="fn">len</span>(rows) <span class="op">></span> <span class="nm">500</span>:
+        <span class="kw">raise</span> <span class="fn">HTTPException</span>(<span class="nm">400</span>, <span class="st">"Batch limit is 500 rows"</span>)
+    pipeline <span class="op">=</span> MODEL[<span class="st">"pipeline"</span>]
+    X <span class="op">=</span> np<span class="op">.</span><span class="fn">array</span>([[
+        r<span class="op">.</span>MedInc, r<span class="op">.</span>HouseAge, r<span class="op">.</span>AveRooms, r<span class="op">.</span>AveBedrms,
+        r<span class="op">.</span>Population, r<span class="op">.</span>AveOccup, r<span class="op">.</span>Latitude, r<span class="op">.</span>Longitude
+    ] <span class="kw">for</span> r <span class="kw">in</span> rows])
+    preds <span class="op">=</span> pipeline<span class="op">.</span><span class="fn">predict</span>(X)
+    <span class="kw">return</span> {<span class="st">"predictions_100k"</span>: [<span class="fn">round</span>(<span class="fn">float</span>(p), <span class="nm">4</span>) <span class="kw">for</span> p <span class="kw">in</span> preds]}
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">get</span>(<span class="st">"/model/info"</span>, tags<span class="op">=</span>[<span class="st">"Model"</span>])
+<span class="kw">async def</span> <span class="fn">model_info</span>():
+    <span class="kw">return</span> MODEL[<span class="st">"meta"</span>]</pre></div>
+      </div>
+
+      <div class="tab-pane" id="reg-schema">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Request &amp; Response Schema Design</h3>
+        <p style="color:var(--ink-70);font-size:.9rem;margin-bottom:1rem">Good schemas do three things: validate input, document the API automatically, and prevent model garbage-in/garbage-out errors.</p>
+        <div class="code-block"><div class="code-header"><span class="code-lang">python — rich schema patterns</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field, field_validator
+<span class="kw">from</span> typing <span class="kw">import</span> Optional, List
+<span class="kw">from</span> enum <span class="kw">import</span> Enum
+
+<span class="cm"># ─── Clean enums beat raw strings ─────────────────────</span>
+<span class="kw">class</span> <span class="dc">Neighbourhood</span>(str, Enum):
+    urban    <span class="op">=</span> <span class="st">"urban"</span>
+    suburban <span class="op">=</span> <span class="st">"suburban"</span>
+    rural    <span class="op">=</span> <span class="st">"rural"</span>
+
+<span class="kw">class</span> <span class="dc">HouseInput</span>(BaseModel):
+    area_sqft:     <span class="fn">float</span> <span class="op">=</span> <span class="fn">Field</span>(..., gt<span class="op">=</span><span class="nm">0</span>, le<span class="op">=</span><span class="nm">20000</span>, example<span class="op">=</span><span class="nm">1400</span>)
+    bedrooms:      int   <span class="op">=</span> <span class="fn">Field</span>(..., ge<span class="op">=</span><span class="nm">1</span>, le<span class="op">=</span><span class="nm">20</span>,    example<span class="op">=</span><span class="nm">3</span>)
+    bathrooms:     <span class="fn">float</span> <span class="op">=</span> <span class="fn">Field</span>(..., ge<span class="op">=</span><span class="nm">0.5</span>,         example<span class="op">=</span><span class="nm">2.0</span>)
+    age_years:     int   <span class="op">=</span> <span class="fn">Field</span>(..., ge<span class="op">=</span><span class="nm">0</span>, le<span class="op">=</span><span class="nm">200</span>)
+    neighbourhood: Neighbourhood <span class="op">=</span> Neighbourhood<span class="op">.</span>suburban
+    has_garage:    bool <span class="op">=</span> <span class="kw">False</span>
+    has_pool:      bool <span class="op">=</span> <span class="kw">False</span>
+
+    <span class="dc">@field_validator</span>(<span class="st">"bathrooms"</span>)
+    <span class="dc">@classmethod</span>
+    <span class="kw">def</span> <span class="fn">bathrooms_reasonable</span>(cls, v, values):
+        bedrooms <span class="op">=</span> values<span class="op">.</span>data<span class="op">.</span><span class="fn">get</span>(<span class="st">"bedrooms"</span>, <span class="nm">1</span>)
+        <span class="kw">if</span> v <span class="op">></span> bedrooms <span class="op">*</span> <span class="nm">2</span>:
+            <span class="kw">raise</span> <span class="fn">ValueError</span>(<span class="st">"bathrooms can't greatly exceed bedrooms"</span>)
+        <span class="kw">return</span> v
+
+<span class="kw">class</span> <span class="dc">PriceResponse</span>(BaseModel):
+    prediction:    <span class="fn">float</span>
+    lower_bound:   Optional[<span class="fn">float</span>] <span class="op">=</span> <span class="kw">None</span>  <span class="cm"># if model supports intervals</span>
+    upper_bound:   Optional[<span class="fn">float</span>] <span class="op">=</span> <span class="kw">None</span>
+    currency:      str <span class="op">=</span> <span class="st">"USD"</span>
+    model_version: str
+    features_used: List[str]  <span class="cm"># transparency: which features mattered</span>
+
+<span class="cm"># ─── Batch schema ─────────────────────────────────────</span>
+<span class="kw">class</span> <span class="dc">BatchRequest</span>(BaseModel):
+    houses:   List[HouseInput] <span class="op">=</span> <span class="fn">Field</span>(..., max_length<span class="op">=</span><span class="nm">500</span>)
+    include_intervals: bool <span class="op">=</span> <span class="kw">False</span>
+
+<span class="kw">class</span> <span class="dc">BatchResponse</span>(BaseModel):
+    predictions: List[<span class="fn">float</span>]
+    count: int
+    model_version: str</pre></div>
+        <div class="info-box"><p>💡 <strong>Pro tip:</strong> Use Enums for categorical features — they prevent typos, show up in the auto-docs dropdown, and let you detect training/serving skew at schema validation time rather than at model inference.</p></div>
+      </div>
+
+      <div class="tab-pane" id="reg-test">
+        <div class="code-block"><div class="code-header"><span class="code-lang">python — test_regression_api.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><span class="kw">from</span> fastapi.testclient <span class="kw">import</span> TestClient
+<span class="kw">from</span> app <span class="kw">import</span> app
+client <span class="op">=</span> <span class="fn">TestClient</span>(app)
+
+VALID_HOUSE <span class="op">=</span> {
+    <span class="st">"MedInc"</span>: <span class="nm">5.5</span>, <span class="st">"HouseAge"</span>: <span class="nm">20.0</span>, <span class="st">"AveRooms"</span>: <span class="nm">5.2</span>,
+    <span class="st">"AveBedrms"</span>: <span class="nm">1.1</span>, <span class="st">"Population"</span>: <span class="nm">800.0</span>, <span class="st">"AveOccup"</span>: <span class="nm">3.0</span>,
+    <span class="st">"Latitude"</span>: <span class="nm">37.5</span>, <span class="st">"Longitude"</span>: <span class="op">-</span><span class="nm">122.4</span>
+}
+
+<span class="kw">def</span> <span class="fn">test_predict_returns_float</span>():
+    r <span class="op">=</span> client<span class="op">.</span><span class="fn">post</span>(<span class="st">"/predict"</span>, json<span class="op">=</span>VALID_HOUSE)
+    <span class="kw">assert</span> r<span class="op">.</span>status_code <span class="op">==</span> <span class="nm">200</span>
+    data <span class="op">=</span> r<span class="op">.</span><span class="fn">json</span>()
+    <span class="kw">assert</span> <span class="fn">isinstance</span>(data[<span class="st">"predicted_price_usd"</span>], <span class="fn">float</span>)
+    <span class="kw">assert</span> data[<span class="st">"predicted_price_usd"</span>] <span class="op">></span> <span class="nm">0</span>
+
+<span class="kw">def</span> <span class="fn">test_predict_rejects_negative_income</span>():
+    bad <span class="op">=</span> {<span class="op">**</span>VALID_HOUSE, <span class="st">"MedInc"</span>: <span class="op">-</span><span class="nm">1</span>}
+    r <span class="op">=</span> client<span class="op">.</span><span class="fn">post</span>(<span class="st">"/predict"</span>, json<span class="op">=</span>bad)
+    <span class="kw">assert</span> r<span class="op">.</span>status_code <span class="op">==</span> <span class="nm">422</span>
+
+<span class="kw">def</span> <span class="fn">test_predict_batch_limit</span>():
+    r <span class="op">=</span> client<span class="op">.</span><span class="fn">post</span>(<span class="st">"/predict/batch"</span>, json<span class="op">=</span>[VALID_HOUSE] <span class="op">*</span> <span class="nm">501</span>)
+    <span class="kw">assert</span> r<span class="op">.</span>status_code <span class="op">==</span> <span class="nm">400</span>
+
+<span class="kw">def</span> <span class="fn">test_sanity_high_income_predicts_higher_price</span>():
+    <span class="cm"># Domain logic check — not just HTTP 200</span>
+    low  <span class="op">=</span> client<span class="op">.</span><span class="fn">post</span>(<span class="st">"/predict"</span>, json<span class="op">=</span>{<span class="op">**</span>VALID_HOUSE, <span class="st">"MedInc"</span>: <span class="nm">1.0</span>})<span class="op">.</span><span class="fn">json</span>()
+    high <span class="op">=</span> client<span class="op">.</span><span class="fn">post</span>(<span class="st">"/predict"</span>, json<span class="op">=</span>{<span class="op">**</span>VALID_HOUSE, <span class="st">"MedInc"</span>: <span class="nm">10.0</span>})<span class="op">.</span><span class="fn">json</span>()
+    <span class="kw">assert</span> high[<span class="st">"predicted_price_usd"</span>] <span class="op">></span> low[<span class="st">"predicted_price_usd"</span>]</pre></div>
+        <div class="tip-box"><p>🎯 <strong>Sanity tests matter more than you think.</strong> Always add at least one domain-logic test (higher income → higher predicted price). It catches silent bugs where the model predicts correctly but returns the wrong field, or scaling was applied twice.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ CLASSIFICATION ══════════════ -->
+  <div class="fw-pane" id="ml-classification">
+    <div class="tab-container">
+      <div class="tab-header">
+        <button class="tab-btn active" onclick="switchTab('clf','train',this)">Train &amp; Save</button>
+        <button class="tab-btn" onclick="switchTab('clf','serve',this)">FastAPI Endpoint</button>
+        <button class="tab-btn" onclick="switchTab('clf','multiclass',this)">Multi-Class</button>
+        <button class="tab-btn" onclick="switchTab('clf','threshold',this)">Threshold Tuning</button>
+      </div>
+
+      <div class="tab-pane active" id="clf-train">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Customer Churn Classifier — Train &amp; Save</h3>
+        <div class="code-block"><div class="code-header"><span class="code-lang">python — train_classifier.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler, LabelEncoder
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+<span class="kw">from</span> sklearn.compose <span class="kw">import</span> ColumnTransformer
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> classification_report, roc_auc_score
+<span class="kw">import</span> joblib
+
+<span class="cm"># Simulated churn dataset</span>
+df <span class="op">=</span> pd<span class="op">.</span><span class="fn">read_csv</span>(<span class="st">"churn.csv"</span>)
+X <span class="op">=</span> df<span class="op">.</span><span class="fn">drop</span>(columns<span class="op">=</span>[<span class="st">"churn"</span>])
+y <span class="op">=</span> df[<span class="st">"churn"</span>]  <span class="cm"># 0 = retained, 1 = churned</span>
+
+numeric_features  <span class="op">=</span> [<span class="st">"tenure"</span>, <span class="st">"monthly_charges"</span>, <span class="st">"total_charges"</span>, <span class="st">"num_products"</span>]
+categorical_features <span class="op">=</span> [<span class="st">"contract_type"</span>, <span class="st">"payment_method"</span>]
+
+preprocessor <span class="op">=</span> <span class="fn">ColumnTransformer</span>([
+    (<span class="st">"num"</span>,  <span class="fn">StandardScaler</span>(), numeric_features),
+    (<span class="st">"cat"</span>,  <span class="st">"passthrough"</span>,  categorical_features),
+])
+
+pipeline <span class="op">=</span> <span class="fn">Pipeline</span>([
+    (<span class="st">"prep"</span>,  preprocessor),
+    (<span class="st">"model"</span>, <span class="fn">RandomForestClassifier</span>(
+        n_estimators<span class="op">=</span><span class="nm">300</span>, class_weight<span class="op">=</span><span class="st">"balanced"</span>,
+        max_depth<span class="op">=</span><span class="nm">8</span>, random_state<span class="op">=</span><span class="nm">42</span>
+    ))
+])
+
+X_train, X_test, y_train, y_test <span class="op">=</span> <span class="fn">train_test_split</span>(X, y, test_size<span class="op">=</span><span class="nm">0.2</span>, random_state<span class="op">=</span><span class="nm">42</span>, stratify<span class="op">=</span>y)
+pipeline<span class="op">.</span><span class="fn">fit</span>(X_train, y_train)
+
+probs <span class="op">=</span> pipeline<span class="op">.</span><span class="fn">predict_proba</span>(X_test)[:, <span class="nm">1</span>]
+print(<span class="st">"AUC-ROC:"</span>, <span class="fn">round</span>(<span class="fn">roc_auc_score</span>(y_test, probs), <span class="nm">4</span>))
+print(<span class="fn">classification_report</span>(y_test, pipeline<span class="op">.</span><span class="fn">predict</span>(X_test)))
+
+<span class="cm"># ─── Save the pipeline and class labels ───────────────</span>
+joblib<span class="op">.</span><span class="fn">dump</span>(pipeline, <span class="st">"models/churn_pipeline.joblib"</span>)
+joblib<span class="op">.</span><span class="fn">dump</span>(pipeline<span class="op">.</span>classes_, <span class="st">"models/churn_classes.joblib"</span>)</pre></div>
+      </div>
+
+      <div class="tab-pane" id="clf-serve">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Classification API — Probabilities + Decision</h3>
+        <div class="code-block"><div class="code-header"><span class="code-lang">python — churn_api.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field
+<span class="kw">from</span> enum <span class="kw">import</span> Enum
+<span class="kw">from</span> contextlib <span class="kw">import</span> asynccontextmanager
+<span class="kw">import</span> joblib, numpy <span class="kw">as</span> np
+
+<span class="kw">class</span> <span class="dc">ContractType</span>(str, Enum):
+    month_to_month <span class="op">=</span> <span class="st">"Month-to-month"</span>
+    one_year       <span class="op">=</span> <span class="st">"One year"</span>
+    two_year       <span class="op">=</span> <span class="st">"Two year"</span>
+
+<span class="kw">class</span> <span class="dc">ChurnInput</span>(BaseModel):
+    tenure:          int   <span class="op">=</span> <span class="fn">Field</span>(..., ge<span class="op">=</span><span class="nm">0</span>,  example<span class="op">=</span><span class="nm">24</span>, description<span class="op">=</span><span class="st">"Months with company"</span>)
+    monthly_charges: <span class="fn">float</span> <span class="op">=</span> <span class="fn">Field</span>(..., gt<span class="op">=</span><span class="nm">0</span>,  example<span class="op">=</span><span class="nm">65.50</span>)
+    total_charges:   <span class="fn">float</span> <span class="op">=</span> <span class="fn">Field</span>(..., ge<span class="op">=</span><span class="nm">0</span>,  example<span class="op">=</span><span class="nm">1571.0</span>)
+    num_products:    int   <span class="op">=</span> <span class="fn">Field</span>(..., ge<span class="op">=</span><span class="nm">1</span>, le<span class="op">=</span><span class="nm">8</span>, example<span class="op">=</span><span class="nm">2</span>)
+    contract_type:   ContractType <span class="op">=</span> ContractType<span class="op">.</span>month_to_month
+    payment_method:  str  <span class="op">=</span> <span class="fn">Field</span>(example<span class="op">=</span><span class="st">"Electronic check"</span>)
+
+<span class="kw">class</span> <span class="dc">ChurnResponse</span>(BaseModel):
+    churn_probability: <span class="fn">float</span>    <span class="cm"># P(churn) — always expose this!</span>
+    retain_probability: <span class="fn">float</span>
+    prediction: str              <span class="cm"># "churn" | "retain"</span>
+    risk_level: str              <span class="cm"># "high" | "medium" | "low"</span>
+    threshold_used: <span class="fn">float</span>
+    recommended_action: str
+
+MODEL <span class="op">=</span> {}
+THRESHOLD <span class="op">=</span> <span class="nm">0.45</span>  <span class="cm"># tuned on validation set — lower = more sensitive to churn</span>
+
+<span class="dc">@asynccontextmanager</span>
+<span class="kw">async def</span> <span class="fn">lifespan</span>(app):
+    MODEL[<span class="st">"pipeline"</span>] <span class="op">=</span> joblib<span class="op">.</span><span class="fn">load</span>(<span class="st">"models/churn_pipeline.joblib"</span>)
+    <span class="kw">yield</span>
+
+app <span class="op">=</span> <span class="fn">FastAPI</span>(title<span class="op">=</span><span class="st">"Churn Prediction API"</span>, lifespan<span class="op">=</span>lifespan)
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">post</span>(<span class="st">"/predict/churn"</span>, response_model<span class="op">=</span>ChurnResponse)
+<span class="kw">async def</span> <span class="fn">predict_churn</span>(customer: ChurnInput):
+    X <span class="op">=</span> [[
+        customer<span class="op">.</span>tenure, customer<span class="op">.</span>monthly_charges,
+        customer<span class="op">.</span>total_charges, customer<span class="op">.</span>num_products,
+        customer<span class="op">.</span>contract_type<span class="op">.</span>value, customer<span class="op">.</span>payment_method
+    ]]
+    probs <span class="op">=</span> MODEL[<span class="st">"pipeline"</span>]<span class="op">.</span><span class="fn">predict_proba</span>(X)[<span class="nm">0</span>]
+    churn_prob <span class="op">=</span> <span class="fn">float</span>(probs[<span class="nm">1</span>])  <span class="cm"># index 1 = churn class</span>
+    will_churn <span class="op">=</span> churn_prob <span class="op">>=</span> THRESHOLD
+
+    <span class="cm"># Business logic layered on top of the model</span>
+    risk <span class="op">=</span> <span class="st">"high"</span> <span class="kw">if</span> churn_prob <span class="op">>=</span> <span class="nm">0.7</span> <span class="kw">else</span> <span class="st">"medium"</span> <span class="kw">if</span> churn_prob <span class="op">>=</span> <span class="nm">0.45</span> <span class="kw">else</span> <span class="st">"low"</span>
+    actions <span class="op">=</span> {
+        <span class="st">"high"</span>:   <span class="st">"Trigger retention call — offer discount or upgrade"</span>,
+        <span class="st">"medium"</span>: <span class="st">"Send personalised email with loyalty offer"</span>,
+        <span class="st">"low"</span>:    <span class="st">"No action needed — customer is stable"</span>,
+    }
+    <span class="kw">return</span> ChurnResponse(
+        churn_probability<span class="op">=</span><span class="fn">round</span>(churn_prob, <span class="nm">4</span>),
+        retain_probability<span class="op">=</span><span class="fn">round</span>(<span class="nm">1</span> <span class="op">-</span> churn_prob, <span class="nm">4</span>),
+        prediction<span class="op">=</span><span class="st">"churn"</span> <span class="kw">if</span> will_churn <span class="kw">else</span> <span class="st">"retain"</span>,
+        risk_level<span class="op">=</span>risk,
+        threshold_used<span class="op">=</span>THRESHOLD,
+        recommended_action<span class="op">=</span>actions[risk],
+    )</pre></div>
+        <div class="fun-fact"><div class="fun-fact-icon">📊</div><div class="fun-fact-body"><div class="fun-fact-label">Always return probabilities</div><p>Never return just "churn: true/false". Return the raw probability (<code>churn_probability: 0.73</code>). Downstream systems can apply their own thresholds, build alerts based on risk bands, or display a confidence bar in the UI. A binary yes/no throws away valuable calibration information.</p></div></div>
+      </div>
+
+      <div class="tab-pane" id="clf-multiclass">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Multi-Class Classification — Product Category</h3>
+        <div class="code-block"><div class="code-header"><span class="code-lang">python — multiclass_api.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
+<span class="kw">from</span> typing <span class="kw">import</span> List, Dict
+<span class="kw">import</span> joblib, numpy <span class="kw">as</span> np
+
+app <span class="op">=</span> <span class="fn">FastAPI</span>()
+
+<span class="kw">class</span> <span class="dc">TextInput</span>(BaseModel):
+    text: str
+    top_k: int <span class="op">=</span> <span class="nm">3</span>  <span class="cm"># return top 3 classes with probabilities</span>
+
+<span class="kw">class</span> <span class="dc">ClassProbability</span>(BaseModel):
+    label: str
+    probability: <span class="fn">float</span>
+
+<span class="kw">class</span> <span class="dc">MultiClassResponse</span>(BaseModel):
+    predicted_class: str
+    confidence: <span class="fn">float</span>
+    top_classes: List[ClassProbability]
+    is_confident: bool  <span class="cm"># True if confidence &gt; 0.7</span>
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">post</span>(<span class="st">"/classify"</span>, response_model<span class="op">=</span>MultiClassResponse)
+<span class="kw">async def</span> <span class="fn">classify</span>(inp: TextInput):
+    pipeline <span class="op">=</span> MODEL[<span class="st">"pipeline"</span>]
+    classes  <span class="op">=</span> MODEL[<span class="st">"classes"</span>]   <span class="cm"># e.g. ["electronics","books","clothing",...]</span>
+
+    probs <span class="op">=</span> pipeline<span class="op">.</span><span class="fn">predict_proba</span>([inp<span class="op">.</span>text])[<span class="nm">0</span>]
+    top_idx <span class="op">=</span> np<span class="op">.</span><span class="fn">argsort</span>(probs)[::<span class="op">-</span><span class="nm">1</span>][<span class="op">:</span>inp<span class="op">.</span>top_k]
+    best_idx <span class="op">=</span> int(np<span class="op">.</span><span class="fn">argmax</span>(probs))
+
+    <span class="kw">return</span> MultiClassResponse(
+        predicted_class<span class="op">=</span>classes[best_idx],
+        confidence<span class="op">=</span><span class="fn">round</span>(<span class="fn">float</span>(probs[best_idx]), <span class="nm">4</span>),
+        top_classes<span class="op">=</span>[
+            <span class="fn">ClassProbability</span>(label<span class="op">=</span>classes[i], probability<span class="op">=</span><span class="fn">round</span>(<span class="fn">float</span>(probs[i]), <span class="nm">4</span>))
+            <span class="kw">for</span> i <span class="kw">in</span> top_idx
+        ],
+        is_confident<span class="op">=</span><span class="fn">float</span>(probs[best_idx]) <span class="op">>=</span> <span class="nm">0.70</span>,
+    )
+
+<span class="cm"># Example response:</span>
+<span class="cm"># {</span>
+<span class="cm">#   "predicted_class": "electronics",</span>
+<span class="cm">#   "confidence": 0.8731,</span>
+<span class="cm">#   "top_classes": [</span>
+<span class="cm">#     {"label": "electronics", "probability": 0.8731},</span>
+<span class="cm">#     {"label": "computers",   "probability": 0.0912},</span>
+<span class="cm">#     {"label": "accessories", "probability": 0.0231}</span>
+<span class="cm">#   ],</span>
+<span class="cm">#   "is_confident": true</span>
+<span class="cm"># }</span></pre></div>
+      </div>
+
+      <div class="tab-pane" id="clf-threshold">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Threshold Tuning via API Parameter</h3>
+        <div class="code-block"><div class="code-header"><span class="code-lang">python — dynamic threshold endpoint</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, Query
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field
+
+app <span class="op">=</span> <span class="fn">FastAPI</span>()
+
+<span class="cm"># Allow callers to pass their own threshold</span>
+<span class="cm"># Great for A/B testing different decision boundaries</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">post</span>(<span class="st">"/predict/churn"</span>)
+<span class="kw">async def</span> <span class="fn">predict_with_threshold</span>(
+    customer: ChurnInput,
+    threshold: <span class="fn">float</span> <span class="op">=</span> <span class="fn">Query</span>(<span class="nm">0.45</span>, ge<span class="op">=</span><span class="nm">0.0</span>, le<span class="op">=</span><span class="nm">1.0</span>, description<span class="op">=</span><span class="st">"Decision threshold (default 0.45)"</span>),
+):
+    probs <span class="op">=</span> MODEL[<span class="st">"pipeline"</span>]<span class="op">.</span><span class="fn">predict_proba</span>([customer<span class="op">.</span><span class="fn">dict</span>()<span class="op">.</span><span class="fn">values</span>()])[<span class="nm">0</span>]
+    churn_prob <span class="op">=</span> <span class="fn">float</span>(probs[<span class="nm">1</span>])
+    <span class="kw">return</span> {
+        <span class="st">"churn_probability"</span>: <span class="fn">round</span>(churn_prob, <span class="nm">4</span>),
+        <span class="st">"prediction"</span>: <span class="st">"churn"</span> <span class="kw">if</span> churn_prob <span class="op">>=</span> threshold <span class="kw">else</span> <span class="st">"retain"</span>,
+        <span class="st">"threshold_used"</span>: threshold,
+    }
+
+<span class="cm"># Usage:</span>
+<span class="cm"># POST /predict/churn?threshold=0.6  ← conservative (fewer false alarms)</span>
+<span class="cm"># POST /predict/churn?threshold=0.3  ← aggressive (catch more churners)</span>
+
+<span class="cm"># Why tune thresholds?</span>
+<span class="cm"># Precision vs Recall tradeoff:</span>
+<span class="cm"># - High threshold → fewer false positives (only call very-likely churners)</span>
+<span class="cm"># - Low threshold  → fewer false negatives (catch more churners, more false alarms)</span>
+<span class="cm"># Right answer depends on cost of a missed churn vs cost of an unwanted call.</span></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ CLUSTERING ══════════════ -->
+  <div class="fw-pane" id="ml-clustering">
+    <div class="tab-container">
+      <div class="tab-header">
+        <button class="tab-btn active" onclick="switchTab('clus','train',this)">Train &amp; Save</button>
+        <button class="tab-btn" onclick="switchTab('clus','serve',this)">Assign &amp; Describe</button>
+        <button class="tab-btn" onclick="switchTab('clus','anomaly',this)">Anomaly Detection</button>
+      </div>
+
+      <div class="tab-pane active" id="clus-train">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Customer Segmentation with K-Means</h3>
+        <div class="code-block"><div class="code-header"><span class="code-lang">python — train_clustering.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><span class="kw">import</span> pandas <span class="kw">as</span> pd, numpy <span class="kw">as</span> np, joblib, json
+<span class="kw">from</span> sklearn.cluster <span class="kw">import</span> KMeans
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+
+df <span class="op">=</span> pd<span class="op">.</span><span class="fn">read_csv</span>(<span class="st">"customers.csv"</span>)
+FEATURES <span class="op">=</span> [<span class="st">"recency_days"</span>, <span class="st">"frequency"</span>, <span class="st">"monetary_value"</span>]
+X <span class="op">=</span> df[FEATURES]
+
+pipeline <span class="op">=</span> <span class="fn">Pipeline</span>([
+    (<span class="st">"scaler"</span>, <span class="fn">StandardScaler</span>()),
+    (<span class="st">"kmeans"</span>, <span class="fn">KMeans</span>(n_clusters<span class="op">=</span><span class="nm">4</span>, random_state<span class="op">=</span><span class="nm">42</span>, n_init<span class="op">=</span><span class="st">"auto"</span>))
+])
+pipeline<span class="op">.</span><span class="fn">fit</span>(X)
+
+labels <span class="op">=</span> pipeline<span class="op">.</span><span class="fn">predict</span>(X)
+df[<span class="st">"segment"</span>] <span class="op">=</span> labels
+
+<span class="cm"># ─── Human-readable segment names ─────────────────────</span>
+<span class="cm"># Compute cluster centroids (in original scale) to name them</span>
+centroids_scaled <span class="op">=</span> pipeline<span class="op">.</span>named_steps[<span class="st">"kmeans"</span>]<span class="op">.</span>cluster_centers_
+centroids <span class="op">=</span> pipeline<span class="op">.</span>named_steps[<span class="st">"scaler"</span>]<span class="op">.</span><span class="fn">inverse_transform</span>(centroids_scaled)
+
+<span class="cm"># Rank by monetary value → name segments</span>
+ranking <span class="op">=</span> centroids[:, <span class="nm">2</span>]<span class="op">.</span><span class="fn">argsort</span>()[::<span class="op">-</span><span class="nm">1</span>]
+segment_names <span class="op">=</span> {}
+names <span class="op">=</span> [<span class="st">"Champions"</span>, <span class="st">"Loyal Customers"</span>, <span class="st">"At Risk"</span>, <span class="st">"Lost"</span>]
+<span class="kw">for</span> rank, cluster_id <span class="kw">in</span> <span class="fn">enumerate</span>(ranking):
+    segment_names[int(cluster_id)] <span class="op">=</span> names[rank]
+
+joblib<span class="op">.</span><span class="fn">dump</span>(pipeline, <span class="st">"models/segmentation_pipeline.joblib"</span>)
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"models/segment_names.json"</span>, <span class="st">"w"</span>) <span class="kw">as</span> f:
+    json<span class="op">.</span><span class="fn">dump</span>({<span class="st">"names"</span>: segment_names, <span class="st">"features"</span>: FEATURES}, f)
+print(<span class="st">"✅ Saved. Segments:"</span>, segment_names)</pre></div>
+      </div>
+
+      <div class="tab-pane" id="clus-serve">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Cluster Assignment API</h3>
+        <div class="code-block"><div class="code-header"><span class="code-lang">python — segmentation_api.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field
+<span class="kw">from</span> contextlib <span class="kw">import</span> asynccontextmanager
+<span class="kw">from</span> typing <span class="kw">import</span> List
+<span class="kw">import</span> joblib, numpy <span class="kw">as</span> np, json
+
+MODEL <span class="op">=</span> {}
+
+<span class="dc">@asynccontextmanager</span>
+<span class="kw">async def</span> <span class="fn">lifespan</span>(app):
+    MODEL[<span class="st">"pipeline"</span>] <span class="op">=</span> joblib<span class="op">.</span><span class="fn">load</span>(<span class="st">"models/segmentation_pipeline.joblib"</span>)
+    <span class="kw">with</span> <span class="fn">open</span>(<span class="st">"models/segment_names.json"</span>) <span class="kw">as</span> f:
+        meta <span class="op">=</span> json<span class="op">.</span><span class="fn">load</span>(f)
+    MODEL[<span class="st">"names"</span>] <span class="op">=</span> {int(k): v <span class="kw">for</span> k, v <span class="kw">in</span> meta[<span class="st">"names"</span>]<span class="op">.</span><span class="fn">items</span>()}
+    <span class="kw">yield</span>
+
+app <span class="op">=</span> <span class="fn">FastAPI</span>(title<span class="op">=</span><span class="st">"Customer Segmentation API"</span>, lifespan<span class="op">=</span>lifespan)
+
+<span class="kw">class</span> <span class="dc">CustomerRFM</span>(BaseModel):
+    recency_days:    int   <span class="op">=</span> <span class="fn">Field</span>(..., ge<span class="op">=</span><span class="nm">0</span>,  example<span class="op">=</span><span class="nm">14</span>,     description<span class="op">=</span><span class="st">"Days since last purchase"</span>)
+    frequency:       int   <span class="op">=</span> <span class="fn">Field</span>(..., ge<span class="op">=</span><span class="nm">1</span>,  example<span class="op">=</span><span class="nm">8</span>,      description<span class="op">=</span><span class="st">"Total purchases in 12 months"</span>)
+    monetary_value:  <span class="fn">float</span> <span class="op">=</span> <span class="fn">Field</span>(..., ge<span class="op">=</span><span class="nm">0</span>,  example<span class="op">=</span><span class="nm">340.5</span>,  description<span class="op">=</span><span class="st">"Total spend in USD"</span>)
+
+<span class="kw">class</span> <span class="dc">SegmentResponse</span>(BaseModel):
+    cluster_id:   int
+    segment_name: str
+    description:  str
+    distances_to_all_clusters: List[<span class="fn">float</span>]  <span class="cm"># transparency</span>
+
+DESCRIPTIONS <span class="op">=</span> {
+    <span class="st">"Champions"</span>:       <span class="st">"Bought recently, buys often, high spender. Reward them!"</span>,
+    <span class="st">"Loyal Customers"</span>: <span class="st">"Regular buyers, moderate spend. Upsell opportunity."</span>,
+    <span class="st">"At Risk"</span>:         <span class="st">"Was a good customer, hasn't purchased recently. Win-back campaign!"</span>,
+    <span class="st">"Lost"</span>:            <span class="st">"Low recency, frequency, and spend. Low-cost reactivation attempt only."</span>,
+}
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">post</span>(<span class="st">"/segment"</span>, response_model<span class="op">=</span>SegmentResponse)
+<span class="kw">async def</span> <span class="fn">segment_customer</span>(customer: CustomerRFM):
+    pipeline  <span class="op">=</span> MODEL[<span class="st">"pipeline"</span>]
+    X <span class="op">=</span> np<span class="op">.</span><span class="fn">array</span>([[customer<span class="op">.</span>recency_days, customer<span class="op">.</span>frequency, customer<span class="op">.</span>monetary_value]])
+
+    cluster_id <span class="op">=</span> int(pipeline<span class="op">.</span><span class="fn">predict</span>(X)[<span class="nm">0</span>])
+
+    <span class="cm"># Distance to each cluster centre (lower = closer match)</span>
+    X_scaled <span class="op">=</span> pipeline<span class="op">.</span>named_steps[<span class="st">"scaler"</span>]<span class="op">.</span><span class="fn">transform</span>(X)
+    kmeans   <span class="op">=</span> pipeline<span class="op">.</span>named_steps[<span class="st">"kmeans"</span>]
+    distances <span class="op">=</span> [<span class="fn">round</span>(<span class="fn">float</span>(d), <span class="nm">4</span>) <span class="kw">for</span> d <span class="kw">in</span> kmeans<span class="op">.</span><span class="fn">transform</span>(X_scaled)[<span class="nm">0</span>]]
+
+    name <span class="op">=</span> MODEL[<span class="st">"names"</span>][cluster_id]
+    <span class="kw">return</span> SegmentResponse(
+        cluster_id<span class="op">=</span>cluster_id,
+        segment_name<span class="op">=</span>name,
+        description<span class="op">=</span>DESCRIPTIONS[name],
+        distances_to_all_clusters<span class="op">=</span>distances,
+    )
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">get</span>(<span class="st">"/segments"</span>)
+<span class="kw">async def</span> <span class="fn">list_segments</span>():
+    <span class="cm"># Useful for UI dropdowns and documentation</span>
+    <span class="kw">return</span> {k: {<span class="st">"name"</span>: v, <span class="st">"description"</span>: DESCRIPTIONS[v]}
+            <span class="kw">for</span> k, v <span class="kw">in</span> MODEL[<span class="st">"names"</span>]<span class="op">.</span><span class="fn">items</span>()}</pre></div>
+      </div>
+
+      <div class="tab-pane" id="clus-anomaly">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Anomaly Detection with Isolation Forest</h3>
+        <div class="code-block"><div class="code-header"><span class="code-lang">python — anomaly_api.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> IsolationForest
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field
+<span class="kw">import</span> joblib, numpy <span class="kw">as</span> np
+
+<span class="cm"># ─── Train on normal transaction data ─────────────────</span>
+pipeline <span class="op">=</span> <span class="fn">Pipeline</span>([
+    (<span class="st">"scaler"</span>, <span class="fn">StandardScaler</span>()),
+    (<span class="st">"iso"</span>,    <span class="fn">IsolationForest</span>(
+        contamination<span class="op">=</span><span class="nm">0.01</span>,  <span class="cm"># expect ~1% anomalies</span>
+        n_estimators<span class="op">=</span><span class="nm">200</span>, random_state<span class="op">=</span><span class="nm">42</span>
+    ))
+])
+pipeline<span class="op">.</span><span class="fn">fit</span>(X_train_normal)
+joblib<span class="op">.</span><span class="fn">dump</span>(pipeline, <span class="st">"models/anomaly_detector.joblib"</span>)
+
+<span class="cm"># ─── API ──────────────────────────────────────────────</span>
+app <span class="op">=</span> <span class="fn">FastAPI</span>(title<span class="op">=</span><span class="st">"Transaction Anomaly Detection"</span>)
+
+<span class="kw">class</span> <span class="dc">Transaction</span>(BaseModel):
+    amount:         <span class="fn">float</span> <span class="op">=</span> <span class="fn">Field</span>(..., gt<span class="op">=</span><span class="nm">0</span>, example<span class="op">=</span><span class="nm">8500.00</span>)
+    hour_of_day:    int   <span class="op">=</span> <span class="fn">Field</span>(..., ge<span class="op">=</span><span class="nm">0</span>, le<span class="op">=</span><span class="nm">23</span>)
+    day_of_week:    int   <span class="op">=</span> <span class="fn">Field</span>(..., ge<span class="op">=</span><span class="nm">0</span>, le<span class="op">=</span><span class="nm">6</span>)
+    merchant_cat:   int   <span class="op">=</span> <span class="fn">Field</span>(..., ge<span class="op">=</span><span class="nm">0</span>)
+    distance_km:    <span class="fn">float</span> <span class="op">=</span> <span class="fn">Field</span>(..., ge<span class="op">=</span><span class="nm">0</span>)
+
+<span class="kw">class</span> <span class="dc">AnomalyResult</span>(BaseModel):
+    is_anomaly:   bool
+    anomaly_score: <span class="fn">float</span>  <span class="cm"># more negative = more anomalous</span>
+    action:       str
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">post</span>(<span class="st">"/detect"</span>, response_model<span class="op">=</span>AnomalyResult)
+<span class="kw">async def</span> <span class="fn">detect_anomaly</span>(txn: Transaction):
+    X <span class="op">=</span> np<span class="op">.</span><span class="fn">array</span>([[txn<span class="op">.</span>amount, txn<span class="op">.</span>hour_of_day, txn<span class="op">.</span>day_of_week,
+                    txn<span class="op">.</span>merchant_cat, txn<span class="op">.</span>distance_km]])
+    pipeline  <span class="op">=</span> MODEL[<span class="st">"pipeline"</span>]
+    score <span class="op">=</span> <span class="fn">float</span>(pipeline<span class="op">.</span>named_steps[<span class="st">"iso"</span>]<span class="op">.</span><span class="fn">score_samples</span>(
+        pipeline<span class="op">.</span>named_steps[<span class="st">"scaler"</span>]<span class="op">.</span><span class="fn">transform</span>(X)
+    )[<span class="nm">0</span>])
+    is_anomaly <span class="op">=</span> <span class="fn">bool</span>(pipeline<span class="op">.</span><span class="fn">predict</span>(X)[<span class="nm">0</span>] <span class="op">==</span> <span class="op">-</span><span class="nm">1</span>)
+    <span class="kw">return</span> AnomalyResult(
+        is_anomaly<span class="op">=</span>is_anomaly,
+        anomaly_score<span class="op">=</span><span class="fn">round</span>(score, <span class="nm">4</span>),
+        action<span class="op">=</span><span class="st">"Block and alert fraud team"</span> <span class="kw">if</span> is_anomaly <span class="kw">else</span> <span class="st">"Approve transaction"</span>,
+    )</pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ NLP ══════════════ -->
+  <div class="fw-pane" id="ml-nlp">
+    <div class="tab-container">
+      <div class="tab-header">
+        <button class="tab-btn active" onclick="switchTab('nlp','sentiment',this)">Sentiment</button>
+        <button class="tab-btn" onclick="switchTab('nlp','tfidf',this)">TF-IDF Classifier</button>
+        <button class="tab-btn" onclick="switchTab('nlp','streaming',this)">Streaming Response</button>
+      </div>
+
+      <div class="tab-pane active" id="nlp-sentiment">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Sentiment Analysis API</h3>
+        <div class="code-block"><div class="code-header"><span class="code-lang">python — sentiment_api.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, HTTPException
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field
+<span class="kw">from</span> transformers <span class="kw">import</span> pipeline <span class="kw">as</span> hf_pipeline
+<span class="kw">from</span> contextlib <span class="kw">import</span> asynccontextmanager
+<span class="kw">from</span> typing <span class="kw">import</span> List
+<span class="kw">import</span> torch
+
+MODEL <span class="op">=</span> {}
+
+<span class="dc">@asynccontextmanager</span>
+<span class="kw">async def</span> <span class="fn">lifespan</span>(app):
+    device <span class="op">=</span> <span class="nm">0</span> <span class="kw">if</span> torch<span class="op">.</span>cuda<span class="op">.</span><span class="fn">is_available</span>() <span class="kw">else</span> <span class="op">-</span><span class="nm">1</span>
+    MODEL[<span class="st">"pipe"</span>] <span class="op">=</span> <span class="fn">hf_pipeline</span>(
+        <span class="st">"sentiment-analysis"</span>,
+        model<span class="op">=</span><span class="st">"distilbert-base-uncased-finetuned-sst-2-english"</span>,
+        device<span class="op">=</span>device
+    )
+    print(<span class="fn">f</span><span class="st">"✅ Sentiment model loaded (device={device})"</span>)
+    <span class="kw">yield</span>
+
+app <span class="op">=</span> <span class="fn">FastAPI</span>(title<span class="op">=</span><span class="st">"Sentiment Analysis API"</span>, lifespan<span class="op">=</span>lifespan)
+
+<span class="kw">class</span> <span class="dc">TextRequest</span>(BaseModel):
+    text: str <span class="op">=</span> <span class="fn">Field</span>(..., min_length<span class="op">=</span><span class="nm">1</span>, max_length<span class="op">=</span><span class="nm">512</span>, example<span class="op">=</span><span class="st">"I absolutely love this product!"</span>)
+
+<span class="kw">class</span> <span class="dc">BatchTextRequest</span>(BaseModel):
+    texts: List[str] <span class="op">=</span> <span class="fn">Field</span>(..., max_length<span class="op">=</span><span class="nm">100</span>)
+
+<span class="kw">class</span> <span class="dc">SentimentResult</span>(BaseModel):
+    label: str       <span class="cm"># "POSITIVE" | "NEGATIVE"</span>
+    score: <span class="fn">float</span>    <span class="cm"># confidence 0.0 → 1.0</span>
+    text_preview: str
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">post</span>(<span class="st">"/sentiment"</span>, response_model<span class="op">=</span>SentimentResult)
+<span class="kw">async def</span> <span class="fn">analyse_sentiment</span>(req: TextRequest):
+    result <span class="op">=</span> MODEL[<span class="st">"pipe"</span>](req<span class="op">.</span>text)[<span class="nm">0</span>]
+    <span class="kw">return</span> SentimentResult(
+        label<span class="op">=</span>result[<span class="st">"label"</span>],
+        score<span class="op">=</span><span class="fn">round</span>(result[<span class="st">"score"</span>], <span class="nm">4</span>),
+        text_preview<span class="op">=</span>req<span class="op">.</span>text[:<span class="nm">80</span>] <span class="op">+</span> (<span class="st">"..."</span> <span class="kw">if</span> <span class="fn">len</span>(req<span class="op">.</span>text) <span class="op">></span> <span class="nm">80</span> <span class="kw">else</span> <span class="st">""</span>),
+    )
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">post</span>(<span class="st">"/sentiment/batch"</span>, response_model<span class="op">=</span>List[SentimentResult])
+<span class="kw">async def</span> <span class="fn">analyse_batch</span>(req: BatchTextRequest):
+    <span class="kw">if</span> <span class="fn">any</span>(<span class="fn">len</span>(t) <span class="op">></span> <span class="nm">512</span> <span class="kw">for</span> t <span class="kw">in</span> req<span class="op">.</span>texts):
+        <span class="kw">raise</span> <span class="fn">HTTPException</span>(<span class="nm">400</span>, <span class="st">"All texts must be ≤ 512 characters"</span>)
+    results <span class="op">=</span> MODEL[<span class="st">"pipe"</span>](req<span class="op">.</span>texts)
+    <span class="kw">return</span> [
+        SentimentResult(
+            label<span class="op">=</span>r[<span class="st">"label"</span>], score<span class="op">=</span><span class="fn">round</span>(r[<span class="st">"score"</span>], <span class="nm">4</span>),
+            text_preview<span class="op">=</span>t[:<span class="nm">80</span>]
+        )
+        <span class="kw">for</span> r, t <span class="kw">in</span> <span class="fn">zip</span>(results, req<span class="op">.</span>texts)
+    ]</pre></div>
+      </div>
+
+      <div class="tab-pane" id="nlp-tfidf">
+        <h3 style="font-weight:700;margin-bottom:.5rem">TF-IDF + Logistic Regression Text Classifier</h3>
+        <div class="code-block"><div class="code-header"><span class="code-lang">python — text_classifier_api.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+<span class="kw">from</span> sklearn.feature_extraction.text <span class="kw">import</span> TfidfVectorizer
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LogisticRegression
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+<span class="kw">import</span> joblib
+
+<span class="cm"># ─── Train ────────────────────────────────────────────</span>
+pipeline <span class="op">=</span> <span class="fn">Pipeline</span>([
+    (<span class="st">"tfidf"</span>, <span class="fn">TfidfVectorizer</span>(
+        max_features<span class="op">=</span><span class="nm">50_000</span>,
+        ngram_range<span class="op">=</span>(<span class="nm">1</span>, <span class="nm">2</span>),
+        sublinear_tf<span class="op">=</span><span class="kw">True</span>,
+        stop_words<span class="op">=</span><span class="st">"english"</span>
+    )),
+    (<span class="st">"clf"</span>, <span class="fn">LogisticRegression</span>(
+        max_iter<span class="op">=</span><span class="nm">1000</span>, C<span class="op">=</span><span class="nm">1.0</span>, class_weight<span class="op">=</span><span class="st">"balanced"</span>
+    ))
+])
+pipeline<span class="op">.</span><span class="fn">fit</span>(X_train_text, y_train)
+joblib<span class="op">.</span><span class="fn">dump</span>(pipeline, <span class="st">"models/text_classifier.joblib"</span>)
+
+<span class="cm"># ─── API ──────────────────────────────────────────────</span>
+<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+app <span class="op">=</span> <span class="fn">FastAPI</span>()
+
+<span class="kw">class</span> <span class="dc">ClassifyRequest</span>(BaseModel):
+    text: str <span class="op">=</span> <span class="fn">Field</span>(..., min_length<span class="op">=</span><span class="nm">10</span>, example<span class="op">=</span><span class="st">"Subject: Claim your prize now!"</span>)
+    explain: bool <span class="op">=</span> <span class="kw">False</span>  <span class="cm"># if True, return top contributing words</span>
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">post</span>(<span class="st">"/classify/text"</span>)
+<span class="kw">async def</span> <span class="fn">classify_text</span>(req: ClassifyRequest):
+    pipeline <span class="op">=</span> MODEL[<span class="st">"pipeline"</span>]
+    classes  <span class="op">=</span> pipeline<span class="op">.</span>classes_
+    probs    <span class="op">=</span> pipeline<span class="op">.</span><span class="fn">predict_proba</span>([req<span class="op">.</span>text])[<span class="nm">0</span>]
+    best     <span class="op">=</span> int(np<span class="op">.</span><span class="fn">argmax</span>(probs))
+    resp     <span class="op">=</span> {
+        <span class="st">"label"</span>:       classes[best],
+        <span class="st">"confidence"</span>:  <span class="fn">round</span>(<span class="fn">float</span>(probs[best]), <span class="nm">4</span>),
+        <span class="st">"all_classes"</span>: {c: <span class="fn">round</span>(<span class="fn">float</span>(p), <span class="nm">4</span>) <span class="kw">for</span> c, p <span class="kw">in</span> <span class="fn">zip</span>(classes, probs)},
+    }
+    <span class="kw">if</span> req<span class="op">.</span>explain:
+        <span class="cm"># Top token contributions (works for LR + TF-IDF)</span>
+        tfidf   <span class="op">=</span> pipeline<span class="op">.</span>named_steps[<span class="st">"tfidf"</span>]
+        clf     <span class="op">=</span> pipeline<span class="op">.</span>named_steps[<span class="st">"clf"</span>]
+        vec     <span class="op">=</span> tfidf<span class="op">.</span><span class="fn">transform</span>([req<span class="op">.</span>text])
+        coef    <span class="op">=</span> clf<span class="op">.</span>coef_[best] <span class="kw">if</span> <span class="fn">len</span>(classes) <span class="op">></span> <span class="nm">2</span> <span class="kw">else</span> clf<span class="op">.</span>coef_[<span class="nm">0</span>]
+        scores  <span class="op">=</span> (vec <span class="op">*</span> coef)<span class="op">.</span><span class="fn">toarray</span>()[<span class="nm">0</span>]
+        top_idx <span class="op">=</span> np<span class="op">.</span><span class="fn">argsort</span>(scores)[::<span class="op">-</span><span class="nm">1</span>][:<span class="nm">10</span>]
+        vocab   <span class="op">=</span> tfidf<span class="op">.</span><span class="fn">get_feature_names_out</span>()
+        resp[<span class="st">"top_tokens"</span>] <span class="op">=</span> [
+            {<span class="st">"token"</span>: vocab[i], <span class="st">"weight"</span>: <span class="fn">round</span>(<span class="fn">float</span>(scores[i]), <span class="nm">4</span>)}
+            <span class="kw">for</span> i <span class="kw">in</span> top_idx <span class="kw">if</span> scores[i] <span class="op">></span> <span class="nm">0</span>
+        ]
+    <span class="kw">return</span> resp</pre></div>
+      </div>
+
+      <div class="tab-pane" id="nlp-streaming">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Streaming Responses — for LLM / Long Generation</h3>
+        <div class="code-block"><div class="code-header"><span class="code-lang">python — streaming_api.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> fastapi.responses <span class="kw">import</span> StreamingResponse
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
+<span class="kw">from</span> transformers <span class="kw">import</span> AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
+<span class="kw">from</span> threading <span class="kw">import</span> Thread
+<span class="kw">import</span> json
+
+app <span class="op">=</span> <span class="fn">FastAPI</span>()
+
+<span class="kw">class</span> <span class="dc">GenerateRequest</span>(BaseModel):
+    prompt:      str
+    max_tokens:  int <span class="op">=</span> <span class="nm">256</span>
+    temperature: <span class="fn">float</span> <span class="op">=</span> <span class="nm">0.7</span>
+
+<span class="cm"># Token-by-token streaming — same UX as ChatGPT</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">post</span>(<span class="st">"/generate"</span>)
+<span class="kw">async def</span> <span class="fn">generate</span>(req: GenerateRequest):
+    tokenizer <span class="op">=</span> MODEL[<span class="st">"tokenizer"</span>]
+    model     <span class="op">=</span> MODEL[<span class="st">"model"</span>]
+    streamer  <span class="op">=</span> <span class="fn">TextIteratorStreamer</span>(tokenizer, skip_special_tokens<span class="op">=</span><span class="kw">True</span>)
+    inputs    <span class="op">=</span> <span class="fn">tokenizer</span>(req<span class="op">.</span>prompt, return_tensors<span class="op">=</span><span class="st">"pt"</span>)
+
+    <span class="kw">def</span> <span class="fn">generate_worker</span>():
+        model<span class="op">.</span><span class="fn">generate</span>(
+            <span class="op">**</span>inputs, max_new_tokens<span class="op">=</span>req<span class="op">.</span>max_tokens,
+            temperature<span class="op">=</span>req<span class="op">.</span>temperature, streamer<span class="op">=</span>streamer
+        )
+
+    Thread(target<span class="op">=</span>generate_worker, daemon<span class="op">=</span><span class="kw">True</span>)<span class="op">.</span><span class="fn">start</span>()
+
+    <span class="kw">def</span> <span class="fn">token_generator</span>():
+        <span class="kw">for</span> token <span class="kw">in</span> streamer:
+            <span class="cm"># Server-Sent Events format (compatible with EventSource)</span>
+            <span class="kw">yield</span> <span class="fn">f</span><span class="st">"data: {json.dumps({'token': token})}\n\n"</span>
+        <span class="kw">yield</span> <span class="st">"data: [DONE]\n\n"</span>
+
+    <span class="kw">return</span> <span class="fn">StreamingResponse</span>(
+        <span class="fn">token_generator</span>(),
+        media_type<span class="op">=</span><span class="st">"text/event-stream"</span>
+    )</pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ DEEP LEARNING ══════════════ -->
+  <div class="fw-pane" id="ml-deeplearning">
+    <div class="tab-container">
+      <div class="tab-header">
+        <button class="tab-btn active" onclick="switchTab('dl','image',this)">Image Classification</button>
+        <button class="tab-btn" onclick="switchTab('dl','pytorch',this)">PyTorch Tabular</button>
+        <button class="tab-btn" onclick="switchTab('dl','timeseries',this)">Time Series</button>
+      </div>
+
+      <div class="tab-pane active" id="dl-image">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Image Classification — ResNet via FastAPI</h3>
+        <div class="code-block"><div class="code-header"><span class="code-lang">python — image_api.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, UploadFile, File, HTTPException
+<span class="kw">from</span> contextlib <span class="kw">import</span> asynccontextmanager
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
+<span class="kw">from</span> typing <span class="kw">import</span> List
+<span class="kw">import</span> torch, torchvision.models <span class="kw">as</span> tv_models
+<span class="kw">import</span> torchvision.transforms <span class="kw">as</span> T
+<span class="kw">from</span> PIL <span class="kw">import</span> Image
+<span class="kw">import</span> io, json
+
+MODEL <span class="op">=</span> {}
+
+<span class="dc">@asynccontextmanager</span>
+<span class="kw">async def</span> <span class="fn">lifespan</span>(app):
+    m <span class="op">=</span> tv_models<span class="op">.</span><span class="fn">resnet50</span>(weights<span class="op">=</span><span class="st">"IMAGENET1K_V2"</span>)
+    m<span class="op">.</span><span class="fn">eval</span>()
+    MODEL[<span class="st">"model"</span>] <span class="op">=</span> m
+    MODEL[<span class="st">"transform"</span>] <span class="op">=</span> T<span class="op">.</span><span class="fn">Compose</span>([
+        T<span class="op">.</span><span class="fn">Resize</span>(<span class="nm">256</span>), T<span class="op">.</span><span class="fn">CenterCrop</span>(<span class="nm">224</span>), T<span class="op">.</span><span class="fn">ToTensor</span>(),
+        T<span class="op">.</span><span class="fn">Normalize</span>(mean<span class="op">=</span>[<span class="nm">0.485</span>,<span class="nm">0.456</span>,<span class="nm">0.406</span>], std<span class="op">=</span>[<span class="nm">0.229</span>,<span class="nm">0.224</span>,<span class="nm">0.225</span>])
+    ])
+    <span class="kw">with</span> <span class="fn">open</span>(<span class="st">"imagenet_classes.json"</span>) <span class="kw">as</span> f:
+        MODEL[<span class="st">"classes"</span>] <span class="op">=</span> json<span class="op">.</span><span class="fn">load</span>(f)
+    <span class="kw">yield</span>
+
+app <span class="op">=</span> <span class="fn">FastAPI</span>(title<span class="op">=</span><span class="st">"Image Classification API"</span>, lifespan<span class="op">=</span>lifespan)
+
+<span class="kw">class</span> <span class="dc">Prediction</span>(BaseModel):
+    label: str
+    probability: <span class="fn">float</span>
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">post</span>(<span class="st">"/classify/image"</span>, response_model<span class="op">=</span>List[Prediction])
+<span class="kw">async def</span> <span class="fn">classify_image</span>(
+    file: UploadFile <span class="op">=</span> <span class="fn">File</span>(...),
+    top_k: int <span class="op">=</span> <span class="nm">5</span>
+):
+    <span class="kw">if</span> file<span class="op">.</span>content_type <span class="kw">not in</span> {<span class="st">"image/jpeg"</span>, <span class="st">"image/png"</span>, <span class="st">"image/webp"</span>}:
+        <span class="kw">raise</span> <span class="fn">HTTPException</span>(<span class="nm">400</span>, <span class="st">"Supported formats: JPEG, PNG, WebP"</span>)
+
+    content <span class="op">=</span> <span class="kw">await</span> file<span class="op">.</span><span class="fn">read</span>()
+    image   <span class="op">=</span> Image<span class="op">.</span><span class="fn">open</span>(io<span class="op">.</span><span class="fn">BytesIO</span>(content))<span class="op">.</span><span class="fn">convert</span>(<span class="st">"RGB"</span>)
+    tensor  <span class="op">=</span> MODEL[<span class="st">"transform"</span>](image)<span class="op">.</span><span class="fn">unsqueeze</span>(<span class="nm">0</span>)  <span class="cm"># add batch dim</span>
+
+    <span class="kw">with</span> torch<span class="op">.</span><span class="fn">no_grad</span>():
+        logits <span class="op">=</span> MODEL[<span class="st">"model"</span>](tensor)
+        probs  <span class="op">=</span> torch<span class="op">.</span><span class="fn">softmax</span>(logits, dim<span class="op">=</span><span class="nm">1</span>)[<span class="nm">0</span>]
+
+    top_probs, top_idx <span class="op">=</span> probs<span class="op">.</span><span class="fn">topk</span>(top_k)
+    classes <span class="op">=</span> MODEL[<span class="st">"classes"</span>]
+    <span class="kw">return</span> [
+        <span class="fn">Prediction</span>(label<span class="op">=</span>classes[i], probability<span class="op">=</span><span class="fn">round</span>(<span class="fn">float</span>(p), <span class="nm">4</span>))
+        <span class="kw">for</span> i, p <span class="kw">in</span> <span class="fn">zip</span>(top_idx<span class="op">.</span><span class="fn">tolist</span>(), top_probs<span class="op">.</span><span class="fn">tolist</span>())
+    ]</pre></div>
+      </div>
+
+      <div class="tab-pane" id="dl-pytorch">
+        <h3 style="font-weight:700;margin-bottom:.5rem">PyTorch Tabular Model (Loan Default)</h3>
+        <div class="code-block"><div class="code-header"><span class="code-lang">python — pytorch_api.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><span class="kw">import</span> torch
+<span class="kw">import</span> torch<span class="op">.</span>nn <span class="kw">as</span> nn
+<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field
+<span class="kw">from</span> contextlib <span class="kw">import</span> asynccontextmanager
+<span class="kw">import</span> joblib
+
+<span class="kw">class</span> <span class="dc">LoanNet</span>(nn<span class="op">.</span>Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, input_dim: int):
+        <span class="fn">super</span>()<span class="op">.</span><span class="fn">__init__</span>()
+        self<span class="op">.</span>net <span class="op">=</span> nn<span class="op">.</span><span class="fn">Sequential</span>(
+            nn<span class="op">.</span><span class="fn">Linear</span>(input_dim, <span class="nm">128</span>), nn<span class="op">.</span><span class="fn">ReLU</span>(), nn<span class="op">.</span><span class="fn">Dropout</span>(<span class="nm">0.3</span>),
+            nn<span class="op">.</span><span class="fn">Linear</span>(<span class="nm">128</span>, <span class="nm">64</span>),         nn<span class="op">.</span><span class="fn">ReLU</span>(), nn<span class="op">.</span><span class="fn">Dropout</span>(<span class="nm">0.2</span>),
+            nn<span class="op">.</span><span class="fn">Linear</span>(<span class="nm">64</span>, <span class="nm">1</span>),            nn<span class="op">.</span><span class="fn">Sigmoid</span>()
+        )
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x): <span class="kw">return</span> self<span class="op">.</span>net(x)
+
+MODEL <span class="op">=</span> {}
+
+<span class="dc">@asynccontextmanager</span>
+<span class="kw">async def</span> <span class="fn">lifespan</span>(app):
+    net <span class="op">=</span> <span class="fn">LoanNet</span>(input_dim<span class="op">=</span><span class="nm">14</span>)
+    net<span class="op">.</span><span class="fn">load_state_dict</span>(torch<span class="op">.</span><span class="fn">load</span>(<span class="st">"models/loan_net.pt"</span>, weights_only<span class="op">=</span><span class="kw">True</span>))
+    net<span class="op">.</span><span class="fn">eval</span>()
+    MODEL[<span class="st">"net"</span>]    <span class="op">=</span> net
+    MODEL[<span class="st">"scaler"</span>] <span class="op">=</span> joblib<span class="op">.</span><span class="fn">load</span>(<span class="st">"models/loan_scaler.joblib"</span>)
+    <span class="kw">yield</span>
+
+app <span class="op">=</span> <span class="fn">FastAPI</span>(title<span class="op">=</span><span class="st">"Loan Default Prediction"</span>, lifespan<span class="op">=</span>lifespan)
+
+<span class="kw">class</span> <span class="dc">LoanApplication</span>(BaseModel):
+    age:             int   <span class="op">=</span> <span class="fn">Field</span>(..., ge<span class="op">=</span><span class="nm">18</span>, le<span class="op">=</span><span class="nm">100</span>)
+    income:          <span class="fn">float</span> <span class="op">=</span> <span class="fn">Field</span>(..., gt<span class="op">=</span><span class="nm">0</span>)
+    loan_amount:     <span class="fn">float</span> <span class="op">=</span> <span class="fn">Field</span>(..., gt<span class="op">=</span><span class="nm">0</span>)
+    credit_score:    int   <span class="op">=</span> <span class="fn">Field</span>(..., ge<span class="op">=</span><span class="nm">300</span>, le<span class="op">=</span><span class="nm">850</span>)
+    employment_years: <span class="fn">float</span> <span class="op">=</span> <span class="fn">Field</span>(..., ge<span class="op">=</span><span class="nm">0</span>)
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">post</span>(<span class="st">"/predict/loan-default"</span>)
+<span class="kw">async def</span> <span class="fn">predict_default</span>(app: LoanApplication):
+    features <span class="op">=</span> [[app<span class="op">.</span>age, app<span class="op">.</span>income, app<span class="op">.</span>loan_amount,
+                  app<span class="op">.</span>credit_score, app<span class="op">.</span>employment_years]]
+    scaled <span class="op">=</span> MODEL[<span class="st">"scaler"</span>]<span class="op">.</span><span class="fn">transform</span>(features)
+    tensor <span class="op">=</span> torch<span class="op">.</span><span class="fn">tensor</span>(scaled, dtype<span class="op">=</span>torch<span class="op">.</span>float32)
+    <span class="kw">with</span> torch<span class="op">.</span><span class="fn">no_grad</span>():
+        prob_default <span class="op">=</span> <span class="fn">float</span>(MODEL[<span class="st">"net"</span>](tensor)<span class="op">.</span><span class="fn">item</span>())
+    <span class="kw">return</span> {
+        <span class="st">"default_probability"</span>: <span class="fn">round</span>(prob_default, <span class="nm">4</span>),
+        <span class="st">"decision"</span>: <span class="st">"reject"</span> <span class="kw">if</span> prob_default <span class="op">></span> <span class="nm">0.5</span> <span class="kw">else</span> <span class="st">"approve"</span>,
+        <span class="st">"risk_tier"</span>: <span class="st">"high"</span> <span class="kw">if</span> prob_default <span class="op">></span> <span class="nm">0.7</span> <span class="kw">else</span> <span class="st">"medium"</span> <span class="kw">if</span> prob_default <span class="op">></span> <span class="nm">0.3</span> <span class="kw">else</span> <span class="st">"low"</span>,
+    }</pre></div>
+      </div>
+
+      <div class="tab-pane" id="dl-timeseries">
+        <h3 style="font-weight:700;margin-bottom:.5rem">Time Series Forecasting API</h3>
+        <div class="code-block"><div class="code-header"><span class="code-lang">python — forecasting_api.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field
+<span class="kw">from</span> typing <span class="kw">import</span> List
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+app <span class="op">=</span> <span class="fn">FastAPI</span>()
+
+<span class="kw">class</span> <span class="dc">ForecastRequest</span>(BaseModel):
+    <span class="cm"># Last N observations (the model's lookback window)</span>
+    history:  List[<span class="fn">float</span>] <span class="op">=</span> <span class="fn">Field</span>(..., min_length<span class="op">=</span><span class="nm">30</span>, max_length<span class="op">=</span><span class="nm">365</span>)
+    horizon:  int <span class="op">=</span> <span class="fn">Field</span>(<span class="nm">7</span>, ge<span class="op">=</span><span class="nm">1</span>, le<span class="op">=</span><span class="nm">90</span>, description<span class="op">=</span><span class="st">"Days to forecast"</span>)
+
+<span class="kw">class</span> <span class="dc">ForecastResponse</span>(BaseModel):
+    forecast:        List[<span class="fn">float</span>]
+    forecast_dates:  List[str]
+    confidence_80_lower: List[<span class="fn">float</span>]
+    confidence_80_upper: List[<span class="fn">float</span>]
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">post</span>(<span class="st">"/forecast"</span>, response_model<span class="op">=</span>ForecastResponse)
+<span class="kw">async def</span> <span class="fn">forecast</span>(req: ForecastRequest):
+    model <span class="op">=</span> MODEL[<span class="st">"model"</span>]
+    scaler <span class="op">=</span> MODEL[<span class="st">"scaler"</span>]
+
+    <span class="cm"># Normalize, reshape for LSTM: (batch=1, seq_len, features=1)</span>
+    arr    <span class="op">=</span> np<span class="op">.</span><span class="fn">array</span>(req<span class="op">.</span>history)<span class="op">.</span><span class="fn">reshape</span>(<span class="op">-</span><span class="nm">1</span>, <span class="nm">1</span>)
+    scaled <span class="op">=</span> scaler<span class="op">.</span><span class="fn">transform</span>(arr)<span class="op">.</span><span class="fn">reshape</span>(<span class="nm">1</span>, <span class="op">-</span><span class="nm">1</span>, <span class="nm">1</span>)
+
+    preds_scaled <span class="op">=</span> model<span class="op">.</span><span class="fn">predict</span>(scaled, horizon<span class="op">=</span>req<span class="op">.</span>horizon)
+    preds <span class="op">=</span> scaler<span class="op">.</span><span class="fn">inverse_transform</span>(preds_scaled<span class="op">.</span><span class="fn">reshape</span>(<span class="op">-</span><span class="nm">1</span>, <span class="nm">1</span>))<span class="op">.</span><span class="fn">flatten</span>()
+
+    <span class="cm"># Simple ±10% prediction interval (replace with proper conformal intervals)</span>
+    std <span class="op">=</span> np<span class="op">.</span><span class="fn">std</span>(req<span class="op">.</span>history[<span class="op">-</span><span class="nm">30</span>:]) <span class="op">*</span> <span class="nm">1.28</span>
+    <span class="kw">from</span> datetime <span class="kw">import</span> date, timedelta
+    today <span class="op">=</span> date<span class="op">.</span><span class="fn">today</span>()
+    dates <span class="op">=</span> [(today <span class="op">+</span> <span class="fn">timedelta</span>(days<span class="op">=</span>i<span class="op">+</span><span class="nm">1</span>))<span class="op">.</span><span class="fn">isoformat</span>() <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(req<span class="op">.</span>horizon)]
+
+    <span class="kw">return</span> ForecastResponse(
+        forecast<span class="op">=</span>[<span class="fn">round</span>(<span class="fn">float</span>(p), <span class="nm">2</span>) <span class="kw">for</span> p <span class="kw">in</span> preds],
+        forecast_dates<span class="op">=</span>dates,
+        confidence_80_lower<span class="op">=</span>[<span class="fn">round</span>(<span class="fn">float</span>(p <span class="op">-</span> std), <span class="nm">2</span>) <span class="kw">for</span> p <span class="kw">in</span> preds],
+        confidence_80_upper<span class="op">=</span>[<span class="fn">round</span>(<span class="fn">float</span>(p <span class="op">+</span> std), <span class="nm">2</span>) <span class="kw">for</span> p <span class="kw">in</span> preds],
+    )</pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ PRODUCTION TIPS ══════════════ -->
+  <div class="fw-pane" id="ml-bestpractices">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem">
+      <div>
+        <div class="warn-box"><p>⚠️ <strong>Never load models inside route handlers.</strong> Each request would deserialise a 200MB file from disk — 300-500ms latency hit every time. Load once at startup using <code>lifespan</code>, store in a module-level dict.</p></div>
+        <div class="warn-box" style="margin-top:1rem"><p>⚠️ <strong>Always save the full pipeline</strong> (scaler + encoder + model together). If you save only the model, you'll forget to apply the same preprocessing at inference. The scaler's <code>mean_</code> and <code>scale_</code> won't survive a server restart.</p></div>
+      </div>
+      <div>
+        <div class="info-box"><p>✅ <strong>Return probabilities, not just labels.</strong> <code>"churn_probability": 0.73</code> lets callers tune their own threshold. A hard label throws away calibration information every downstream system could use.</p></div>
+        <div class="tip-box" style="margin-top:1rem"><p>🎯 <strong>Add a /model/info endpoint</strong> that returns model version, training date, feature list, and performance metrics. Ops teams will thank you during incidents.</p></div>
+      </div>
+    </div>
+    <div class="code-block"><div class="code-header"><span class="code-lang">python — production ML API skeleton</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, HTTPException
+<span class="kw">from</span> contextlib <span class="kw">import</span> asynccontextmanager
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
+<span class="kw">import</span> joblib, time, logging, uuid
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+logger <span class="op">=</span> logging<span class="op">.</span><span class="fn">getLogger</span>(__name__)
+
+<span class="cm"># ─── 1. Load once at startup ───────────────────────────</span>
+MODEL <span class="op">=</span> {}
+<span class="dc">@asynccontextmanager</span>
+<span class="kw">async def</span> <span class="fn">lifespan</span>(app):
+    MODEL[<span class="st">"pipeline"</span>] <span class="op">=</span> joblib<span class="op">.</span><span class="fn">load</span>(<span class="st">"models/pipeline.joblib"</span>)
+    logger<span class="op">.</span><span class="fn">info</span>(<span class="st">"Model loaded ✅"</span>)
+    <span class="kw">yield</span>
+    MODEL<span class="op">.</span><span class="fn">clear</span>()
+
+app <span class="op">=</span> <span class="fn">FastAPI</span>(lifespan<span class="op">=</span>lifespan)
+
+<span class="cm"># ─── 2. Structured logging middleware ─────────────────</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">middleware</span>(<span class="st">"http"</span>)
+<span class="kw">async def</span> <span class="fn">log_requests</span>(request, call_next):
+    request_id <span class="op">=</span> str(uuid<span class="op">.</span><span class="fn">uuid4</span>())
+    start <span class="op">=</span> time<span class="op">.</span><span class="fn">perf_counter</span>()
+    response <span class="op">=</span> <span class="kw">await</span> <span class="fn">call_next</span>(request)
+    elapsed <span class="op">=</span> (time<span class="op">.</span><span class="fn">perf_counter</span>() <span class="op">-</span> start) <span class="op">*</span> <span class="nm">1000</span>
+    logger<span class="op">.</span><span class="fn">info</span>({
+        <span class="st">"request_id"</span>: request_id,
+        <span class="st">"path"</span>: request<span class="op">.</span>url<span class="op">.</span>path,
+        <span class="st">"latency_ms"</span>: <span class="fn">round</span>(elapsed, <span class="nm">1</span>),
+        <span class="st">"status"</span>: response<span class="op">.</span>status_code,
+    })
+    <span class="kw">return</span> response
+
+<span class="cm"># ─── 3. Health &amp; model info endpoints ─────────────────</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">get</span>(<span class="st">"/health"</span>)
+<span class="kw">async def</span> <span class="fn">health</span>():
+    <span class="kw">return</span> {<span class="st">"status"</span>: <span class="st">"healthy"</span>, <span class="st">"model_loaded"</span>: <span class="st">"pipeline"</span> <span class="kw">in</span> MODEL}
+
+<span class="dc">@app</span><span class="op">.</span><span class="fn">get</span>(<span class="st">"/model/info"</span>)
+<span class="kw">async def</span> <span class="fn">model_info</span>():
+    <span class="kw">return</span> {
+        <span class="st">"model_type"</span>:    type(MODEL[<span class="st">"pipeline"</span>]<span class="op">.</span>named_steps[<span class="st">"model"</span>])<span class="op">.</span>__name__,
+        <span class="st">"model_version"</span>: <span class="st">"2.1.0"</span>,
+        <span class="st">"features"</span>:      [<span class="st">"MedInc"</span>, <span class="st">"HouseAge"</span>, <span class="st">"..."</span>],
+        <span class="st">"trained_on"</span>:    <span class="st">"2025-05-01"</span>,
+        <span class="st">"metrics"</span>:       {<span class="st">"val_mae"</span>: <span class="nm">0.3412</span>, <span class="st">"val_r2"</span>: <span class="nm">0.8603</span>},
+    }
+
+<span class="cm"># ─── 4. Graceful error handling ────────────────────────</span>
+<span class="dc">@app</span><span class="op">.</span><span class="fn">exception_handler</span>(Exception)
+<span class="kw">async def</span> <span class="fn">catch_all</span>(request, exc):
+    logger<span class="op">.</span><span class="fn">exception</span>(<span class="st">"Unexpected prediction error"</span>, exc_info<span class="op">=</span>exc)
+    <span class="kw">raise</span> <span class="fn">HTTPException</span>(
+        status_code<span class="op">=</span><span class="nm">500</span>,
+        detail<span class="op">=</span>{<span class="st">"code"</span>: <span class="st">"PREDICTION_ERROR"</span>, <span class="st">"message"</span>: <span class="st">"Prediction failed. Incident logged."</span>}
+    )</pre></div>
+
+    <h3 style="font-size:1.1rem;font-weight:700;margin:2rem 0 .8rem">ML API Production Checklist</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div class="cheat-card"><h4>Before You Deploy</h4>
+        <div class="cheat-row"><span class="cheat-key">✅ Pipeline saved</span><span class="cheat-val">scaler + model together</span></div>
+        <div class="cheat-row"><span class="cheat-key">✅ Feature order</span><span class="cheat-val">same as training</span></div>
+        <div class="cheat-row"><span class="cheat-key">✅ Input validation</span><span class="cheat-val">range, type, nulls</span></div>
+        <div class="cheat-row"><span class="cheat-key">✅ Batch endpoint</span><span class="cheat-val">with size limit</span></div>
+        <div class="cheat-row"><span class="cheat-key">✅ /health route</span><span class="cheat-val">liveness probe</span></div>
+        <div class="cheat-row"><span class="cheat-key">✅ /model/info</span><span class="cheat-val">version &amp; metrics</span></div>
+      </div>
+      <div class="cheat-card"><h4>Monitoring in Production</h4>
+        <div class="cheat-row"><span class="cheat-key">📊 Prediction distribution</span><span class="cheat-val">drift detection</span></div>
+        <div class="cheat-row"><span class="cheat-key">⏱️ Latency p50/p95/p99</span><span class="cheat-val">Prometheus/Grafana</span></div>
+        <div class="cheat-row"><span class="cheat-key">🚨 Error rate</span><span class="cheat-val">alert at &gt;1%</span></div>
+        <div class="cheat-row"><span class="cheat-key">📥 Input feature stats</span><span class="cheat-val">log mean, std, nulls</span></div>
+        <div class="cheat-row"><span class="cheat-key">🔁 Model retraining</span><span class="cheat-val">trigger on drift</span></div>
+        <div class="cheat-row"><span class="cheat-key">🗃️ Prediction logging</span><span class="cheat-val">for future retraining</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
 <!-- SECTION 7: SECURITY -->
 <section class="section" id="security">
   <div class="section-header">
-    <div class="section-tag rose">Chapter 7</div>
+    <div class="section-tag rose">Chapter 8</div>
     <h2 class="section-h2">API Security — <em>Don't skip this</em></h2>
     <p class="section-desc">Security isn't optional. Here are the must-knows before you go to production.</p>
   </div>
@@ -1913,9 +2994,9 @@ app<span class="op">.</span><span class="fn">add_middleware</span>(
 <!-- QUIZ -->
 <section class="section" id="quiz">
   <div class="section-header">
-    <div class="section-tag violet">Chapter 8</div>
+    <div class="section-tag violet">Chapter 9</div>
     <h2 class="section-h2">Test Your <em>Knowledge</em></h2>
-    <p class="section-desc">10 questions covering everything we've learned. How many can you get right?</p>
+    <p class="section-desc">15 questions spanning HTTP, FastAPI, Pydantic, ML APIs and beyond. How many can you ace?</p>
   </div>
 
   <div class="quiz-card">
@@ -2343,7 +3424,17 @@ function nextQuestion() {
   if (current >= questions.length) {
     showScore();
   } else {
-    renderQuiz();
+    
+// ─── ML PANE SWITCHER ──────────────────────────────────────────
+function switchML(name, btn) {
+  document.querySelectorAll('#ml-tabs .fw-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#ml-apis > .fw-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  const pane = document.getElementById('ml-' + name);
+  if (pane) pane.classList.add('active');
+}
+
+renderQuiz();
   }
 }
 

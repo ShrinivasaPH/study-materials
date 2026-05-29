@@ -128,21 +128,24 @@
     max-width: 1140px;
     margin: 0 auto;
     gap: 0;
-    align-items: start;
     overflow: hidden;
   }
 
   /* ── SIDEBAR ── */
   .sidebar {
-    position: sticky;
-    top: 24px;
-    padding: 28px 0 28px 24px;
-    height: calc(100vh - 48px);
-    overflow-y: auto;
+    border-right: 1px solid var(--border);
+    background: var(--bg);
   }
-  .sidebar::-webkit-scrollbar { width: 4px; }
-  .sidebar::-webkit-scrollbar-track { background: transparent; }
-  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .sidebar-inner {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 28px 0 28px 24px;
+  }
+  .sidebar-inner::-webkit-scrollbar { width: 4px; }
+  .sidebar-inner::-webkit-scrollbar-track { background: transparent; }
+  .sidebar-inner::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
   .sidebar-label {
     font-size: 10.5px;
@@ -593,7 +596,7 @@
   /* ── RESPONSIVE ── */
   @media (max-width: 768px) {
     .layout { grid-template-columns: 1fr; }
-    .sidebar { display: none; }
+    .sidebar, .sidebar-inner { display: none; }
     .main { padding: 24px 20px 60px; }
     .hero { padding: 36px 20px 36px; }
     .hero-stats { gap: 20px; }
@@ -655,6 +658,7 @@
 <div class="layout">
   <!-- SIDEBAR -->
   <nav class="sidebar">
+    <div class="sidebar-inner">
     <div class="nav-section">
       <div class="sidebar-label">Foundations</div>
       <a class="nav-link active" href="#intro" onclick="setActive(this)">🌱 What is Git?</a>
@@ -679,6 +683,7 @@
     <div class="nav-section">
       <div class="sidebar-label">Test Yourself</div>
       <a class="nav-link" href="#quiz" onclick="setActive(this)">🧠 Quiz</a>
+    </div>
     </div>
   </nav>
 

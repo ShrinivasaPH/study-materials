@@ -647,6 +647,8 @@
                     <li class="nav-item"><a class="nav-link" data-section="basics-formulas">Formula Basics</a></li>
                     <li class="nav-item"><a class="nav-link" data-section="functions">Common Functions</a></li>
                     <li class="nav-item"><a class="nav-link" data-section="logical">Logical Functions</a></li>
+                    <li class="nav-item"><a class="nav-link" data-section="cond-stats">Conditional Formulas Lab</a></li>
+                    <li class="nav-item"><a class="nav-link" data-section="lookups">Lookup Functions Lab</a></li>
                     <li class="nav-item"><a class="nav-link" data-section="text-functions">Text Functions</a></li>
                     <li class="nav-item"><a class="nav-link" data-section="date-functions">Date Functions</a></li>
                     <li class="nav-item"><a class="nav-link" data-section="advanced">Advanced Formulas</a></li>
@@ -1583,6 +1585,734 @@
                 <div class="tips-box">
                     <div class="tips-title">Pro Tip</div>
                     <div class="tips-text">Use SUMIFS instead of SUMIF when you can - it's more powerful and handles more complex scenarios. The syntax is SUMIFS(sum_range, criteria_range1, criteria1, criteria_range2, criteria2, ...).</div>
+                </div>
+            </section>
+
+            <!-- Conditional & Statistical Formulas Lab -->
+            <section id="cond-stats" class="content-section">
+                <h1 class="section-title">Conditional &amp; Statistical Formulas Lab</h1>
+                <p class="section-subtitle">Master IF, SUMIF/S, COUNTIF/S and AVERAGEIF/S with hands-on practice data</p>
+
+                <p class="content-text">Conditional formulas are the workhorses of real-world analysis. Instead of summing or averaging <em>everything</em>, they let you ask targeted questions like "What were total sales <strong>in the North region</strong>?" or "What's the average deal size <strong>for Laptops sold in quantities of 10 or more</strong>?" This section walks through every major conditional function using one shared dataset, so you can paste it into Excel once and practice everything.</p>
+
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">📋 Practice Dataset — Paste into a Sheet Named "SalesData"</h2>
+
+                <p class="content-text">Copy this table into Excel starting at cell <strong>A1</strong> (headers in row 1, data in rows 2–13). All the formulas below reference these exact cells, so your results should match the worked answers.</p>
+
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem;">
+                    <tr style="background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">
+                        <td style="padding: 0.4rem; border: 1px solid #ccc; width: 36px;"></td>
+                        <td style="padding: 0.4rem; border: 1px solid #ccc;">A</td>
+                        <td style="padding: 0.4rem; border: 1px solid #ccc;">B</td>
+                        <td style="padding: 0.4rem; border: 1px solid #ccc;">C</td>
+                        <td style="padding: 0.4rem; border: 1px solid #ccc;">D</td>
+                        <td style="padding: 0.4rem; border: 1px solid #ccc;">E</td>
+                        <td style="padding: 0.4rem; border: 1px solid #ccc;">F</td>
+                    </tr>
+                    <tr style="background: var(--primary-dark); color: white; font-weight: 700;">
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center;">1</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--primary-dark);">Region</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--primary-dark);">Salesperson</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--primary-dark);">Product</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--primary-dark);">Units</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--primary-dark);">Sale Amount</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--primary-dark);">Month</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">2</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">North</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Anita</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Laptop</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">12</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">54000</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Jan</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">3</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">South</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Ravi</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Tablet</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">8</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">24000</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Jan</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">4</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">North</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Vikram</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Laptop</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">15</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">67500</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Jan</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">5</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">East</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Priya</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Phone</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">20</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">36000</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Jan</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">6</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">West</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Sneha</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Tablet</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">10</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">30000</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Feb</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">7</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">North</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Anita</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Phone</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">25</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">45000</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Feb</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">8</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">South</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Ravi</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Laptop</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">9</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">40500</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Feb</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">9</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">East</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Priya</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Tablet</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">14</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">42000</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Feb</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">10</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">West</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Sneha</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Laptop</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">11</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">49500</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Mar</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">11</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">North</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Vikram</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Phone</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">30</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">54000</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Mar</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">12</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">South</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Ravi</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Phone</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">18</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">32400</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Mar</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">13</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">East</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Priya</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Laptop</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">7</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">31500</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Mar</td>
+                    </tr>
+                </table>
+
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">1️⃣ IF — Teaching Excel to Make Decisions</h2>
+
+                <p class="content-text">Think of IF as a question with two prepared answers: <strong>=IF(test, value_if_true, value_if_false)</strong>. Excel evaluates the test, and depending on whether it comes back TRUE or FALSE, returns one of the two values. This is the if-else of the spreadsheet world.</p>
+
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">Basic IF</div>
+                        <div class="formula-code">=IF(E2&gt;=50000,"High Value","Standard")</div>
+                        <p class="formula-desc">E2 is 54000, so the test (54000 ≥ 50000) is TRUE → returns <strong>"High Value"</strong>. Drag down column G to classify every sale.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">IF with Calculation</div>
+                        <div class="formula-code">=IF(D2&gt;=15,E2*5%,E2*2%)</div>
+                        <p class="formula-desc">Pays 5% commission on deals of 15+ units, otherwise 2%. Row 2 has 12 units → 54000 × 2% = <strong>1080</strong>. The true/false slots can hold formulas, not just text.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Nested IF (else-if chain)</div>
+                        <div class="formula-code">=IF(D2&gt;=25,"Gold",IF(D2&gt;=15,"Silver","Bronze"))</div>
+                        <p class="formula-desc">Reads as: if units ≥ 25 → Gold; <em>else if</em> ≥ 15 → Silver; <em>else</em> Bronze. Row 2 (12 units) → <strong>Bronze</strong>; row 7 (25 units) → <strong>Gold</strong>.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">IFS — Cleaner Multi-Branch</div>
+                        <div class="formula-code">=IFS(D2&gt;=25,"Gold",D2&gt;=15,"Silver",TRUE,"Bronze")</div>
+                        <p class="formula-desc">Same logic without the nesting headache. Conditions are checked left to right; the first TRUE wins. The final <strong>TRUE,"Bronze"</strong> pair acts as the "else" catch-all.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">IF + AND</div>
+                        <div class="formula-code">=IF(AND(A2="North",E2&gt;50000),"Star Deal","—")</div>
+                        <p class="formula-desc">Both conditions must hold. Row 2 (North, 54000) → <strong>"Star Deal"</strong>; row 7 (North, 45000) fails the amount test → "—".</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">IF + OR</div>
+                        <div class="formula-code">=IF(OR(C2="Laptop",E2&gt;50000),"Priority","Normal")</div>
+                        <p class="formula-desc">Either condition is enough. Row 5 (Phone, 36000) fails both → <strong>"Normal"</strong>; row 11 (Phone, 54000) passes on amount → "Priority".</p>
+                    </div>
+                </div>
+
+                <div class="tips-box">
+                    <div class="tips-title">Intuition First</div>
+                    <div class="tips-text">When designing nested IF / IFS conditions, always order thresholds from highest to lowest (or lowest to highest) consistently. Excel stops at the first TRUE — if you check D2&gt;=15 before D2&gt;=25, a value of 30 will wrongly land in "Silver" because 30≥15 is already TRUE.</div>
+                </div>
+
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">2️⃣ Single-Condition Aggregates: SUMIF, COUNTIF, AVERAGEIF</h2>
+
+                <p class="content-text">All three follow the same mental model: <strong>look through one range for matches, then aggregate</strong>. The argument order differs slightly — COUNTIF needs no separate sum/average range because it just counts the matches.</p>
+
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+                    <tr style="background: var(--primary-dark); color: white;">
+                        <td style="padding: 0.8rem; font-weight: 700; border: 1px solid var(--primary-dark);">Function</td>
+                        <td style="padding: 0.8rem; font-weight: 700; border: 1px solid var(--primary-dark);">Syntax</td>
+                        <td style="padding: 0.8rem; font-weight: 700; border: 1px solid var(--primary-dark);">Plain-English Reading</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light); font-weight: 700;">SUMIF</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">=SUMIF(criteria_range, criteria, sum_range)</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">"Where <em>criteria_range</em> matches <em>criteria</em>, add up the corresponding cells in <em>sum_range</em>."</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light); font-weight: 700;">COUNTIF</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">=COUNTIF(criteria_range, criteria)</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">"How many cells in <em>criteria_range</em> match <em>criteria</em>?"</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light); font-weight: 700;">AVERAGEIF</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">=AVERAGEIF(criteria_range, criteria, average_range)</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">"Where <em>criteria_range</em> matches <em>criteria</em>, average the corresponding cells in <em>average_range</em>."</td>
+                    </tr>
+                </table>
+
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">SUMIF — Text Criteria</div>
+                        <div class="formula-code">=SUMIF(A2:A13,"North",E2:E13)</div>
+                        <p class="formula-desc">Total sales for North = 54000 + 67500 + 45000 + 54000 = <strong>2,20,500</strong>. Rows 2, 4, 7 and 11 match.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">SUMIF — Number Criteria</div>
+                        <div class="formula-code">=SUMIF(D2:D13,"&gt;=15",E2:E13)</div>
+                        <p class="formula-desc">Sum of Sale Amount where Units ≥ 15. Matching rows: 4, 5, 7, 11, 12 → 67500+36000+45000+54000+32400 = <strong>2,34,900</strong>. Note the criteria is in quotes when it includes an operator.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">COUNTIF — Exact Match</div>
+                        <div class="formula-code">=COUNTIF(C2:C13,"Laptop")</div>
+                        <p class="formula-desc">Counts Laptop sales → <strong>5</strong> (rows 2, 4, 8, 10, 13). Matching is case-insensitive.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">COUNTIF — Wildcard</div>
+                        <div class="formula-code">=COUNTIF(B2:B13,"*a")</div>
+                        <p class="formula-desc">Counts salespeople whose names <em>end</em> in "a" (Anita, Priya, Sneha) → <strong>7</strong> rows. Use * for any characters, ? for exactly one character.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">AVERAGEIF</div>
+                        <div class="formula-code">=AVERAGEIF(A2:A13,"North",E2:E13)</div>
+                        <p class="formula-desc">Average North sale = 220500 ÷ 4 matching rows = <strong>55,125</strong>. Only matching rows enter both the sum and the count.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Criteria from a Cell</div>
+                        <div class="formula-code">=SUMIF(A2:A13,H1,E2:E13)</div>
+                        <p class="formula-desc">Type "South" in H1 and the formula becomes a mini dashboard — change H1 and the total updates. For operators, concatenate: <strong>"&gt;="&amp;H2</strong>.</p>
+                    </div>
+                </div>
+
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">3️⃣ Multi-Condition Aggregates: SUMIFS, COUNTIFS, AVERAGEIFS</h2>
+
+                <p class="content-text">The "S" versions accept <strong>pairs</strong> of (criteria_range, criteria) — as many as you need — and all conditions must be true simultaneously (logical AND). One important gotcha: <strong>SUMIFS and AVERAGEIFS put the sum/average range FIRST</strong>, the opposite of their singular cousins.</p>
+
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">SUMIFS — Two Conditions</div>
+                        <div class="formula-code">=SUMIFS(E2:E13,A2:A13,"North",C2:C13,"Laptop")</div>
+                        <p class="formula-desc">North <em>and</em> Laptop → rows 2 and 4 → 54000 + 67500 = <strong>1,21,500</strong>. Read it as: "Sum E, where A is North and C is Laptop."</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">COUNTIFS — Text + Number</div>
+                        <div class="formula-code">=COUNTIFS(F2:F13,"Feb",D2:D13,"&gt;10")</div>
+                        <p class="formula-desc">February sales with more than 10 units → rows 7 (25) and 9 (14) → <strong>2</strong>. Row 6 has exactly 10 units, so "&gt;10" excludes it.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">AVERAGEIFS</div>
+                        <div class="formula-code">=AVERAGEIFS(E2:E13,C2:C13,"Phone",D2:D13,"&gt;=20")</div>
+                        <p class="formula-desc">Average Phone sale with 20+ units → rows 5, 7, 11 → (36000+45000+54000)÷3 = <strong>45,000</strong>.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Range Between Two Values</div>
+                        <div class="formula-code">=COUNTIFS(E2:E13,"&gt;=30000",E2:E13,"&lt;=50000")</div>
+                        <p class="formula-desc">Same column used twice creates a between condition: sales from 30000 to 50000 → rows 5, 6, 7, 8, 9, 10, 12, 13 → <strong>8</strong>.</p>
+                    </div>
+                </div>
+
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">Criteria Syntax Cheat Sheet</h2>
+
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+                    <tr style="background: var(--primary-dark); color: white;">
+                        <td style="padding: 0.8rem; font-weight: 700; border: 1px solid var(--primary-dark);">You Want</td>
+                        <td style="padding: 0.8rem; font-weight: 700; border: 1px solid var(--primary-dark);">Criteria to Write</td>
+                        <td style="padding: 0.8rem; font-weight: 700; border: 1px solid var(--primary-dark);">Example</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Exact text match</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">"North"</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">=COUNTIF(A:A,"North")</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Exact number</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">25 (no quotes needed)</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">=COUNTIF(D:D,25)</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Comparison</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">"&gt;50000", "&lt;=10", "&lt;&gt;North" (not equal)</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">=SUMIF(E:E,"&gt;50000")</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Compare against a cell</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">"&gt;="&amp;H1 (operator in quotes, joined with &amp;)</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">=SUMIF(D:D,"&gt;="&amp;H1,E:E)</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Starts / ends / contains</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">"La*", "*a", "*an*"</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">=COUNTIF(C:C,"La*") counts Laptop</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Non-blank / blank cells</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">"&lt;&gt;" for non-blank, "" for blank</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">=COUNTIF(B:B,"&lt;&gt;")</td>
+                    </tr>
+                </table>
+
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🏋️ Practice Exercises (Answers Hidden — Try First!)</h2>
+
+                <p class="content-text">Use the SalesData table above. Write each formula yourself in Excel, then click to check.</p>
+
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q1. Total Sale Amount for the South region</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=SUMIF(A2:A13,"South",E2:E13)</p>
+                    <p style="margin-top: 0.5rem;">Matching rows 3, 8, 12 → 24000 + 40500 + 32400 = <strong>96,900</strong></p>
+                </details>
+
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q2. How many sales happened in March?</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=COUNTIF(F2:F13,"Mar")</p>
+                    <p style="margin-top: 0.5rem;">Rows 10, 11, 12, 13 → <strong>4</strong></p>
+                </details>
+
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q3. Average Units sold per Tablet transaction</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=AVERAGEIF(C2:C13,"Tablet",D2:D13)</p>
+                    <p style="margin-top: 0.5rem;">Rows 3, 6, 9 → (8 + 10 + 14) ÷ 3 = <strong>10.67</strong></p>
+                </details>
+
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q4. Total Sale Amount for East region deals with more than 10 units</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=SUMIFS(E2:E13,A2:A13,"East",D2:D13,"&gt;10")</p>
+                    <p style="margin-top: 0.5rem;">Rows 5 (20 units) and 9 (14 units) qualify; row 13 (7 units) doesn't → 36000 + 42000 = <strong>78,000</strong></p>
+                </details>
+
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q5. In column G, label each sale: ≥50000 → "Excellent", ≥35000 → "Good", else → "Needs Push"</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=IFS(E2&gt;=50000,"Excellent",E2&gt;=35000,"Good",TRUE,"Needs Push")</p>
+                    <p style="margin-top: 0.5rem;">Or with nested IF: <span style="font-family: monospace;">=IF(E2&gt;=50000,"Excellent",IF(E2&gt;=35000,"Good","Needs Push"))</span>. Row 2 → Excellent, Row 3 → Needs Push, Row 5 → Good.</p>
+                </details>
+
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q6. Count Laptop sales worth at least 50000</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=COUNTIFS(C2:C13,"Laptop",E2:E13,"&gt;=50000")</p>
+                    <p style="margin-top: 0.5rem;">Rows 2 (54000) and 4 (67500) → <strong>2</strong>. Rows 8, 10, 13 are laptops but below 50000.</p>
+                </details>
+
+                <div class="tips-box">
+                    <div class="tips-title">Pro Tip</div>
+                    <div class="tips-text">All the IF-family criteria are AND-logic across conditions. To get OR-logic (e.g., "North OR South"), add two SUMIFs together: =SUMIF(A:A,"North",E:E)+SUMIF(A:A,"South",E:E), or use SUMPRODUCT for advanced cases. Also remember: criteria ranges in SUMIFS/COUNTIFS must all be the same size, or you'll get a #VALUE! error.</div>
+                </div>
+            </section>
+
+            <!-- Lookup Functions Lab -->
+            <section id="lookups" class="content-section">
+                <h1 class="section-title">Lookup Functions Lab: VLOOKUP, HLOOKUP &amp; XLOOKUP</h1>
+                <p class="section-subtitle">Find and pull data from tables — the most-asked Excel skill in interviews</p>
+
+                <p class="content-text">A lookup is Excel's version of asking a question against a table: "Given this employee ID, what is their salary?" You provide a <strong>lookup value</strong> (the thing you know), Excel finds it in a table, and returns a <strong>related value</strong> (the thing you want). If you think in database terms, lookups are how Excel does joins.</p>
+
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">📋 Practice Dataset 1 — Paste into a Sheet Named "Employees" (start at A1)</h2>
+
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem;">
+                    <tr style="background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">
+                        <td style="padding: 0.4rem; border: 1px solid #ccc; width: 36px;"></td>
+                        <td style="padding: 0.4rem; border: 1px solid #ccc;">A</td>
+                        <td style="padding: 0.4rem; border: 1px solid #ccc;">B</td>
+                        <td style="padding: 0.4rem; border: 1px solid #ccc;">C</td>
+                        <td style="padding: 0.4rem; border: 1px solid #ccc;">D</td>
+                        <td style="padding: 0.4rem; border: 1px solid #ccc;">E</td>
+                    </tr>
+                    <tr style="background: var(--primary-dark); color: white; font-weight: 700;">
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center;">1</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--primary-dark);">Emp ID</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--primary-dark);">Name</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--primary-dark);">Department</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--primary-dark);">City</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--primary-dark);">Salary</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">2</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">E101</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Aarav Kumar</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Finance</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Mumbai</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">58000</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">3</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">E102</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Diya Sharma</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">HR</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Delhi</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">52000</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">4</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">E103</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Kabir Mehta</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">IT</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Bengaluru</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">75000</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">5</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">E104</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Ananya Rao</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Finance</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Chennai</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">61000</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">6</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">E105</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Rohan Gupta</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Marketing</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Pune</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">56000</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">7</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">E106</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Ishita Nair</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">IT</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Bengaluru</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">80000</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">8</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">E107</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Arjun Singh</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Sales</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Hyderabad</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">54000</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">9</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">E108</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Meera Iyer</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">HR</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">Mumbai</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">50000</td>
+                    </tr>
+                </table>
+
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">1️⃣ VLOOKUP — Vertical Lookup</h2>
+
+                <p class="content-text">VLOOKUP scans <strong>down the first column</strong> of a table for your lookup value, then hops <strong>right</strong> by a number of columns you specify and returns whatever it finds there. The mental picture: a finger sliding down column A until it hits "E104", then sliding right to the Salary column.</p>
+
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+                    <tr style="background: var(--primary-dark); color: white;">
+                        <td style="padding: 0.8rem; font-weight: 700; border: 1px solid var(--primary-dark);">Argument</td>
+                        <td style="padding: 0.8rem; font-weight: 700; border: 1px solid var(--primary-dark);">Meaning</td>
+                        <td style="padding: 0.8rem; font-weight: 700; border: 1px solid var(--primary-dark);">In =VLOOKUP("E104",A2:E9,5,FALSE)</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light); font-weight: 700;">lookup_value</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">What you're searching for</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">"E104" (or a cell like G2)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light); font-weight: 700;">table_array</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">The table to search. Lookup value MUST be in its first column</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">A2:E9 (use $A$2:$E$9 before dragging)</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light); font-weight: 700;">col_index_num</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Which column of the table to return, counted from the table's own first column = 1</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">5 → Salary (A=1, B=2, C=3, D=4, E=5)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light); font-weight: 700;">range_lookup</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">FALSE/0 = exact match (use this 95% of the time). TRUE/1 = approximate match on sorted data</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">FALSE → returns <strong>61000</strong></td>
+                    </tr>
+                </table>
+
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">Exact Match (most common)</div>
+                        <div class="formula-code">=VLOOKUP("E106",A2:E9,3,FALSE)</div>
+                        <p class="formula-desc">Finds E106 in column A, returns column 3 (Department) → <strong>IT</strong>. Change col_index_num to 2 for the name, 4 for the city.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Lookup Value from a Cell</div>
+                        <div class="formula-code">=VLOOKUP(G2,$A$2:$E$9,5,0)</div>
+                        <p class="formula-desc">Type any Emp ID in G2 and the salary appears. The $ signs lock the table so you can drag the formula down for a list of IDs. 0 is shorthand for FALSE.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Handling "Not Found"</div>
+                        <div class="formula-code">=IFERROR(VLOOKUP("E999",A2:E9,5,0),"ID not found")</div>
+                        <p class="formula-desc">E999 doesn't exist, so VLOOKUP returns #N/A. Wrapping in IFERROR (or IFNA) replaces the error with a friendly message.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Approximate Match (TRUE)</div>
+                        <div class="formula-code">=VLOOKUP(E2,$G$2:$H$5,2,TRUE)</div>
+                        <p class="formula-desc">For tier/slab lookups (tax brackets, grades, commission bands). Finds the <strong>largest value ≤ lookup value</strong>. The first column of the tier table must be sorted ascending. See the bonus tier example below.</p>
+                    </div>
+                </div>
+
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">Approximate Match in Action — Bonus Tier Table (paste at G1)</h3>
+
+                <table style="width: 60%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem;">
+                    <tr style="background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">
+                        <td style="padding: 0.4rem; border: 1px solid #ccc; width: 36px;"></td>
+                        <td style="padding: 0.4rem; border: 1px solid #ccc;">G</td>
+                        <td style="padding: 0.4rem; border: 1px solid #ccc;">H</td>
+                    </tr>
+                    <tr style="background: var(--primary-dark); color: white; font-weight: 700;">
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center;">1</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--primary-dark);">Salary From</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--primary-dark);">Bonus %</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">2</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">0</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">5%</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">3</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">55000</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">8%</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">4</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">65000</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">10%</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">5</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">75000</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">12%</td>
+                    </tr>
+                </table>
+
+                <p class="content-text">With <span style="font-family: monospace;">=VLOOKUP(E2,$G$2:$H$5,2,TRUE)</span>: Aarav's salary 58000 falls into the 55000 band → <strong>8%</strong>. Meera (50000) → 5%. Ishita (80000) → 12%. This is exactly how income-tax slab calculations work — one tidy formula instead of a long nested IF.</p>
+
+                <div class="tips-box">
+                    <div class="tips-title">VLOOKUP's Three Famous Limitations</div>
+                    <div class="tips-text">1) It can only look to the RIGHT — the lookup column must be the table's first column. 2) col_index_num is a hard-coded number, so inserting a column silently breaks your formula. 3) It returns only the FIRST match for duplicates. XLOOKUP (below) fixes all three.</div>
+                </div>
+
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">2️⃣ HLOOKUP — Horizontal Lookup</h2>
+
+                <p class="content-text">HLOOKUP is VLOOKUP rotated 90°: it scans <strong>across the first row</strong> for the lookup value, then drops <strong>down</strong> a given number of rows. Use it when your data is laid out sideways — months or quarters as column headers.</p>
+
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">📋 Practice Dataset 2 — Paste into a Sheet Named "Quarterly" (start at A1)</h3>
+
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem;">
+                    <tr style="background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">
+                        <td style="padding: 0.4rem; border: 1px solid #ccc; width: 36px;"></td>
+                        <td style="padding: 0.4rem; border: 1px solid #ccc;">A</td>
+                        <td style="padding: 0.4rem; border: 1px solid #ccc;">B</td>
+                        <td style="padding: 0.4rem; border: 1px solid #ccc;">C</td>
+                        <td style="padding: 0.4rem; border: 1px solid #ccc;">D</td>
+                        <td style="padding: 0.4rem; border: 1px solid #ccc;">E</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">1</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--primary-dark); background: var(--primary-dark); color: white; font-weight: 700;">Metric</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--primary-dark); background: var(--primary-dark); color: white; font-weight: 700;">Q1</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--primary-dark); background: var(--primary-dark); color: white; font-weight: 700;">Q2</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--primary-dark); background: var(--primary-dark); color: white; font-weight: 700;">Q3</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--primary-dark); background: var(--primary-dark); color: white; font-weight: 700;">Q4</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">2</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light); font-weight: 700;">Target</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">150000</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">165000</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">180000</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">200000</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem; border: 1px solid #ccc; background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">3</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light); font-weight: 700;">Actual</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">158000</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">160500</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">191000</td>
+                        <td style="padding: 0.5rem; border: 1px solid var(--border-light);">175000</td>
+                    </tr>
+                </table>
+
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">HLOOKUP — Target</div>
+                        <div class="formula-code">=HLOOKUP("Q3",B1:E3,2,FALSE)</div>
+                        <p class="formula-desc">Finds "Q3" in row 1, drops down to row 2 of the table (Target) → <strong>180000</strong>. row_index_num counts from the table's own top row.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">HLOOKUP — Actual</div>
+                        <div class="formula-code">=HLOOKUP("Q3",B1:E3,3,FALSE)</div>
+                        <p class="formula-desc">Same search, but returns row 3 (Actual) → <strong>191000</strong>. Combine both to compute variance: Actual − Target = 11000 above target.</p>
+                    </div>
+                </div>
+
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">3️⃣ XLOOKUP — The Modern Replacement (Excel 2021 / Microsoft 365)</h2>
+
+                <p class="content-text">XLOOKUP separates the lookup column and the return column into two independent ranges, which removes every VLOOKUP limitation at once: it can look left, it doesn't break when columns are inserted, it defaults to exact match, and it has a built-in "not found" message. Syntax: <strong>=XLOOKUP(lookup_value, lookup_array, return_array, [if_not_found], [match_mode], [search_mode])</strong> — only the first three are required.</p>
+
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">Basic XLOOKUP</div>
+                        <div class="formula-code">=XLOOKUP("E104",A2:A9,E2:E9)</div>
+                        <p class="formula-desc">Search A2:A9 for E104, return the matching cell from E2:E9 → <strong>61000</strong>. No column counting, exact match by default.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Built-in Not Found</div>
+                        <div class="formula-code">=XLOOKUP("E999",A2:A9,B2:B9,"No such employee")</div>
+                        <p class="formula-desc">The 4th argument replaces #N/A — no IFERROR wrapper needed → <strong>"No such employee"</strong>.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Leftward Lookup ⭐</div>
+                        <div class="formula-code">=XLOOKUP("Kabir Mehta",B2:B9,A2:A9)</div>
+                        <p class="formula-desc">Search Names (column B), return Emp ID (column A — to the LEFT) → <strong>E103</strong>. Impossible with plain VLOOKUP.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Reverse Lookup by Value</div>
+                        <div class="formula-code">=XLOOKUP(80000,E2:E9,B2:B9)</div>
+                        <p class="formula-desc">Who earns 80000? Search the Salary column, return the Name → <strong>Ishita Nair</strong>.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Return Multiple Columns (Spill)</div>
+                        <div class="formula-code">=XLOOKUP("E105",A2:A9,B2:E9)</div>
+                        <p class="formula-desc">Return array spans B:E, so the result spills Name, Department, City and Salary into four adjacent cells → Rohan Gupta, Marketing, Pune, 56000.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Approximate Match Mode</div>
+                        <div class="formula-code">=XLOOKUP(E2,$G$2:$G$5,$H$2:$H$5,,-1)</div>
+                        <p class="formula-desc">match_mode −1 = "exact or next smaller" — same as the bonus-tier VLOOKUP, but the table doesn't even need sorting. Use 1 for "exact or next larger".</p>
+                    </div>
+                </div>
+
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">Which Lookup Should You Use?</h2>
+
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+                    <tr style="background: var(--primary-dark); color: white;">
+                        <td style="padding: 0.8rem; font-weight: 700; border: 1px solid var(--primary-dark);">Feature</td>
+                        <td style="padding: 0.8rem; font-weight: 700; border: 1px solid var(--primary-dark);">VLOOKUP</td>
+                        <td style="padding: 0.8rem; font-weight: 700; border: 1px solid var(--primary-dark);">HLOOKUP</td>
+                        <td style="padding: 0.8rem; font-weight: 700; border: 1px solid var(--primary-dark);">XLOOKUP</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Search direction</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Down first column, return right only</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Across first row, return below only</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Any direction — vertical or horizontal, left or right</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Default match</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Approximate (dangerous — always type FALSE!)</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Approximate (same trap)</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Exact ✔</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Survives column insertion</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">No — col_index_num breaks</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">No — row_index_num breaks</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Yes — ranges adjust automatically</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Not-found handling</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Needs IFERROR/IFNA wrapper</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Needs IFERROR/IFNA wrapper</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Built-in 4th argument</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Availability</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">All Excel versions</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">All Excel versions</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Excel 2021+ / Microsoft 365 only</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">When to choose</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Older files, interview questions, shared workbooks on old Excel</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Horizontal layouts (months/quarters as headers)</td>
+                        <td style="padding: 0.8rem; border: 1px solid var(--border-light);">Everything else — your default in modern Excel</td>
+                    </tr>
+                </table>
+
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🏋️ Practice Exercises (Answers Hidden — Try First!)</h2>
+
+                <p class="content-text">Use the Employees and Quarterly datasets above.</p>
+
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q1. Using VLOOKUP, find the Department of employee E107</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=VLOOKUP("E107",A2:E9,3,FALSE)</p>
+                    <p style="margin-top: 0.5rem;">Department is the 3rd column of A2:E9 → <strong>Sales</strong></p>
+                </details>
+
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q2. Using VLOOKUP with Name as the lookup value, find Ananya Rao's City</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=VLOOKUP("Ananya Rao",B2:E9,3,FALSE)</p>
+                    <p style="margin-top: 0.5rem;">Key insight: the table_array must START at the Name column (B), so City becomes column 3 of B2:E9 (B=1, C=2, D=3) → <strong>Chennai</strong>. Counting columns from A would give the wrong answer.</p>
+                </details>
+
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q3. Using HLOOKUP, what was the Actual figure for Q2?</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=HLOOKUP("Q2",B1:E3,3,FALSE)</p>
+                    <p style="margin-top: 0.5rem;">Row 3 of the table is Actual → <strong>160500</strong></p>
+                </details>
+
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q4. Using XLOOKUP, find the Emp ID of the person earning 75000</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=XLOOKUP(75000,E2:E9,A2:A9)</p>
+                    <p style="margin-top: 0.5rem;">Searches the Salary column, returns from the Emp ID column on the far LEFT → <strong>E103</strong> (Kabir Mehta). This leftward lookup is XLOOKUP's signature trick.</p>
+                </details>
+
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q5. Using XLOOKUP, look up employee "E110" and show "Check the ID" if missing</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=XLOOKUP("E110",A2:A9,B2:B9,"Check the ID")</p>
+                    <p style="margin-top: 0.5rem;">E110 doesn't exist, so the 4th argument kicks in → <strong>"Check the ID"</strong>. With VLOOKUP you'd need =IFNA(VLOOKUP(...),"Check the ID").</p>
+                </details>
+
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q6. (Challenge) Using the bonus tier table, compute Rohan Gupta's bonus amount in rupees</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=E6*VLOOKUP(E6,$G$2:$H$5,2,TRUE)</p>
+                    <p style="margin-top: 0.5rem;">Rohan's salary (E6) is 56000 → falls in the 55000 band → 8% → 56000 × 8% = <strong>4,480</strong>. XLOOKUP version: =E6*XLOOKUP(E6,$G$2:$G$5,$H$2:$H$5,,-1)</p>
+                </details>
+
+                <div class="tips-box">
+                    <div class="tips-title">Interview Gold</div>
+                    <div class="tips-text">A classic interview question: "What are VLOOKUP's limitations and how does XLOOKUP solve them?" Answer with the three limitations (right-only, fragile column index, approximate default) and demonstrate the leftward XLOOKUP. Bonus points for mentioning INDEX/MATCH as the version-proof alternative that works everywhere.</div>
                 </div>
             </section>
 
@@ -2946,8 +3676,6 @@
                     <div class="tips-title">Pro Tip</div>
                     <div class="tips-text">Master VBA by doing! Start with simple macros (like filling one column), then build complexity. Each new concept (loops, conditions, error handling) adds to your toolkit. Before long, you'll be building powerful automation tools that save hours every week!</div>
                 </div>
-
-            </section>
 
                 <p class="content-text">Use this sample data to follow along with VBA examples. Copy and paste into Excel to practice the concepts.</p>
 

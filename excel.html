@@ -609,6 +609,33 @@
                 font-size: 1rem;
             }
         }
+
+        .copy-data-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--primary-dark);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.5rem 1.1rem;
+            font-family: 'Lato', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 0.3rem 0 0.2rem;
+            transition: background 0.25s ease, transform 0.15s ease;
+        }
+
+        .copy-data-btn:hover {
+            background: var(--primary-light);
+            transform: translateY(-1px);
+        }
+
+        .copy-data-btn.copied {
+            background: var(--success);
+        }
+
     </style>
 </head>
 <body>
@@ -1597,6 +1624,8 @@
 
                 <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">📋 Practice Dataset — Paste into a Sheet Named "SalesData"</h2>
 
+                <button class="copy-data-btn" data-dataset="salesdata">📋 Copy SalesData — then paste at A1 in Excel</button>
+
                 <p class="content-text">Copy this table into Excel starting at cell <strong>A1</strong> (headers in row 1, data in rows 2–13). All the formulas below reference these exact cells, so your results should match the worked answers.</p>
 
                 <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem;">
@@ -1937,10 +1966,6 @@
                     <p style="margin-top: 0.5rem;">Rows 2 (54000) and 4 (67500) → <strong>2</strong>. Rows 8, 10, 13 are laptops but below 50000.</p>
                 </details>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">All the IF-family criteria are AND-logic across conditions. To get OR-logic (e.g., "North OR South"), add two SUMIFs together: =SUMIF(A:A,"North",E:E)+SUMIF(A:A,"South",E:E), or use SUMPRODUCT for advanced cases. Also remember: criteria ranges in SUMIFS/COUNTIFS must all be the same size, or you'll get a #VALUE! error.</div>
-                </div>
             </section>
 
             <!-- Lookup Functions Lab -->
@@ -1951,6 +1976,8 @@
                 <p class="content-text">A lookup is Excel's version of asking a question against a table: "Given this employee ID, what is their salary?" You provide a <strong>lookup value</strong> (the thing you know), Excel finds it in a table, and returns a <strong>related value</strong> (the thing you want). If you think in database terms, lookups are how Excel does joins.</p>
 
                 <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">📋 Practice Dataset 1 — Paste into a Sheet Named "Employees" (start at A1)</h2>
+
+                <button class="copy-data-btn" data-dataset="employees">📋 Copy Employees — then paste at A1 in Excel</button>
 
                 <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem;">
                     <tr style="background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">
@@ -2092,6 +2119,8 @@
 
                 <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">Approximate Match in Action — Bonus Tier Table (paste at G1)</h3>
 
+                <button class="copy-data-btn" data-dataset="bonustier">📋 Copy Bonus Tiers — then paste at G1 in Excel</button>
+
                 <table style="width: 60%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem;">
                     <tr style="background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">
                         <td style="padding: 0.4rem; border: 1px solid #ccc; width: 36px;"></td>
@@ -2137,6 +2166,8 @@
                 <p class="content-text">HLOOKUP is VLOOKUP rotated 90°: it scans <strong>across the first row</strong> for the lookup value, then drops <strong>down</strong> a given number of rows. Use it when your data is laid out sideways — months or quarters as column headers.</p>
 
                 <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">📋 Practice Dataset 2 — Paste into a Sheet Named "Quarterly" (start at A1)</h3>
+
+                <button class="copy-data-btn" data-dataset="quarterly">📋 Copy Quarterly — then paste at A1 in Excel</button>
 
                 <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem;">
                     <tr style="background: #e8e8e8; color: #555; text-align: center; font-weight: 700;">
@@ -5525,6 +5556,87 @@
 
         // Initialize calculation on load
         calculateResult();
+
+        // ===== Copy-to-Excel functionality for practice datasets =====
+        // Values are tab-separated so Excel places each value in its own cell.
+        const practiceDatasets = {
+            salesdata:
+                "Region\tSalesperson\tProduct\tUnits\tSale Amount\tMonth\n" +
+                "North\tAnita\tLaptop\t12\t54000\tJan\n" +
+                "South\tRavi\tTablet\t8\t24000\tJan\n" +
+                "North\tVikram\tLaptop\t15\t67500\tJan\n" +
+                "East\tPriya\tPhone\t20\t36000\tJan\n" +
+                "West\tSneha\tTablet\t10\t30000\tFeb\n" +
+                "North\tAnita\tPhone\t25\t45000\tFeb\n" +
+                "South\tRavi\tLaptop\t9\t40500\tFeb\n" +
+                "East\tPriya\tTablet\t14\t42000\tFeb\n" +
+                "West\tSneha\tLaptop\t11\t49500\tMar\n" +
+                "North\tVikram\tPhone\t30\t54000\tMar\n" +
+                "South\tRavi\tPhone\t18\t32400\tMar\n" +
+                "East\tPriya\tLaptop\t7\t31500\tMar",
+            employees:
+                "Emp ID\tName\tDepartment\tCity\tSalary\n" +
+                "E101\tAarav Kumar\tFinance\tMumbai\t58000\n" +
+                "E102\tDiya Sharma\tHR\tDelhi\t52000\n" +
+                "E103\tKabir Mehta\tIT\tBengaluru\t75000\n" +
+                "E104\tAnanya Rao\tFinance\tChennai\t61000\n" +
+                "E105\tRohan Gupta\tMarketing\tPune\t56000\n" +
+                "E106\tIshita Nair\tIT\tBengaluru\t80000\n" +
+                "E107\tArjun Singh\tSales\tHyderabad\t54000\n" +
+                "E108\tMeera Iyer\tHR\tMumbai\t50000",
+            bonustier:
+                "Salary From\tBonus %\n" +
+                "0\t5%\n" +
+                "55000\t8%\n" +
+                "65000\t10%\n" +
+                "75000\t12%",
+            quarterly:
+                "Metric\tQ1\tQ2\tQ3\tQ4\n" +
+                "Target\t150000\t165000\t180000\t200000\n" +
+                "Actual\t158000\t160500\t191000\t175000"
+        };
+
+        function copyDatasetToClipboard(text, btn) {
+            const showCopied = () => {
+                const originalText = btn.textContent;
+                btn.textContent = "✓ Copied! Now paste in Excel";
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('copied');
+                }, 2500);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(showCopied).catch(() => fallbackCopy(text, showCopied));
+            } else {
+                fallbackCopy(text, showCopied);
+            }
+        }
+
+        function fallbackCopy(text, onSuccess) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                onSuccess();
+            } catch (err) {
+                alert('Copy failed — please select the table manually and press Ctrl+C.');
+            }
+            document.body.removeChild(ta);
+        }
+
+        document.querySelectorAll('.copy-data-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const data = practiceDatasets[btn.getAttribute('data-dataset')];
+                if (data) copyDatasetToClipboard(data, btn);
+            });
+        });
+
+
     </script>
 </body>
 </html>

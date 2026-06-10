@@ -1482,6 +1482,52 @@
                     </div>
                 </div>
 
+            
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🔧 Worked Examples — Against the SalesData Practice Table</h2>
+                <p class="content-text">All examples below run on the SalesData sheet (A1:F13) from the Conditional Formulas Lab — copy it from there and verify each result yourself.</p>
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">SUM / AVERAGE</div>
+                        <div class="formula-code">=SUM(E2:E13) and =AVERAGE(E2:E13)</div>
+                        <p class="formula-desc">Total sales <strong>506400</strong>; average deal <strong>42200</strong>. AVERAGE ignores empty cells and text — a blank row would not drag the average down, but a 0 would.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">MIN / MAX / spread</div>
+                        <div class="formula-code">=MAX(E2:E13)-MIN(E2:E13)</div>
+                        <p class="formula-desc">Largest deal 67500 minus smallest 24000 → range of <strong>43500</strong>. A quick volatility check before any deeper analysis.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">COUNT vs COUNTA vs COUNTBLANK</div>
+                        <div class="formula-code">=COUNT(E2:E13) vs =COUNTA(B2:B13)</div>
+                        <p class="formula-desc">COUNT counts only numbers (→ 12 in column E); COUNTA counts anything non-empty (→ 12 names in B); COUNTBLANK counts the gaps. Mixing them up is a classic data-quality bug.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">LARGE / SMALL — Nth values</div>
+                        <div class="formula-code">=LARGE(E2:E13,2)</div>
+                        <p class="formula-desc">The 2nd biggest deal → <strong>54000</strong>. MAX is just LARGE(...,1). SMALL works from the other end — ideal for top-N / bottom-N reporting.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">RANK — position of a value</div>
+                        <div class="formula-code">=RANK(E2,$E$2:$E$13,0)</div>
+                        <p class="formula-desc">Where does row 2&#39;s 54000 stand? → <strong>2</strong> (tied with another 54000; both get rank 2 and rank 4 is skipped). 0 = descending, 1 = ascending.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">ROUND family</div>
+                        <div class="formula-code">=ROUND(E2/D2,0)</div>
+                        <p class="formula-desc">Per-unit price 54000/12 = 4500 exactly; for messier divisions ROUND(x,0) → nearest rupee, ROUNDUP always up, ROUNDDOWN truncates, MROUND(x,500) → nearest 500.</p>
+                    </div>
+                </div>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">🏋️ Practice</h3>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q1. What is the 3rd smallest Sale Amount?</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=SMALL(E2:E13,3)</p>
+                    <p style="margin-top: 0.5rem;">Sorted ascending: 24000, 30000, 31500... → <strong>31500</strong></p>
+                </details>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q2. How many transactions involved more than 12 units?</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=COUNTIF(D2:D13,"&gt;12")</p>
+                    <p style="margin-top: 0.5rem;">Rows with 15, 20, 25, 14, 30, 18 → <strong>6</strong>. (COUNT counts numbers; COUNTIF counts matches — this needs the criteria version covered in the Conditional Formulas Lab.)</p>
+                </details>
             </section>
 
             <!-- Logical Functions -->
@@ -1581,6 +1627,42 @@
                     </div>
                 </div>
 
+            
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🔧 Worked Examples — Combining Logical Functions</h2>
+                <p class="content-text">Logical functions return TRUE/FALSE and become powerful when nested inside IF or used to build flags. Examples below use SalesData (A1:F13):</p>
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">Boolean Columns (no IF needed)</div>
+                        <div class="formula-code">=E2&gt;=50000</div>
+                        <p class="formula-desc">Returns plain <strong>TRUE</strong>/FALSE. Handy trick: booleans become 1/0 in math, so =SUM((E2:E13&gt;=50000)*1) entered as an array counts high-value deals → 3.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">AND across many tests</div>
+                        <div class="formula-code">=AND(D2&gt;10,E2&gt;40000,A2="North")</div>
+                        <p class="formula-desc">TRUE only when all three hold — row 2 (12 units, 54000, North) → <strong>TRUE</strong>. AND accepts up to 255 conditions.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">XOR — exactly-one-true</div>
+                        <div class="formula-code">=XOR(C2="Laptop",E2&gt;50000)</div>
+                        <p class="formula-desc">TRUE when precisely ONE condition holds. Row 2 is a Laptop AND above 50000 → both true → <strong>FALSE</strong>. Niche but great for either-or business rules.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">NOT for readable negation</div>
+                        <div class="formula-code">=IF(NOT(A2="North"),"Outstation","HQ")</div>
+                        <p class="formula-desc">Same as A2&lt;&gt;"North" but often clearer when the condition is itself complex.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">IFERROR — graceful failures</div>
+                        <div class="formula-code">=IFERROR(E2/D2,"check units")</div>
+                        <p class="formula-desc">Division is fine here (4500), but if D2 were 0 or blank you would get #DIV/0! — IFERROR swaps any error for your fallback. Use IFNA to catch only #N/A from lookups.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">SWITCH — cleaner than nested IF</div>
+                        <div class="formula-code">=SWITCH(A2,"North","NR","South","SR","East","ER","WR")</div>
+                        <p class="formula-desc">Compares one expression against value/result pairs; the lone last argument is the default → row 2 gives <strong>NR</strong>. Use IFS when each branch tests a different condition; SWITCH when all branches test the same expression.</p>
+                    </div>
+                </div>
+                <p class="content-text">For full hands-on practice with IF, IFS and the criteria-based SUMIF/COUNTIF family, continue to the <strong>Conditional Formulas Lab</strong> section — it includes a paste-ready dataset and graded exercises.</p>
             </section>
 
             <!-- Conditional & Statistical Formulas Lab -->
@@ -2396,6 +2478,66 @@
                 
                 <p class="content-text"><strong>Methods:</strong> The & operator (=A1&" "&B1) is simplest. CONCATENATE() function is traditional. TEXTJOIN() (Excel 2016+) is most powerful, allowing delimiters and ignoring blanks.</p>
 
+            
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🔧 Worked Examples — Cleaning Messy Real-World Data</h2>
+                <p class="content-text">Text functions shine when combined. Suppose A2 contains the messy entry <strong>"&nbsp;&nbsp;aarav KUMAR&nbsp;&nbsp;"</strong> and B2 contains <strong>"aarav.kumar@acte.in"</strong>. Here is how the functions chain together to clean and extract:</p>
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">Clean + Capitalize in One Go</div>
+                        <div class="formula-code">=PROPER(TRIM(A2))</div>
+                        <p class="formula-desc">TRIM strips the stray spaces first, then PROPER capitalizes each word → <strong>Aarav Kumar</strong>. Functions evaluate inside-out, like nested calls in Python.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">First Name (dynamic length)</div>
+                        <div class="formula-code">=LEFT(A2,FIND(" ",A2)-1)</div>
+                        <p class="formula-desc">On the cleaned "Aarav Kumar": FIND locates the space at position 6, so LEFT grabs 5 characters → <strong>Aarav</strong>. Works for any name length — never hard-code the count.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Last Name</div>
+                        <div class="formula-code">=MID(A2,FIND(" ",A2)+1,100)</div>
+                        <p class="formula-desc">Start one character after the space and take up to 100 chars → <strong>Kumar</strong>. Overshooting is safe — MID simply stops at the end of the text.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Username / Domain from Email</div>
+                        <div class="formula-code">=LEFT(B2,FIND("@",B2)-1)</div>
+                        <p class="formula-desc">Everything before the @ → <strong>aarav.kumar</strong>. Swap LEFT for MID(B2,FIND("@",B2)+1,100) to get the domain → <strong>acte.in</strong>.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Count Words in a Cell</div>
+                        <div class="formula-code">=LEN(TRIM(A2))-LEN(SUBSTITUTE(TRIM(A2)," ",""))+1</div>
+                        <p class="formula-desc">Classic trick: length with spaces minus length without = number of spaces; add 1 → <strong>2</strong> words. Note SUBSTITUTE removes ALL occurrences; REPLACE works by position instead.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">TEXTJOIN with Ignore-Empty</div>
+                        <div class="formula-code">=TEXTJOIN(", ",TRUE,B2:B9)</div>
+                        <p class="formula-desc">Joins a whole range with one delimiter, skipping blanks (the TRUE). Run it on the Employees Name column → one comma-separated string of all 8 names. Far cleaner than chaining &amp;.</p>
+                    </div>
+                </div>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">Number Formatting with TEXT()</h3>
+                <p class="content-text">TEXT converts a number into formatted text — essential when concatenating numbers into sentences, because raw concatenation drops all formatting.</p>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;">
+                    <tr style="background: var(--primary-dark); color: white;"><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Formula</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Result</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Use Case</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">=TEXT(54000,"₹#,##0")</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">₹54,000</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Currency inside messages</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">=TEXT(0.0856,"0.0%")</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">8.6%</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Percentages in labels</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">=TEXT(TODAY(),"dd-mmm-yyyy")</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">10-Jun-2026</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Dates inside sentences</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">="Total: "&amp;TEXT(SUM(E2:E13),"#,##0")</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Total: 5,06,400</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Dynamic chart titles &amp; dashboard headers</td></tr>
+                </table>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">🏋️ Practice (uses the Employees sheet from the Lookup Lab)</h3>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q1. Extract the first name of the employee in B2 ("Aarav Kumar")</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=LEFT(B2,FIND(" ",B2)-1)</p>
+                    <p style="margin-top: 0.5rem;">FIND returns 6 (position of the space), LEFT takes characters 1–5 → <strong>Aarav</strong></p>
+                </details>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q2. Build an email for row 2 in the pattern firstname.lastname@acte.in (lowercase)</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=LOWER(SUBSTITUTE(B2," ","."))&amp;"@acte.in"</p>
+                    <p style="margin-top: 0.5rem;">SUBSTITUTE swaps the space for a dot, LOWER fixes the case → <strong>aarav.kumar@acte.in</strong></p>
+                </details>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q3. Count the characters in "Bengaluru" (D4) — and reason about what TRIM would change</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=LEN(D4)</p>
+                    <p style="margin-top: 0.5rem;">LEN counts every character → <strong>9</strong>. TRIM(D4) is identical here because there are no extra spaces — TRIM only removes leading, trailing, and doubled internal spaces.</p>
+                </details>
             </section>
 
             <!-- Date Functions -->
@@ -2475,6 +2617,65 @@
                     </div>
                 </div>
 
+            
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🔧 Worked Examples — Real Date Calculations</h2>
+                <p class="content-text">Excel stores dates as serial numbers (1 = 1-Jan-1900), which is why date arithmetic is just addition and subtraction. Assume A2 = <strong>15-Aug-2024</strong> (a project start date) and today is <strong>10-Jun-2026</strong> via =TODAY().</p>
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">Tenure in Complete Years</div>
+                        <div class="formula-code">=DATEDIF(A2,TODAY(),"Y")</div>
+                        <p class="formula-desc">Complete years between the dates → <strong>1</strong> (Aug-2024 to Aug-2025 is one full year; the second completes only in Aug-2026). Units: "Y" years, "M" months, "D" days, "YM" leftover months.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Tenure as "Y yrs M months"</div>
+                        <div class="formula-code">=DATEDIF(A2,TODAY(),"Y")&amp;" yrs "&amp;DATEDIF(A2,TODAY(),"YM")&amp;" months"</div>
+                        <p class="formula-desc">Combines two DATEDIF units → <strong>1 yrs 9 months</strong>. The "YM" unit returns months remaining after full years are removed.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Deadline: 45 Working Days Out</div>
+                        <div class="formula-code">=WORKDAY(A2,45)</div>
+                        <p class="formula-desc">Adds 45 business days to 15-Aug-2024, skipping weekends → <strong>16-Oct-2024</strong>. Pass holidays as the third argument: =WORKDAY(A2,45,$H$2:$H$5).</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Business Days Between</div>
+                        <div class="formula-code">=NETWORKDAYS(A2,TODAY())</div>
+                        <p class="formula-desc">Counts working days between the dates, inclusive — the backbone of SLA and turnaround-time reports. Add an Indian holiday list as the third argument for accuracy.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Invoice Due: End of Next Month</div>
+                        <div class="formula-code">=EOMONTH(A2,1)</div>
+                        <p class="formula-desc">Month-end one month after the date → <strong>30-Sep-2024</strong>. EOMONTH(A2,0) returns the same month-end (31-Aug-2024) — the classic "Net EOM" credit-terms pattern.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Calendar Quarter</div>
+                        <div class="formula-code">="Q"&amp;ROUNDUP(MONTH(A2)/3,0)</div>
+                        <p class="formula-desc">August is month 8; 8/3 rounded up = 3 → <strong>Q3</strong>. For an April-start fiscal year (India), use ="Q"&amp;MOD(ROUNDUP(MONTH(A2)/3,0)+2,4)+1 → FY <strong>Q2</strong>.</p>
+                    </div>
+                </div>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">Date Display Cheat Sheet — TEXT() Codes</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;">
+                    <tr style="background: var(--primary-dark); color: white;"><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Code</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">=TEXT(A2, code) gives</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Notes</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">"dd-mm-yyyy"</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">15-08-2024</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Standard Indian format</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">"dddd"</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Thursday</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Full day name — great for rosters and attendance sheets</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">"mmm-yy"</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Aug-24</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Compact month label for pivots and charts</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">"[h]:mm"</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">26:30 stays 26:30</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Square brackets stop time wrapping at 24h — essential for timesheets</td></tr>
+                </table>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">🏋️ Practice</h3>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q1. A task starts on 2-Mar-2026, a Monday (A5). What date is 10 working days later?</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=WORKDAY(A5,10)</p>
+                    <p style="margin-top: 0.5rem;">Two full working weeks land on <strong>16-Mar-2026</strong> (Monday) — both weekends are skipped automatically.</p>
+                </details>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q2. How many days until Diwali if D1 = 8-Nov-2026?</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=D1-TODAY()</p>
+                    <p style="margin-top: 0.5rem;">Plain subtraction works because dates are numbers → <strong>151</strong> days from 10-Jun-2026. If you see a weird date instead, format the result cell as Number.</p>
+                </details>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q3. Show the month name of the date in A2 (15-Aug-2024)</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=TEXT(A2,"mmmm")</p>
+                    <p style="margin-top: 0.5rem;">→ <strong>August</strong>. MONTH(A2) gives the number 8; TEXT gives the name.</p>
+                </details>
             </section>
 
             <!-- Advanced Formulas -->
@@ -2546,6 +2747,83 @@
                     </div>
                 </div>
 
+            
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🔧 INDEX + MATCH — The Version-Proof Power Lookup</h2>
+                <p class="content-text">INDEX/MATCH is two simple ideas glued together. <strong>MATCH(value, range, 0)</strong> answers "at what position?" and <strong>INDEX(range, position)</strong> answers "what is at this position?". Using the Employees sheet from the Lookup Lab:</p>
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">Step 1 — MATCH finds the position</div>
+                        <div class="formula-code">=MATCH("E104",A2:A9,0)</div>
+                        <p class="formula-desc">E104 is the 4th entry in the ID column → <strong>4</strong>. The 0 demands an exact match — always include it.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Step 2 — INDEX fetches the value</div>
+                        <div class="formula-code">=INDEX(E2:E9,4)</div>
+                        <p class="formula-desc">The 4th value in the Salary column → <strong>61000</strong>.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Combined — left-lookups work</div>
+                        <div class="formula-code">=INDEX(A2:A9,MATCH("Kabir Mehta",B2:B9,0))</div>
+                        <p class="formula-desc">Search Names, return Emp ID from the column to the LEFT → <strong>E103</strong>. Works in every Excel version, even where XLOOKUP does not exist.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Two-Way Lookup (row AND column)</div>
+                        <div class="formula-code">=INDEX(B2:E3,MATCH("Actual",A2:A3,0),MATCH("Q3",B1:E1,0))</div>
+                        <p class="formula-desc">On the Quarterly sheet: the MATCHes find row 2 (Actual) and column 3 (Q3) → <strong>191000</strong>. One formula reads any cell of a grid by its labels.</p>
+                    </div>
+                </div>
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">⚡ Dynamic Array Functions (Excel 365 / 2021)</h2>
+                <p class="content-text">These functions return whole result ranges that "spill" into neighbouring cells — one formula, many answers. Try them against the SalesData sheet (A1:F13) from the Conditional Formulas Lab:</p>
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">FILTER — formula-driven subsets</div>
+                        <div class="formula-code">=FILTER(A2:F13,A2:A13="North")</div>
+                        <p class="formula-desc">Spills all 4 North rows instantly and updates live when data changes — unlike a manual filter. Third argument handles no matches: =FILTER(A2:F13,A2:A13="Goa","No rows").</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">FILTER with AND / OR logic</div>
+                        <div class="formula-code">=FILTER(B2:B13,(A2:A13="North")*(E2:E13&gt;50000))</div>
+                        <p class="formula-desc">Multiply conditions for AND, add (+) for OR → spills <strong>Anita, Vikram</strong> — sellers of North deals above 50000.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">UNIQUE — distinct values</div>
+                        <div class="formula-code">=UNIQUE(C2:C13)</div>
+                        <p class="formula-desc">Spills <strong>Laptop, Tablet, Phone</strong>. Chain it: =SORT(UNIQUE(A2:A13)) gives an alphabetized region list — the perfect feeder for dropdown validation.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">SORT / SORTBY</div>
+                        <div class="formula-code">=SORTBY(A2:F13,E2:E13,-1)</div>
+                        <p class="formula-desc">The whole table reordered by Sale Amount descending — the top row becomes Vikram&#39;s 67500 Laptop deal. The source data stays untouched.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">SEQUENCE — number generator</div>
+                        <div class="formula-code">=SEQUENCE(12,1,1,1)</div>
+                        <p class="formula-desc">Spills 1–12 down a column (rows, columns, start, step). Great for serial numbers, schedules, and test data: =SEQUENCE(5,3) fills a 5×3 grid.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Spill References with #</div>
+                        <div class="formula-code">=SUM(G2#)</div>
+                        <p class="formula-desc">If G2 holds a spilling formula, G2# refers to the entire spilled range — downstream formulas resize automatically with their source.</p>
+                    </div>
+                </div>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">OFFSET &amp; INDIRECT — Powerful but Use Sparingly</h3>
+                <p class="content-text"><strong>OFFSET(A1,2,3)</strong> returns the cell 2 rows down and 3 columns right of A1 (→ D3); with height/width arguments it returns resizable ranges for dynamic charts. <strong>INDIRECT("Sheet"&amp;A1&amp;"!B2")</strong> builds a reference out of text — handy for pulling the same cell from many sheets. Both are <em>volatile</em> (they recalculate on every change), so on large workbooks prefer INDEX, structured Table references, or dynamic arrays for performance.</p>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">🏋️ Practice</h3>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q1. Using INDEX/MATCH on Employees, find the City of E107</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=INDEX(D2:D9,MATCH("E107",A2:A9,0))</p>
+                    <p style="margin-top: 0.5rem;">MATCH finds position 7; INDEX returns the 7th City → <strong>Hyderabad</strong></p>
+                </details>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q2. (365) Spill the names of all employees earning more than 55000</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=FILTER(B2:B9,E2:E9&gt;55000)</p>
+                    <p style="margin-top: 0.5rem;">→ <strong>Aarav Kumar, Kabir Mehta, Ananya Rao, Rohan Gupta, Ishita Nair</strong> — five names spill down from one formula.</p>
+                </details>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q3. (365) Produce a sorted list of unique products from SalesData</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=SORT(UNIQUE(C2:C13))</p>
+                    <p style="margin-top: 0.5rem;">UNIQUE removes duplicates, SORT alphabetizes → <strong>Laptop, Phone, Tablet</strong></p>
+                </details>
             </section>
 
             <!-- Data Validation -->
@@ -2592,6 +2870,47 @@
                 <p class="content-text">4. (Optional) Create custom error message in Error Alert tab</p>
                 <p class="content-text">5. Click OK</p>
 
+            
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🔧 Worked Example — Build a Region Dropdown in 60 Seconds</h2>
+                <p class="content-text">Goal: restrict column A of a data-entry sheet to the four sales regions, so nobody can type "Nort" or "NORTH " by mistake.</p>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;">
+                    <tr style="background: var(--primary-dark); color: white;"><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Step</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Action</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">1</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Select the cells to control (e.g., A2:A100)</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">2</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Data tab → Data Validation → Allow: <strong>List</strong></td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">3</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Source: type <strong>North,South,East,West</strong> directly — or better, point to a range like =$H$2:$H$5 so the list stays editable</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">4</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Input Message tab (optional): "Pick a region from the list" — shows as a tooltip when the cell is selected</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">5</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Error Alert tab: <strong>Stop</strong> blocks invalid entries; <strong>Warning</strong> allows them after confirmation</td></tr>
+                </table>
+                <p class="content-text">In Excel 365, point the Source at a spilled formula for a self-maintaining dropdown: put <span style="font-family: monospace;">=SORT(UNIQUE(SalesData!A2:A13))</span> in H2, then use <span style="font-family: monospace;">=$H$2#</span> as the validation source — any new region appearing in the data joins the dropdown automatically.</p>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">Dependent (Cascading) Dropdowns</h3>
+                <p class="content-text">Classic setup: pick a Region in A2, and B2&#39;s dropdown shows only that region&#39;s cities. Create named ranges called <strong>North</strong>, <strong>South</strong>, etc., each holding its city list, then set B2&#39;s validation source to <span style="font-family: monospace;">=INDIRECT($A$2)</span> — INDIRECT converts the chosen text "North" into a reference to the named range North. The 365 alternative: validation source =$J$2# where J2 holds =FILTER(CityCol, RegionCol=$A$2).</p>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">Custom Formula Rules — The Real Power</h3>
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">Block Duplicate IDs</div>
+                        <div class="formula-code">=COUNTIF($A$2:$A$100,A2)=1</div>
+                        <p class="formula-desc">Applied to A2:A100: an entry is valid only if it appears exactly once in the column — instantly prevents duplicate employee or invoice IDs.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Force a Prefix and Length</div>
+                        <div class="formula-code">=AND(LEFT(A2,1)="E",LEN(A2)=4)</div>
+                        <p class="formula-desc">Only 4-character values starting with "E" pass — enforces ID conventions like E101. Each cell is checked against the formula with its own relative reference.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">No Future Dates</div>
+                        <div class="formula-code">=B2&lt;=TODAY()</div>
+                        <p class="formula-desc">Transaction dates cannot be in the future. Flip the operator for booking systems that only accept future dates.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Whole-Column Budget Cap</div>
+                        <div class="formula-code">=SUM($D$2:$D$100)&lt;=500000</div>
+                        <p class="formula-desc">A new entry is valid only while the column total stays within budget — validation rules can look beyond the cell itself.</p>
+                    </div>
+                </div>
+                <div class="tips-box">
+                    <div class="tips-title">Auditing Existing Data</div>
+                    <div class="tips-text">Validation only checks NEW entries — pasted data bypasses it entirely. To test what is already there, use Data → Data Validation → Circle Invalid Data: Excel draws red ovals around every cell breaking its rule.</div>
+                </div>
             </section>
 
             <!-- Pivot Tables -->
@@ -2630,6 +2949,53 @@
                 <p class="content-text"><strong>4. Drag fields:</strong> Build your summary by dragging fields to areas.</p>
                 <p class="content-text"><strong>5. Analyze:</strong> Expand/collapse categories, filter, sort results.</p>
 
+            
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🔧 Full Walkthrough — Pivot the SalesData Practice Table</h2>
+                <p class="content-text">Use the 12-row SalesData table from the Conditional Formulas Lab (copy button included there). Question to answer: <strong>"How much did each Region sell, per Product?"</strong></p>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;">
+                    <tr style="background: var(--primary-dark); color: white;"><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Step</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Action</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">1</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Click anywhere inside the data → Insert → PivotTable → New Worksheet → OK</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">2</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Drag <strong>Region</strong> into the Rows area</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">3</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Drag <strong>Product</strong> into the Columns area</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">4</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Drag <strong>Sale Amount</strong> into the Values area (defaults to Sum)</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">5</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Optionally drag <strong>Month</strong> into Filters to slice by month</td></tr>
+                </table>
+                <p class="content-text">Your pivot should match this exactly — a 12-row table summarized into a 4×3 grid in five drags, zero formulas:</p>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;">
+                    <tr style="background: var(--primary-dark); color: white;"><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Sum of Sale Amount</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Laptop</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Phone</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Tablet</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Grand Total</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">East</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">31500</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">36000</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">42000</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">109500</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">North</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">121500</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">99000</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);"></td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">220500</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">South</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">40500</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">32400</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">24000</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">96900</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">West</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">49500</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);"></td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">30000</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">79500</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);"><strong>Grand Total</strong></td><td style="padding: 0.6rem; border: 1px solid var(--border-light);"><strong>243000</strong></td><td style="padding: 0.6rem; border: 1px solid var(--border-light);"><strong>167400</strong></td><td style="padding: 0.6rem; border: 1px solid var(--border-light);"><strong>96000</strong></td><td style="padding: 0.6rem; border: 1px solid var(--border-light);"><strong>506400</strong></td></tr>
+                </table>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">Going Further — Value Field Settings</h3>
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">Change Sum → Average / Count</div>
+                        <div class="formula-code">Right-click a value → Summarize Values By</div>
+                        <p class="formula-desc">Switch the same field to Average to see typical deal size per region, or Count to see number of transactions. Drag Sale Amount into Values TWICE to show Sum and Average side by side.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Show % of Grand Total</div>
+                        <div class="formula-code">Right-click → Show Values As → % of Grand Total</div>
+                        <p class="formula-desc">North&#39;s 220500 displays as <strong>43.5%</strong> of the 506400 total — instant contribution analysis without writing a single division formula.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Group Dates / Numbers</div>
+                        <div class="formula-code">Right-click a date field → Group</div>
+                        <p class="formula-desc">Group transaction dates by Month/Quarter/Year, or group numeric values into bands (e.g., 0–25000, 25001–50000) for distribution analysis.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Slicers — Clickable Filters</div>
+                        <div class="formula-code">PivotTable Analyze → Insert Slicer</div>
+                        <p class="formula-desc">Slicers are button-style filters (pick Month or Salesperson) that can control multiple pivots at once via Report Connections — the foundation of every Excel dashboard.</p>
+                    </div>
+                </div>
+                <div class="tips-box">
+                    <div class="tips-title">Pivot Data Went Stale?</div>
+                    <div class="tips-text">Pivots do NOT auto-update when source data changes. Right-click → Refresh (or Ctrl+Alt+F5 for all). Better: convert the source to a Table (Ctrl+T) first, so new rows are picked up automatically on refresh.</div>
+                </div>
             </section>
 
             <!-- Charts -->
@@ -2739,6 +3105,41 @@
                 <p class="content-text"><strong>Data Labels:</strong> Add precise values if needed for small charts. Omit for large datasets where they create clutter.</p>
                 <p class="content-text"><strong>Legends:</strong> Only include if absolutely necessary. Label directly on series when possible.</p>
 
+            
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">📊 Which Chart for Which Question? — Decision Guide</h2>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;">
+                    <tr style="background: var(--primary-dark); color: white;"><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Your Question</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Best Chart</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Why</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Compare categories (sales by region)</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Clustered Column / Bar</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Lengths are the easiest visual to compare; use Bar when labels are long</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Trend over time (monthly revenue)</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Line</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Time flows left to right; lines reveal direction and slope</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Part-of-whole at ONE point in time</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Pie / Doughnut (≤5 slices)</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">More than 5 slices becomes unreadable — switch to a sorted bar</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Relationship between two numerics (units vs amount)</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Scatter (XY)</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">The only chart where BOTH axes are values; add a trendline for correlation</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Two measures, different scales (revenue + margin %)</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Combo with Secondary Axis</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Column for revenue, line on secondary axis for the percentage</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Distribution of values</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Histogram</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Shows the shape of the data — built-in since Excel 2016</td></tr>
+                </table>
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🔧 Worked Example — Region Chart from SalesData in 4 Steps</h2>
+                <p class="content-text">1) Build the summary first — charts should plot summaries, not raw rows. Use the pivot from the Pivot Tables section, or formulas: regions in H2:H5 and =SUMIF($A$2:$A$13,H2,$E$2:$E$13) in I2:I5 (North 220500, South 96900, East 109500, West 79500). 2) Select H1:I5 → Insert → Clustered Column. 3) Title it via the dynamic-title trick: click the chart title, type = in the formula bar, click a cell containing ="Sales by Region — Total "&amp;TEXT(SUM(I2:I5),"#,##0"). 4) Right-click bars → Add Data Labels, then delete gridlines for a cleaner look.</p>
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">Sort Bars for Instant Readability</div>
+                        <div class="formula-code">Sort the source data descending</div>
+                        <p class="formula-desc">A column chart sorted North → East → South → West reads ten times faster than alphabetical order. Charts inherit the order of their source.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Make It Auto-Expanding</div>
+                        <div class="formula-code">Ctrl+T the source first</div>
+                        <p class="formula-desc">Charts built on Tables grow automatically when rows are added — no more editing the data range every month.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Spark Trends in a Single Cell</div>
+                        <div class="formula-code">Insert → Sparklines → Line</div>
+                        <p class="formula-desc">Mini in-cell charts beside each row of a summary — perfect for showing each region&#39;s Jan→Mar trajectory without a full chart object.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Copy Formatting Between Charts</div>
+                        <div class="formula-code">Ctrl+C the styled chart → select target → Paste Special → Formats</div>
+                        <p class="formula-desc">Style once, reuse everywhere — keeps a dashboard visually consistent in seconds.</p>
+                    </div>
+                </div>
             </section>
 
             <!-- Conditional Formatting -->
@@ -2782,8 +3183,56 @@
                 <p class="content-text"><strong>Sales Dashboard:</strong> Green for quota-exceeding regions, red for underperforming ones. Data bars show magnitude instantly.</p>
                 <p class="content-text"><strong>Inventory:</strong> Highlight items below minimum stock in red. Automatic visual alert without needing emails or reports.</p>
                 <p class="content-text"><strong>Budget Tracking:</strong> Color-code overages in red, surpluses in green. Icon sets (traffic lights) show budget status at a glance.</p>
-                <p class="content-text"><strong>Project Timeline:</strong> Highlight overdue tasks in red, on-track in green. Uses formula: =A1<TODAY() for visual deadline management.</p>
+                <p class="content-text"><strong>Project Timeline:</strong> Highlight overdue tasks in red, on-track in green. Uses formula: =A1&lt;TODAY() for visual deadline management.</p>
 
+            
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🔧 Worked Examples — Formula-Driven Formatting on SalesData</h2>
+                <p class="content-text">The built-in rules color single cells, but the real power move is <strong>Use a formula to determine which cells to format</strong> — it can color whole rows and respond to other columns. Select the full data range A2:F13 first; the formula is written for the top-left row and Excel adjusts it downward.</p>
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">Highlight Entire High-Value Rows</div>
+                        <div class="formula-code">=$E2&gt;=50000</div>
+                        <p class="formula-desc">Select A2:F13 → New Rule → Use a formula. The $ locks the column (always test column E) while the row stays relative → rows 2, 4, 11 glow across all six columns. This $-anchoring is THE key trick.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Flag Duplicate Salesperson+Month</div>
+                        <div class="formula-code">=COUNTIFS($B$2:$B$13,$B2,$F$2:$F$13,$F2)&gt;1</div>
+                        <p class="formula-desc">Highlights rows where the same person sold twice in the same month — multi-column duplicate detection the built-in Duplicates rule cannot do.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Zebra Stripes That Survive Sorting</div>
+                        <div class="formula-code">=MOD(ROW(),2)=0</div>
+                        <p class="formula-desc">Shades every even row. Unlike manual fills, the stripes stay correct after sorting and filtering. Use ISEVEN(ROW()) for readability.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Top 3 Deals Only</div>
+                        <div class="formula-code">=$E2&gt;=LARGE($E$2:$E$13,3)</div>
+                        <p class="formula-desc">LARGE(...,3) returns the 3rd biggest value (54000), so the rule lights up everything at or above it → the 67500 deal and both 54000 deals.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Overdue Date Alert</div>
+                        <div class="formula-code">=AND($G2&lt;TODAY(),$H2&lt;&gt;"Done")</div>
+                        <p class="formula-desc">A due date in G that has passed AND status not "Done" turns red. Conditional formats with TODAY() re-evaluate daily — a self-updating tracker.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Compare Two Columns</div>
+                        <div class="formula-code">=$E2&lt;$D2*3000</div>
+                        <p class="formula-desc">Highlight rows where revenue fell below ₹3000 per unit — formatting driven by a calculation across columns, not by any single cell value.</p>
+                    </div>
+                </div>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">Managing Rules Like a Pro</h3>
+                <p class="content-text">Home → Conditional Formatting → <strong>Manage Rules</strong> shows every rule on the sheet, its range, and its priority — rules higher in the list win. Tick <strong>Stop If True</strong> to prevent lower rules from also applying (e.g., a red "loss" rule should stop the green "high revenue" rule from overpainting it). To remove formatting: Clear Rules → from Selected Cells or Entire Sheet.</p>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">🏋️ Practice</h3>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q1. Color the entire row green where the Product is Laptop</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=$C2="Laptop"</p>
+                    <p style="margin-top: 0.5rem;">Select A2:F13 first, then apply the formula rule. Five rows light up (2, 4, 8, 10, 13). Without the $ before C, only some columns would test the right cell.</p>
+                </details>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q2. Highlight Sale Amounts that are below the average of all sales</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">=$E2&lt;AVERAGE($E$2:$E$13)</p>
+                    <p style="margin-top: 0.5rem;">Average is 506400 ÷ 12 = 42200, so rows with E &lt; 42200 highlight: rows 3 (24000), 5 (36000), 6 (30000), 8 (40500), 12 (32400), 13 (31500). The full-range $E$2:$E$13 must be locked.</p>
+                </details>
             </section>
 
             <!-- Sorting & Filtering - Expanded -->
@@ -2856,6 +3305,51 @@
                     </tr>
                 </table>
 
+            
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🔧 Worked Example — Multi-Level Sort on SalesData</h2>
+                <p class="content-text">Task: arrange SalesData by <strong>Region A→Z</strong>, and within each region by <strong>Sale Amount, largest first</strong>. Click inside the data → Data tab → Sort → Add Level twice:</p>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;">
+                    <tr style="background: var(--primary-dark); color: white;"><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Level</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Column</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Order</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Sort by</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Region</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">A to Z</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Then by</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Sale Amount</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Largest to Smallest</td></tr>
+                </table>
+                <p class="content-text">Result: East&#39;s rows appear first (42000 → 36000 → 31500), then North (67500 → 54000 → 54000 → 45000), and so on. Excel keeps each row intact while reordering — but only if your selection covers the whole table, which is why you should click a single cell inside the data and let Excel auto-expand, rather than selecting one column.</p>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">Custom List Sort — Months in the RIGHT Order</h3>
+                <p class="content-text">Sorting the Month column alphabetically gives Feb, Jan, Mar — useless. In the Sort dialog, set Order to <strong>Custom List</strong> and choose Jan, Feb, Mar... Excel already knows month and weekday sequences, and you can define your own (e.g., Bronze, Silver, Gold) under File → Options → Advanced → Edit Custom Lists. Better long-term fix: store real dates and sort those.</p>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">Filtering + SUBTOTAL — Totals That Respect Filters</h3>
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">The Problem with SUM</div>
+                        <div class="formula-code">=SUM(E2:E13)</div>
+                        <p class="formula-desc">Always returns <strong>506400</strong> — even when you filter to just the North region. SUM cannot see that rows are hidden by a filter.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">SUBTOTAL Sees Filters</div>
+                        <div class="formula-code">=SUBTOTAL(9,E2:E13)</div>
+                        <p class="formula-desc">Function 9 = SUM, but only of <strong>visible</strong> rows. Filter Region to North and it shows 220500; change the filter and it updates. Use 1 for AVERAGE, 3 for COUNTA.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">AGGREGATE — SUBTOTAL++</div>
+                        <div class="formula-code">=AGGREGATE(9,5,E2:E13)</div>
+                        <p class="formula-desc">Like SUBTOTAL but option 5 also ignores error values in the range — the robust choice for messy data.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Quick Filter Shortcuts</div>
+                        <div class="formula-code">Ctrl+Shift+L toggles filters</div>
+                        <p class="formula-desc">Then click a value → right-click → Filter → "Filter by Selected Cell&#39;s Value" for one-click filtering. Number Filters offer Top 10, Above Average, Between out of the box.</p>
+                    </div>
+                </div>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">🏋️ Practice</h3>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q1. Filter SalesData to show only deals above 40000 — which filter type and what total does SUBTOTAL(9,...) show?</summary>
+                    
+                    <p style="margin-top: 0.5rem;">Use Number Filters → Greater Than → 40000 on Sale Amount. Visible rows: 54000, 67500, 45000, 40500, 42000, 49500, 54000 → SUBTOTAL shows <strong>352500</strong> while SUM stubbornly shows 506400.</p>
+                </details>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q2. Why does sorting only the Sale Amount column (selecting just E2:E13) corrupt the data?</summary>
+                    
+                    <p style="margin-top: 0.5rem;">Sorting a selected single column reorders ONLY those cells — amounts detach from their regions and salespeople, silently scrambling the table. Always click one cell and let Excel expand the selection, and check for the "expand the selection" warning dialog.</p>
+                </details>
             </section>
 
             <!-- Scenario Analysis -->
@@ -2890,6 +3384,34 @@
                     </div>
                 </div>
 
+            
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🔧 Worked Example — Goal Seek on a Profit Model</h2>
+                <p class="content-text">Set up this tiny model: B1 = Units <strong>100</strong>, B2 = Price <strong>500</strong>, B3 = Unit Cost <strong>350</strong>, and B4 = Profit with the formula <span style="font-family: monospace;">=B1*(B2-B3)</span> → <strong>15000</strong>. Question: how many units must we sell to hit a profit of 25000?</p>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;">
+                    <tr style="background: var(--primary-dark); color: white;"><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Goal Seek Field</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Entry</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Set cell</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">B4 (the Profit formula)</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">To value</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">25000</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">By changing cell</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">B1 (Units)</td></tr>
+                </table>
+                <p class="content-text">Data tab → What-If Analysis → Goal Seek → OK. Excel iterates and lands on B1 ≈ <strong>166.67 units</strong> — check: 166.67 × (500 − 350) = 25000. Goal Seek works backwards through any single-input formula chain: required exam score, break-even price, loan tenure for a target EMI.</p>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">One-Variable Data Table — Price Sensitivity in One Shot</h3>
+                <p class="content-text">What does profit look like at every price from 400 to 600? List the candidate prices down D2:D6 (400, 450, 500, 550, 600). In E1, link the output: <span style="font-family: monospace;">=B4</span>. Select D1:E6 → Data → What-If Analysis → Data Table → <strong>Column input cell: B2</strong> → OK. Excel substitutes each price into B2 and records the profit:</p>
+                <table style="width: 60%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;">
+                    <tr style="background: var(--primary-dark); color: white;"><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Price (input)</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Profit (computed)</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">400</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">5000</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">450</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">10000</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">500</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">15000</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">550</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">20000</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">600</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">25000</td></tr>
+                </table>
+                <p class="content-text">A <strong>two-variable</strong> data table tests Price × Units simultaneously: prices down the left column, unit counts across the top row, the =B4 link in the top-left corner cell, and both a Row and Column input cell in the dialog — a full sensitivity grid in one operation.</p>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">Scenario Manager — Named What-If Bundles</h3>
+                <p class="content-text">When you want to switch between whole <em>sets</em> of assumptions: Data → What-If Analysis → Scenario Manager → Add. Create <strong>Base</strong> (Units 100, Price 500, Cost 350), <strong>Optimistic</strong> (130, 525, 340 → profit 24050) and <strong>Pessimistic</strong> (80, 480, 360 → profit 9600), each changing cells B1:B3. Click Show to flip the entire model between worlds, and <strong>Summary</strong> to generate a comparison report of all scenarios against the B4 result cell — the classic best/base/worst framing for any business case.</p>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q. Using Goal Seek on the same model, what price hits a 30000 profit at 100 units?</summary>
+                    <p style="margin-top: 0.8rem; font-family: monospace; background: var(--bg-light); padding: 0.6rem; border-radius: 4px;">Set cell B4, To value 30000, By changing B2</p>
+                    <p style="margin-top: 0.5rem;">100 × (Price − 350) = 30000 → Price = <strong>650</strong>. Goal Seek changes one input; if you need to optimize several inputs with constraints, that is Solver&#39;s job (enable it under File → Options → Add-ins).</p>
+                </details>
             </section>
 
             <!-- VBA Programming -->
@@ -4293,11 +4815,11 @@
                     <div></div>
                     <div style="color: #2ecc71;">    ' Loop through each sheet in the workbook</div>
                     <div>    For Each ws In ThisWorkbook.Sheets</div>
-                    <div style="color: #2ecc71;">        ' Make row 1 bold</span></div>
+                    <div style="color: #2ecc71;">        ' Make row 1 bold</div>
                     <div>        ws.Range("1:1").Font.Bold = True</div>
-                    <div style="color: #2ecc71;">        ' Add background color</span></div>
+                    <div style="color: #2ecc71;">        ' Add background color</div>
                     <div>        ws.Range("1:1").Interior.Color = RGB(212, 165, 116)</div>
-                    <div style="color: #2ecc71;">        ' Add white text</span></div>
+                    <div style="color: #2ecc71;">        ' Add white text</div>
                     <div>        ws.Range("1:1").Font.Color = RGB(255, 255, 255)</div>
                     <div>    Next ws</div>
                     <div></div>
@@ -5162,6 +5684,48 @@
                 <p class="content-text"><strong>Reports:</strong> Generate standardized reports with one click. Applies consistent formatting, creates charts, sets up summaries.</p>
                 <p class="content-text"><strong>Navigation:</strong> Create buttons that jump to different sheets or sections. Makes complex workbooks user-friendly.</p>
 
+            
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🔧 Worked Example — Record Your First Macro (Header Formatter)</h2>
+                <p class="content-text">The macro recorder converts your clicks into VBA — the fastest way to automate repetitive formatting. Let&#39;s record one that turns any selected row into a styled header:</p>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;">
+                    <tr style="background: var(--primary-dark); color: white;"><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Step</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Action</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">1</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">View tab → Macros → Record Macro (or the ⏺ button in the status bar)</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">2</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Name it <strong>FormatHeader</strong> (no spaces), shortcut Ctrl+Shift+H, store in This Workbook</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">3</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">With the header row selected: apply Bold, white font, dark fill, center alignment, and a bottom border</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">4</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Stop Recording (status bar ⏹). Done — every click was captured.</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">5</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Select any other header row and press Ctrl+Shift+H — instant formatting replay</td></tr>
+                </table>
+                <p class="content-text">Press Alt+F11 to see what was generated — recorded code is verbose but readable, and editing it is the on-ramp to real VBA:</p>
+                <div class="formula-card" style="margin: 1rem 0;">
+                    <div class="formula-name">What the Recorder Wrote (trimmed)</div>
+                    <div class="formula-code">Sub FormatHeader()<br/>&nbsp;&nbsp;&nbsp;&nbsp;Selection.Font.Bold = True<br/>&nbsp;&nbsp;&nbsp;&nbsp;Selection.Font.Color = vbWhite<br/>&nbsp;&nbsp;&nbsp;&nbsp;Selection.Interior.Color = RGB(26, 54, 93)<br/>&nbsp;&nbsp;&nbsp;&nbsp;Selection.HorizontalAlignment = xlCenter<br/>End Sub</div>
+                    <p class="formula-desc">The recorder works on <strong>Selection</strong> — whatever is selected when the macro runs. That is what makes the recorded macro reusable on any range.</p>
+                </div>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">Absolute vs Relative Recording — The Gotcha That Confuses Everyone</h3>
+                <p class="content-text">By default the recorder captures <strong>absolute</strong> references: if you clicked A1 during recording, the macro will always jump to A1 on replay. Toggle <strong>Use Relative References</strong> (in the Macros dropdown) before recording and movements are captured relative to the starting cell — "move one cell down" instead of "go to A2". Rule of thumb: formatting the same fixed report layout → absolute; a macro you will run at different positions (e.g., process the current row) → relative.</p>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">Where Macros Live</h3>
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">This Workbook (.xlsm)</div>
+                        <div class="formula-code">Save As → Excel Macro-Enabled Workbook</div>
+                        <p class="formula-desc">Macros travel with the file. Saving as regular .xlsx silently STRIPS all macros — Excel warns once; do not click through it.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Personal Macro Workbook</div>
+                        <div class="formula-code">Store macro in: Personal Macro Workbook</div>
+                        <p class="formula-desc">PERSONAL.XLSB loads invisibly with Excel, making its macros available in every file you open — the right home for your personal utility macros like FormatHeader.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Run from a Button</div>
+                        <div class="formula-code">Insert → Shapes → right-click → Assign Macro</div>
+                        <p class="formula-desc">Draw a rounded rectangle, label it "Format Report", assign the macro — one-click automation for colleagues who will never open the VBA editor.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Security Reality Check</div>
+                        <div class="formula-code">File → Options → Trust Center</div>
+                        <p class="formula-desc">Files from the internet open with macros disabled (Protected View). Only enable macros in workbooks you trust — macros can run arbitrary code on your machine.</p>
+                    </div>
+                </div>
             </section>
 
             <!-- Tips & Tricks -->

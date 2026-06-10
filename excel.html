@@ -794,10 +794,6 @@
 
                 <p class="content-text"><strong>Pro Tips:</strong> Special boxes highlight power-user techniques and common pitfalls to avoid. These are worth re-reading.</p>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Start with basic navigation and cell references. These fundamentals make everything else much easier. Don't try to memorize all formulas - learn them as needed for your tasks. Excel's Help and formula suggestions are your friends.</div>
-                </div>
 
                 <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">Learning Path Recommendations</h2>
 
@@ -883,10 +879,6 @@
                     </tr>
                 </table>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Use View > Freeze Panes to keep header rows and columns visible while scrolling through data. Select the cell below and to the right of what you want to freeze, then use Freeze Panes.</div>
-                </div>
             </section>
 
             <!-- Navigation -->
@@ -958,10 +950,6 @@
                 <p class="content-text"><strong>A1:C10</strong> - Select the range A1 to C10</p>
                 <p class="content-text"><strong>Budget!A1</strong> - Jump to cell A1 in the "Budget" sheet</p>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Master Ctrl+G (Go To) to jump to specific cells instantly. For very large datasets, use the Name Box with range addresses to select multiple cells at once without scrolling.</div>
-                </div>
             </section>
 
             <!-- Cells & Ranges -->
@@ -1095,10 +1083,6 @@
                 
                 <p class="content-text">Ranges are essential in formulas. Most functions accept ranges as arguments. For example, =SUM(A1:A100) adds all values in cells A1 through A100. Understanding range syntax makes creating complex formulas much easier.</p>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Use named ranges to make formulas more readable. Instead of =SUM(A1:A100), you could create a named range called "Sales" and write =SUM(Sales). Go to Formulas > Define Name to create named ranges.</div>
-                </div>
             </section>
 
             <!-- Formatting -->
@@ -1195,10 +1179,6 @@
 
                 <p class="content-text"><strong>Fill Colors:</strong> Use background colors to highlight important rows, create alternating row colors for readability, or distinguish between different data types. Choose colors with good contrast for readability.</p>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Use Format Painter (Home > Format Painter) to copy formatting from one cell or range to others. This ensures consistent formatting across your entire spreadsheet without manually adjusting each cell.</div>
-                </div>
             </section>
 
             <!-- Formula Basics -->
@@ -1388,10 +1368,6 @@
                     </div>
                 </div>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">When creating complex formulas, break them into smaller parts and test each section. Use IFERROR() to gracefully handle errors that might occur in calculations with unpredictable data.</div>
-                </div>
             </section>
 
             <!-- Common Functions -->
@@ -1506,10 +1482,6 @@
                     </div>
                 </div>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">INDEX/MATCH is more powerful than VLOOKUP. It can search in any direction, handle duplicates better, and work with columns to the left. Use =INDEX(range,MATCH(lookup_value,lookup_range,0)) for professional spreadsheets.</div>
-                </div>
             </section>
 
             <!-- Logical Functions -->
@@ -1609,10 +1581,6 @@
                     </div>
                 </div>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Use SUMIFS instead of SUMIF when you can - it's more powerful and handles more complex scenarios. The syntax is SUMIFS(sum_range, criteria_range1, criteria1, criteria_range2, criteria2, ...).</div>
-                </div>
             </section>
 
             <!-- Conditional & Statistical Formulas Lab -->
@@ -2428,10 +2396,6 @@
                 
                 <p class="content-text"><strong>Methods:</strong> The & operator (=A1&" "&B1) is simplest. CONCATENATE() function is traditional. TEXTJOIN() (Excel 2016+) is most powerful, allowing delimiters and ignoring blanks.</p>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Always use TRIM when combining data from different sources. Extra spaces often cause VLOOKUP to fail silently. =TRIM(A1)&" "&TRIM(B1) ensures clean output.</div>
-                </div>
             </section>
 
             <!-- Date Functions -->
@@ -2511,10 +2475,6 @@
                     </div>
                 </div>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Use DATEDIF for age calculations: =DATEDIF(birthdate,TODAY(),"Y") returns age in years. It's more reliable than manual date subtraction for this purpose.</div>
-                </div>
             </section>
 
             <!-- Advanced Formulas -->
@@ -2586,10 +2546,6 @@
                     </div>
                 </div>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Always test complex formulas step by step. Remove a function, see if it works, then add the next layer. Use the Formula Auditing tools (Formulas > Show Formulas, Evaluate Formula) to debug.</div>
-                </div>
             </section>
 
             <!-- Data Validation -->
@@ -2636,10 +2592,6 @@
                 <p class="content-text">4. (Optional) Create custom error message in Error Alert tab</p>
                 <p class="content-text">5. Click OK</p>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Always include helpful error messages. Instead of "Invalid entry", explain what's acceptable: "Please enter a date between project start (A1) and end (B1)". This reduces frustration and support tickets.</div>
-                </div>
             </section>
 
             <!-- Pivot Tables -->
@@ -2678,10 +2630,6 @@
                 <p class="content-text"><strong>4. Drag fields:</strong> Build your summary by dragging fields to areas.</p>
                 <p class="content-text"><strong>5. Analyze:</strong> Expand/collapse categories, filter, sort results.</p>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Pivot tables don't modify original data - they create a separate summary. You can delete and recreate pivot tables freely. Use them to explore data without fear of breaking anything.</div>
-                </div>
             </section>
 
             <!-- Charts -->
@@ -2791,10 +2739,6 @@
                 <p class="content-text"><strong>Data Labels:</strong> Add precise values if needed for small charts. Omit for large datasets where they create clutter.</p>
                 <p class="content-text"><strong>Legends:</strong> Only include if absolutely necessary. Label directly on series when possible.</p>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Right-click chart elements to format them. Double-click to enter edit mode. Format axis, change colors, adjust sizing - all through context menus. Avoid 3D effects and decorative elements that distract from data.</div>
-                </div>
             </section>
 
             <!-- Conditional Formatting -->
@@ -2840,10 +2784,6 @@
                 <p class="content-text"><strong>Budget Tracking:</strong> Color-code overages in red, surpluses in green. Icon sets (traffic lights) show budget status at a glance.</p>
                 <p class="content-text"><strong>Project Timeline:</strong> Highlight overdue tasks in red, on-track in green. Uses formula: =A1<TODAY() for visual deadline management.</p>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Use Home > Conditional Formatting > Manage Rules to see all rules in a worksheet and make edits easily. This is essential when managing complex dashboards with multiple formatting rules.</div>
-                </div>
             </section>
 
             <!-- Sorting & Filtering - Expanded -->
@@ -2916,10 +2856,6 @@
                     </tr>
                 </table>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">AutoFilter hides rows (you see a blue row number), while deleting removes them. Always use filters to view subsets. If you need to delete, copy filtered results to a new sheet first.</div>
-                </div>
             </section>
 
             <!-- Scenario Analysis -->
@@ -2954,10 +2890,6 @@
                     </div>
                 </div>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Build all scenario assumptions in a separate input section at the top of your sheet. Have all formulas reference these cells. Then change one set of assumptions and everything updates instantly.</div>
-                </div>
             </section>
 
             <!-- VBA Programming -->
@@ -3079,10 +3011,6 @@
 
                 <p class="content-text" style="font-size: 0.95rem; color: #666; margin-top: 1rem;"><strong>How to use this data:</strong> Paste into a sheet named "Employees". This data has mixed types (text, numbers, dates) - perfect for practicing VBA variable types and loops.</p>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Create a new workbook specifically for VBA practice. Name it "VBA_Practice.xlsx". Keep sample data there separate from real work files. This is your safe playground for learning!</div>
-                </div>
 
                 <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">PART 1: VBA Foundations</h2>
 
@@ -3703,10 +3631,6 @@
                     <p style="margin: 0.5rem 0 0;">Makes macros run 10-100x faster! No screen flickering either.</p>
                 </div>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Master VBA by doing! Start with simple macros (like filling one column), then build complexity. Each new concept (loops, conditions, error handling) adds to your toolkit. Before long, you'll be building powerful automation tools that save hours every week!</div>
-                </div>
 
                 <p class="content-text">Use this sample data to follow along with VBA examples. Copy and paste into Excel to practice the concepts.</p>
 
@@ -3808,10 +3732,6 @@
 
                 <p class="content-text" style="font-size: 0.95rem; color: #666; margin-top: 1rem;"><strong>How to use this data:</strong> Paste into a sheet named "Employees". This data has mixed types (text, numbers, dates) - perfect for practicing VBA variable types and loops.</p>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Create a new workbook specifically for VBA practice. Name it "VBA_Practice.xlsx". Keep sample data there separate from real work files. This is your safe playground for learning!</div>
-                </div>
 
                 <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">Getting Started with VBA</h2>
 
@@ -4684,10 +4604,6 @@
                 <p class="content-text">2. The commission macro runs automatically!</p>
                 <p class="content-text">3. Users don't need to know about macros - just click the button</p>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Events make Excel tools much more user-friendly. Instead of "Run the macro," users can just edit data and see results automatically. The interface feels professional and just works!</div>
-                </div>
 
                 <div class="formula-grid">
                     <div class="formula-card">
@@ -5208,15 +5124,7 @@
                     <li><strong>Disable code lines:</strong> Put <code style="background: #f5f5f5; padding: 0.2rem 0.4rem;">'</code> at start: <code style="background: #f5f5f5; padding: 0.2rem 0.4rem;">' Range("A1").Copy</code></li>
                 </ul>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Bookmark this Quick Reference section! When writing VBA code, you'll refer to it constantly. Copy-paste code patterns from the examples above and modify for your needs. This is exactly how professional developers work - they reuse proven patterns!</div>
-                </div>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Start by recording a macro, then examine the generated code. This teaches VBA syntax through examples. Edit recorded code to improve it - remove Select statements, add variables, improve efficiency. This is how many experts learned VBA!</div>
-                </div>
             </section>
 
             <!-- Macros Intro -->
@@ -5254,10 +5162,6 @@
                 <p class="content-text"><strong>Reports:</strong> Generate standardized reports with one click. Applies consistent formatting, creates charts, sets up summaries.</p>
                 <p class="content-text"><strong>Navigation:</strong> Create buttons that jump to different sheets or sections. Makes complex workbooks user-friendly.</p>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Save macros in a personal macro workbook to access them from any Excel file. File > Save As > Excel Macro-Enabled Workbook (.xlsm) to preserve macros when saving.</div>
-                </div>
             </section>
 
             <!-- Tips & Tricks -->
@@ -5337,10 +5241,6 @@
                 <p class="content-text"><strong>Remove Duplicates:</strong> Data > Remove Duplicates eliminates exact duplicate rows. Essential for cleaning imported data.</p>
                 <p class="content-text"><strong>Spell Check:</strong> Review > Spelling catches text errors. Run before sharing reports.</p>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Create a spreadsheet template for recurring reports. Set up all formulas, formatting, and structure once. Then duplicate the template and fill in new data. Consistency, accuracy, and dramatic time savings.</div>
-                </div>
             </section>
 
             <!-- Data Entry -->
@@ -5445,10 +5345,6 @@
                     </div>
                 </div>
 
-                <div class="tips-box">
-                    <div class="tips-title">Pro Tip</div>
-                    <div class="tips-text">Create a data entry template with headers, formatting, and validation rules pre-configured. Duplicate it for each new project. This ensures consistency and prevents manual setup errors that create cascading problems.</div>
-                </div>
             </section>
 
         </main>

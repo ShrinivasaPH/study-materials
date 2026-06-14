@@ -697,6 +697,8 @@
                 <div class="nav-section-title">Advanced</div>
                 <ul class="nav-items">
                     <li class="nav-item"><a class="nav-link" data-section="conditional">Conditional Formatting</a></li>
+                    <li class="nav-item"><a class="nav-link" data-section="visualization">Data Visualization</a></li>
+                    <li class="nav-item"><a class="nav-link" data-section="dashboards">Dashboard Creation</a></li>
                     <li class="nav-item"><a class="nav-link" data-section="scenarios">Scenario Analysis</a></li>
                     <li class="nav-item"><a class="nav-link" data-section="vba">VBA Programming</a></li>
                     <li class="nav-item"><a class="nav-link" data-section="macros">Macros Intro</a></li>
@@ -3352,6 +3354,243 @@
                 </details>
             </section>
 
+
+            <section id="visualization" class="content-section">
+                <h1 class="section-title">Data Visualization</h1>
+                <p class="section-subtitle">Choose the right chart, kill the clutter, and make every pixel earn its place</p>
+
+                <p class="content-text">A good chart answers a question before the reader finishes reading the title. This section goes beyond "how to insert a chart" into the craft of visualization: choosing the right chart, removing clutter, and using Excel&#39;s advanced visual tools. All examples use the <strong>SalesData</strong> sheet (A1:F13) from the Conditional Formulas Lab — copy it with the button there and follow along.</p>
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🎯 The Chart-Choice Decision Tree</h2>
+                <p class="content-text">Every chart maps numbers to a visual property — length, position, angle, or color. Humans read length and position most accurately and angles worst, which is why bars beat pies. Pick the chart from the <em>question</em>, never from what looks prettiest:</p>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;">
+                    <tr style="background: var(--primary-dark); color: white;"><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">If you are showing…</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Use</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Avoid</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Comparison across categories</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Clustered Column / Bar</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">3-D anything — perspective distorts values</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Change over time</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Line (or Area for volume)</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Pie — it cannot show time</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Part-to-whole, one moment</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Pie / Doughnut, ≤5 slices</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Pie with 8+ slices or two pies side by side</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Ranking</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Sorted Bar (largest on top)</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Unsorted columns</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Correlation of two numbers</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Scatter (XY) + trendline</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Line chart with non-time X axis</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Two units on one chart</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Combo with secondary axis</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Forcing both onto one axis</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Progress toward a target</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Bar with target line, or gauge</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Speedometer gauges with heavy 3-D</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Distribution / frequency</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Histogram or Box &amp; Whisker</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Smoothed lines that hide real spread</td></tr>
+                </table>
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🔧 Build a Combo Chart — Revenue Columns + Margin % Line</h2>
+                <p class="content-text">The single most useful business chart shows an absolute value and a rate together. Two units (rupees and percent) live on very different scales, so the percentage needs its own axis. Set up a small summary — Month in A, Revenue in B, Margin% in C — then:</p>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;">
+                    <tr style="background: var(--primary-dark); color: white;"><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Step</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Action</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">1</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Select the three columns → Insert → Combo Chart → Create Custom Combo Chart</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">2</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Set Revenue to <strong>Clustered Column</strong></td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">3</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Set Margin% to <strong>Line</strong> and tick its <strong>Secondary Axis</strong> box</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">4</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Format the secondary axis as Percentage; revenue stays on the primary axis</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">5</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Color the line boldly so it reads as the "story" layer over the columns</td></tr>
+                </table>
+                <p class="content-text">Now a single picture says "revenue rose but margin slipped in March" — something two separate charts would force the reader to mentally join.</p>
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">✨ In-Cell &amp; Lightweight Visuals</h2>
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">Sparklines</div>
+                        <div class="formula-code">Insert → Sparklines → Line / Column / Win-Loss</div>
+                        <p class="formula-desc">Tiny charts inside one cell. Put a Line sparkline beside each region summarizing its Jan→Mar trend — perfect for tables where a full chart would not fit. The Win/Loss type is ideal for over/under-target streaks.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Data Bars (in-cell bars)</div>
+                        <div class="formula-code">Conditional Formatting → Data Bars</div>
+                        <p class="formula-desc">Fills each cell proportionally to its value — a built-in bar chart that lives in the data. Use "Show Bar Only" to hide the numbers for a clean mini-visual.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Icon Sets (KPIs)</div>
+                        <div class="formula-code">Conditional Formatting → Icon Sets</div>
+                        <p class="formula-desc">Traffic lights / arrows that flag status. Edit the rule to drive icons by percentage or by another column — green if Actual ≥ Target, red otherwise.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Color Scales (heatmaps)</div>
+                        <div class="formula-code">Conditional Formatting → Color Scales</div>
+                        <p class="formula-desc">A 3-color scale turns a grid of numbers into a heatmap — instantly reveals hot and cold spots in a month × region matrix.</p>
+                    </div>
+                </div>
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🧹 Decluttering — Make Charts Say More with Less</h2>
+                <p class="content-text">Excel&#39;s defaults are noisy. Edward Tufte&#39;s idea of the "data-ink ratio" applies: every pixel that is not data should justify itself. A 60-second cleanup transforms a default chart:</p>
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">Delete gridlines &amp; chart border</div>
+                        <div class="formula-code">Click a gridline → Delete</div>
+                        <p class="formula-desc">Faint reference lines are fine; dense gridlines compete with the data. Remove the outer border too.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Label directly, drop the legend</div>
+                        <div class="formula-code">Add Data Labels; remove Legend</div>
+                        <p class="formula-desc">For a few series, labelling the end of each line beats making the eye bounce to a legend and back.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Sort before plotting</div>
+                        <div class="formula-code">Sort source data descending</div>
+                        <p class="formula-desc">A sorted bar chart needs no extra annotation — rank is obvious. Charts inherit source order.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Start bar axes at zero</div>
+                        <div class="formula-code">Format Axis → Minimum 0</div>
+                        <p class="formula-desc">Truncated bar axes exaggerate differences and mislead. Line charts may use a non-zero axis; bars must not.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Highlight one series, mute the rest</div>
+                        <div class="formula-code">Color the key series; grey the others</div>
+                        <p class="formula-desc">Color is your scarcest ink. One accent color draws the eye to the point; grey supplies context.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Title that states the takeaway</div>
+                        <div class="formula-code">Type the conclusion as the title</div>
+                        <p class="formula-desc">Replace "Sales by Region" with "North drives 44% of sales" — the title does the analysis for the reader.</p>
+                    </div>
+                </div>
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">📈 Trendlines, Error Bars &amp; Annotations</h2>
+                <p class="content-text">On a Scatter of Units (X) versus Sale Amount (Y), right-click a point → <strong>Add Trendline</strong> → Linear, then tick <strong>Display Equation</strong> and <strong>Display R-squared</strong>. The equation gives the rupees-per-unit slope; R² (0 to 1) tells you how tightly the points follow it. Add a vertical line for a target by plotting an extra two-point series, and use a text box to call out the single most important data point rather than annotating everything.</p>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">🏋️ Practice</h3>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q1. You have Revenue (₹ lakhs) and Customer-Satisfaction (%) per month. Which chart and what axis setup?</summary>
+                    
+                    <p style="margin-top: 0.5rem;">A <strong>combo chart</strong>: Revenue as columns on the primary axis, Satisfaction% as a line on a <strong>secondary axis</strong> formatted as percentage. Two units never share one axis.</p>
+                </details>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q2. Why is a sorted bar chart usually better than a pie for "sales share by 6 regions"?</summary>
+                    
+                    <p style="margin-top: 0.5rem;">Six pie slices force the eye to compare angles (which humans judge poorly) and many slices look similar. A bar sorted largest-to-smallest lets the reader compare lengths and read the ranking instantly — and labels fit cleanly.</p>
+                </details>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q3. Your column chart’s y-axis starts at 40,000 to "show the difference better." What is wrong?</summary>
+                    
+                    <p style="margin-top: 0.5rem;">Truncating a <strong>bar/column</strong> axis exaggerates small differences and is considered misleading — bar length must be proportional to value, so the axis must start at 0. (A line chart, which encodes position not length, may use a zoomed axis.)</p>
+                </details>
+            </section>
+
+            <section id="dashboards" class="content-section">
+                <h1 class="section-title">Dashboard Creation</h1>
+                <p class="section-subtitle">Turn raw rows into a single interactive screen that updates itself</p>
+
+                <p class="content-text">A dashboard is a single screen that answers a manager&#39;s recurring questions at a glance — no scrolling, no formulas to read. Building one well is mostly <em>architecture</em>: separate your data, your calculations, and your display so the dashboard updates itself when new data arrives. This section builds a real sales dashboard on the <strong>SalesData</strong> practice sheet.</p>
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🏗️ The Three-Layer Architecture</h2>
+                <p class="content-text">Professional dashboards keep three things on separate sheets. Mixing them is the number-one reason dashboards break:</p>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;">
+                    <tr style="background: var(--primary-dark); color: white;"><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Layer</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Sheet</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Contains</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">1. Data</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">"Data" (a Table, Ctrl+T)</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Raw rows only — the SalesData records. Never formatted, never charted directly.</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">2. Calculation</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">"Calc" / pivots</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Pivot tables and formulas that summarize the data into the exact numbers the visuals need.</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">3. Presentation</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">"Dashboard"</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Only charts, KPI cards, and slicers. No raw numbers, no clutter — this is the screen people see.</td></tr>
+                </table>
+                <div class="tips-box">
+                    <div class="tips-title">Why a Table is Step Zero</div>
+                    <div class="tips-text">Press Ctrl+T on your data first. Every pivot, chart, and formula built on a Table auto-expands when you add rows — so next month&#39;s data flows through to the dashboard on a single Refresh. Build on a plain range instead and you will re-point ranges by hand forever.</div>
+                </div>
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🔢 KPI Cards — The Big Numbers at the Top</h2>
+                <p class="content-text">The top strip of a dashboard shows 3–5 headline metrics in large type. Build each from a formula on the Calc sheet, then link a display cell on the Dashboard so the number updates automatically. Using SalesData:</p>
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">Total Revenue</div>
+                        <div class="formula-code">=SUM(Data[Sale Amount])</div>
+                        <p class="formula-desc">The hero number → <strong>5,06,400</strong>. Structured Table references (Data[Sale Amount]) read clearly and never break when rows grow.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Total Units</div>
+                        <div class="formula-code">=SUM(Data[Units])</div>
+                        <p class="formula-desc">Volume alongside value → <strong>179</strong>. Pair value and volume so a manager sees both at once.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Avg Deal Size</div>
+                        <div class="formula-code">=AVERAGE(Data[Sale Amount])</div>
+                        <p class="formula-desc">→ <strong>42,200</strong>. Format as currency, no decimals.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Top Region</div>
+                        <div class="formula-code">=INDEX(regions,MATCH(MAX(totals),totals,0))</div>
+                        <p class="formula-desc">Returns the best-performing region name (<strong>North</strong>) by looking up the max of a region-totals column — a dynamic label, not a typed one.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">% to Target</div>
+                        <div class="formula-code">=SUM(Data[Sale Amount])/Target</div>
+                        <p class="formula-desc">If Target is 6,00,000 → <strong>84%</strong>. Drive an icon or color on this cell so the card turns green/amber/red on its own.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">MoM Growth</div>
+                        <div class="formula-code">=(ThisMonth-LastMonth)/LastMonth</div>
+                        <p class="formula-desc">Show direction with TEXT(...,"+0.0%;-0.0%") and a ▲/▼ so the trend reads instantly.</p>
+                    </div>
+                </div>
+                <p class="content-text">Style each card as a colored rounded rectangle (Insert → Shapes) with the metric label small on top and the linked value large below. Group label + value + shape so the card moves as one unit.</p>
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🎛️ Slicers &amp; Timelines — Interactive Filtering</h2>
+                <p class="content-text">Slicers are the magic that makes a dashboard <em>interactive</em> instead of static. Build your charts from pivot tables, then:</p>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;">
+                    <tr style="background: var(--primary-dark); color: white;"><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Step</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Action</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">1</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Click a pivot → PivotTable Analyze → Insert Slicer → choose Region and Month</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">2</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Click a Timeline instead for date fields — a slider to filter by month/quarter/year</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">3</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Select a slicer → Report Connections → tick EVERY pivot it should control</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">4</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">One click on "North" now filters all KPI cards and charts together</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">5</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Style slicers (Slicer tab) and set columns so the buttons sit in a neat row</td></tr>
+                </table>
+                <div class="tips-box">
+                    <div class="tips-title">The Report Connections Secret</div>
+                    <div class="tips-text">A slicer only controls pivots that share the same data source AND are wired to it via Report Connections. This is how one "Region" slicer drives six charts at once — the single feature that separates a real dashboard from a pile of charts.</div>
+                </div>
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🔧 Worked Build — A Sales Dashboard in 8 Moves</h2>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;">
+                    <tr style="background: var(--primary-dark); color: white;"><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">#</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Move</td><td style="padding: 0.6rem; font-weight: 700; border: 1px solid var(--primary-dark);">Result</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">1</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Ctrl+T the SalesData range, name it <strong>Data</strong></td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Auto-expanding source</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">2</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Insert 3 pivots on a Calc sheet: Revenue by Region, Revenue by Product, Revenue by Month</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Summary numbers</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">3</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Chart each pivot: sorted Bar (Region), Pie or Bar (Product), Line (Month trend)</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Three visuals</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">4</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">On a clean Dashboard sheet, add a title bar and 4 KPI cards linked to Calc formulas</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Headline strip</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">5</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Cut/paste the three pivot charts under the cards in a grid</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Visual body</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">6</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Insert Region + Month slicers; wire them to all pivots via Report Connections</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Interactivity</td></tr>
+                    <tr><td style="padding: 0.6rem; border: 1px solid var(--border-light);">7</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Apply Conditional Formatting data bars/icons inside any small summary tables</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">In-cell visuals</td></tr>
+                    <tr style="background: var(--bg-light);"><td style="padding: 0.6rem; border: 1px solid var(--border-light);">8</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">View tab → uncheck Gridlines &amp; Headings; freeze the title row</td><td style="padding: 0.6rem; border: 1px solid var(--border-light);">Clean canvas</td></tr>
+                </table>
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">🎨 Layout &amp; Design Principles</h2>
+                <div class="formula-grid">
+                    <div class="formula-card">
+                        <div class="formula-name">Reading Order: Z-Pattern</div>
+                        <div class="formula-code">KPIs top, detail below</div>
+                        <p class="formula-desc">Eyes enter top-left and sweep right then down. Put the most important number top-left, supporting charts below — match the layout to how people actually read.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">A Tight Color Palette</div>
+                        <div class="formula-code">2–3 colors max</div>
+                        <p class="formula-desc">One accent for the key metric, one neutral grey for context, one alert color (red) for problems. More colors means less meaning per color. Keep it consistent across every chart.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Align to a Grid</div>
+                        <div class="formula-code">Alt-drag snaps to cells</div>
+                        <p class="formula-desc">Set a uniform column width and snap every chart and card to the same gridlines. Misaligned edges are what make a dashboard look amateur.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">White Space is Not Wasted</div>
+                        <div class="formula-code">Leave breathing room</div>
+                        <p class="formula-desc">Cramming fills anxiety, not information. Padding between cards and charts makes each element readable and the whole screen calmer.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">Hide the Machinery</div>
+                        <div class="formula-code">Right-click Calc/Data tabs → Hide</div>
+                        <p class="formula-desc">Hide the supporting sheets so users see only the Dashboard. Protect the sheet (Review → Protect Sheet) so layout cannot be nudged by accident.</p>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-name">One Screen, No Scroll</div>
+                        <div class="formula-code">Design for the viewport</div>
+                        <p class="formula-desc">A dashboard that needs scrolling is a report. Size it to fit one screen; if it overflows, you are showing too much — split into tabs or drill-downs.</p>
+                    </div>
+                </div>
+                <h2 style="font-size: 1.3rem; color: var(--primary-dark); margin: 1.5rem 0 0.8rem;">⚙️ Keeping It Live</h2>
+                <p class="content-text">The payoff of the three-layer design: when next month&#39;s rows are pasted into the Data table, every pivot, KPI formula, chart, and slicer updates on <strong>Data → Refresh All</strong> (Ctrl+Alt+F5). For a fully hands-off refresh, a one-line macro <span style="font-family: monospace;">ThisWorkbook.RefreshAll</span> assigned to a button (see the Macros section) lets a non-technical user update the whole dashboard with a single click. For very large or multi-table data, the same ideas scale up into Power Pivot and Power Query, which load and relate millions of rows behind an identical dashboard front-end.</p>
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1rem 0 0.5rem;">🏋️ Practice</h3>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q1. You paste 200 new sales rows but the dashboard charts ignore them. What did the build skip?</summary>
+                    
+                    <p style="margin-top: 0.5rem;">The source was a plain range, not a <strong>Table</strong>. Without Ctrl+T, pivots and charts keep their original fixed range. Convert to a Table (or re-point every range by hand). After that, Refresh All picks up new rows automatically.</p>
+                </details>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q2. One "Region" slicer should filter all six charts but only filters one. Why?</summary>
+                    
+                    <p style="margin-top: 0.5rem;">The other five pivots are not wired to the slicer. Select the slicer → <strong>Report Connections</strong> → tick all six pivots. They must also share the same data source.</p>
+                </details>
+                <details style="background: white; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin: 0.8rem 0;">
+                    <summary style="cursor: pointer; font-weight: 700; color: var(--primary-dark);">Q3. Where should the formula =SUM(Data[Sale Amount]) live, and where should its value appear?</summary>
+                    
+                    <p style="margin-top: 0.5rem;">The formula belongs on the <strong>Calc</strong> sheet (calculation layer); the Dashboard KPI card simply <em>links</em> to that cell (=Calc!B2) for display. Keeping calculation separate from presentation is what makes the dashboard maintainable.</p>
+                </details>
+            </section>
             <!-- Scenario Analysis -->
             <section id="scenarios" class="content-section">
                 <h1 class="section-title">Scenario Analysis & What-If</h1>

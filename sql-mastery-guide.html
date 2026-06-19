@@ -244,12 +244,6 @@ tr:hover td{background:var(--bg2)}
 /* ── INLINE CODE ── */
 code{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-family:'JetBrains Mono',monospace;font-size:.82em;color:var(--accent)}
 
-/* ── TABS ── */
-.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px}
-.tab-btn{padding:10px 20px;font-size:.85rem;font-weight:600;color:var(--text2);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
-.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
-.tab-content{display:none}
-.tab-content.active{display:block}
 </style>
 </head>
 <body>
@@ -644,7 +638,7 @@ CREATE TABLE products (
     product_id INTEGER PRIMARY KEY,
     name       TEXT NOT NULL,
     category   TEXT,
-    price      REAL NOT NULL CHECK(price > 0),
+    price      REAL NOT NULL CHECK(price &gt; 0),
     stock      INTEGER DEFAULT 0
 );
 CREATE TABLE orders (
@@ -831,7 +825,7 @@ print(<span class="str">"✅ Database ready! Run sql('SELECT ...') to query."</s
 <span class="kw">INNER JOIN</span>  <span class="tbl">products</span> p <span class="kw">ON</span> o.product_id <span class="op">=</span> p.product_id
 <span class="kw">WHERE</span>  o.status <span class="op">=</span> <span class="str">'delivered'</span>            <span class="cmt">-- filter rows first</span>
 <span class="kw">GROUP BY</span> p.category
-<span class="kw">HAVING</span> <span class="fn">SUM</span>(o.quantity <span class="op">*</span> p.price) <span class="op">&gt;</span> <span class="num">100</span>  <span class="cmt">-- only categories with >$100 revenue</span>
+<span class="kw">HAVING</span> <span class="fn">SUM</span>(o.quantity <span class="op">*</span> p.price) <span class="op">&gt;</span> <span class="num">100</span>  <span class="cmt">-- only categories with &gt;$100 revenue</span>
 <span class="kw">ORDER BY</span> revenue <span class="kw">DESC</span>;</pre>
         </div>
         <div class="result-box">

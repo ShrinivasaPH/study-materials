@@ -35,6 +35,8 @@
   --sky-lt:    #e0f2fe;
   --rose:      #be185d;
   --rose-lt:   #fce7f3;
+  --fuchsia:    #a21caf;
+  --fuchsia-lt: #fae8ff;
   --code-bg:   #1e1b16;
   --code-surf: #2a2620;
   --radius:    14px;
@@ -345,7 +347,8 @@ main { background: var(--bg); overflow: hidden; }
 .section-tag.sky { background: var(--sky-lt); color: var(--sky); }
 .section-tag.rose   { background: var(--rose-lt);   color: var(--rose); }
 .section-tag.teal   { background: var(--teal-lt);   color: var(--teal); }
-.section-tag.indigo { background: var(--indigo-lt); color: var(--indigo); }
+.section-tag.indigo   { background: var(--indigo-lt);   color: var(--indigo); }
+.section-tag.fuchsia  { background: var(--fuchsia-lt);  color: var(--fuchsia); }
 .section-tag-num {
   background: var(--ink);
   color: var(--white);
@@ -1089,9 +1092,11 @@ code { font-family: 'JetBrains Mono', monospace; }
 .ct-green { color: var(--green); font-weight: 600; }
 .ct-violet { color: var(--violet); font-weight: 600; }
 .ct-sky    { color: var(--sky);    font-weight: 600; }
-.ct-orange { color: var(--orange); font-weight: 600; }
+.ct-orange   { color: var(--orange);   font-weight: 600; }
+.ct-fuchsia  { color: var(--fuchsia);  font-weight: 600; }
 .ct-indigo { color: var(--indigo); font-weight: 600; }
-.ct-orange { color: var(--orange); font-weight: 600; }
+.ct-orange   { color: var(--orange);   font-weight: 600; }
+.ct-fuchsia  { color: var(--fuchsia);  font-weight: 600; }
 
 /* ══════════════════════════════════
    STEP CARDS (new)
@@ -1215,6 +1220,9 @@ code { font-family: 'JetBrains Mono', monospace; }
 
     <span class="nav-group-label" style="color:var(--indigo)">🟦 Infrastructure</span>
     <a class="nav-link" href="#vector-dbs"><span class="nav-icon">🗃️</span> Vector Databases</a>
+
+    <span class="nav-group-label" style="color:var(--fuchsia)">🟪 Evaluation</span>
+    <a class="nav-link" href="#evaluation"><span class="nav-icon">📐</span> Evaluating LLM Apps</a>
 
     <span class="nav-group-label">Reference</span>
     <a class="nav-link" href="#pipeline"><span class="nav-icon">🗺️</span> Full Pipeline Map</a>
@@ -6929,6 +6937,485 @@ client.close()</code></pre>
   <div class="callout story">
     <div class="callout-icon">📖</div>
     <div class="callout-body"><strong>Decision guide.</strong> Start with <strong>FAISS</strong> for any prototype — zero ops. Move to <strong>ChromaDB</strong> when you need data to survive restarts but don't want cloud dependencies. Move to <strong>Pinecone</strong> for production at scale or when you need an SLA and zero infra management. Choose <strong>Weaviate</strong> when your users type exact product names or short keywords alongside natural-language queries — hybrid search beats pure vector search significantly in those cases. Use <strong>pgvector</strong> if you're already on Postgres and the dataset fits on one machine: it's the zero-overhead path.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     EVALUATION — DEEP DIVE
+═══════════════════════════════════════════════════════════════ -->
+<section class="section" id="evaluation">
+  <div class="section-tag fuchsia"><span class="section-tag-num">31</span> Evaluation</div>
+  <h2>Evaluating LLM Apps —<br><em>from gut feel to rigorous science</em></h2>
+
+  <div class="section-story">
+    <p>"It feels better" is not a metric. Every team building with LLMs eventually hits the same wall: a prompt change, a new retrieval strategy, or a model upgrade seems to help in the three examples someone tried by hand — but did it actually help, or regress on the ten edge cases nobody tested? Without systematic evaluation, every iteration is a guess dressed up as an improvement.</p>
+    <p>LLM evaluation is genuinely harder than traditional software testing. There is rarely one correct answer — many phrasings of a response can be equally valid. The same input can produce different outputs across runs. And quality is often subjective: is a longer, more thorough answer "better," or is a shorter, more direct one? This section builds a complete evaluation practice: the methodologies available, the metrics that matter for plain LLM outputs versus RAG pipelines versus agents, how to build the datasets that make evaluation repeatable, and how to wire evaluation into CI/CD so regressions are caught before they reach users.</p>
+  </div>
+
+  <!-- ── METHODOLOGIES ──────────────────────────────── -->
+  <h3>🧭 Evaluation Methodologies</h3>
+  <div class="section-story">
+    <p>Three independent axes define any evaluation strategy, and production systems typically combine all three. <strong>Reference-based vs. reference-free</strong>: reference-based evaluation compares the output against a known "golden" answer (exact match, semantic similarity, ROUGE) — precise but requires someone to write the golden answers. Reference-free evaluation judges the output on its own merits (is it relevant? is it grounded in context? is it coherent?) — more flexible, usually implemented as LLM-as-judge, and the only option when there's no single correct answer.</p>
+    <p><strong>Offline vs. online</strong>: offline evaluation runs against a fixed test dataset before deployment — fast, repeatable, ideal for catching regressions in CI. Online evaluation observes real production traffic — captures the actual distribution of user behaviour that no test set fully replicates, but feedback arrives after the fact (you find out you have a problem from a degraded average, not from a failed test). <strong>Automated vs. human-in-the-loop</strong>: automated evaluation (rule-based + LLM-as-judge) scales to thousands of examples for pennies; human evaluation is the gold standard for nuanced judgment but is slow and expensive — used sparingly, on samples, to calibrate and validate that automated judges agree with human judgment.</p>
+  </div>
+
+  <table class="compare-table">
+    <thead><tr><th>Axis</th><th>Option A</th><th>Option B</th><th>When to use which</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Reference</strong></td><td class="ct-green">Reference-based</td><td class="ct-fuchsia">Reference-free</td><td>Use references for factual QA with one right answer; reference-free for open-ended generation</td></tr>
+      <tr><td><strong>Timing</strong></td><td class="ct-sky">Offline (pre-deploy)</td><td class="ct-violet">Online (production)</td><td>Offline catches regressions in CI; online catches real-world distribution shift</td></tr>
+      <tr><td><strong>Judge</strong></td><td class="ct-orange">Automated</td><td class="ct-indigo">Human-in-the-loop</td><td>Automate for scale and speed; sample humans to calibrate the automated judge</td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-wrap">
+    <div class="code-bar">
+      <div class="code-bar-left"><div class="dots"><span></span><span></span><span></span></div><span class="code-fname">eval_01_methodology_comparison.py</span></div>
+      <div class="code-actions"><button class="btn-copy" onclick="copyCode(this)">📋 Copy</button><button class="btn-colab" onclick="openColab(this)">▶ Run in Colab</button></div>
+    </div>
+    <pre><code><span class="kw">!pip install</span> <span class="st">langchain langchain-openai pydantic rapidfuzz -q</span>
+
+<span class="imp">import</span> os
+os.environ[<span class="st">"OPENAI_API_KEY"</span>] = <span class="st">"sk-your-key"</span>
+
+<span class="imp">from</span> <span class="cl">langchain_openai</span> <span class="imp">import</span> <span class="cl">ChatOpenAI</span>
+<span class="imp">from</span> <span class="cl">pydantic</span> <span class="imp">import</span> <span class="cl">BaseModel</span>, <span class="cl">Field</span>
+<span class="imp">from</span> <span class="cl">rapidfuzz</span> <span class="imp">import</span> fuzz
+
+llm = <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>, temperature=<span class="nm">0</span>)
+
+<span class="cm"># ══ Reference-based: exact + fuzzy match (fast, deterministic) ══</span>
+<span class="kw">def</span> <span class="fn">exact_match</span>(prediction: <span class="tp">str</span>, reference: <span class="tp">str</span>) -> <span class="tp">bool</span>:
+    <span class="kw">return</span> prediction.strip().lower() == reference.strip().lower()
+
+<span class="kw">def</span> <span class="fn">fuzzy_match</span>(prediction: <span class="tp">str</span>, reference: <span class="tp">str</span>, threshold: <span class="nm">int</span> = <span class="nm">85</span>) -> <span class="tp">dict</span>:
+    <span class="st">"""Token-sort similarity — robust to word order and minor phrasing differences."""</span>
+    score = fuzz.token_sort_ratio(prediction.lower(), reference.lower())
+    <span class="kw">return</span> {<span class="st">"score"</span>: score, <span class="st">"passed"</span>: score >= threshold}
+
+<span class="cm"># ══ Reference-free: LLM-as-judge on the answer alone ══════════</span>
+<span class="kw">class</span> <span class="cl">QualityJudgment</span>(<span class="cl">BaseModel</span>):
+    is_coherent:    <span class="tp">bool</span> = <span class="cl">Field</span>(description=<span class="st">"Is the response well-structured and readable?"</span>)
+    is_relevant:    <span class="tp">bool</span> = <span class="cl">Field</span>(description=<span class="st">"Does it directly address the question asked?"</span>)
+    reasoning:      <span class="tp">str</span>
+
+<span class="kw">def</span> <span class="fn">reference_free_judge</span>(question: <span class="tp">str</span>, answer: <span class="tp">str</span>) -> <span class="cl">QualityJudgment</span>:
+    <span class="kw">return</span> llm.with_structured_output(<span class="cl">QualityJudgment</span>).invoke(
+        <span class="fn">f</span><span class="st">"Judge this answer's quality without a reference answer.
+Q: {question}
+A: {answer}"</span>
+    )
+
+<span class="cm"># ── Demonstrate both on the same example ──────────────</span>
+question  = <span class="st">"What year was the LangChain Expression Language (LCEL) introduced?"</span>
+reference = <span class="st">"LCEL was introduced in 2023"</span>
+prediction = llm.invoke(question).content
+
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"Q: {question}"</span>)
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"Prediction: {prediction[:100]}"</span>)
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"
+[Reference-based] Exact match: {exact_match(prediction, reference)}"</span>)
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"[Reference-based] Fuzzy match:  {fuzzy_match(prediction, reference)}"</span>)
+
+judgment = <span class="fn">reference_free_judge</span>(question, prediction)
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"[Reference-free]  Coherent={judgment.is_coherent} Relevant={judgment.is_relevant}"</span>)
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"                  Reasoning: {judgment.reasoning}"</span>)</code></pre>
+  </div>
+
+  <!-- ── CORE METRICS ───────────────────────────────── -->
+  <h3>📏 Core Metrics — Traditional &amp; LLM-as-Judge</h3>
+  <div class="section-story">
+    <p>Traditional NLP metrics — <strong>BLEU</strong> and <strong>ROUGE</strong> — measure n-gram overlap between a prediction and a reference. They're fast, free, and deterministic, but they penalise correct answers that simply use different words, and they reward verbatim copying. They remain useful for translation and summarisation where wording closely tracks the source, but they're a poor fit for open-ended chat or RAG answers.</p>
+    <p><strong>LLM-as-judge</strong> has become the dominant approach because it evaluates meaning, not surface form. Three patterns cover almost every use case. <strong>Rubric scoring</strong> asks the judge to rate a single response against named criteria (helpfulness, accuracy, tone) on a numeric or categorical scale — best for absolute quality measurement. <strong>Pairwise comparison</strong> shows the judge two responses (e.g., from two different prompts or models) and asks which is better — more reliable than rubric scoring because relative judgments are easier for LLMs to make consistently than absolute ones. <strong>Reference-grading</strong> gives the judge both the candidate answer and a gold reference, and asks it to grade correctness — combines the precision of reference-based evaluation with the flexibility of natural-language judgment, so wording differences don't cause false negatives.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-bar">
+      <div class="code-bar-left"><div class="dots"><span></span><span></span><span></span></div><span class="code-fname">eval_02_llm_as_judge_patterns.py</span></div>
+      <div class="code-actions"><button class="btn-copy" onclick="copyCode(this)">📋 Copy</button><button class="btn-colab" onclick="openColab(this)">▶ Run in Colab</button></div>
+    </div>
+    <pre><code><span class="kw">!pip install</span> <span class="st">langchain langchain-openai pydantic rouge-score -q</span>
+
+<span class="imp">import</span> os
+os.environ[<span class="st">"OPENAI_API_KEY"</span>] = <span class="st">"sk-your-key"</span>
+
+<span class="imp">from</span> <span class="cl">langchain_openai</span> <span class="imp">import</span> <span class="cl">ChatOpenAI</span>
+<span class="imp">from</span> <span class="cl">pydantic</span> <span class="imp">import</span> <span class="cl">BaseModel</span>, <span class="cl">Field</span>
+<span class="imp">from</span> <span class="cl">typing</span> <span class="imp">import</span> <span class="cl">Literal</span>
+<span class="imp">from</span> <span class="cl">rouge_score</span> <span class="imp">import</span> rouge_scorer
+
+judge = <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>, temperature=<span class="nm">0</span>)
+
+<span class="cm"># ══ Traditional metric: ROUGE-L (longest common subsequence) ══</span>
+scorer = rouge_scorer.RougeScorer([<span class="st">"rougeL"</span>], use_stemmer=<span class="kw">True</span>)
+
+<span class="kw">def</span> <span class="fn">rouge_l</span>(prediction: <span class="tp">str</span>, reference: <span class="tp">str</span>) -> <span class="tp">float</span>:
+    <span class="kw">return</span> scorer.score(reference, prediction)[<span class="st">"rougeL"</span>].fmeasure
+
+<span class="cm"># ══ Pattern 1: Rubric scoring (absolute quality) ══════</span>
+<span class="kw">class</span> <span class="cl">RubricScore</span>(<span class="cl">BaseModel</span>):
+    helpfulness: <span class="tp">int</span> = <span class="cl">Field</span>(ge=<span class="nm">1</span>, le=<span class="nm">5</span>, description=<span class="st">"Does it solve the user's actual need?"</span>)
+    accuracy:    <span class="tp">int</span> = <span class="cl">Field</span>(ge=<span class="nm">1</span>, le=<span class="nm">5</span>, description=<span class="st">"Are the facts correct?"</span>)
+    tone:        <span class="tp">int</span> = <span class="cl">Field</span>(ge=<span class="nm">1</span>, le=<span class="nm">5</span>, description=<span class="st">"Appropriately professional and clear?"</span>)
+
+<span class="kw">def</span> <span class="fn">rubric_judge</span>(question: <span class="tp">str</span>, answer: <span class="tp">str</span>) -> <span class="cl">RubricScore</span>:
+    <span class="kw">return</span> judge.with_structured_output(<span class="cl">RubricScore</span>).invoke(
+        <span class="fn">f</span><span class="st">"Score this response 1-5 on each dimension.
+Q: {question}
+A: {answer}"</span>
+    )
+
+<span class="cm"># ══ Pattern 2: Pairwise comparison (relative judgment) ══</span>
+<span class="kw">class</span> <span class="cl">PairwiseVerdict</span>(<span class="cl">BaseModel</span>):
+    winner:     <span class="cl">Literal</span>[<span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"tie"</span>]
+    reasoning:  <span class="tp">str</span>
+
+<span class="kw">def</span> <span class="fn">pairwise_judge</span>(question: <span class="tp">str</span>, answer_a: <span class="tp">str</span>, answer_b: <span class="tp">str</span>) -> <span class="cl">PairwiseVerdict</span>:
+    <span class="kw">return</span> judge.with_structured_output(<span class="cl">PairwiseVerdict</span>).invoke(<span class="fn">f</span><span class="st">"""
+Compare these two answers to the same question. Which is better?
+Question: {question}
+Answer A: {answer_a}
+Answer B: {answer_b}"""</span>)
+
+<span class="cm"># ══ Pattern 3: Reference-grading (correctness + flexibility) ══</span>
+<span class="kw">class</span> <span class="cl">ReferenceGrade</span>(<span class="cl">BaseModel</span>):
+    is_correct:        <span class="tp">bool</span>
+    matches_reference:  <span class="tp">bool</span> = <span class="cl">Field</span>(description=<span class="st">"True if semantically equivalent to reference, even if worded differently"</span>)
+    explanation:        <span class="tp">str</span>
+
+<span class="kw">def</span> <span class="fn">reference_grade</span>(question: <span class="tp">str</span>, prediction: <span class="tp">str</span>, reference: <span class="tp">str</span>) -> <span class="cl">ReferenceGrade</span>:
+    <span class="kw">return</span> judge.with_structured_output(<span class="cl">ReferenceGrade</span>).invoke(<span class="fn">f</span><span class="st">"""
+Grade the PREDICTION against the REFERENCE. Wording can differ — judge meaning, not phrasing.
+Question: {question}
+Reference (gold answer): {reference}
+Prediction: {prediction}"""</span>)
+
+<span class="cm"># ── Run all three on the same Q&A pair ────────────────</span>
+question   = <span class="st">"What does LCEL stand for?"</span>
+reference  = <span class="st">"LCEL stands for LangChain Expression Language"</span>
+answer_a   = <span class="st">"LCEL is short for LangChain Expression Language, used to compose chains."</span>
+answer_b   = <span class="st">"It's an acronym — LangChain's chain composition syntax."</span>
+
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"ROUGE-L (A vs ref): {rouge_l(answer_a, reference):.3f}"</span>)
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"ROUGE-L (B vs ref): {rouge_l(answer_b, reference):.3f}  ← low despite being correct!"</span>)
+
+rubric = <span class="fn">rubric_judge</span>(question, answer_a)
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"
+Rubric:    helpfulness={rubric.helpfulness} accuracy={rubric.accuracy} tone={rubric.tone}"</span>)
+
+pairwise = <span class="fn">pairwise_judge</span>(question, answer_a, answer_b)
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"Pairwise:  winner={pairwise.winner} — {pairwise.reasoning}"</span>)
+
+graded = <span class="fn">reference_grade</span>(question, answer_b, reference)
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"Reference: correct={graded.is_correct} matches={graded.matches_reference}  ← catches B despite low ROUGE"</span>)</code></pre>
+  </div>
+
+  <!-- ── RAG-SPECIFIC EVALUATION ────────────────────── -->
+  <h3>🔍 RAG-Specific Evaluation</h3>
+  <div class="section-story">
+    <p>RAG pipelines have two independent failure points — retrieval and generation — and need metrics for each, because a bad final answer could stem from either. This is the structure popularised by the RAGAS framework, and it's worth implementing even without the library, since the four metrics map directly to four concrete questions.</p>
+    <p><strong>Context precision</strong> asks: of the chunks retrieved, how many are actually relevant? Low precision means the retriever is fetching noise. <strong>Context recall</strong> asks: of the information needed to answer fully, how much did retrieval actually find? Low recall means the retriever is missing critical chunks — often invisible until you check against a reference answer. <strong>Faithfulness</strong> asks: is the generated answer fully supported by the retrieved context, with no hallucinated additions? This is the most important production guardrail metric. <strong>Answer relevancy</strong> asks: does the generated answer actually address the question, independent of whether it's grounded? An answer can be perfectly faithful to context yet still fail to address what was asked.</p>
+  </div>
+
+  <div class="formula-box">
+    <div class="fb-title">🧮 The RAG Evaluation Quadrant</div>
+    <div class="formula"><span class="fp">Context Precision</span>  <span class="fc">= relevant retrieved chunks ÷ total retrieved chunks</span></div>
+    <div class="formula"><span class="fp">Context Recall</span>     <span class="fc">= retrieved info needed for full answer ÷ all info needed</span></div>
+    <div class="formula"><span class="fp">Faithfulness</span>       <span class="fc">= claims in answer supported by context ÷ total claims in answer</span></div>
+    <div class="formula"><span class="fp">Answer Relevancy</span>   <span class="fc">= does the answer address the actual question asked? (LLM judged)</span></div>
+    <div class="fb-divider"></div>
+    <div class="fb-vars">
+      <div class="fb-var"><span class="fv-name">Diagnosing failures</span><span class="fv-desc">Low precision + high recall → retriever fetches too much noise, add re-ranking. Low recall → retriever misses content, fix chunking or add multi-query. High precision/recall + low faithfulness → generation hallucinates despite good context, tighten the prompt. High faithfulness + low relevancy → answer is accurate but doesn't address the question, check prompt instructions.</span></div>
+    </div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-bar">
+      <div class="code-bar-left"><div class="dots"><span></span><span></span><span></span></div><span class="code-fname">eval_03_rag_quadrant_metrics.py</span></div>
+      <div class="code-actions"><button class="btn-copy" onclick="copyCode(this)">📋 Copy</button><button class="btn-colab" onclick="openColab(this)">▶ Run in Colab</button></div>
+    </div>
+    <pre><code><span class="kw">!pip install</span> <span class="st">langchain langchain-openai pydantic -q</span>
+
+<span class="imp">import</span> os
+os.environ[<span class="st">"OPENAI_API_KEY"</span>] = <span class="st">"sk-your-key"</span>
+
+<span class="imp">from</span> <span class="cl">langchain_openai</span> <span class="imp">import</span> <span class="cl">ChatOpenAI</span>
+<span class="imp">from</span> <span class="cl">pydantic</span> <span class="imp">import</span> <span class="cl">BaseModel</span>, <span class="cl">Field</span>
+<span class="imp">from</span> <span class="cl">typing</span> <span class="imp">import</span> <span class="cl">List</span>
+
+judge = <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>, temperature=<span class="nm">0</span>)
+
+<span class="cm"># ── 1. Context Precision: what fraction of retrieved chunks are relevant? ──</span>
+<span class="kw">class</span> <span class="cl">ChunkRelevance</span>(<span class="cl">BaseModel</span>):
+    relevant_indices: <span class="cl">List</span>[<span class="tp">int</span>] = <span class="cl">Field</span>(description=<span class="st">"0-based indices of chunks that help answer the question"</span>)
+
+<span class="kw">def</span> <span class="fn">context_precision</span>(question: <span class="tp">str</span>, chunks: <span class="cl">List</span>[<span class="tp">str</span>]) -> <span class="tp">float</span>:
+    numbered = <span class="st">"
+"</span>.join(<span class="fn">f</span><span class="st">"[{i}] {c}"</span> <span class="kw">for</span> i, c <span class="kw">in</span> <span class="fn">enumerate</span>(chunks))
+    result: <span class="cl">ChunkRelevance</span> = judge.with_structured_output(<span class="cl">ChunkRelevance</span>).invoke(
+        <span class="fn">f</span><span class="st">"Question: {question}
+Retrieved chunks:
+{numbered}
+Which chunk indices are actually relevant?"</span>
+    )
+    <span class="kw">return</span> <span class="fn">len</span>(result.relevant_indices) / <span class="fn">len</span>(chunks) <span class="kw">if</span> chunks <span class="kw">else</span> <span class="nm">0.0</span>
+
+<span class="cm"># ── 2. Context Recall: did retrieval find what the reference answer needed? ──</span>
+<span class="kw">class</span> <span class="cl">RecallCheck</span>(<span class="cl">BaseModel</span>):
+    covered_claims:  <span class="cl">List</span>[<span class="tp">str</span>] = <span class="cl">Field</span>(description=<span class="st">"Claims from the reference answer that ARE supported by retrieved context"</span>)
+    missing_claims:  <span class="cl">List</span>[<span class="tp">str</span>] = <span class="cl">Field</span>(description=<span class="st">"Claims from the reference answer that are NOT in retrieved context"</span>)
+
+<span class="kw">def</span> <span class="fn">context_recall</span>(reference_answer: <span class="tp">str</span>, chunks: <span class="cl">List</span>[<span class="tp">str</span>]) -> <span class="tp">float</span>:
+    context = <span class="st">"
+"</span>.join(chunks)
+    result: <span class="cl">RecallCheck</span> = judge.with_structured_output(<span class="cl">RecallCheck</span>).invoke(
+        <span class="fn">f</span><span class="st">"Reference answer: {reference_answer}
+Retrieved context: {context}
+Which claims in the reference are/aren't covered by the context?"</span>
+    )
+    total = <span class="fn">len</span>(result.covered_claims) + <span class="fn">len</span>(result.missing_claims)
+    <span class="kw">return</span> <span class="fn">len</span>(result.covered_claims) / total <span class="kw">if</span> total <span class="kw">else</span> <span class="nm">0.0</span>
+
+<span class="cm"># ── 3. Faithfulness: is every claim in the answer grounded? ──</span>
+<span class="kw">class</span> <span class="cl">FaithfulnessCheck</span>(<span class="cl">BaseModel</span>):
+    total_claims:         <span class="tp">int</span>
+    unsupported_claims:   <span class="cl">List</span>[<span class="tp">str</span>]
+
+<span class="kw">def</span> <span class="fn">faithfulness</span>(answer: <span class="tp">str</span>, chunks: <span class="cl">List</span>[<span class="tp">str</span>]) -> <span class="tp">float</span>:
+    context = <span class="st">"
+"</span>.join(chunks)
+    result: <span class="cl">FaithfulnessCheck</span> = judge.with_structured_output(<span class="cl">FaithfulnessCheck</span>).invoke(
+        <span class="fn">f</span><span class="st">"Answer: {answer}
+Context: {context}
+List total factual claims in the answer and which ones (if any) aren't supported by context."</span>
+    )
+    <span class="kw">if</span> result.total_claims == <span class="nm">0</span>: <span class="kw">return</span> <span class="nm">1.0</span>
+    <span class="kw">return</span> (result.total_claims - <span class="fn">len</span>(result.unsupported_claims)) / result.total_claims
+
+<span class="cm"># ── 4. Answer Relevancy: does the answer address the question? ──</span>
+<span class="kw">class</span> <span class="cl">RelevancyCheck</span>(<span class="cl">BaseModel</span>):
+    addresses_question: <span class="tp">bool</span>
+    relevancy_score:    <span class="tp">float</span> = <span class="cl">Field</span>(ge=<span class="nm">0</span>, le=<span class="nm">1</span>)
+
+<span class="kw">def</span> <span class="fn">answer_relevancy</span>(question: <span class="tp">str</span>, answer: <span class="tp">str</span>) -> <span class="tp">float</span>:
+    result: <span class="cl">RelevancyCheck</span> = judge.with_structured_output(<span class="cl">RelevancyCheck</span>).invoke(
+        <span class="fn">f</span><span class="st">"Question: {question}
+Answer: {answer}
+Does the answer address the question? Score 0-1."</span>
+    )
+    <span class="kw">return</span> result.relevancy_score
+
+<span class="cm"># ── Run the full quadrant on one example ──────────────</span>
+question  = <span class="st">"What is LCEL and when was it released?"</span>
+chunks    = [
+    <span class="st">"LCEL (LangChain Expression Language) is a declarative syntax for composing chains."</span>,
+    <span class="st">"FAISS is a vector similarity search library from Meta AI."</span>,            <span class="cm"># irrelevant</span>
+    <span class="st">"LCEL was introduced in LangChain version 0.1 in early 2023."</span>,
+]
+reference = <span class="st">"LCEL is a declarative chain-composition syntax, released in 2023."</span>
+answer    = <span class="st">"LCEL stands for LangChain Expression Language. It was released in 2023 and lets you compose chains declaratively."</span>
+
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"Context Precision: {context_precision(question, chunks):.2f}  (1 of 3 chunks is noise)"</span>)
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"Context Recall:    {context_recall(reference, chunks):.2f}"</span>)
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"Faithfulness:      {faithfulness(answer, chunks):.2f}"</span>)
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"Answer Relevancy:  {answer_relevancy(question, answer):.2f}"</span>)</code></pre>
+  </div>
+
+  <!-- ── AGENT EVALUATION ────────────────────────────── -->
+  <h3>🤖 Agent &amp; Multi-Step Evaluation</h3>
+  <div class="section-story">
+    <p>Evaluating an agent is harder than evaluating a single LLM call because correctness depends on the entire <strong>trajectory</strong>, not just the final output. An agent that calls the wrong tool but still stumbles onto a correct answer "passed" by final-answer matching but failed by any reasonable engineering standard — and will likely fail differently next time. Three trajectory-level metrics matter in practice: <strong>tool selection accuracy</strong> (did it call the right tool for the situation?), <strong>tool-call correctness</strong> (were the arguments to that tool correct?), and <strong>task completion</strong> (did the overall multi-step goal get accomplished, regardless of the exact path taken?). Good agent evaluation checks all three, because they fail independently.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-bar">
+      <div class="code-bar-left"><div class="dots"><span></span><span></span><span></span></div><span class="code-fname">eval_04_agent_trajectory.py</span></div>
+      <div class="code-actions"><button class="btn-copy" onclick="copyCode(this)">📋 Copy</button><button class="btn-colab" onclick="openColab(this)">▶ Run in Colab</button></div>
+    </div>
+    <pre><code><span class="kw">!pip install</span> <span class="st">langchain langchain-openai pydantic -q</span>
+
+<span class="imp">import</span> os
+os.environ[<span class="st">"OPENAI_API_KEY"</span>] = <span class="st">"sk-your-key"</span>
+
+<span class="imp">from</span> <span class="cl">langchain_openai</span> <span class="imp">import</span> <span class="cl">ChatOpenAI</span>
+<span class="imp">from</span> <span class="cl">pydantic</span> <span class="imp">import</span> <span class="cl">BaseModel</span>, <span class="cl">Field</span>
+<span class="imp">from</span> <span class="cl">typing</span> <span class="imp">import</span> <span class="cl">List</span>, <span class="cl">Literal</span>
+
+judge = <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>, temperature=<span class="nm">0</span>)
+
+<span class="cm"># ── A recorded agent trajectory (what actually happened) ─</span>
+<span class="kw">class</span> <span class="cl">ToolCall</span>(<span class="cl">BaseModel</span>):
+    tool: <span class="tp">str</span>
+    args: <span class="tp">dict</span>
+
+trajectory = {
+    <span class="st">"task"</span>: <span class="st">"Refund order #4471 and notify the customer by email"</span>,
+    <span class="st">"steps"</span>: [
+        <span class="cl">ToolCall</span>(tool=<span class="st">"lookup_order"</span>,  args={<span class="st">"order_id"</span>: <span class="st">"4471"</span>}),
+        <span class="cl">ToolCall</span>(tool=<span class="st">"issue_refund"</span>,  args={<span class="st">"order_id"</span>: <span class="st">"4471"</span>, <span class="st">"amount"</span>: <span class="st">"full"</span>}),
+        <span class="cl">ToolCall</span>(tool=<span class="st">"send_email"</span>,    args={<span class="st">"to"</span>: <span class="st">"customer@example.com"</span>, <span class="st">"template"</span>: <span class="st">"refund_confirmation"</span>}),
+    ],
+    <span class="st">"final_answer"</span>: <span class="st">"Refund issued for order #4471 and confirmation email sent."</span>
+}
+
+<span class="cm"># ── 1. Tool selection accuracy: right tools, right order? ─</span>
+<span class="kw">class</span> <span class="cl">ToolSelectionGrade</span>(<span class="cl">BaseModel</span>):
+    correct_tools_used: <span class="tp">bool</span> = <span class="cl">Field</span>(description=<span class="st">"Were the necessary and ONLY necessary tools called?"</span>)
+    correct_order:      <span class="tp">bool</span> = <span class="cl">Field</span>(description=<span class="st">"Were tools called in a logical dependency order?"</span>)
+    missing_steps:      <span class="cl">List</span>[<span class="tp">str</span>] = <span class="cl">Field</span>(description=<span class="st">"Any steps that should have happened but didn't"</span>)
+
+<span class="kw">def</span> <span class="fn">grade_tool_selection</span>(task: <span class="tp">str</span>, steps: <span class="cl">List</span>[<span class="cl">ToolCall</span>]) -> <span class="cl">ToolSelectionGrade</span>:
+    steps_str = <span class="st">"
+"</span>.join(<span class="fn">f</span><span class="st">"{i+1}. {s.tool}({s.args})"</span> <span class="kw">for</span> i, s <span class="kw">in</span> <span class="fn">enumerate</span>(steps))
+    <span class="kw">return</span> judge.with_structured_output(<span class="cl">ToolSelectionGrade</span>).invoke(
+        <span class="fn">f</span><span class="st">"Task: {task}
+Tool calls made:
+{steps_str}
+Were the right tools called in the right order?"</span>
+    )
+
+<span class="cm"># ── 2. Tool-call argument correctness ──────────────────</span>
+<span class="kw">class</span> <span class="cl">ArgCheck</span>(<span class="cl">BaseModel</span>):
+    tool:       <span class="tp">str</span>
+    args_valid: <span class="tp">bool</span>
+    issue:      <span class="tp">str</span> = <span class="cl">Field</span>(description=<span class="st">"Empty string if valid, else what's wrong"</span>)
+
+<span class="kw">def</span> <span class="fn">grade_arguments</span>(task: <span class="tp">str</span>, step: <span class="cl">ToolCall</span>) -> <span class="cl">ArgCheck</span>:
+    <span class="kw">return</span> judge.with_structured_output(<span class="cl">ArgCheck</span>).invoke(
+        <span class="fn">f</span><span class="st">"Task: {task}
+Tool called: {step.tool} with args {step.args}
+Are these arguments correct and complete for this task?"</span>
+    )
+
+<span class="cm"># ── 3. Task completion: did the overall goal succeed? ──</span>
+<span class="kw">class</span> <span class="cl">TaskCompletionGrade</span>(<span class="cl">BaseModel</span>):
+    completed:  <span class="tp">bool</span>
+    confidence: <span class="cl">Literal</span>[<span class="st">"high"</span>, <span class="st">"medium"</span>, <span class="st">"low"</span>]
+
+<span class="kw">def</span> <span class="fn">grade_completion</span>(task: <span class="tp">str</span>, final_answer: <span class="tp">str</span>) -> <span class="cl">TaskCompletionGrade</span>:
+    <span class="kw">return</span> judge.with_structured_output(<span class="cl">TaskCompletionGrade</span>).invoke(
+        <span class="fn">f</span><span class="st">"Task: {task}
+Agent's final report: {final_answer}
+Was the task fully completed?"</span>
+    )
+
+<span class="cm"># ── Run the full trajectory evaluation ────────────────</span>
+selection = <span class="fn">grade_tool_selection</span>(trajectory[<span class="st">"task"</span>], trajectory[<span class="st">"steps"</span>])
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"Tool selection: correct_tools={selection.correct_tools_used} order={selection.correct_order}"</span>)
+<span class="kw">if</span> selection.missing_steps:
+    <span class="fn">print</span>(<span class="fn">f</span><span class="st">"  ⚠️ Missing: {selection.missing_steps}"</span>)
+
+<span class="kw">for</span> step <span class="kw">in</span> trajectory[<span class="st">"steps"</span>]:
+    arg_check = <span class="fn">grade_arguments</span>(trajectory[<span class="st">"task"</span>], step)
+    status = <span class="st">"✅"</span> <span class="kw">if</span> arg_check.args_valid <span class="kw">else</span> <span class="fn">f</span><span class="st">"❌ {arg_check.issue}"</span>
+    <span class="fn">print</span>(<span class="fn">f</span><span class="st">"  {step.tool}: {status}"</span>)
+
+completion = <span class="fn">grade_completion</span>(trajectory[<span class="st">"task"</span>], trajectory[<span class="st">"final_answer"</span>])
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"
+Task completion: {completion.completed} (confidence: {completion.confidence})"</span>)</code></pre>
+  </div>
+
+  <!-- ── GOLDEN DATASETS & CI/CD ─────────────────────── -->
+  <h3>🗂️ Golden Datasets &amp; Continuous Evaluation</h3>
+  <div class="section-story">
+    <p>Evaluation is only as good as the dataset behind it. A <strong>golden dataset</strong> is a curated set of (input, expected output) pairs that represents the real distribution of what your application needs to handle — including edge cases, ambiguous phrasing, and known historical failure modes. Building one by hand doesn't scale past a few dozen examples; the practical approach is <strong>synthetic generation</strong>: have an LLM generate plausible questions from your source documents, then have a human (or a stronger LLM) spot-check a sample for quality before trusting the full set.</p>
+    <p>The dataset earns its value when it's wired into <strong>continuous evaluation</strong> — running automatically on every pull request that touches a prompt, retrieval config, or model choice, exactly like a unit test suite. A regression gate fails the build if the composite score drops below a threshold or below the previous baseline by more than a tolerance, catching quality regressions before they ship rather than after a user complains.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-bar">
+      <div class="code-bar-left"><div class="dots"><span></span><span></span><span></span></div><span class="code-fname">eval_05_golden_dataset_and_ci_gate.py</span></div>
+      <div class="code-actions"><button class="btn-copy" onclick="copyCode(this)">📋 Copy</button><button class="btn-colab" onclick="openColab(this)">▶ Run in Colab</button></div>
+    </div>
+    <pre><code><span class="kw">!pip install</span> <span class="st">langchain langchain-openai pydantic -q</span>
+
+<span class="imp">import</span> os, json, sys
+os.environ[<span class="st">"OPENAI_API_KEY"</span>] = <span class="st">"sk-your-key"</span>
+
+<span class="imp">from</span> <span class="cl">langchain_openai</span> <span class="imp">import</span> <span class="cl">ChatOpenAI</span>
+<span class="imp">from</span> <span class="cl">pydantic</span> <span class="imp">import</span> <span class="cl">BaseModel</span>, <span class="cl">Field</span>
+<span class="imp">from</span> <span class="cl">typing</span> <span class="imp">import</span> <span class="cl">List</span>
+
+llm = <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>, temperature=<span class="nm">0.3</span>)   <span class="cm"># slight temp for question diversity</span>
+
+<span class="cm"># ── Step 1: Generate synthetic Q&A pairs from source docs ─</span>
+<span class="kw">class</span> <span class="cl">SyntheticQA</span>(<span class="cl">BaseModel</span>):
+    questions_and_answers: <span class="cl">List</span>[<span class="tp">dict</span>] = <span class="cl">Field</span>(description=<span class="st">"List of {'question': ..., 'answer': ...} dicts"</span>)
+
+source_doc = <span class="st">"""
+LangChain Expression Language (LCEL) was introduced in early 2023.
+It uses the pipe operator (|) to compose Runnables into chains.
+LCEL chains automatically support streaming, batching, and async execution.
+The runnable interface defines invoke(), batch(), and stream() methods.
+"""</span>
+
+<span class="kw">def</span> <span class="fn">generate_golden_set</span>(document: <span class="tp">str</span>, n: <span class="nm">int</span> = <span class="nm">5</span>) -> <span class="cl">List</span>[<span class="tp">dict</span>]:
+    <span class="st">"""Generate n diverse Q&A pairs covering different facts in the document."""</span>
+    result: <span class="cl">SyntheticQA</span> = llm.with_structured_output(<span class="cl">SyntheticQA</span>).invoke(<span class="fn">f</span><span class="st">"""
+Generate {n} diverse question-answer pairs that test understanding of this document.
+Cover different facts — don't repeat the same point. Keep answers concise and factual.
+
+Document:
+{document}"""</span>)
+    <span class="kw">return</span> result.questions_and_answers
+
+golden_set = <span class="fn">generate_golden_set</span>(source_doc, n=<span class="nm">4</span>)
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"Generated {len(golden_set)} golden examples:"</span>)
+<span class="kw">for</span> qa <span class="kw">in</span> golden_set:
+    <span class="fn">print</span>(<span class="fn">f</span><span class="st">"  Q: {qa['question']}
+  A: {qa['answer']}
+"</span>)
+
+<span class="cm"># Persist as a versioned test fixture (commit this to the repo)</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"golden_dataset.json"</span>, <span class="st">"w"</span>) <span class="kw">as</span> f:
+    json.dump(golden_set, f, indent=<span class="nm">2</span>)
+
+<span class="cm"># ── Step 2: CI regression gate ────────────────────────
+# Run this script in CI on every PR. Exits non-zero (fails the build)
+# if average score drops below threshold or regresses vs. baseline.</span>
+<span class="kw">class</span> <span class="cl">Grade</span>(<span class="cl">BaseModel</span>):
+    correct: <span class="tp">bool</span>
+
+<span class="kw">def</span> <span class="fn">grade_against_golden</span>(question: <span class="tp">str</span>, reference: <span class="tp">str</span>, prediction: <span class="tp">str</span>) -> <span class="tp">bool</span>:
+    result: <span class="cl">Grade</span> = llm.with_structured_output(<span class="cl">Grade</span>).invoke(
+        <span class="fn">f</span><span class="st">"Q: {question}
+Reference: {reference}
+Prediction: {prediction}
+Is prediction correct (allowing different wording)?"</span>
+    )
+    <span class="kw">return</span> result.correct
+
+<span class="kw">def</span> <span class="fn">run_ci_gate</span>(chain_fn, golden_set: <span class="cl">List</span>[<span class="tp">dict</span>], threshold: <span class="nm">float</span> = <span class="nm">0.85</span>, baseline: <span class="nm">float</span> = None):
+    <span class="st">"""Run the chain against golden set; fail build if below threshold or regressed."""</span>
+    results = []
+    <span class="kw">for</span> qa <span class="kw">in</span> golden_set:
+        prediction = chain_fn(qa[<span class="st">"question"</span>])
+        passed     = <span class="fn">grade_against_golden</span>(qa[<span class="st">"question"</span>], qa[<span class="st">"answer"</span>], prediction)
+        results.append(passed)
+        <span class="fn">print</span>(<span class="fn">f</span><span class="st">"  {'✅' if passed else '❌'} {qa['question'][:50]}"</span>)
+
+    score = <span class="fn">sum</span>(results) / <span class="fn">len</span>(results)
+    <span class="fn">print</span>(<span class="fn">f</span><span class="st">"
+Score: {score:.1%} (threshold: {threshold:.0%})"</span>)
+
+    <span class="kw">if</span> score < threshold:
+        <span class="fn">print</span>(<span class="fn">f</span><span class="st">"🔴 FAILED — below threshold"</span>); <span class="kw">return</span> <span class="kw">False</span>
+    <span class="kw">if</span> baseline <span class="kw">and</span> score < baseline - <span class="nm">0.05</span>:
+        <span class="fn">print</span>(<span class="fn">f</span><span class="st">"🔴 FAILED — regressed {baseline:.1%} → {score:.1%}"</span>); <span class="kw">return</span> <span class="kw">False</span>
+    <span class="fn">print</span>(<span class="st">"🟢 PASSED"</span>); <span class="kw">return</span> <span class="kw">True</span>
+
+<span class="cm"># Mock chain under test</span>
+<span class="kw">def</span> <span class="fn">my_chain</span>(question: <span class="tp">str</span>) -> <span class="tp">str</span>:
+    <span class="kw">return</span> llm.invoke(<span class="fn">f</span><span class="st">"Context: {source_doc}
+Q: {question}"</span>).content
+
+passed = <span class="fn">run_ci_gate</span>(my_chain, golden_set, threshold=<span class="nm">0.8</span>, baseline=<span class="nm">0.85</span>)
+<span class="cm"># sys.exit(0 if passed else 1)   ← uncomment in an actual CI script</span></code></pre>
+  </div>
+
+  <div class="callout tip">
+    <div class="callout-icon">🎓</div>
+    <div class="callout-body"><strong>Building an evaluation practice — in order.</strong> 1) Write 20–50 golden examples covering your real use cases plus known edge cases. 2) Add reference-grading for factual QA, rubric scoring for open-ended generation. 3) For RAG, instrument all four quadrant metrics — faithfulness first, it's the highest-risk failure. 4) For agents, evaluate the trajectory, not just the final answer. 5) Wire the golden set into CI as a regression gate before every prompt or model change ships. 6) Sample 5–10% of production traffic for human review monthly to catch what your automated judge misses and to recalibrate it.</div>
   </div>
 </section>
 

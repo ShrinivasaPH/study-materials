@@ -7923,6 +7923,12 @@ const navObserver = new IntersectionObserver(entries => {
 sections.forEach(s => navObserver.observe(s));
 
 // ── Scroll-reveal ──
+// threshold is intentionally tiny (not a percentage like 0.08): a percentage-based
+// threshold requires that fraction of the ELEMENT'S TOTAL HEIGHT to be on-screen at
+// once. Long sections (lots of code blocks) can be taller than the viewport itself,
+// so even a fully-filled viewport never reaches an 8% ratio — the section silently
+// never reveals. Triggering on the first sliver of visibility fixes this regardless
+// of how tall any individual section grows.
 const revealObserver = new IntersectionObserver(entries => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -7931,13 +7937,28 @@ const revealObserver = new IntersectionObserver(entries => {
       revealObserver.unobserve(entry.target);
     }
   });
-}, { threshold: 0.08 });
+}, { threshold: 0, rootMargin: '0px 0px -5% 0px' });
 
 document.querySelectorAll('.section').forEach(el => {
   el.style.opacity = '0';
   el.style.transform = 'translateY(28px)';
   el.style.transition = 'opacity 0.55s ease, transform 0.55s ease';
   revealObserver.observe(el);
+});
+
+// Safety net: if any section is somehow never observed as intersecting
+// (e.g. it's already in view before JS runs, or sits above the fold),
+// force it visible after load so content is never stuck invisible.
+window.addEventListener('load', () => {
+  document.querySelectorAll('.section').forEach(el => {
+    if (el.style.opacity !== '1') {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      }
+    }
+  });
 });
 </script>
 </body>

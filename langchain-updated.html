@@ -5187,157 +5187,6 @@ format_instructions = parser.get_format_instructions()
   </div>
 </section>
 
-<!-- ────────────── PIPELINE MAP ────────────── -->
-<section class="section" id="pipeline">
-  <div class="section-tag green"><span class="section-tag-num">16</span> Reference</div>
-  <h2>The Full <em>Production Pipeline</em></h2>
-
-  <div class="section-story">
-    <p>Now that you've seen all the individual pieces, here's how they connect in a real production application. The diagram below shows the complete flow from user input to final response for a sophisticated application that combines RAG, memory, and output parsing. Most real-world LangChain apps use some subset of this full pipeline. You start simple and add pieces as your requirements grow.</p>
-    <p>The most important mental model is the <strong>complexity ladder</strong>: start with the simplest working solution, then layer in complexity only when you actually need it. A simple three-step chain (prompt → LLM → parser) can solve a surprising number of real problems without any of the more advanced components.</p>
-  </div>
-
-  <div class="formula-box">
-    <div class="fb-title">🗺️ Full Application Flow — Read Top to Bottom</div>
-    <div class="formula"><span class="cn">①</span> <span class="fp">User Input</span>  →  text string from UI, API, or chat</div>
-    <div class="formula"><span class="cn">②</span> <span class="fp">Router</span> (optional)  →  classify intent, pick a sub-chain</div>
-    <div class="formula"><span class="cn">③</span> <span class="fp">Memory Load</span>  →  fetch conversation history by session_id</div>
-    <div class="formula"><span class="cn">④</span> <span class="fp">Retriever</span> (if RAG)  →  embed query → find k nearest chunks</div>
-    <div class="formula"><span class="cn">⑤</span> <span class="fp">Prompt Template</span>  →  assemble system + history + context + query</div>
-    <div class="formula"><span class="cn">⑥</span> <span class="fp">LLM</span>  →  generate response tokens</div>
-    <div class="formula"><span class="cn">⑦</span> <span class="fp">Output Parser</span>  →  extract string, JSON, or Pydantic model</div>
-    <div class="formula"><span class="cn">⑧</span> <span class="fp">Memory Save</span>  →  persist this turn's messages</div>
-    <div class="formula"><span class="cn">⑨</span> <span class="fp">Response</span>  →  return to user, stream to UI, or feed next step</div>
-    <div class="fb-divider"></div>
-    <div class="fb-vars">
-      <div class="fb-var"><span class="fv-name">Simple chain</span><span class="fv-desc">Steps ①, ⑤, ⑥, ⑦, ⑨ — just 5 steps. This covers about 60% of use cases.</span></div>
-      <div class="fb-var"><span class="fv-name">Conversational bot</span><span class="fv-desc">Add steps ③ and ⑧ to give the bot memory. 7 steps total.</span></div>
-      <div class="fb-var"><span class="fv-name">RAG app</span><span class="fv-desc">Add step ④. Requires indexing your documents first (one-time setup).</span></div>
-      <div class="fb-var"><span class="fv-name">Full RAG + Memory</span><span class="fv-desc">All steps — the complete enterprise-grade conversational app pattern.</span></div>
-    </div>
-  </div>
-
-  <div class="callout story">
-    <div class="callout-icon">📖</div>
-    <div class="callout-body"><strong>What comes next after LangChain basics?</strong> Once you're comfortable here, explore <strong>LangSmith</strong> — Anthropic's observability tool that lets you trace every step of every chain call, debug failures, and evaluate performance systematically. Then look at <strong>LangGraph</strong> for building multi-agent workflows where agents collaborate with each other. And <strong>LangServe</strong> for deploying your chains as production REST APIs in minutes.</div>
-  </div>
-</section>
-
-<!-- ────────────── CHEATSHEET ────────────── -->
-<section class="section" id="cheatsheet">
-  <div class="section-tag amber"><span class="section-tag-num">17</span> Reference</div>
-  <h2>The Essential <em>Cheatsheet</em></h2>
-
-  <div class="section-story">
-    <p>Eight patterns you'll use in almost every LangChain project. Each is a complete, working snippet — copy, paste into Colab, and adapt to your use case. Think of this as your go-to reference once you're building your own applications and need to quickly recall the syntax for a specific pattern.</p>
-  </div>
-
-  <div class="code-wrap">
-    <div class="code-bar">
-      <div class="code-bar-left"><div class="dots"><span></span><span></span><span></span></div><span class="code-fname">cheatsheet.py</span></div>
-      <div class="code-actions"><button class="btn-copy" onclick="copyCode(this)">📋 Copy</button><button class="btn-colab" onclick="openColab(this)">▶ Run in Colab</button></div>
-    </div>
-    <pre><code><span class="cm"># ══════════════════════════════════════════════════════════
-# LANGCHAIN CHEATSHEET — 8 Essential Patterns
-# ══════════════════════════════════════════════════════════</span>
-
-<span class="cm"># ─── 1. Minimal working chain ─────────────────────────</span>
-<span class="imp">from</span> <span class="cl">langchain_openai</span> <span class="imp">import</span> <span class="cl">ChatOpenAI</span>
-<span class="imp">from</span> <span class="cl">langchain_core.prompts</span> <span class="imp">import</span> <span class="cl">ChatPromptTemplate</span>
-<span class="imp">from</span> <span class="cl">langchain_core.output_parsers</span> <span class="imp">import</span> <span class="cl">StrOutputParser</span>
-
-chain = (
-    <span class="cl">ChatPromptTemplate</span>.from_template(<span class="st">"Answer this: {q}"</span>)
-    | <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>)
-    | <span class="cl">StrOutputParser</span>()
-)
-chain.invoke({<span class="st">"q"</span>: <span class="st">"What is Python?"</span>})
-
-<span class="cm"># ─── 2. Stream tokens to terminal ─────────────────────</span>
-<span class="kw">for</span> token <span class="kw">in</span> chain.stream({<span class="st">"q"</span>: <span class="st">"Tell me a story"</span>}):
-    <span class="fn">print</span>(token, end=<span class="st">""</span>, flush=<span class="kw">True</span>)
-
-<span class="cm"># ─── 3. Structured JSON output ────────────────────────</span>
-<span class="imp">from</span> <span class="cl">langchain_core.output_parsers</span> <span class="imp">import</span> <span class="cl">JsonOutputParser</span>
-
-json_chain = (
-    <span class="cl">ChatPromptTemplate</span>.from_template(
-        <span class="st">"Return ONLY JSON with 'answer' (string) and 'confidence' (0-1). Question: {q}"</span>
-    )
-    | <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>)
-    | <span class="cl">JsonOutputParser</span>()
-)
-result = json_chain.invoke({<span class="st">"q"</span>: <span class="st">"Is Python popular?"</span>})
-<span class="fn">print</span>(result[<span class="st">"answer"</span>], result[<span class="st">"confidence"</span>])
-
-<span class="cm"># ─── 4. RAG in 8 lines ────────────────────────────────</span>
-<span class="imp">from</span> <span class="cl">langchain_community.vectorstores</span> <span class="imp">import</span> <span class="cl">FAISS</span>
-<span class="imp">from</span> <span class="cl">langchain_openai</span> <span class="imp">import</span> <span class="cl">OpenAIEmbeddings</span>
-<span class="imp">from</span> <span class="cl">langchain_core.documents</span> <span class="imp">import</span> <span class="cl">Document</span>
-<span class="imp">from</span> <span class="cl">langchain_core.runnables</span> <span class="imp">import</span> <span class="cl">RunnablePassthrough</span>
-
-docs = [<span class="cl">Document</span>(page_content=<span class="st">"LangChain makes LLM apps easy."</span>)]
-vs   = <span class="cl">FAISS</span>.from_documents(docs, <span class="cl">OpenAIEmbeddings</span>())
-rag  = (
-    {<span class="st">"ctx"</span>: vs.as_retriever() | (<span class="kw">lambda</span> d: d[<span class="nm">0</span>].page_content), <span class="st">"q"</span>: <span class="cl">RunnablePassthrough</span>()}
-    | <span class="cl">ChatPromptTemplate</span>.from_template(<span class="st">"Context: {ctx}\nAnswer: {q}"</span>)
-    | <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>) | <span class="cl">StrOutputParser</span>()
-)
-rag.invoke(<span class="st">"What does LangChain do?"</span>)
-
-<span class="cm"># ─── 5. Add conversation memory ───────────────────────</span>
-<span class="imp">from</span> <span class="cl">langchain_core.chat_history</span> <span class="imp">import</span> <span class="cl">InMemoryChatMessageHistory</span>
-<span class="imp">from</span> <span class="cl">langchain_core.runnables.history</span> <span class="imp">import</span> <span class="cl">RunnableWithMessageHistory</span>
-<span class="imp">from</span> <span class="cl">langchain_core.prompts</span> <span class="imp">import</span> <span class="cl">MessagesPlaceholder</span>
-
-memory_chain = <span class="cl">RunnableWithMessageHistory</span>(
-    <span class="cl">ChatPromptTemplate</span>.from_messages([
-        (<span class="st">"system"</span>, <span class="st">"Be helpful."</span>),
-        <span class="cl">MessagesPlaceholder</span>(<span class="st">"history"</span>),
-        (<span class="st">"human"</span>, <span class="st">"{q}"</span>)
-    ]) | <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>) | <span class="cl">StrOutputParser</span>(),
-    <span class="kw">lambda</span> sid: <span class="cl">InMemoryChatMessageHistory</span>(),
-    input_messages_key=<span class="st">"q"</span>, history_messages_key=<span class="st">"history"</span>
-)
-cfg = {<span class="st">"configurable"</span>: {<span class="st">"session_id"</span>: <span class="st">"my-session"</span>}}
-memory_chain.invoke({<span class="st">"q"</span>: <span class="st">"My name is Alex."</span>}, config=cfg)
-memory_chain.invoke({<span class="st">"q"</span>: <span class="st">"What's my name?"</span>}, config=cfg)   <span class="cm"># → "Alex"</span>
-
-<span class="cm"># ─── 6. Create a custom @tool ─────────────────────────</span>
-<span class="imp">from</span> <span class="cl">langchain_core.tools</span> <span class="imp">import</span> tool
-
-<span class="dec">@tool</span>
-<span class="kw">def</span> <span class="fn">my_tool</span>(query: <span class="tp">str</span>) -> <span class="tp">str</span>:
-    <span class="st">"""Clear description of what this tool does. LLM reads this to decide when to call it."""</span>
-    <span class="kw">return</span> <span class="fn">f</span><span class="st">"Result for: {query}"</span>
-
-<span class="cm"># ─── 7. Parallel chains ───────────────────────────────</span>
-<span class="imp">from</span> <span class="cl">langchain_core.runnables</span> <span class="imp">import</span> <span class="cl">RunnableParallel</span>
-
-parallel = <span class="cl">RunnableParallel</span>(
-    pros  = <span class="cl">ChatPromptTemplate</span>.from_template(<span class="st">"3 pros of {tech}"</span>)    | <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>) | <span class="cl">StrOutputParser</span>(),
-    cons  = <span class="cl">ChatPromptTemplate</span>.from_template(<span class="st">"3 cons of {tech}"</span>)    | <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>) | <span class="cl">StrOutputParser</span>(),
-    brief = <span class="cl">ChatPromptTemplate</span>.from_template(<span class="st">"1 sentence about {tech}"</span>) | <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>) | <span class="cl">StrOutputParser</span>(),
-)
-result = parallel.invoke({<span class="st">"tech"</span>: <span class="st">"Kubernetes"</span>})
-
-<span class="cm"># ─── 8. Inject any Python function into a chain ───────</span>
-<span class="imp">from</span> <span class="cl">langchain_core.runnables</span> <span class="imp">import</span> <span class="cl">RunnableLambda</span>
-
-enriched_chain = (
-    <span class="cl">RunnableLambda</span>(<span class="kw">lambda</span> x: {<span class="st">"q"</span>: x[<span class="st">"q"</span>].strip().title()})   <span class="cm"># preprocess</span>
-    | <span class="cl">ChatPromptTemplate</span>.from_template(<span class="st">"Answer: {q}"</span>)
-    | <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>)
-    | <span class="cl">StrOutputParser</span>()
-    | <span class="cl">RunnableLambda</span>(<span class="kw">lambda</span> s: {<span class="st">"answer"</span>: s, <span class="st">"words"</span>: <span class="fn">len</span>(s.split())})  <span class="cm"># postprocess</span>
-)</code></pre>
-  </div>
-
-  <div class="callout tip">
-    <div class="callout-icon">🚀</div>
-    <div class="callout-body"><strong>You've covered the full ecosystem.</strong> These 8 patterns handle the LangChain mechanics. Head to <strong>LangGraph</strong> for stateful workflows and multi-agent loops, <strong>LangSmith</strong> to trace, evaluate, and version every chain, and <strong>LangServe</strong> to deploy any chain as a documented REST API with streaming and a built-in playground — all in about 10 lines.</div>
-  </div>
-</section>
 
 <!-- ────────────── LANGGRAPH ────────────── -->
 <section class="section" id="langgraph">
@@ -8206,6 +8055,158 @@ passed = <span class="fn">run_ci_gate</span>(my_chain, golden_set, threshold=<sp
   <div class="callout tip">
     <div class="callout-icon">🎓</div>
     <div class="callout-body"><strong>Building an evaluation practice — in order.</strong> 1) Write 20–50 golden examples covering your real use cases plus known edge cases. 2) Add reference-grading for factual QA, rubric scoring for open-ended generation. 3) For RAG, instrument all four quadrant metrics — faithfulness first, it's the highest-risk failure. 4) For agents, evaluate the trajectory, not just the final answer. 5) Wire the golden set into CI as a regression gate before every prompt or model change ships. 6) Sample 5–10% of production traffic for human review monthly to catch what your automated judge misses and to recalibrate it.</div>
+  </div>
+</section>
+
+<!-- ────────────── PIPELINE MAP ────────────── -->
+<section class="section" id="pipeline">
+  <div class="section-tag green"><span class="section-tag-num">16</span> Reference</div>
+  <h2>The Full <em>Production Pipeline</em></h2>
+
+  <div class="section-story">
+    <p>Now that you've seen all the individual pieces, here's how they connect in a real production application. The diagram below shows the complete flow from user input to final response for a sophisticated application that combines RAG, memory, and output parsing. Most real-world LangChain apps use some subset of this full pipeline. You start simple and add pieces as your requirements grow.</p>
+    <p>The most important mental model is the <strong>complexity ladder</strong>: start with the simplest working solution, then layer in complexity only when you actually need it. A simple three-step chain (prompt → LLM → parser) can solve a surprising number of real problems without any of the more advanced components.</p>
+  </div>
+
+  <div class="formula-box">
+    <div class="fb-title">🗺️ Full Application Flow — Read Top to Bottom</div>
+    <div class="formula"><span class="cn">①</span> <span class="fp">User Input</span>  →  text string from UI, API, or chat</div>
+    <div class="formula"><span class="cn">②</span> <span class="fp">Router</span> (optional)  →  classify intent, pick a sub-chain</div>
+    <div class="formula"><span class="cn">③</span> <span class="fp">Memory Load</span>  →  fetch conversation history by session_id</div>
+    <div class="formula"><span class="cn">④</span> <span class="fp">Retriever</span> (if RAG)  →  embed query → find k nearest chunks</div>
+    <div class="formula"><span class="cn">⑤</span> <span class="fp">Prompt Template</span>  →  assemble system + history + context + query</div>
+    <div class="formula"><span class="cn">⑥</span> <span class="fp">LLM</span>  →  generate response tokens</div>
+    <div class="formula"><span class="cn">⑦</span> <span class="fp">Output Parser</span>  →  extract string, JSON, or Pydantic model</div>
+    <div class="formula"><span class="cn">⑧</span> <span class="fp">Memory Save</span>  →  persist this turn's messages</div>
+    <div class="formula"><span class="cn">⑨</span> <span class="fp">Response</span>  →  return to user, stream to UI, or feed next step</div>
+    <div class="fb-divider"></div>
+    <div class="fb-vars">
+      <div class="fb-var"><span class="fv-name">Simple chain</span><span class="fv-desc">Steps ①, ⑤, ⑥, ⑦, ⑨ — just 5 steps. This covers about 60% of use cases.</span></div>
+      <div class="fb-var"><span class="fv-name">Conversational bot</span><span class="fv-desc">Add steps ③ and ⑧ to give the bot memory. 7 steps total.</span></div>
+      <div class="fb-var"><span class="fv-name">RAG app</span><span class="fv-desc">Add step ④. Requires indexing your documents first (one-time setup).</span></div>
+      <div class="fb-var"><span class="fv-name">Full RAG + Memory</span><span class="fv-desc">All steps — the complete enterprise-grade conversational app pattern.</span></div>
+    </div>
+  </div>
+
+  <div class="callout story">
+    <div class="callout-icon">📖</div>
+    <div class="callout-body"><strong>What comes next after LangChain basics?</strong> Once you're comfortable here, explore <strong>LangSmith</strong> — Anthropic's observability tool that lets you trace every step of every chain call, debug failures, and evaluate performance systematically. Then look at <strong>LangGraph</strong> for building multi-agent workflows where agents collaborate with each other. And <strong>LangServe</strong> for deploying your chains as production REST APIs in minutes.</div>
+  </div>
+</section>
+
+<!-- ────────────── CHEATSHEET ────────────── -->
+<section class="section" id="cheatsheet">
+  <div class="section-tag amber"><span class="section-tag-num">17</span> Reference</div>
+  <h2>The Essential <em>Cheatsheet</em></h2>
+
+  <div class="section-story">
+    <p>Eight patterns you'll use in almost every LangChain project. Each is a complete, working snippet — copy, paste into Colab, and adapt to your use case. Think of this as your go-to reference once you're building your own applications and need to quickly recall the syntax for a specific pattern.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-bar">
+      <div class="code-bar-left"><div class="dots"><span></span><span></span><span></span></div><span class="code-fname">cheatsheet.py</span></div>
+      <div class="code-actions"><button class="btn-copy" onclick="copyCode(this)">📋 Copy</button><button class="btn-colab" onclick="openColab(this)">▶ Run in Colab</button></div>
+    </div>
+    <pre><code><span class="cm"># ══════════════════════════════════════════════════════════
+# LANGCHAIN CHEATSHEET — 8 Essential Patterns
+# ══════════════════════════════════════════════════════════</span>
+
+<span class="cm"># ─── 1. Minimal working chain ─────────────────────────</span>
+<span class="imp">from</span> <span class="cl">langchain_openai</span> <span class="imp">import</span> <span class="cl">ChatOpenAI</span>
+<span class="imp">from</span> <span class="cl">langchain_core.prompts</span> <span class="imp">import</span> <span class="cl">ChatPromptTemplate</span>
+<span class="imp">from</span> <span class="cl">langchain_core.output_parsers</span> <span class="imp">import</span> <span class="cl">StrOutputParser</span>
+
+chain = (
+    <span class="cl">ChatPromptTemplate</span>.from_template(<span class="st">"Answer this: {q}"</span>)
+    | <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>)
+    | <span class="cl">StrOutputParser</span>()
+)
+chain.invoke({<span class="st">"q"</span>: <span class="st">"What is Python?"</span>})
+
+<span class="cm"># ─── 2. Stream tokens to terminal ─────────────────────</span>
+<span class="kw">for</span> token <span class="kw">in</span> chain.stream({<span class="st">"q"</span>: <span class="st">"Tell me a story"</span>}):
+    <span class="fn">print</span>(token, end=<span class="st">""</span>, flush=<span class="kw">True</span>)
+
+<span class="cm"># ─── 3. Structured JSON output ────────────────────────</span>
+<span class="imp">from</span> <span class="cl">langchain_core.output_parsers</span> <span class="imp">import</span> <span class="cl">JsonOutputParser</span>
+
+json_chain = (
+    <span class="cl">ChatPromptTemplate</span>.from_template(
+        <span class="st">"Return ONLY JSON with 'answer' (string) and 'confidence' (0-1). Question: {q}"</span>
+    )
+    | <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>)
+    | <span class="cl">JsonOutputParser</span>()
+)
+result = json_chain.invoke({<span class="st">"q"</span>: <span class="st">"Is Python popular?"</span>})
+<span class="fn">print</span>(result[<span class="st">"answer"</span>], result[<span class="st">"confidence"</span>])
+
+<span class="cm"># ─── 4. RAG in 8 lines ────────────────────────────────</span>
+<span class="imp">from</span> <span class="cl">langchain_community.vectorstores</span> <span class="imp">import</span> <span class="cl">FAISS</span>
+<span class="imp">from</span> <span class="cl">langchain_openai</span> <span class="imp">import</span> <span class="cl">OpenAIEmbeddings</span>
+<span class="imp">from</span> <span class="cl">langchain_core.documents</span> <span class="imp">import</span> <span class="cl">Document</span>
+<span class="imp">from</span> <span class="cl">langchain_core.runnables</span> <span class="imp">import</span> <span class="cl">RunnablePassthrough</span>
+
+docs = [<span class="cl">Document</span>(page_content=<span class="st">"LangChain makes LLM apps easy."</span>)]
+vs   = <span class="cl">FAISS</span>.from_documents(docs, <span class="cl">OpenAIEmbeddings</span>())
+rag  = (
+    {<span class="st">"ctx"</span>: vs.as_retriever() | (<span class="kw">lambda</span> d: d[<span class="nm">0</span>].page_content), <span class="st">"q"</span>: <span class="cl">RunnablePassthrough</span>()}
+    | <span class="cl">ChatPromptTemplate</span>.from_template(<span class="st">"Context: {ctx}\nAnswer: {q}"</span>)
+    | <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>) | <span class="cl">StrOutputParser</span>()
+)
+rag.invoke(<span class="st">"What does LangChain do?"</span>)
+
+<span class="cm"># ─── 5. Add conversation memory ───────────────────────</span>
+<span class="imp">from</span> <span class="cl">langchain_core.chat_history</span> <span class="imp">import</span> <span class="cl">InMemoryChatMessageHistory</span>
+<span class="imp">from</span> <span class="cl">langchain_core.runnables.history</span> <span class="imp">import</span> <span class="cl">RunnableWithMessageHistory</span>
+<span class="imp">from</span> <span class="cl">langchain_core.prompts</span> <span class="imp">import</span> <span class="cl">MessagesPlaceholder</span>
+
+memory_chain = <span class="cl">RunnableWithMessageHistory</span>(
+    <span class="cl">ChatPromptTemplate</span>.from_messages([
+        (<span class="st">"system"</span>, <span class="st">"Be helpful."</span>),
+        <span class="cl">MessagesPlaceholder</span>(<span class="st">"history"</span>),
+        (<span class="st">"human"</span>, <span class="st">"{q}"</span>)
+    ]) | <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>) | <span class="cl">StrOutputParser</span>(),
+    <span class="kw">lambda</span> sid: <span class="cl">InMemoryChatMessageHistory</span>(),
+    input_messages_key=<span class="st">"q"</span>, history_messages_key=<span class="st">"history"</span>
+)
+cfg = {<span class="st">"configurable"</span>: {<span class="st">"session_id"</span>: <span class="st">"my-session"</span>}}
+memory_chain.invoke({<span class="st">"q"</span>: <span class="st">"My name is Alex."</span>}, config=cfg)
+memory_chain.invoke({<span class="st">"q"</span>: <span class="st">"What's my name?"</span>}, config=cfg)   <span class="cm"># → "Alex"</span>
+
+<span class="cm"># ─── 6. Create a custom @tool ─────────────────────────</span>
+<span class="imp">from</span> <span class="cl">langchain_core.tools</span> <span class="imp">import</span> tool
+
+<span class="dec">@tool</span>
+<span class="kw">def</span> <span class="fn">my_tool</span>(query: <span class="tp">str</span>) -> <span class="tp">str</span>:
+    <span class="st">"""Clear description of what this tool does. LLM reads this to decide when to call it."""</span>
+    <span class="kw">return</span> <span class="fn">f</span><span class="st">"Result for: {query}"</span>
+
+<span class="cm"># ─── 7. Parallel chains ───────────────────────────────</span>
+<span class="imp">from</span> <span class="cl">langchain_core.runnables</span> <span class="imp">import</span> <span class="cl">RunnableParallel</span>
+
+parallel = <span class="cl">RunnableParallel</span>(
+    pros  = <span class="cl">ChatPromptTemplate</span>.from_template(<span class="st">"3 pros of {tech}"</span>)    | <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>) | <span class="cl">StrOutputParser</span>(),
+    cons  = <span class="cl">ChatPromptTemplate</span>.from_template(<span class="st">"3 cons of {tech}"</span>)    | <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>) | <span class="cl">StrOutputParser</span>(),
+    brief = <span class="cl">ChatPromptTemplate</span>.from_template(<span class="st">"1 sentence about {tech}"</span>) | <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>) | <span class="cl">StrOutputParser</span>(),
+)
+result = parallel.invoke({<span class="st">"tech"</span>: <span class="st">"Kubernetes"</span>})
+
+<span class="cm"># ─── 8. Inject any Python function into a chain ───────</span>
+<span class="imp">from</span> <span class="cl">langchain_core.runnables</span> <span class="imp">import</span> <span class="cl">RunnableLambda</span>
+
+enriched_chain = (
+    <span class="cl">RunnableLambda</span>(<span class="kw">lambda</span> x: {<span class="st">"q"</span>: x[<span class="st">"q"</span>].strip().title()})   <span class="cm"># preprocess</span>
+    | <span class="cl">ChatPromptTemplate</span>.from_template(<span class="st">"Answer: {q}"</span>)
+    | <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>)
+    | <span class="cl">StrOutputParser</span>()
+    | <span class="cl">RunnableLambda</span>(<span class="kw">lambda</span> s: {<span class="st">"answer"</span>: s, <span class="st">"words"</span>: <span class="fn">len</span>(s.split())})  <span class="cm"># postprocess</span>
+)</code></pre>
+  </div>
+
+  <div class="callout tip">
+    <div class="callout-icon">🚀</div>
+    <div class="callout-body"><strong>You've covered the full ecosystem.</strong> These 8 patterns handle the LangChain mechanics. Head to <strong>LangGraph</strong> for stateful workflows and multi-agent loops, <strong>LangSmith</strong> to trace, evaluate, and version every chain, and <strong>LangServe</strong> to deploy any chain as a documented REST API with streaming and a built-in playground — all in about 10 lines.</div>
   </div>
 </section>
 

@@ -1183,6 +1183,7 @@ code { font-family: 'JetBrains Mono', monospace; }
     <a class="nav-link" href="#local-models"><span class="nav-icon">💻</span> Local Models (Ollama)</a>
     <a class="nav-link" href="#advanced-rag"><span class="nav-icon">🔬</span> Advanced RAG</a>
     <a class="nav-link" href="#rag-deepdive"><span class="nav-icon">🏗️</span> RAG — Deep Dive</a>
+    <a class="nav-link" href="#reranking"><span class="nav-icon">🎯</span> Re-Ranking</a>
     <a class="nav-link" href="#multimodal-rag"><span class="nav-icon">🖼️</span> Multimodal Retrieval</a>
 
     <span class="nav-group-label" style="color:var(--green)">🟢 LangChain — Use Cases</span>
@@ -3706,10 +3707,397 @@ tests = [
 </section>
 
 <!-- ═══════════════════════════════════════════════════════════════
+     RE-RANKING
+═══════════════════════════════════════════════════════════════ -->
+<section class="section" id="reranking">
+  <div class="section-tag green"><span class="section-tag-num">13</span> LangChain</div>
+  <h2>Re-Ranking —<br><em>retrieve wide, answer narrow</em></h2>
+
+  <div class="section-story">
+    <p>Vector similarity search is built for speed, not precision. A bi-encoder embeds the query and every document independently, then compares them with a single cosine-similarity number — fast enough to search millions of vectors in milliseconds, but blind to the actual interaction between query and document. Two passages can land close together in embedding space because they share vocabulary, even when one doesn't actually answer the question. The result: your top-20 retrieved chunks are usually <em>topically</em> related, but the truly best answer might be sitting at rank 14, buried under several "close enough" distractors sitting above it.</p>
+    <p><strong>Re-ranking</strong> fixes this with a second, deliberately more expensive pass. Instead of asking "is this generally similar?" across millions of candidates, a reranker asks "given this specific query, how relevant is this specific document?" across a much smaller shortlist — typically the top 20–50 results from the first stage. Because it only has to score a few dozen candidates instead of millions, it can afford a model that reads the query and document <em>together</em>, attending across both simultaneously, which produces dramatically better relevance judgments. This section covers the two-stage architecture, the spectrum of reranking methods from cross-encoders to LLM judges, managed reranking APIs, and the guardrails that keep reranking from becoming a latency or cost liability.</p>
+  </div>
+
+  <!-- ── TWO-STAGE ARCHITECTURE ─────────────────────── -->
+  <h3>🏗️ Two-Stage Architecture — Retrieve Wide, Re-Rank Narrow</h3>
+  <div class="section-story">
+    <p>The pattern is a funnel with two stages of increasing precision and decreasing scale. <strong>Stage 1 (retrieval)</strong> uses a bi-encoder — separate embeddings for query and document, compared via cosine similarity — to cheaply narrow millions of documents down to a candidate set of 20–50. This stage optimises for <em>recall</em>: cast a net wide enough that the truly relevant documents are almost certainly somewhere in the candidate set, even if they're not ranked first. <strong>Stage 2 (re-ranking)</strong> uses a more powerful but far more expensive model — a cross-encoder, ColBERT-style late-interaction model, or an LLM — to re-score just those 20–50 candidates with full query-document interaction. This stage optimises for <em>precision</em>: of the documents we already know are roughly relevant, which 3–5 are actually the best answer? The same cross-encoder that's far too slow to run against a million-document corpus is perfectly affordable against fifty.</p>
+  </div>
+
+  <div class="formula-box">
+    <div class="fb-title">🔻 The Retrieval Funnel</div>
+    <div class="formula"><span class="fp">Corpus</span>     <span class="fc">= millions of chunks — too many to score individually per query</span></div>
+    <div class="formula"><span class="fp">Stage 1</span>    <span class="fc">= bi-encoder ANN search → top 20–50 candidates (optimise recall)</span></div>
+    <div class="formula"><span class="fp">Stage 2</span>    <span class="fc">= cross-encoder / LLM re-score the 20–50 → top 3–5 (optimise precision)</span></div>
+    <div class="formula"><span class="fp">Generation</span> <span class="fc">= LLM receives only the re-ranked top 3–5 — less noise, better answers</span></div>
+    <div class="fb-divider"></div>
+    <div class="fb-vars">
+      <div class="fb-var"><span class="fv-name">Why not just retrieve more?</span><span class="fv-desc">Increasing k alone (retrieving top-30 instead of top-5 and stuffing all of it into the prompt) adds noise faster than signal — irrelevant chunks dilute attention and increase hallucination risk. Re-ranking lets you retrieve broadly for recall, then narrow sharply for the actual generation context.</span></div>
+      <div class="fb-var"><span class="fv-name">Why not just use a cross-encoder for everything?</span><span class="fv-desc">Cross-encoders require the query and document to be encoded <em>together</em>, so there's no way to pre-compute document embeddings offline — every query needs a fresh forward pass per candidate document. That's fine for 50 candidates, computationally prohibitive for a million-document corpus.</span></div>
+    </div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-bar">
+      <div class="code-bar-left"><div class="dots"><span></span><span></span><span></span></div><span class="code-fname">rerank_01_two_stage_pipeline.py</span></div>
+      <div class="code-actions"><button class="btn-copy" onclick="copyCode(this)">📋 Copy</button><button class="btn-colab" onclick="openColab(this)">▶ Run in Colab</button></div>
+    </div>
+    <pre><code><span class="kw">!pip install</span> <span class="st">langchain langchain-openai langchain-community faiss-cpu sentence-transformers -q</span>
+
+<span class="imp">import</span> os
+os.environ[<span class="st">"OPENAI_API_KEY"</span>] = <span class="st">"sk-your-key"</span>
+
+<span class="imp">from</span> <span class="cl">langchain_openai</span> <span class="imp">import</span> <span class="cl">OpenAIEmbeddings</span>
+<span class="imp">from</span> <span class="cl">langchain_community.vectorstores</span> <span class="imp">import</span> <span class="cl">FAISS</span>
+<span class="imp">from</span> <span class="cl">langchain.retrievers</span> <span class="imp">import</span> <span class="cl">ContextualCompressionRetriever</span>
+<span class="imp">from</span> <span class="cl">langchain.retrievers.document_compressors</span> <span class="imp">import</span> <span class="cl">CrossEncoderReranker</span>
+<span class="imp">from</span> <span class="cl">langchain_community.cross_encoders</span> <span class="imp">import</span> <span class="cl">HuggingFaceCrossEncoder</span>
+<span class="imp">from</span> <span class="cl">langchain_core.documents</span> <span class="imp">import</span> <span class="cl">Document</span>
+
+<span class="cm"># ── Sample corpus — note the deliberate "near-miss" distractors ──</span>
+docs = [
+    <span class="cl">Document</span>(page_content=<span class="st">"LangChain's caching layer reduces redundant LLM API calls using SQLiteCache or RedisCache."</span>),
+    <span class="cl">Document</span>(page_content=<span class="st">"Caching in web browsers stores static assets like images and scripts locally."</span>),                  <span class="cm"># near-miss: "caching" but wrong domain</span>
+    <span class="cl">Document</span>(page_content=<span class="st">"Redis is an in-memory data store commonly used for caching and pub/sub messaging."</span>),               <span class="cm"># near-miss: mentions Redis, not the LangChain API</span>
+    <span class="cl">Document</span>(page_content=<span class="st">"set_llm_cache(SQLiteCache()) is the one-line way to enable LLM response caching in LangChain."</span>),    <span class="cm"># the actual best answer</span>
+    <span class="cl">Document</span>(page_content=<span class="st">"LangChain agents can call external tools like search engines and calculators."</span>),
+    <span class="cl">Document</span>(page_content=<span class="st">"Model tiering routes simple queries to cheap models and complex ones to expensive models."</span>),
+]
+
+<span class="cm"># ── Stage 1: cheap, broad bi-encoder retrieval ────────</span>
+vectorstore   = <span class="cl">FAISS</span>.from_documents(docs, <span class="cl">OpenAIEmbeddings</span>())
+base_retriever = vectorstore.as_retriever(search_kwargs={<span class="st">"k"</span>: <span class="nm">5</span>})   <span class="cm"># wide net</span>
+
+query = <span class="st">"How do I enable caching for LLM calls in LangChain?"</span>
+stage1_results = base_retriever.invoke(query)
+<span class="fn">print</span>(<span class="st">"Stage 1 — bi-encoder retrieval order:"</span>)
+<span class="kw">for</span> i, doc <span class="kw">in</span> <span class="fn">enumerate</span>(stage1_results):
+    <span class="fn">print</span>(<span class="fn">f</span><span class="st">"  [{i}] {doc.page_content[:75]}"</span>)
+
+<span class="cm"># ── Stage 2: expensive, narrow cross-encoder re-ranking ──
+# Cross-encoder reads (query, document) TOGETHER — far more accurate
+# than comparing two independently-computed embeddings.</span>
+cross_encoder = <span class="cl">HuggingFaceCrossEncoder</span>(model_name=<span class="st">"BAAI/bge-reranker-base"</span>)
+compressor    = <span class="cl">CrossEncoderReranker</span>(model=cross_encoder, top_n=<span class="nm">3</span>)
+
+reranking_retriever = <span class="cl">ContextualCompressionRetriever</span>(
+    base_compressor=compressor,
+    base_retriever=base_retriever
+)
+
+stage2_results = reranking_retriever.invoke(query)
+<span class="fn">print</span>(<span class="st">"
+Stage 2 — after cross-encoder re-ranking:"</span>)
+<span class="kw">for</span> i, doc <span class="kw">in</span> <span class="fn">enumerate</span>(stage2_results):
+    <span class="fn">print</span>(<span class="fn">f</span><span class="st">"  [{i}] {doc.page_content[:75]}"</span>)
+<span class="fn">print</span>(<span class="st">"
+  ↑ Notice: the exact 'set_llm_cache' answer should now rank #1,"</span>)
+<span class="fn">print</span>(<span class="st">"    even if the bi-encoder ranked a topically-similar distractor higher."</span>)</code></pre>
+  </div>
+
+  <!-- ── METHODS COMPARED ─────────────────────────────── -->
+  <h3>🧮 Re-Ranking Methods Compared</h3>
+  <div class="section-story">
+    <p><strong>Cross-encoders</strong> concatenate the query and document into one input and run them through a single transformer, letting every token attend to every other token across both — this joint attention is exactly what a bi-encoder can never do, since it encodes query and document in two completely separate forward passes. <strong>ColBERT-style late interaction</strong> sits in between: it still encodes query and document separately (so document embeddings can be precomputed, unlike a cross-encoder), but keeps token-level embeddings rather than collapsing to a single vector, and computes relevance via MaxSim across token pairs at query time — most of a cross-encoder's accuracy at a fraction of the latency. <strong>LLM-based reranking</strong> uses a general-purpose LLM as the relevance judge — most flexible and often most accurate, especially for nuanced or multi-hop relevance, but also the slowest and most expensive per query.</p>
+  </div>
+
+  <table class="compare-table">
+    <thead><tr><th>Method</th><th>Latency (50 docs)</th><th>Accuracy</th><th>Precompute docs?</th><th>Best for</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Bi-encoder (baseline)</strong></td><td>~5 ms</td><td>Baseline</td><td>✅ Yes</td><td>Stage 1 only — broad recall</td></tr>
+      <tr><td><strong class="ct-green">Cross-encoder</strong></td><td>50–200 ms</td><td>High</td><td>❌ No</td><td>Stage 2 — best accuracy/cost balance</td></tr>
+      <tr><td><strong class="ct-sky">ColBERT (late interaction)</strong></td><td>10–40 ms</td><td>High</td><td>✅ Partially</td><td>Latency-sensitive production reranking</td></tr>
+      <tr><td><strong class="ct-violet">LLM pointwise</strong></td><td>200–500 ms</td><td>Highest</td><td>❌ No</td><td>High-stakes, nuanced relevance judgments</td></tr>
+      <tr><td><strong class="ct-orange">LLM listwise</strong></td><td>300–800 ms</td><td>Highest (with caveats)</td><td>❌ No</td><td>Need a full ranked order, not just scores</td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-wrap">
+    <div class="code-bar">
+      <div class="code-bar-left"><div class="dots"><span></span><span></span><span></span></div><span class="code-fname">rerank_02_cross_encoder_direct.py</span></div>
+      <div class="code-actions"><button class="btn-copy" onclick="copyCode(this)">📋 Copy</button><button class="btn-colab" onclick="openColab(this)">▶ Run in Colab</button></div>
+    </div>
+    <pre><code><span class="kw">!pip install</span> <span class="st">sentence-transformers -q</span>
+
+<span class="imp">from</span> <span class="cl">sentence_transformers</span> <span class="imp">import</span> <span class="cl">CrossEncoder</span>
+
+<span class="cm"># ── Load a cross-encoder reranker directly (no LangChain wrapper) ──
+# bge-reranker-base is a strong open-source cross-encoder fine-tuned for
+# query-passage relevance scoring.</span>
+model = <span class="cl">CrossEncoder</span>(<span class="st">"BAAI/bge-reranker-base"</span>, max_length=<span class="nm">512</span>)
+
+query = <span class="st">"How do I enable caching for LLM calls in LangChain?"</span>
+candidates = [
+    <span class="st">"Caching in web browsers stores static assets like images and scripts locally."</span>,
+    <span class="st">"Redis is an in-memory data store commonly used for caching and pub/sub messaging."</span>,
+    <span class="st">"set_llm_cache(SQLiteCache()) is the one-line way to enable LLM response caching in LangChain."</span>,
+    <span class="st">"LangChain agents can call external tools like search engines and calculators."</span>,
+]
+
+<span class="cm"># Cross-encoder scores EACH (query, candidate) pair jointly — one forward pass per pair</span>
+pairs  = [[query, c] <span class="kw">for</span> c <span class="kw">in</span> candidates]
+scores = model.predict(pairs)   <span class="cm"># returns a relevance score per pair, higher = more relevant</span>
+
+ranked = <span class="fn">sorted</span>(<span class="fn">zip</span>(candidates, scores), key=<span class="kw">lambda</span> x: x[<span class="nm">1</span>], reverse=<span class="kw">True</span>)
+<span class="fn">print</span>(<span class="st">"Cross-encoder ranking (score, then text):"</span>)
+<span class="kw">for</span> text, score <span class="kw">in</span> ranked:
+    <span class="fn">print</span>(<span class="fn">f</span><span class="st">"  {score:.3f}  {text[:70]}"</span>)
+
+<span class="cm"># ── Compare against naive keyword overlap (what a weak bi-encoder might do) ──</span>
+<span class="kw">def</span> <span class="fn">word_overlap_score</span>(query: <span class="tp">str</span>, text: <span class="tp">str</span>) -> <span class="tp">float</span>:
+    q_words = <span class="fn">set</span>(query.lower().split())
+    t_words = <span class="fn">set</span>(text.lower().split())
+    <span class="kw">return</span> <span class="fn">len</span>(q_words & t_words) / <span class="fn">len</span>(q_words)
+
+<span class="fn">print</span>(<span class="st">"
+Naive word-overlap ranking (illustrates the failure mode):"</span>)
+naive_ranked = <span class="fn">sorted</span>(candidates, key=<span class="kw">lambda</span> c: <span class="fn">word_overlap_score</span>(query, c), reverse=<span class="kw">True</span>)
+<span class="kw">for</span> text <span class="kw">in</span> naive_ranked:
+    <span class="fn">print</span>(<span class="fn">f</span><span class="st">"  {word_overlap_score(query, text):.2f}  {text[:70]}"</span>)
+<span class="fn">print</span>(<span class="st">"  ↑ 'Redis' and 'browser caching' rank artificially high on word overlap alone"</span>)</code></pre>
+  </div>
+
+  <!-- ── LLM RERANKING STRATEGIES ───────────────────────-->
+  <h3>🤖 LLM Re-Ranking — Pointwise, Pairwise, Listwise</h3>
+  <div class="section-story">
+    <p>When using an LLM as the reranker, three distinct strategies trade off accuracy against cost. <strong>Pointwise</strong> scores each candidate independently against the query — one structured-output call per document, fully parallelisable, but each judgment is made in isolation without seeing the competing candidates, which can produce a flat distribution of "all pretty relevant" scores that's hard to rank confidently. <strong>Pairwise</strong> compares two candidates head-to-head and asks which is better — much more reliable per-judgment because relative comparisons are easier for LLMs than absolute scoring, but naively requires O(n²) comparisons for n candidates, so it's typically reserved for re-ranking a final shortlist of 5–10 rather than the full 20–50 candidate set. <strong>Listwise</strong> shows the LLM the entire candidate set at once and asks it to output a complete ranked order in a single call — the cheapest in terms of LLM calls, but vulnerable to position bias (the order candidates are presented in can subtly influence the output ranking) and to context-window limits if candidates or their content are long.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-bar">
+      <div class="code-bar-left"><div class="dots"><span></span><span></span><span></span></div><span class="code-fname">rerank_03_llm_pointwise_pairwise_listwise.py</span></div>
+      <div class="code-actions"><button class="btn-copy" onclick="copyCode(this)">📋 Copy</button><button class="btn-colab" onclick="openColab(this)">▶ Run in Colab</button></div>
+    </div>
+    <pre><code><span class="kw">!pip install</span> <span class="st">langchain langchain-openai pydantic -q</span>
+
+<span class="imp">import</span> os
+os.environ[<span class="st">"OPENAI_API_KEY"</span>] = <span class="st">"sk-your-key"</span>
+
+<span class="imp">from</span> <span class="cl">langchain_openai</span> <span class="imp">import</span> <span class="cl">ChatOpenAI</span>
+<span class="imp">from</span> <span class="cl">pydantic</span> <span class="imp">import</span> <span class="cl">BaseModel</span>, <span class="cl">Field</span>
+<span class="imp">from</span> <span class="cl">typing</span> <span class="imp">import</span> <span class="cl">List</span>, <span class="cl">Literal</span>
+<span class="imp">import</span> itertools
+
+llm = <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>, temperature=<span class="nm">0</span>)
+query = <span class="st">"How do I enable caching for LLM calls in LangChain?"</span>
+candidates = [
+    <span class="st">"Caching in web browsers stores static assets like images and scripts locally."</span>,
+    <span class="st">"Redis is an in-memory data store commonly used for caching and pub/sub messaging."</span>,
+    <span class="st">"set_llm_cache(SQLiteCache()) is the one-line way to enable LLM response caching in LangChain."</span>,
+    <span class="st">"LangChain agents can call external tools like search engines and calculators."</span>,
+]
+
+<span class="cm"># ══ Pointwise: score each candidate independently (parallel, cheap per-call) ══</span>
+<span class="kw">class</span> <span class="cl">PointwiseScore</span>(<span class="cl">BaseModel</span>):
+    relevance: <span class="tp">float</span> = <span class="cl">Field</span>(ge=<span class="nm">0</span>, le=<span class="nm">1</span>, description=<span class="st">"0=irrelevant, 1=perfectly answers the query"</span>)
+
+<span class="kw">def</span> <span class="fn">pointwise_rerank</span>(query: <span class="tp">str</span>, candidates: <span class="cl">List</span>[<span class="tp">str</span>]) -> <span class="cl">List</span>[<span class="tp">tuple</span>]:
+    scores = []
+    <span class="kw">for</span> c <span class="kw">in</span> candidates:
+        result: <span class="cl">PointwiseScore</span> = llm.with_structured_output(<span class="cl">PointwiseScore</span>).invoke(
+            <span class="fn">f</span><span class="st">"Query: {query}
+Candidate: {c}
+How relevant is this candidate to the query?"</span>
+        )
+        scores.append((c, result.relevance))
+    <span class="kw">return</span> <span class="fn">sorted</span>(scores, key=<span class="kw">lambda</span> x: x[<span class="nm">1</span>], reverse=<span class="kw">True</span>)
+
+<span class="fn">print</span>(<span class="st">"═══ POINTWISE ═══"</span>)
+<span class="kw">for</span> text, score <span class="kw">in</span> <span class="fn">pointwise_rerank</span>(query, candidates):
+    <span class="fn">print</span>(<span class="fn">f</span><span class="st">"  {score:.2f}  {text[:65]}"</span>)
+
+<span class="cm"># ══ Pairwise: head-to-head comparisons, more reliable but O(n²) ══</span>
+<span class="kw">class</span> <span class="cl">PairwiseWinner</span>(<span class="cl">BaseModel</span>):
+    winner: <span class="cl">Literal</span>[<span class="st">"A"</span>, <span class="st">"B"</span>]
+
+<span class="kw">def</span> <span class="fn">pairwise_rerank</span>(query: <span class="tp">str</span>, candidates: <span class="cl">List</span>[<span class="tp">str</span>]) -> <span class="cl">List</span>[<span class="tp">str</span>]:
+    <span class="st">"""Tournament-style: count head-to-head wins, rank by win count."""</span>
+    wins = {c: <span class="nm">0</span> <span class="kw">for</span> c <span class="kw">in</span> candidates}
+    <span class="kw">for</span> a, b <span class="kw">in</span> itertools.combinations(candidates, <span class="nm">2</span>):
+        result: <span class="cl">PairwiseWinner</span> = llm.with_structured_output(<span class="cl">PairwiseWinner</span>).invoke(
+            <span class="fn">f</span><span class="st">"Query: {query}
+A: {a}
+B: {b}
+Which better answers the query, A or B?"</span>
+        )
+        wins[a <span class="kw">if</span> result.winner == <span class="st">"A"</span> <span class="kw">else</span> b] += <span class="nm">1</span>
+    <span class="kw">return</span> <span class="fn">sorted</span>(candidates, key=<span class="kw">lambda</span> c: wins[c], reverse=<span class="kw">True</span>)
+
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"
+═══ PAIRWISE ═══ ({len(candidates)*(len(candidates)-1)//2} comparisons for {len(candidates)} candidates)"</span>)
+<span class="kw">for</span> i, text <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="fn">pairwise_rerank</span>(query, candidates)):
+    <span class="fn">print</span>(<span class="fn">f</span><span class="st">"  [{i}] {text[:65]}"</span>)
+
+<span class="cm"># ══ Listwise: rank the whole set in ONE call (cheapest, watch for position bias) ══</span>
+<span class="kw">class</span> <span class="cl">ListwiseRanking</span>(<span class="cl">BaseModel</span>):
+    ranked_indices: <span class="cl">List</span>[<span class="tp">int</span>] = <span class="cl">Field</span>(description=<span class="st">"Candidate indices ordered most→least relevant"</span>)
+
+<span class="kw">def</span> <span class="fn">listwise_rerank</span>(query: <span class="tp">str</span>, candidates: <span class="cl">List</span>[<span class="tp">str</span>]) -> <span class="cl">List</span>[<span class="tp">str</span>]:
+    numbered = <span class="st">"
+"</span>.join(<span class="fn">f</span><span class="st">"[{i}] {c}"</span> <span class="kw">for</span> i, c <span class="kw">in</span> <span class="fn">enumerate</span>(candidates))
+    result: <span class="cl">ListwiseRanking</span> = llm.with_structured_output(<span class="cl">ListwiseRanking</span>).invoke(
+        <span class="fn">f</span><span class="st">"Query: {query}
+Rank these by relevance, most relevant first:
+{numbered}"</span>
+    )
+    <span class="kw">return</span> [candidates[i] <span class="kw">for</span> i <span class="kw">in</span> result.ranked_indices]
+
+<span class="fn">print</span>(<span class="st">"
+═══ LISTWISE ═══ (1 LLM call total)"</span>)
+<span class="kw">for</span> i, text <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="fn">listwise_rerank</span>(query, candidates)):
+    <span class="fn">print</span>(<span class="fn">f</span><span class="st">"  [{i}] {text[:65]}"</span>)</code></pre>
+  </div>
+
+  <!-- ── MANAGED APIS ─────────────────────────────────── -->
+  <h3>☁️ Managed Re-Ranking APIs</h3>
+  <div class="section-story">
+    <p>Self-hosting a cross-encoder means managing GPU infrastructure, model versioning, and inference scaling. Managed reranking APIs — <strong>Cohere Rerank</strong>, <strong>Jina Reranker</strong>, <strong>Voyage Rerank</strong> — provide cross-encoder-quality relevance scoring as a simple API call, trained on much larger and more diverse relevance datasets than most teams could assemble themselves. They're the pragmatic default for production RAG systems that don't already have GPU infrastructure for self-hosted reranking, and typically add 100–300ms of latency per request for a meaningful precision improvement.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-bar">
+      <div class="code-bar-left"><div class="dots"><span></span><span></span><span></span></div><span class="code-fname">rerank_04_managed_cohere_api.py</span></div>
+      <div class="code-actions"><button class="btn-copy" onclick="copyCode(this)">📋 Copy</button><button class="btn-colab" onclick="openColab(this)">▶ Run in Colab</button></div>
+    </div>
+    <pre><code><span class="kw">!pip install</span> <span class="st">langchain langchain-cohere langchain-openai langchain-community faiss-cpu -q</span>
+
+<span class="imp">import</span> os
+os.environ[<span class="st">"OPENAI_API_KEY"</span>] = <span class="st">"sk-your-key"</span>
+os.environ[<span class="st">"COHERE_API_KEY"</span>] = <span class="st">"your-cohere-key"</span>   <span class="cm"># dashboard.cohere.com</span>
+
+<span class="imp">from</span> <span class="cl">langchain_openai</span> <span class="imp">import</span> <span class="cl">OpenAIEmbeddings</span>
+<span class="imp">from</span> <span class="cl">langchain_community.vectorstores</span> <span class="imp">import</span> <span class="cl">FAISS</span>
+<span class="imp">from</span> <span class="cl">langchain_cohere</span> <span class="imp">import</span> <span class="cl">CohereRerank</span>
+<span class="imp">from</span> <span class="cl">langchain.retrievers</span> <span class="imp">import</span> <span class="cl">ContextualCompressionRetriever</span>
+<span class="imp">from</span> <span class="cl">langchain_core.documents</span> <span class="imp">import</span> <span class="cl">Document</span>
+
+docs = [
+    <span class="cl">Document</span>(page_content=<span class="st">"Caching in web browsers stores static assets like images and scripts locally."</span>),
+    <span class="cl">Document</span>(page_content=<span class="st">"Redis is an in-memory data store commonly used for caching and pub/sub messaging."</span>),
+    <span class="cl">Document</span>(page_content=<span class="st">"set_llm_cache(SQLiteCache()) is the one-line way to enable LLM response caching in LangChain."</span>),
+    <span class="cl">Document</span>(page_content=<span class="st">"LangChain agents can call external tools like search engines and calculators."</span>),
+    <span class="cl">Document</span>(page_content=<span class="st">"Model tiering routes simple queries to cheap models and complex ones to expensive models."</span>),
+]
+vectorstore    = <span class="cl">FAISS</span>.from_documents(docs, <span class="cl">OpenAIEmbeddings</span>())
+base_retriever = vectorstore.as_retriever(search_kwargs={<span class="st">"k"</span>: <span class="nm">5</span>})
+
+<span class="cm"># ── Cohere's hosted rerank-v3.5 model — no GPU, no local model weights ──</span>
+compressor = <span class="cl">CohereRerank</span>(model=<span class="st">"rerank-v3.5"</span>, top_n=<span class="nm">3</span>)
+
+reranking_retriever = <span class="cl">ContextualCompressionRetriever</span>(
+    base_compressor=compressor,
+    base_retriever=base_retriever
+)
+
+query   = <span class="st">"How do I enable caching for LLM calls in LangChain?"</span>
+results = reranking_retriever.invoke(query)
+
+<span class="fn">print</span>(<span class="st">"Cohere-reranked results:"</span>)
+<span class="kw">for</span> i, doc <span class="kw">in</span> <span class="fn">enumerate</span>(results):
+    relevance_score = doc.metadata.get(<span class="st">"relevance_score"</span>, <span class="st">"n/a"</span>)
+    <span class="fn">print</span>(<span class="fn">f</span><span class="st">"  [{i}] (score={relevance_score}) {doc.page_content[:65]}"</span>)
+
+<span class="cm"># ── This same ContextualCompressionRetriever pattern works as a drop-in
+# replacement for ANY base retriever — swap CohereRerank for CrossEncoderReranker
+# from the earlier example with zero changes to the rest of the RAG chain.</span></code></pre>
+  </div>
+
+  <!-- ── WHEN TO RERANK & GUARDRAILS ─────────────────── -->
+  <h3>⚖️ When to Re-Rank — Tradeoffs &amp; Guardrails</h3>
+  <div class="section-story">
+    <p>Re-ranking isn't free, and it isn't always worth it. It adds <strong>latency</strong> — typically 100–500ms depending on method and candidate count — directly to the critical path of every query, so it should only be added when retrieval precision is the actual bottleneck. If your bi-encoder is already producing well-separated similarity scores (a clear winner well above the rest), reranking adds cost without changing the outcome. It earns its keep when retrieval consistently surfaces several "close enough" candidates that are hard to distinguish by cosine similarity alone — exactly the scenario in the examples above, where lexical overlap created misleading bi-encoder rankings.</p>
+    <p><strong>Position bias</strong> is the main failure mode specific to listwise LLM reranking: research has repeatedly shown LLMs have a measurable tendency to favour items appearing earlier (or in some models, later) in a list, independent of true relevance. The standard mitigation is to run the listwise ranking multiple times with the candidate order shuffled, then aggregate the resulting ranks — true signal survives the shuffle, position artifacts average out. <strong>Score calibration</strong> matters when combining reranker scores with other signals (recency, popularity) in a final weighted ranking — raw LLM-output "relevance scores" are not well-calibrated probabilities and shouldn't be averaged or compared across queries without normalisation.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-bar">
+      <div class="code-bar-left"><div class="dots"><span></span><span></span><span></span></div><span class="code-fname">rerank_05_guardrails_latency_bias.py</span></div>
+      <div class="code-actions"><button class="btn-copy" onclick="copyCode(this)">📋 Copy</button><button class="btn-colab" onclick="openColab(this)">▶ Run in Colab</button></div>
+    </div>
+    <pre><code><span class="kw">!pip install</span> <span class="st">langchain langchain-openai pydantic -q</span>
+
+<span class="imp">import</span> os, time, random
+os.environ[<span class="st">"OPENAI_API_KEY"</span>] = <span class="st">"sk-your-key"</span>
+
+<span class="imp">from</span> <span class="cl">langchain_openai</span> <span class="imp">import</span> <span class="cl">ChatOpenAI</span>
+<span class="imp">from</span> <span class="cl">pydantic</span> <span class="imp">import</span> <span class="cl">BaseModel</span>, <span class="cl">Field</span>
+<span class="imp">from</span> <span class="cl">typing</span> <span class="imp">import</span> <span class="cl">List</span>
+<span class="imp">from</span> <span class="cl">collections</span> <span class="imp">import</span> defaultdict
+
+llm = <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4o-mini"</span>, temperature=<span class="nm">0</span>)
+
+<span class="cm"># ── Guardrail 1: should we even re-rank? Check score separation first ──</span>
+<span class="kw">def</span> <span class="fn">needs_reranking</span>(similarity_scores: <span class="cl">List</span>[<span class="tp">float</span>], gap_threshold: <span class="tp">float</span> = <span class="nm">0.08</span>) -> <span class="tp">bool</span>:
+    <span class="st">"""Skip reranking if the top result is already clearly separated from the rest."""</span>
+    <span class="kw">if</span> <span class="fn">len</span>(similarity_scores) < <span class="nm">2</span>: <span class="kw">return</span> <span class="kw">False</span>
+    sorted_scores = <span class="fn">sorted</span>(similarity_scores, reverse=<span class="kw">True</span>)
+    gap = sorted_scores[<span class="nm">0</span>] - sorted_scores[<span class="nm">1</span>]
+    <span class="kw">return</span> gap < gap_threshold   <span class="cm"># small gap = ambiguous = worth reranking</span>
+
+clear_winner   = [<span class="nm">0.91</span>, <span class="nm">0.62</span>, <span class="nm">0.58</span>, <span class="nm">0.55</span>]   <span class="cm"># big gap after #1 — skip reranking</span>
+ambiguous_set  = [<span class="nm">0.74</span>, <span class="nm">0.71</span>, <span class="nm">0.69</span>, <span class="nm">0.67</span>]   <span class="cm"># tight cluster — reranking will help</span>
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"Clear winner case  → rerank? {needs_reranking(clear_winner)}"</span>)
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"Ambiguous case     → rerank? {needs_reranking(ambiguous_set)}"</span>)
+
+<span class="cm"># ── Guardrail 2: latency budget — time-box the reranking step ─────</span>
+<span class="kw">def</span> <span class="fn">rerank_with_budget</span>(rerank_fn, *args, max_seconds: <span class="tp">float</span> = <span class="nm">0.8</span>, fallback=None):
+    <span class="st">"""Run reranking but fall back to original order if it blows the latency budget."""</span>
+    start = time.time()
+    result = rerank_fn(*args)
+    elapsed = time.time() - start
+    <span class="kw">if</span> elapsed > max_seconds:
+        <span class="fn">print</span>(<span class="fn">f</span><span class="st">"  ⚠️  Reranking took {elapsed:.2f}s, exceeding {max_seconds}s budget — log for monitoring"</span>)
+    <span class="kw">return</span> result
+
+<span class="cm"># ── Guardrail 3: position-bias mitigation via shuffle-and-aggregate ──</span>
+<span class="kw">class</span> <span class="cl">ListwiseRanking</span>(<span class="cl">BaseModel</span>):
+    ranked_indices: <span class="cl">List</span>[<span class="tp">int</span>]
+
+<span class="kw">def</span> <span class="fn">debiased_listwise_rerank</span>(query: <span class="tp">str</span>, candidates: <span class="cl">List</span>[<span class="tp">str</span>], n_shuffles: <span class="tp">int</span> = <span class="nm">3</span>) -> <span class="cl">List</span>[<span class="tp">str</span>]:
+    <span class="st">"""Run listwise ranking multiple times with shuffled order; average the ranks."""</span>
+    rank_sums = defaultdict(<span class="tp">float</span>)
+
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n_shuffles):
+        shuffled = candidates.copy()
+        random.shuffle(shuffled)
+        numbered = <span class="st">"
+"</span>.join(<span class="fn">f</span><span class="st">"[{i}] {c}"</span> <span class="kw">for</span> i, c <span class="kw">in</span> <span class="fn">enumerate</span>(shuffled))
+
+        result: <span class="cl">ListwiseRanking</span> = llm.with_structured_output(<span class="cl">ListwiseRanking</span>).invoke(
+            <span class="fn">f</span><span class="st">"Query: {query}
+Rank by relevance, most relevant first:
+{numbered}"</span>
+        )
+        <span class="kw">for</span> rank_position, idx <span class="kw">in</span> <span class="fn">enumerate</span>(result.ranked_indices):
+            rank_sums[shuffled[idx]] += rank_position   <span class="cm"># lower rank_position = more relevant</span>
+
+    <span class="cm"># Average rank across shuffles — items consistently ranked well will have low avg rank</span>
+    <span class="kw">return</span> <span class="fn">sorted</span>(candidates, key=<span class="kw">lambda</span> c: rank_sums[c] / n_shuffles)
+
+query = <span class="st">"How do I enable caching for LLM calls in LangChain?"</span>
+candidates = [
+    <span class="st">"Caching in web browsers stores static assets like images and scripts locally."</span>,
+    <span class="st">"set_llm_cache(SQLiteCache()) is the one-line way to enable LLM response caching in LangChain."</span>,
+    <span class="st">"Redis is an in-memory data store commonly used for caching and pub/sub messaging."</span>,
+]
+debiased = <span class="fn">debiased_listwise_rerank</span>(query, candidates, n_shuffles=<span class="nm">3</span>)
+<span class="fn">print</span>(<span class="fn">f</span><span class="st">"
+Debiased ranking (averaged over 3 shuffles):"</span>)
+<span class="kw">for</span> i, text <span class="kw">in</span> <span class="fn">enumerate</span>(debiased):
+    <span class="fn">print</span>(<span class="fn">f</span><span class="st">"  [{i}] {text[:65]}"</span>)</code></pre>
+  </div>
+
+  <div class="callout tip">
+    <div class="callout-icon">🎓</div>
+    <div class="callout-body"><strong>Re-ranking — a decision guide.</strong> Start without reranking; add it once you observe retrieval surfacing plausible-but-wrong top results. Retrieve 20–30 candidates at stage 1, rerank down to 3–5 for generation. Default to a managed API (Cohere Rerank) unless you already run GPU infrastructure — self-hosted cross-encoders (<span class="ic">BAAI/bge-reranker</span>) are the next step up in control and cost. Reserve LLM-based reranking for cases needing nuanced, multi-hop, or instruction-following relevance judgments that a cross-encoder can't capture. If using listwise LLM reranking, shuffle and average across a few runs to cancel out position bias. Always benchmark: log both the pre-rerank and post-rerank order so you can verify reranking is actually improving outcomes, not just adding latency.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
      MULTIMODAL RETRIEVAL
 ═══════════════════════════════════════════════════════════════ -->
 <section class="section" id="multimodal-rag">
-  <div class="section-tag green"><span class="section-tag-num">13</span> LangChain</div>
+  <div class="section-tag green"><span class="section-tag-num">14</span> LangChain</div>
   <h2>Multimodal Retrieval —<br><em>beyond plain text</em></h2>
 
   <div class="section-story">

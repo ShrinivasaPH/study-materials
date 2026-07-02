@@ -268,9 +268,10 @@ code{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padd
   <div class="nav-item" onclick="scrollToSection('s6')">🔗 JOINs</div>
   <div class="nav-item" onclick="scrollToSection('s7')">🔍 Sub-Queries</div>
   <div class="nav-section">Advanced</div>
-  <div class="nav-item" onclick="scrollToSection('s8')">🪟 Window Functions <span class="badge">Power</span></div>
-  <div class="nav-item" onclick="scrollToSection('s9')">🌿 CTEs</div>
-  <div class="nav-item" onclick="scrollToSection('s10')">⚙️ Stored Procedures</div>
+  <div class="nav-item" onclick="scrollToSection('s8')">🔎 EXISTS, ALL &amp; ANY</div>
+  <div class="nav-item" onclick="scrollToSection('s9')">🪟 Window Functions <span class="badge">Power</span></div>
+  <div class="nav-item" onclick="scrollToSection('s10')">🌿 CTEs</div>
+  <div class="nav-item" onclick="scrollToSection('s11')">⚙️ Stored Procedures</div>
 </nav>
 
 <!-- ══ MAIN ══ -->
@@ -1005,10 +1006,261 @@ print(<span class="str">"✅ Database ready! Run sql('SELECT ...') to query."</s
 
   <hr class="section-divider"/>
 
-  <!-- ══ SECTION 8: WINDOW FUNCTIONS ══ -->
+  <!-- ══ SECTION 8: EXISTS / ALL / ANY ══ -->
   <section class="section" id="s8">
     <div class="section-header">
       <div class="section-num">8</div>
+      <h2>EXISTS, ALL &amp; ANY</h2>
+      <span class="tag">SET OPS</span>
+    </div>
+
+    <p>These three operators work alongside sub-queries to compare a value against a <em>set</em> of results. They let you express powerful "does something exist?" or "is this value bigger than everything in that set?" logic in a single readable clause.</p>
+
+    <div class="card-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="info-card" style="border-top:3px solid var(--green)"><div class="icon">✅</div><h4>EXISTS</h4><p>Returns TRUE if the sub-query produces <em>at least one row</em>. Stops scanning the moment it finds a match.</p></div>
+      <div class="info-card" style="border-top:3px solid var(--accent)"><div class="icon">🌐</div><h4>ALL</h4><p>Returns TRUE only if the condition holds for <em>every single row</em> in the sub-query result set.</p></div>
+      <div class="info-card" style="border-top:3px solid var(--amber)"><div class="icon">⚡</div><h4>ANY / SOME</h4><p>Returns TRUE if the condition holds for <em>at least one row</em> in the sub-query result. <code>SOME</code> is an alias for <code>ANY</code>.</p></div>
+    </div>
+
+    <!-- EXISTS -->
+    <h3>8.1 EXISTS</h3>
+    <p><code>EXISTS</code> checks whether the correlated sub-query returns any rows at all. It doesn't care about the actual values — just presence or absence. This makes it ideal for membership checks and anti-joins.</p>
+
+    <div class="formula">
+<span class="f-kw">SELECT</span> <span class="f-name">col</span>
+<span class="f-kw">FROM</span>   <span class="f-name">table_A</span>  <span class="f-kw">AS</span> <span class="f-lit">a</span>
+<span class="f-kw">WHERE</span>  <span class="f-bracket">[NOT]</span> <span class="f-kw">EXISTS</span> <span class="f-bracket">(</span>
+  <span class="f-kw">SELECT</span> <span class="f-num">1</span>              <span class="f-cmt">← convention: SELECT 1, value irrelevant</span>
+  <span class="f-kw">FROM</span>   <span class="f-name">table_B</span> <span class="f-kw">AS</span> <span class="f-lit">b</span>
+  <span class="f-kw">WHERE</span>  <span class="f-lit">b</span><span class="f-sep">.</span><span class="f-name">key</span> <span class="f-sep">=</span> <span class="f-lit">a</span><span class="f-sep">.</span><span class="f-name">key</span>  <span class="f-cmt">← correlated to outer row</span>
+<span class="f-bracket">)</span><span class="f-sep">;</span>
+    </div>
+
+    <div class="callout info"><span class="callout-icon">⚡</span><p><strong>Performance tip:</strong> <code>EXISTS</code> short-circuits — as soon as the inner query finds one matching row, it stops and returns TRUE. With <code>IN</code>, the engine must materialise the entire sub-query result first. For large datasets, <code>EXISTS</code> is almost always faster for membership tests.</p></div>
+
+    <div class="usecase">
+      <div class="usecase-header">🛍️ <h4>Use Case: Find customers who have placed at least one order vs. those who haven't</h4></div>
+      <div class="usecase-body">
+        <div class="code-wrap">
+          <div class="code-header"><span>SQL — EXISTS / NOT EXISTS</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Customers who HAVE placed at least one order</span>
+<span class="kw">SELECT</span> c.full_name, c.city
+<span class="kw">FROM</span>   <span class="tbl">customers</span> c
+<span class="kw">WHERE EXISTS</span> (
+  <span class="kw">SELECT</span> <span class="num">1</span>
+  <span class="kw">FROM</span>   <span class="tbl">orders</span> o
+  <span class="kw">WHERE</span>  o.customer_id <span class="op">=</span> c.customer_id   <span class="cmt">-- correlated to outer c</span>
+);
+
+<span class="cmt">-- Customers who have NEVER placed an order (anti-join via NOT EXISTS)</span>
+<span class="kw">SELECT</span> c.full_name, c.city
+<span class="kw">FROM</span>   <span class="tbl">customers</span> c
+<span class="kw">WHERE NOT EXISTS</span> (
+  <span class="kw">SELECT</span> <span class="num">1</span>
+  <span class="kw">FROM</span>   <span class="tbl">orders</span> o
+  <span class="kw">WHERE</span>  o.customer_id <span class="op">=</span> c.customer_id
+);
+
+<span class="cmt">-- EXISTS with multiple conditions:
+-- Customers who ordered a Laptop AND had it delivered</span>
+<span class="kw">SELECT</span> c.full_name
+<span class="kw">FROM</span>   <span class="tbl">customers</span> c
+<span class="kw">WHERE EXISTS</span> (
+  <span class="kw">SELECT</span> <span class="num">1</span>
+  <span class="kw">FROM</span>        <span class="tbl">orders</span>   o
+  <span class="kw">INNER JOIN</span>  <span class="tbl">products</span> p <span class="kw">ON</span> o.product_id <span class="op">=</span> p.product_id
+  <span class="kw">WHERE</span>  o.customer_id <span class="op">=</span> c.customer_id
+    <span class="kw">AND</span>  p.category     <span class="op">=</span> <span class="str">'Laptop'</span>
+    <span class="kw">AND</span>  o.status       <span class="op">=</span> <span class="str">'delivered'</span>
+);</pre>
+        </div>
+        <div class="result-box">
+          <div class="result-label">NOT EXISTS result — customers with no orders</div>
+          <table><thead><tr><th>full_name</th><th>city</th></tr></thead>
+          <tbody><tr><td colspan="2" style="color:var(--text2);font-style:italic">0 rows — all seeded customers have at least one order</td></tr></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL -->
+    <h3>8.2 ALL</h3>
+    <p><code>ALL</code> compares a value against every row returned by the sub-query. The condition must hold for <em>every</em> row. Think of it as "is X greater than the maximum?" expressed differently.</p>
+
+    <div class="formula">
+<span class="f-kw">SELECT</span> <span class="f-name">col</span>
+<span class="f-kw">FROM</span>   <span class="f-name">table</span>
+<span class="f-kw">WHERE</span>  <span class="f-name">value</span>  <span class="f-bracket">{</span><span class="f-sep">&gt; | &lt; | &gt;= | &lt;= | = | &lt;&gt;</span><span class="f-bracket">}</span>  <span class="f-kw">ALL</span>  <span class="f-bracket">(</span>
+  <span class="f-kw">SELECT</span> <span class="f-name">col</span> <span class="f-kw">FROM</span> <span class="f-name">other_table</span> <span class="f-kw">WHERE</span> <span class="f-opt">...</span>
+<span class="f-bracket">)</span><span class="f-sep">;</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Expression</th><th>Equivalent to</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>x &gt; ALL (subq)</code></td><td><code>x &gt; MAX(subq)</code></td><td>x is greater than every value</td></tr>
+          <tr><td><code>x &lt; ALL (subq)</code></td><td><code>x &lt; MIN(subq)</code></td><td>x is less than every value</td></tr>
+          <tr><td><code>x = ALL (subq)</code></td><td>all values equal x</td><td>x equals every value (rare)</td></tr>
+          <tr><td><code>x &lt;&gt; ALL (subq)</code></td><td><code>x NOT IN (subq)</code></td><td>x matches none of the values</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="usecase">
+      <div class="usecase-header">💰 <h4>Use Case: Find the most expensive product — more expensive than all others</h4></div>
+      <div class="usecase-body">
+        <div class="code-wrap">
+          <div class="code-header"><span>SQL — ALL</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Products whose price is greater than ALL other products
+-- i.e., the single most expensive product</span>
+<span class="kw">SELECT</span> name, price
+<span class="kw">FROM</span>   <span class="tbl">products</span>
+<span class="kw">WHERE</span>  price <span class="op">&gt;</span> <span class="kw">ALL</span> (
+  <span class="kw">SELECT</span> price
+  <span class="kw">FROM</span>   <span class="tbl">products</span> p2
+  <span class="kw">WHERE</span>  p2.product_id <span class="op">&lt;&gt;</span> products.product_id  <span class="cmt">-- exclude self</span>
+);
+
+<span class="cmt">-- Products more expensive than ALL products in the 'Keyboard' category</span>
+<span class="kw">SELECT</span> name, price, category
+<span class="kw">FROM</span>   <span class="tbl">products</span>
+<span class="kw">WHERE</span>  price <span class="op">&gt;</span> <span class="kw">ALL</span> (
+  <span class="kw">SELECT</span> price
+  <span class="kw">FROM</span>   <span class="tbl">products</span>
+  <span class="kw">WHERE</span>  category <span class="op">=</span> <span class="str">'Keyboard'</span>
+)
+<span class="kw">ORDER BY</span> price <span class="kw">ASC</span>;
+
+<span class="cmt">-- Equivalent using MAX (same result, often more readable)</span>
+<span class="kw">SELECT</span> name, price, category
+<span class="kw">FROM</span>   <span class="tbl">products</span>
+<span class="kw">WHERE</span>  price <span class="op">&gt;</span> (<span class="kw">SELECT</span> <span class="fn">MAX</span>(price) <span class="kw">FROM</span> <span class="tbl">products</span> <span class="kw">WHERE</span> category <span class="op">=</span> <span class="str">'Keyboard'</span>)
+<span class="kw">ORDER BY</span> price <span class="kw">ASC</span>;</pre>
+        </div>
+        <div class="result-box">
+          <div class="result-label">Products priced above all Keyboards (price &gt; 99.99)</div>
+          <table><thead><tr><th>name</th><th>price</th><th>category</th></tr></thead>
+          <tbody>
+            <tr><td>Sony WH-1000XM5</td><td>349.99</td><td>Headphones</td></tr>
+            <tr><td>Samsung 27" Monitor</td><td>449.99</td><td>Monitor</td></tr>
+            <tr><td>iPad Pro 12.9</td><td>1099.99</td><td>Tablet</td></tr>
+            <tr><td>Dell XPS 15</td><td>1299.99</td><td>Laptop</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn"><span class="callout-icon">⚠️</span><p><strong>NULL trap:</strong> If the sub-query returns even one NULL, <code>&gt; ALL</code> evaluates to UNKNOWN (not TRUE) for every comparison — and the outer row is excluded. Always filter NULLs in the sub-query: add <code>WHERE col IS NOT NULL</code>.</p></div>
+
+    <!-- ANY -->
+    <h3>8.3 ANY / SOME</h3>
+    <p><code>ANY</code> (alias <code>SOME</code>) passes if the condition is true for <em>at least one</em> row in the sub-query. It's logically equivalent to <code>EXISTS</code> for equality checks, but more expressive with <code>&lt;</code>, <code>&gt;</code>, etc.</p>
+
+    <div class="formula">
+<span class="f-kw">SELECT</span> <span class="f-name">col</span>
+<span class="f-kw">FROM</span>   <span class="f-name">table</span>
+<span class="f-kw">WHERE</span>  <span class="f-name">value</span>  <span class="f-bracket">{</span><span class="f-sep">&gt; | &lt; | &gt;= | &lt;= | = | &lt;&gt;</span><span class="f-bracket">}</span>  <span class="f-kw">ANY</span>  <span class="f-bracket">(</span>
+  <span class="f-kw">SELECT</span> <span class="f-name">col</span> <span class="f-kw">FROM</span> <span class="f-name">other_table</span> <span class="f-kw">WHERE</span> <span class="f-opt">...</span>
+<span class="f-bracket">)</span><span class="f-sep">;</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Expression</th><th>Equivalent to</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>x &gt; ANY (subq)</code></td><td><code>x &gt; MIN(subq)</code></td><td>x is greater than at least one value</td></tr>
+          <tr><td><code>x &lt; ANY (subq)</code></td><td><code>x &lt; MAX(subq)</code></td><td>x is less than at least one value</td></tr>
+          <tr><td><code>x = ANY (subq)</code></td><td><code>x IN (subq)</code></td><td>x matches at least one value</td></tr>
+          <tr><td><code>x &lt;&gt; ANY (subq)</code></td><td>not all values equal x</td><td>x differs from at least one value</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="usecase">
+      <div class="usecase-header">📦 <h4>Use Case: Find products cheaper than at least one product in a given category</h4></div>
+      <div class="usecase-body">
+        <div class="code-wrap">
+          <div class="code-header"><span>SQL — ANY / SOME</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Products cheaper than AT LEAST ONE laptop
+-- i.e., not more expensive than the most affordable laptop</span>
+<span class="kw">SELECT</span> name, price, category
+<span class="kw">FROM</span>   <span class="tbl">products</span>
+<span class="kw">WHERE</span>  price <span class="op">&lt;</span> <span class="kw">ANY</span> (
+  <span class="kw">SELECT</span> price
+  <span class="kw">FROM</span>   <span class="tbl">products</span>
+  <span class="kw">WHERE</span>  category <span class="op">=</span> <span class="str">'Laptop'</span>
+)
+<span class="kw">ORDER BY</span> price <span class="kw">DESC</span>;
+
+<span class="cmt">-- = ANY is identical to IN (choose whichever reads better)
+-- Find products that have been ordered</span>
+<span class="kw">SELECT</span> name, price
+<span class="kw">FROM</span>   <span class="tbl">products</span>
+<span class="kw">WHERE</span>  product_id <span class="op">=</span> <span class="kw">ANY</span> (
+  <span class="kw">SELECT</span> product_id <span class="kw">FROM</span> <span class="tbl">orders</span>
+);
+<span class="cmt">-- Identical result using IN:</span>
+<span class="kw">SELECT</span> name, price
+<span class="kw">FROM</span>   <span class="tbl">products</span>
+<span class="kw">WHERE</span>  product_id <span class="kw">IN</span> (
+  <span class="kw">SELECT</span> product_id <span class="kw">FROM</span> <span class="tbl">orders</span>
+);
+
+<span class="cmt">-- Practical: find customers who spent MORE than at least one
+-- other customer's total spend (not the bottom spender)</span>
+<span class="kw">WITH</span> spend <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> o.customer_id, <span class="fn">SUM</span>(o.quantity <span class="op">*</span> p.price) <span class="kw">AS</span> <span class="alias">total</span>
+  <span class="kw">FROM</span>       <span class="tbl">orders</span>   o
+  <span class="kw">INNER JOIN</span> <span class="tbl">products</span> p <span class="kw">ON</span> o.product_id <span class="op">=</span> p.product_id
+  <span class="kw">GROUP BY</span>   o.customer_id
+)
+<span class="kw">SELECT</span> c.full_name, s.total
+<span class="kw">FROM</span>       spend     s
+<span class="kw">INNER JOIN</span> <span class="tbl">customers</span> c <span class="kw">ON</span> s.customer_id <span class="op">=</span> c.customer_id
+<span class="kw">WHERE</span> s.total <span class="op">&gt;</span> <span class="kw">ANY</span> (
+  <span class="kw">SELECT</span> total <span class="kw">FROM</span> spend s2
+  <span class="kw">WHERE</span>  s2.customer_id <span class="op">&lt;&gt;</span> s.customer_id
+)
+<span class="kw">ORDER BY</span> s.total <span class="kw">DESC</span>;</pre>
+        </div>
+        <div class="result-box">
+          <div class="result-label">Products cheaper than at least one Laptop (price &lt; 1299.99)</div>
+          <table><thead><tr><th>name</th><th>price</th><th>category</th></tr></thead>
+          <tbody>
+            <tr><td>iPad Pro 12.9</td><td>1099.99</td><td>Tablet</td></tr>
+            <tr><td>Samsung 27" Monitor</td><td>449.99</td><td>Monitor</td></tr>
+            <tr><td>Sony WH-1000XM5</td><td>349.99</td><td>Headphones</td></tr>
+            <tr><td>Logitech MX Keys</td><td>99.99</td><td>Keyboard</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparison table -->
+    <h3>8.4 EXISTS vs IN vs ANY vs ALL — Quick Reference</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Operator</th><th>Evaluates</th><th>NULL safe?</th><th>Correlated?</th><th>Best for</th></tr></thead>
+        <tbody>
+          <tr><td><code>EXISTS</code></td><td>Row presence (TRUE/FALSE)</td><td class="td-green">Yes</td><td class="td-green">Yes</td><td>Membership, anti-joins, any-match checks</td></tr>
+          <tr><td><code>NOT EXISTS</code></td><td>Row absence</td><td class="td-green">Yes</td><td class="td-green">Yes</td><td>Find rows with no matching child rows</td></tr>
+          <tr><td><code>IN</code></td><td>Value in a set</td><td class="td-red">No*</td><td>Optional</td><td>Small known lists, readable equality checks</td></tr>
+          <tr><td><code>= ANY</code></td><td>Match at least one</td><td class="td-red">No*</td><td>Optional</td><td>Same as IN, slightly more expressive</td></tr>
+          <tr><td><code>&gt; ANY</code></td><td>Greater than at least one</td><td class="td-red">No*</td><td>Optional</td><td>"More than the minimum" comparisons</td></tr>
+          <tr><td><code>&gt; ALL</code></td><td>Greater than every row</td><td class="td-red">No*</td><td>Optional</td><td>"More than the maximum" comparisons</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:.8rem;color:var(--text2)">* A NULL in the sub-query result set causes <code>IN</code>, <code>ANY</code>, and <code>ALL</code> to return UNKNOWN rather than FALSE, potentially excluding rows you expected to see. Always add <code>WHERE col IS NOT NULL</code> to the inner query when NULLs are possible.</p>
+
+  </section>
+
+  <hr class="section-divider"/>
+
+  <!-- ══ SECTION 9: WINDOW FUNCTIONS ══ -->
+  <section class="section" id="s9">
+    <div class="section-header">
+      <div class="section-num">9</div>
       <h2>Window Functions</h2>
       <span class="tag">ADVANCED</span>
     </div>
@@ -1107,9 +1359,9 @@ print(<span class="str">"✅ Database ready! Run sql('SELECT ...') to query."</s
   <hr class="section-divider"/>
 
   <!-- ══ SECTION 9: CTEs ══ -->
-  <section class="section" id="s9">
+  <section class="section" id="s10">
     <div class="section-header">
-      <div class="section-num">9</div>
+      <div class="section-num">10</div>
       <h2>CTEs — Common Table Expressions</h2>
       <span class="tag">ADVANCED</span>
     </div>
@@ -1205,9 +1457,9 @@ customer_segments <span class="kw">AS</span> (
   <hr class="section-divider"/>
 
   <!-- ══ SECTION 10: STORED PROCEDURES ══ -->
-  <section class="section" id="s10">
+  <section class="section" id="s11">
     <div class="section-header">
-      <div class="section-num">10</div>
+      <div class="section-num">11</div>
       <h2>Stored Procedures</h2>
       <span class="tag">PROGRAMMATIC</span>
     </div>
@@ -1349,7 +1601,7 @@ function scrollToSection(id){
 }
 
 // ── Progress bar + active nav + back to top
-const sections=['s0','s1','s2','s3','s4','s5','s6','s7','s8','s9','s10'];
+const sections=['s0','s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11'];
 const navItems=document.querySelectorAll('.nav-item');
 const progress=document.getElementById('progress');
 const backTop=document.getElementById('backTop');

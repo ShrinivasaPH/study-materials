@@ -1002,6 +1002,180 @@ print(<span class="str">"✅ Database ready! Run sql('SELECT ...') to query."</s
     </div>
 
     <div class="callout tip"><span class="callout-icon">💡</span><p><strong>EXISTS vs IN:</strong> Use <code>EXISTS</code> when the sub-query returns many rows (it short-circuits on first match). Use <code>IN</code> for small, static lists. For correlated queries, <code>EXISTS</code> is typically faster.</p></div>
+
+    <!-- CORRELATED SUB-QUERY DEEP DIVE -->
+    <h3>7.2 Correlated Sub-queries — Deep Dive</h3>
+
+    <p>A <strong>correlated sub-query</strong> is a sub-query that references a column from the <em>outer</em> query. Unlike a regular sub-query (which runs once and hands its result to the outer query), a correlated sub-query <strong>re-executes once for every row</strong> the outer query processes.</p>
+
+    <div class="card" style="border-left:4px solid var(--accent)">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+        <div>
+          <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:8px">Regular Sub-query</p>
+          <p style="font-size:.85rem;margin-bottom:6px">Runs <strong>once</strong>. Result is a fixed set that the outer query uses.</p>
+          <div style="background:var(--bg2);border-radius:6px;padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--text2)">
+            ① Inner query executes → produces result set<br/>
+            ② Outer query filters using that fixed result
+          </div>
+        </div>
+        <div>
+          <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:8px">Correlated Sub-query</p>
+          <p style="font-size:.85rem;margin-bottom:6px">Runs <strong>N times</strong> — once per outer row. Each run sees a different outer value.</p>
+          <div style="background:rgba(59,130,246,.06);border-radius:6px;padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--text2)">
+            ① Outer query fetches row 1<br/>
+            ② Inner query runs with row 1's value<br/>
+            ③ Outer query fetches row 2 → inner reruns…
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula">
+<span class="f-kw">SELECT</span> <span class="f-name">outer_col</span>
+<span class="f-kw">FROM</span>   <span class="f-name">outer_table</span>  <span class="f-kw">AS</span> <span class="f-lit">o</span>          <span class="f-cmt">← alias the outer table</span>
+<span class="f-kw">WHERE</span>  <span class="f-name">expression</span> <span class="f-sep">=</span> <span class="f-bracket">(</span>
+  <span class="f-kw">SELECT</span> <span class="f-name">AGG</span><span class="f-bracket">(</span><span class="f-name">inner_col</span><span class="f-bracket">)</span>
+  <span class="f-kw">FROM</span>   <span class="f-name">inner_table</span>  <span class="f-kw">AS</span> <span class="f-lit">i</span>
+  <span class="f-kw">WHERE</span>  <span class="f-lit">i</span><span class="f-sep">.</span><span class="f-name">key</span> <span class="f-sep">=</span> <span class="f-lit">o</span><span class="f-sep">.</span><span class="f-name">key</span>  <span class="f-cmt">← reference to outer alias — this is the correlation</span>
+<span class="f-bracket">)</span><span class="f-sep">;</span>
+    </div>
+
+    <div class="callout info"><span class="callout-icon">🔑</span><p><strong>The correlation clause</strong> is the <code>WHERE</code> inside the sub-query that ties it to the outer row — e.g. <code>WHERE o.customer_id = c.customer_id</code>. Remove it and the sub-query becomes independent (non-correlated). That one line is what makes it correlated.</p></div>
+
+    <!-- WHERE clause -->
+    <div class="usecase">
+      <div class="usecase-header">📍 <h4>Use Case 1 — WHERE: Customers whose total spend exceeds their city's average</h4></div>
+      <div class="usecase-body">
+        <p>For every customer row, the inner query calculates the average spend <em>only for customers in that same city</em> — a different calculation for each row.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span>SQL — Correlated sub-query in WHERE</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Step 1: helper CTE to pre-compute each customer's total spend</span>
+<span class="kw">WITH</span> spend <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    o.customer_id,
+    <span class="fn">SUM</span>(o.quantity <span class="op">*</span> p.price) <span class="kw">AS</span> <span class="alias">total</span>
+  <span class="kw">FROM</span>       <span class="tbl">orders</span>   o
+  <span class="kw">INNER JOIN</span> <span class="tbl">products</span> p <span class="kw">ON</span> o.product_id <span class="op">=</span> p.product_id
+  <span class="kw">GROUP BY</span>   o.customer_id
+)
+<span class="cmt">-- Step 2: correlated sub-query compares each customer's spend
+-- to the average spend of all customers in the SAME city</span>
+<span class="kw">SELECT</span>
+  c.full_name,
+  c.city,
+  s.total                        <span class="kw">AS</span> <span class="alias">my_spend</span>,
+  <span class="fn">ROUND</span>((<span class="kw">SELECT</span> <span class="fn">AVG</span>(s2.total)   <span class="cmt">-- ← city average (inner query)</span>
+         <span class="kw">FROM</span>       spend     s2
+         <span class="kw">INNER JOIN</span> <span class="tbl">customers</span> c2 <span class="kw">ON</span> s2.customer_id <span class="op">=</span> c2.customer_id
+         <span class="kw">WHERE</span>      c2.city <span class="op">=</span> c.city  <span class="cmt">-- ← correlation: same city as outer</span>
+        ), <span class="num">2</span>)                     <span class="kw">AS</span> <span class="alias">city_avg</span>
+<span class="kw">FROM</span>       spend     s
+<span class="kw">INNER JOIN</span> <span class="tbl">customers</span> c <span class="kw">ON</span> s.customer_id <span class="op">=</span> c.customer_id
+<span class="kw">WHERE</span> s.total <span class="op">&gt;</span> (
+  <span class="kw">SELECT</span> <span class="fn">AVG</span>(s2.total)
+  <span class="kw">FROM</span>       spend     s2
+  <span class="kw">INNER JOIN</span> <span class="tbl">customers</span> c2 <span class="kw">ON</span> s2.customer_id <span class="op">=</span> c2.customer_id
+  <span class="kw">WHERE</span>      c2.city <span class="op">=</span> c.city  <span class="cmt">-- ← re-evaluated for every outer row</span>
+)
+<span class="kw">ORDER BY</span> s.total <span class="kw">DESC</span>;</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- SELECT clause -->
+    <div class="usecase">
+      <div class="usecase-header">📊 <h4>Use Case 2 — SELECT: Show each product's price vs its category average</h4></div>
+      <div class="usecase-body">
+        <p>The correlated sub-query sits in the <code>SELECT</code> list and is evaluated per row to produce an inline derived column — no JOIN needed.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span>SQL — Correlated sub-query in SELECT</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="kw">SELECT</span>
+  p.name,
+  p.category,
+  p.price,
+  <span class="fn">ROUND</span>((<span class="kw">SELECT</span> <span class="fn">AVG</span>(p2.price)    <span class="cmt">-- inner query: avg FOR THIS category</span>
+         <span class="kw">FROM</span>  <span class="tbl">products</span> p2
+         <span class="kw">WHERE</span> p2.category <span class="op">=</span> p.category  <span class="cmt">-- ← correlation</span>
+        ), <span class="num">2</span>)                           <span class="kw">AS</span> <span class="alias">category_avg</span>,
+  <span class="fn">ROUND</span>(p.price <span class="op">-</span> (<span class="kw">SELECT</span> <span class="fn">AVG</span>(p2.price)
+                   <span class="kw">FROM</span>  <span class="tbl">products</span> p2
+                   <span class="kw">WHERE</span> p2.category <span class="op">=</span> p.category), <span class="num">2</span>)
+                                        <span class="kw">AS</span> <span class="alias">vs_cat_avg</span>,
+  <span class="kw">CASE</span>
+    <span class="kw">WHEN</span> p.price <span class="op">&gt;</span> (<span class="kw">SELECT</span> <span class="fn">AVG</span>(p2.price) <span class="kw">FROM</span> <span class="tbl">products</span> p2
+                    <span class="kw">WHERE</span> p2.category <span class="op">=</span> p.category)
+    <span class="kw">THEN</span> <span class="str">'Above avg'</span>
+    <span class="kw">ELSE</span> <span class="str">'Below avg'</span>
+  <span class="kw">END</span>                                  <span class="kw">AS</span> <span class="alias">position</span>
+<span class="kw">FROM</span> <span class="tbl">products</span> p
+<span class="kw">ORDER BY</span> p.category, p.price <span class="kw">DESC</span>;</pre>
+        </div>
+        <div class="result-box">
+          <div class="result-label">Result</div>
+          <table><thead><tr><th>name</th><th>category</th><th>price</th><th>category_avg</th><th>vs_cat_avg</th><th>position</th></tr></thead>
+          <tbody>
+            <tr><td>Dell XPS 15</td><td>Laptop</td><td>1299.99</td><td>1299.99</td><td>0.00</td><td>Below avg</td></tr>
+            <tr><td>Sony WH-1000XM5</td><td>Headphones</td><td>349.99</td><td>349.99</td><td>0.00</td><td>Below avg</td></tr>
+            <tr><td>Logitech MX Keys</td><td>Keyboard</td><td>99.99</td><td>99.99</td><td>0.00</td><td>Below avg</td></tr>
+            <tr><td>Samsung 27" Monitor</td><td>Monitor</td><td>449.99</td><td>449.99</td><td>0.00</td><td>Below avg</td></tr>
+            <tr><td>iPad Pro 12.9</td><td>Tablet</td><td>1099.99</td><td>1099.99</td><td>0.00</td><td>Below avg</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPDATE clause -->
+    <div class="usecase">
+      <div class="usecase-header">✏️ <h4>Use Case 3 — UPDATE: Set a flag column based on correlated logic</h4></div>
+      <div class="usecase-body">
+        <p>Correlated sub-queries work inside <code>UPDATE SET</code> too — each row's update value is computed relative to other rows.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span>SQL — Correlated sub-query in UPDATE</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Assume we added a column: ALTER TABLE products ADD COLUMN is_priciest_in_cat INTEGER DEFAULT 0;
+-- Mark each product that is the most expensive in its category</span>
+<span class="kw">UPDATE</span> <span class="tbl">products</span> p
+<span class="kw">SET</span>    is_priciest_in_cat <span class="op">=</span> (
+  <span class="kw">CASE</span> <span class="kw">WHEN</span> p.price <span class="op">=</span> (
+    <span class="kw">SELECT</span> <span class="fn">MAX</span>(p2.price)
+    <span class="kw">FROM</span>   <span class="tbl">products</span> p2
+    <span class="kw">WHERE</span>  p2.category <span class="op">=</span> p.category  <span class="cmt">-- ← correlation</span>
+  ) <span class="kw">THEN</span> <span class="num">1</span> <span class="kw">ELSE</span> <span class="num">0</span> <span class="kw">END</span>
+);</pre>
+        </div>
+      </div>
+    </div>
+
+    <h3>7.3 Execution Model — How the Engine Runs a Correlated Sub-query</h3>
+    <div class="card">
+      <ol class="steps">
+        <li>Outer query fetches the <strong>first row</strong> from <code>customers</code> (e.g., customer_id = 1, Priya Sharma).</li>
+        <li>The engine substitutes <code>c.customer_id = 1</code> into the inner query and <strong>executes it</strong>, returning Priya's total spend.</li>
+        <li>The outer <code>WHERE</code> evaluates the result (e.g., 2099.96 &gt; 1000 → TRUE → row included).</li>
+        <li>Outer query moves to the <strong>next row</strong> (customer_id = 2, Rahul). Inner query re-executes with the new value.</li>
+        <li>This repeats for <strong>every outer row</strong>. Total inner executions = number of outer rows.</li>
+      </ol>
+    </div>
+
+    <div class="callout warn"><span class="callout-icon">⚡</span><p><strong>Performance:</strong> Because the inner query runs N times, correlated sub-queries on large tables can be slow. Always check if an equivalent <code>JOIN</code> + <code>GROUP BY</code> or a <code>CTE</code> + <code>JOIN</code> would be faster. Correlated sub-queries in <code>SELECT</code> are especially costly — consider <code>LEFT JOIN</code> instead.</p></div>
+
+    <h3>7.4 Non-correlated vs Correlated — Side by Side</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Aspect</th><th>Non-correlated</th><th>Correlated</th></tr></thead>
+        <tbody>
+          <tr><td>Outer reference</td><td class="td-red">None — fully independent</td><td class="td-green">References outer table alias</td></tr>
+          <tr><td>Executions</td><td class="td-green">Once</td><td class="td-red">Once per outer row (N times)</td></tr>
+          <tr><td>Can use in SELECT</td><td class="td-green">Yes</td><td class="td-green">Yes (careful — costly)</td></tr>
+          <tr><td>Can use in WHERE</td><td class="td-green">Yes</td><td class="td-green">Yes (most common use)</td></tr>
+          <tr><td>Can use in UPDATE SET</td><td class="td-green">Yes</td><td class="td-green">Yes</td></tr>
+          <tr><td>Common substitute</td><td>JOIN / CTE</td><td>JOIN + GROUP BY / Window Function</td></tr>
+          <tr><td>Use when</td><td>Value is global (e.g., overall AVG)</td><td>Value depends on each row (e.g., per-category AVG)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout success"><span class="callout-icon">🎯</span><p><strong>Rule of thumb:</strong> If you find yourself writing a sub-query that references the outer table, ask — <em>"Can I express this as a JOIN with a GROUP BY or a Window Function?"</em> If yes, prefer that. Use correlated sub-queries when the logic is clearest written that way and the table is small-to-medium sized.</p></div>
+
   </section>
 
   <hr class="section-divider"/>

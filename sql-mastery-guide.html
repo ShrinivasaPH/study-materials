@@ -258,19 +258,19 @@ code{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padd
     <span>Interactive Learning Guide</span>
   </div>
   <div class="nav-section">Foundations</div>
-  <div class="nav-item" onclick="scrollTo('s0')">🗄️ What is SQL?</div>
-  <div class="nav-item" onclick="scrollTo('s1')">📦 CRUD Operations <span class="badge">Core</span></div>
-  <div class="nav-item" onclick="scrollTo('s2')">🏗️ Schema & Design</div>
-  <div class="nav-item" onclick="scrollTo('s3')">🛠️ Platforms & Setup</div>
-  <div class="nav-item" onclick="scrollTo('s4')">📝 Syntax & Clauses</div>
+  <div class="nav-item" onclick="scrollToSection('s0')">🗄️ What is SQL?</div>
+  <div class="nav-item" onclick="scrollToSection('s1')">📦 CRUD Operations <span class="badge">Core</span></div>
+  <div class="nav-item" onclick="scrollToSection('s2')">🏗️ Schema & Design</div>
+  <div class="nav-item" onclick="scrollToSection('s3')">🛠️ Platforms & Setup</div>
+  <div class="nav-item" onclick="scrollToSection('s4')">📝 Syntax & Clauses</div>
   <div class="nav-section">Intermediate</div>
-  <div class="nav-item" onclick="scrollTo('s5')">📊 GROUP BY & Aggregates</div>
-  <div class="nav-item" onclick="scrollTo('s6')">🔗 JOINs</div>
-  <div class="nav-item" onclick="scrollTo('s7')">🔍 Sub-Queries</div>
+  <div class="nav-item" onclick="scrollToSection('s5')">📊 GROUP BY & Aggregates</div>
+  <div class="nav-item" onclick="scrollToSection('s6')">🔗 JOINs</div>
+  <div class="nav-item" onclick="scrollToSection('s7')">🔍 Sub-Queries</div>
   <div class="nav-section">Advanced</div>
-  <div class="nav-item" onclick="scrollTo('s8')">🪟 Window Functions <span class="badge">Power</span></div>
-  <div class="nav-item" onclick="scrollTo('s9')">🌿 CTEs</div>
-  <div class="nav-item" onclick="scrollTo('s10')">⚙️ Stored Procedures</div>
+  <div class="nav-item" onclick="scrollToSection('s8')">🪟 Window Functions <span class="badge">Power</span></div>
+  <div class="nav-item" onclick="scrollToSection('s9')">🌿 CTEs</div>
+  <div class="nav-item" onclick="scrollToSection('s10')">⚙️ Stored Procedures</div>
 </nav>
 
 <!-- ══ MAIN ══ -->
@@ -1343,8 +1343,9 @@ function copyCode(btn){
 }
 
 // ── Scroll to section
-function scrollTo(id){
-  document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'});
+function scrollToSection(id){
+  const el = document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 // ── Progress bar + active nav + back to top

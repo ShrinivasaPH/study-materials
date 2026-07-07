@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SQL Mastery — Interactive Learning Guide</title>
+<title>SQL Mastery &#8212; Interactive Learning Guide</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
@@ -250,9 +250,7 @@ code{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padd
 
 <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
 
-<div class="app">
-<!-- ══ SIDEBAR ══ -->
-<nav class="sidebar">
+<div class="app"><nav class="sidebar">
   <div class="sidebar-logo">
     <h1>⚡ SQL Mastery</h1>
     <span>Interactive Learning Guide</span>
@@ -273,8 +271,6 @@ code{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padd
   <div class="nav-item" onclick="scrollToSection('s10')">🌿 CTEs</div>
   <div class="nav-item" onclick="scrollToSection('s11')">⚙️ Stored Procedures</div>
 </nav>
-
-<!-- ══ MAIN ══ -->
 <main class="main">
 
   <div class="topbar">
@@ -284,19 +280,19 @@ code{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padd
     </button>
   </div>
 
-  <!-- HERO -->
   <div class="hero">
-    <h1>SQL — Structured Query Language</h1>
-    <p>Master the language of data. From your first SELECT to advanced Window Functions — real examples, copiable code, and intuitive explanations.</p>
+    <h1>SQL &#8212; Structured Query Language</h1>
+    <p>Master the language of data. Deep explanations, mental models, real-world examples, and copiable Colab-ready code for all 12 core concepts.</p>
     <div class="hero-pills">
-      <span class="hero-pill">10 Core Concepts</span>
+      <span class="hero-pill">12 Core Concepts</span>
+      <span class="hero-pill">Deep Explanations</span>
       <span class="hero-pill">Real-world Use Cases</span>
       <span class="hero-pill">Colab-ready Code</span>
-      <span class="hero-pill">Visual Explanations</span>
+      <span class="hero-pill">Common Mistakes</span>
     </div>
   </div>
 
-  <!-- ══ SECTION 0: WHAT IS SQL ══ -->
+
   <section class="section" id="s0">
     <div class="section-header">
       <div class="section-num">0</div>
@@ -304,49 +300,65 @@ code{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padd
       <span class="tag">INTRO</span>
     </div>
 
-    <p>SQL (Structured Query Language) is the standard language for communicating with <strong>relational databases</strong>. Every time you search products on Amazon, book a flight, or log into an app — SQL is quietly working behind the scenes.</p>
+    <p>SQL — Structured Query Language — is the standard language for interacting with <strong>relational databases</strong>. It was developed at IBM in the 1970s, standardised by ANSI/ISO, and remains the most widely used data language in the world, 50+ years later. Every time you search products on Amazon, check a bank balance, log into an app, or book a flight — dozens of SQL queries fire behind the scenes.</p>
 
-    <div class="card-grid">
-      <div class="info-card"><div class="icon">📊</div><h4>Query Data</h4><p>Retrieve exactly the rows and columns you need from millions of records</p></div>
-      <div class="info-card"><div class="icon">✏️</div><h4>Modify Data</h4><p>Insert, update, or delete records with precise control</p></div>
-      <div class="info-card"><div class="icon">🏗️</div><h4>Define Structure</h4><p>Create tables, define data types, set constraints and relationships</p></div>
-      <div class="info-card"><div class="icon">🔒</div><h4>Control Access</h4><p>Grant and revoke permissions on tables and operations</p></div>
-    </div>
+    <p>What makes SQL powerful is that it is <strong>declarative</strong>: you describe <em>what</em> data you want, not <em>how</em> to retrieve it. The database engine's query planner figures out the most efficient execution path. This is in contrast to procedural languages (Python, Java) where you specify step-by-step instructions.</p>
 
-    <h3>SQL Sub-Languages</h3>
+    <div class="callout info"><span class="callout-icon">🧠</span><p><strong>Mental model:</strong> Imagine a relational database as a collection of interconnected spreadsheets (tables). Each spreadsheet has named columns and typed rows. SQL is the language you use to ask questions, combine sheets, and modify data — all in a single, standardised syntax understood by every major database.</p></div>
+
+    <h3>SQL Sub-Languages — The Big Picture</h3>
+    <p>SQL is not just one thing. It is composed of five sub-languages, each governing a different aspect of database interaction. Most SQL you write day-to-day is DML — but understanding all five builds a complete mental map.</p>
+
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Sub-language</th><th>Stands For</th><th>Purpose</th><th>Commands</th></tr></thead>
+        <thead><tr><th>Sub-language</th><th>Stands For</th><th>Purpose</th><th>Key Commands</th><th>Rollback?</th></tr></thead>
         <tbody>
-          <tr><td><span class="badge badge-blue">DDL</span></td><td>Data Definition Language</td><td>Define structure</td><td><code>CREATE, ALTER, DROP, TRUNCATE</code></td></tr>
-          <tr><td><span class="badge badge-green">DML</span></td><td>Data Manipulation Language</td><td>Modify data (CRUD)</td><td><code>INSERT, SELECT, UPDATE, DELETE</code></td></tr>
-          <tr><td><span class="badge badge-amber">DCL</span></td><td>Data Control Language</td><td>Access permissions</td><td><code>GRANT, REVOKE</code></td></tr>
-          <tr><td><span class="badge badge-purple">TCL</span></td><td>Transaction Control Language</td><td>Manage transactions</td><td><code>COMMIT, ROLLBACK, SAVEPOINT</code></td></tr>
-          <tr><td><span class="badge badge-red">DQL</span></td><td>Data Query Language</td><td>Query/retrieve data</td><td><code>SELECT</code></td></tr>
+          <tr><td><span class="badge badge-green">DML</span></td><td>Data Manipulation Language</td><td>Read and modify rows</td><td><code>SELECT, INSERT, UPDATE, DELETE</code></td><td class="td-green">Yes</td></tr>
+          <tr><td><span class="badge badge-blue">DDL</span></td><td>Data Definition Language</td><td>Define and change structure</td><td><code>CREATE, ALTER, DROP, TRUNCATE</code></td><td class="td-red">No (auto-commit)</td></tr>
+          <tr><td><span class="badge badge-amber">DCL</span></td><td>Data Control Language</td><td>Manage user permissions</td><td><code>GRANT, REVOKE</code></td><td class="td-red">No</td></tr>
+          <tr><td><span class="badge badge-purple">TCL</span></td><td>Transaction Control Language</td><td>Control transaction boundaries</td><td><code>COMMIT, ROLLBACK, SAVEPOINT</code></td><td>N/A</td></tr>
+          <tr><td><span class="badge badge-red">DQL</span></td><td>Data Query Language</td><td>Query data (often grouped with DML)</td><td><code>SELECT</code></td><td class="td-green">Yes</td></tr>
         </tbody>
       </table>
     </div>
 
-    <div class="callout info"><span class="callout-icon">💡</span><p><strong>Key Mental Model:</strong> Think of a relational database as a collection of interconnected spreadsheets (tables). SQL is the language you use to ask questions about those spreadsheets — and modify them.</p></div>
-
-    <h3>Nomenclature Reference</h3>
+    <h3>How the Database Engine Processes a Query</h3>
+    <p>When you run a SQL statement, it doesn't just "run". It passes through a multi-stage pipeline inside the database engine:</p>
     <div class="card">
-      <div class="nomen-item"><div class="nomen-term">TABLE</div><div class="nomen-def">A structured grid of rows and columns storing related data. <em>e.g., employees, orders, products</em></div></div>
-      <div class="nomen-item"><div class="nomen-term">ROW / RECORD</div><div class="nomen-def">A single entry in a table representing one entity instance. <em>e.g., one employee</em></div></div>
-      <div class="nomen-item"><div class="nomen-term">COLUMN / FIELD</div><div class="nomen-def">A named attribute for all rows in a table. <em>e.g., employee_name, salary</em></div></div>
-      <div class="nomen-item"><div class="nomen-term">PRIMARY KEY</div><div class="nomen-def">A column (or set) that uniquely identifies each row. Cannot be NULL or duplicate. <em>e.g., employee_id</em></div></div>
-      <div class="nomen-item"><div class="nomen-term">FOREIGN KEY</div><div class="nomen-def">A column referencing the PRIMARY KEY of another table to enforce relationships. <em>e.g., dept_id in employees</em></div></div>
-      <div class="nomen-item"><div class="nomen-term">INDEX</div><div class="nomen-def">A performance structure that speeds up data retrieval (like a book index). <em>Trades write speed for read speed</em></div></div>
-      <div class="nomen-item"><div class="nomen-term">NULL</div><div class="nomen-def">Absence of a value — NOT zero, NOT empty string. Requires IS NULL / IS NOT NULL to check.</div></div>
-      <div class="nomen-item"><div class="nomen-term">CONSTRAINT</div><div class="nomen-def">A rule enforced on a column. <em>Types: PRIMARY KEY, FOREIGN KEY, UNIQUE, NOT NULL, CHECK, DEFAULT</em></div></div>
-      <div class="nomen-item"><div class="nomen-term">SCHEMA</div><div class="nomen-def">The blueprint of the database — its tables, columns, types, and relationships.</div></div>
-      <div class="nomen-item"><div class="nomen-term">QUERY</div><div class="nomen-def">An instruction to the database engine written in SQL. Queries are declarative — you say what you want, not how to get it.</div></div>
+      <ol class="steps">
+        <li><strong>Parsing</strong> — The SQL text is checked for syntax errors and tokenised into an internal representation (AST — Abstract Syntax Tree).</li>
+        <li><strong>Semantic Analysis</strong> — The engine checks that all table and column names exist, that data types are compatible, and that permissions allow the operation.</li>
+        <li><strong>Query Optimisation</strong> — The query planner generates multiple possible execution plans and picks the cheapest one based on table statistics (row counts, index cardinality, etc.). This is why the same logical query can perform very differently on different data distributions.</li>
+        <li><strong>Execution</strong> — The chosen plan is executed by the storage engine, which reads/writes pages of data from disk or cache.</li>
+        <li><strong>Result Return</strong> — Rows are streamed or buffered back to the client.</li>
+      </ol>
     </div>
+
+    <h3>Complete Nomenclature Reference</h3>
+    <div class="card">
+      <div class="nomen-item"><div class="nomen-term">DATABASE</div><div class="nomen-def">A named container holding a set of related tables, views, functions, and other objects. One server can host hundreds of databases. <em>e.g., ecommerce_db, analytics_db</em></div></div>
+      <div class="nomen-item"><div class="nomen-term">TABLE</div><div class="nomen-def">A structured grid of rows and columns, the fundamental storage unit. Each table represents one entity type. <em>e.g., customers, orders, products</em></div></div>
+      <div class="nomen-item"><div class="nomen-term">ROW / RECORD / TUPLE</div><div class="nomen-def">A single entry in a table — one instance of the entity. A table with 10,000 customers has 10,000 rows. <em>All three terms mean the same thing.</em></div></div>
+      <div class="nomen-item"><div class="nomen-term">COLUMN / FIELD / ATTRIBUTE</div><div class="nomen-def">A named property shared by all rows. Every column has a fixed data type that all values in it must conform to. <em>e.g., customer_name VARCHAR(100)</em></div></div>
+      <div class="nomen-item"><div class="nomen-term">PRIMARY KEY (PK)</div><div class="nomen-def">One column (or a combination of columns) that uniquely identifies every row. Cannot be NULL. Cannot have duplicates. The DB creates a unique index on it automatically. <em>e.g., customer_id INT PRIMARY KEY</em></div></div>
+      <div class="nomen-item"><div class="nomen-term">FOREIGN KEY (FK)</div><div class="nomen-def">A column whose values must match an existing value in another table's primary key. This enforces referential integrity — you can't have an order for a customer that doesn't exist. <em>e.g., orders.customer_id REFERENCES customers.customer_id</em></div></div>
+      <div class="nomen-item"><div class="nomen-term">INDEX</div><div class="nomen-def">A performance data structure (usually a B-tree) maintained alongside a table to speed up lookups on specific columns. Trades faster reads for slower writes and extra storage. Think of it as the book index at the back — you don't read every page to find a topic.</div></div>
+      <div class="nomen-item"><div class="nomen-term">NULL</div><div class="nomen-def">The explicit absence of a value — distinct from 0, empty string, or FALSE. NULL is not equal to anything, including itself (NULL = NULL is UNKNOWN). Always use <code>IS NULL</code> or <code>IS NOT NULL</code> to test for it, never <code>= NULL</code>.</div></div>
+      <div class="nomen-item"><div class="nomen-term">CONSTRAINT</div><div class="nomen-def">A rule the DB engine enforces on every INSERT and UPDATE. If a row would violate the constraint, the operation is rejected with an error. Types: PRIMARY KEY, FOREIGN KEY, UNIQUE, NOT NULL, CHECK, DEFAULT.</div></div>
+      <div class="nomen-item"><div class="nomen-term">SCHEMA</div><div class="nomen-def">In the broad sense: the full blueprint of the database — all tables, columns, types, and relationships. In PostgreSQL specifically, a schema is also a namespace within a database (like a folder), e.g., public.customers vs analytics.customers.</div></div>
+      <div class="nomen-item"><div class="nomen-term">VIEW</div><div class="nomen-def">A saved SELECT query that behaves like a virtual table. No data is stored — querying a view runs the underlying SELECT in real time. Useful for simplifying complex joins and restricting column access.</div></div>
+      <div class="nomen-item"><div class="nomen-term">TRANSACTION</div><div class="nomen-def">A group of SQL statements executed as one atomic unit. Either all succeed (COMMIT) or all are undone (ROLLBACK). Guarantees ACID properties: Atomicity, Consistency, Isolation, Durability.</div></div>
+      <div class="nomen-item"><div class="nomen-term">QUERY PLAN</div><div class="nomen-def">The execution strategy chosen by the query optimiser. Use EXPLAIN (or EXPLAIN ANALYZE in PostgreSQL) to inspect it — the single most important tool for diagnosing slow queries.</div></div>
+      <div class="nomen-item"><div class="nomen-term">CARDINALITY</div><div class="nomen-def">The number of distinct values in a column. High cardinality (e.g., email — nearly every row different) = index very useful. Low cardinality (e.g., gender — few distinct values) = index less useful.</div></div>
+    </div>
+
+    <div class="callout tip"><span class="callout-icon">💡</span><p><strong>ACID — the four guarantees of a transaction:</strong> <strong>A</strong>tomicity (all or nothing), <strong>C</strong>onsistency (data rules are always preserved), <strong>I</strong>solation (concurrent transactions don't interfere), <strong>D</strong>urability (committed data survives crashes). Every production database you'll work with honours ACID.</p></div>
   </section>
+
 
   <hr class="section-divider"/>
 
-  <!-- ══ SECTION 1: CRUD ══ -->
+
   <section class="section" id="s1">
     <div class="section-header">
       <div class="section-num">1</div>
@@ -354,141 +366,318 @@ code{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padd
       <span class="tag">DML</span>
     </div>
 
-    <p>CRUD stands for the four fundamental operations on any data store: <strong>C</strong>reate, <strong>R</strong>ead, <strong>U</strong>pdate, <strong>D</strong>elete. In SQL, these map directly to four commands.</p>
+    <p>CRUD — Create, Read, Update, Delete — are the four fundamental operations on any data store. In SQL they map directly to four DML commands: <code>INSERT</code>, <code>SELECT</code>, <code>UPDATE</code>, <code>DELETE</code>. Every data-driven application you'll ever build is ultimately just variations of these four operations.</p>
 
     <div class="card-grid" style="grid-template-columns:repeat(4,1fr)">
-      <div class="info-card" style="border-top:3px solid var(--green)"><div class="icon">➕</div><h4>CREATE → INSERT</h4><p>Add new rows into a table</p></div>
-      <div class="info-card" style="border-top:3px solid var(--accent)"><div class="icon">🔍</div><h4>READ → SELECT</h4><p>Retrieve rows from a table</p></div>
-      <div class="info-card" style="border-top:3px solid var(--amber)"><div class="icon">✏️</div><h4>UPDATE → UPDATE</h4><p>Modify existing rows</p></div>
-      <div class="info-card" style="border-top:3px solid var(--red)"><div class="icon">🗑️</div><h4>DELETE → DELETE</h4><p>Remove rows from a table</p></div>
+      <div class="info-card" style="border-top:3px solid var(--green)"><div class="icon">➕</div><h4>Create → INSERT</h4><p>Add new rows into a table. The table structure must already exist.</p></div>
+      <div class="info-card" style="border-top:3px solid var(--accent)"><div class="icon">🔍</div><h4>Read → SELECT</h4><p>Retrieve rows. The most frequent operation — never modifies data.</p></div>
+      <div class="info-card" style="border-top:3px solid var(--amber)"><div class="icon">✏️</div><h4>Update → UPDATE</h4><p>Modify existing row values. Always pair with WHERE to avoid full-table updates.</p></div>
+      <div class="info-card" style="border-top:3px solid var(--red)"><div class="icon">🗑️</div><h4>Delete → DELETE</h4><p>Remove rows. Keeps the table structure. Use WHERE or lose everything.</p></div>
     </div>
 
-    <!-- Real-life setup -->
-    <div class="callout success"><span class="callout-icon">🏪</span><p><strong>Running Example:</strong> We'll use an <strong>e-commerce store</strong> throughout this section — a <code>products</code> table and an <code>orders</code> table. Copy any snippet into Google Colab with SQLite (setup code at end).</p></div>
+    <div class="callout success"><span class="callout-icon">🏪</span><p><strong>Running Example:</strong> All examples use an e-commerce store with <code>customers</code>, <code>products</code>, and <code>orders</code> tables. The Colab boilerplate in Section 3 creates and seeds all three — paste it once and run every snippet below.</p></div>
 
-    <!-- CREATE -->
-    <h3>1.1 CREATE (INSERT)</h3>
-    <p>Adds one or more new rows to a table.</p>
+    <!-- ── INSERT ── -->
+    <h3>1.1 INSERT — Creating Rows</h3>
+
+    <p>INSERT adds one or more new rows to a table. You can insert by specifying column names explicitly (recommended — order-independent and future-safe) or by position (fragile — breaks if columns are added/reordered).</p>
 
     <div class="formula">
-<span class="f-kw">INSERT INTO</span> <span class="f-name">table_name</span> <span class="f-bracket">(</span><span class="f-name">col1</span><span class="f-sep">,</span> <span class="f-name">col2</span><span class="f-sep">,</span> <span class="f-opt">...</span><span class="f-bracket">)</span>
-<span class="f-kw">VALUES</span> <span class="f-bracket">(</span><span class="f-lit">val1</span><span class="f-sep">,</span> <span class="f-lit">val2</span><span class="f-sep">,</span> <span class="f-opt">...</span><span class="f-bracket">)</span><span class="f-sep">;</span>
+<span class="f-cmt">-- Single row, named columns (preferred)</span>
+<span class="f-kw">INSERT INTO</span> <span class="f-name">table_name</span> <span class="f-bracket">(</span><span class="f-name">col1</span><span class="f-sep">, </span><span class="f-name">col2</span><span class="f-sep">, </span><span class="f-name">col3</span><span class="f-bracket">)</span>
+<span class="f-kw">VALUES</span> <span class="f-bracket">(</span><span class="f-lit">val1</span><span class="f-sep">, </span><span class="f-lit">val2</span><span class="f-sep">, </span><span class="f-lit">val3</span><span class="f-bracket">)</span><span class="f-sep">;</span>
+
+<span class="f-cmt">-- Multiple rows in one statement (more efficient than N separate INSERTs)</span>
+<span class="f-kw">INSERT INTO</span> <span class="f-name">table_name</span> <span class="f-bracket">(</span><span class="f-name">col1</span><span class="f-sep">, </span><span class="f-name">col2</span><span class="f-bracket">)</span>
+<span class="f-kw">VALUES</span>
+  <span class="f-bracket">(</span><span class="f-lit">val1a</span><span class="f-sep">, </span><span class="f-lit">val2a</span><span class="f-bracket">)</span><span class="f-sep">,</span>
+  <span class="f-bracket">(</span><span class="f-lit">val1b</span><span class="f-sep">, </span><span class="f-lit">val2b</span><span class="f-bracket">)</span><span class="f-sep">;</span>
+
+<span class="f-cmt">-- Insert from a SELECT result (INSERT … SELECT)</span>
+<span class="f-kw">INSERT INTO</span> <span class="f-name">target_table</span> <span class="f-bracket">(</span><span class="f-name">col1</span><span class="f-sep">, </span><span class="f-name">col2</span><span class="f-bracket">)</span>
+<span class="f-kw">SELECT</span> <span class="f-name">col1</span><span class="f-sep">, </span><span class="f-name">col2</span> <span class="f-kw">FROM</span> <span class="f-name">source_table</span> <span class="f-kw">WHERE</span> <span class="f-name">condition</span><span class="f-sep">;</span>
     </div>
 
     <div class="usecase">
-      <div class="usecase-header">🛍️ <h4>Use Case: Add a new product to the store</h4></div>
+      <div class="usecase-header">🛍️ <h4>Use Case: Register new customers and stock new products</h4></div>
       <div class="usecase-body">
-        <p>A new laptop arrives in inventory. We need to add it to our <code>products</code> table.</p>
+        <p>A new customer signs up and three new products arrive in inventory. We also copy last year's delivered orders into an archive table.</p>
         <div class="code-wrap">
-          <div class="code-header"><span>SQL — INSERT</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-          <pre><span class="cmt">-- Insert a single product</span>
-<span class="kw">INSERT INTO</span> <span class="tbl">products</span> (product_id, name, category, price, stock)
-<span class="kw">VALUES</span> (<span class="num">101</span>, <span class="str">'Dell XPS 15'</span>, <span class="str">'Laptop'</span>, <span class="num">1299.99</span>, <span class="num">50</span>);
+          <div class="code-header"><span>SQL — INSERT (all forms)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Single customer registration</span>
+<span class="kw">INSERT INTO</span> <span class="tbl">customers</span> (customer_id, full_name, email, city)
+<span class="kw">VALUES</span> (<span class="num">5</span>, <span class="str">'Meera Nair'</span>, <span class="str">'meera@email.com'</span>, <span class="str">'Chennai'</span>);
 
-<span class="cmt">-- Insert multiple rows at once (more efficient)</span>
+<span class="cmt">-- Columns with DEFAULT values can be omitted entirely;
+-- joined_date will use CURRENT_DATE automatically</span>
+<span class="kw">INSERT INTO</span> <span class="tbl">customers</span> (customer_id, full_name, email)
+<span class="kw">VALUES</span> (<span class="num">6</span>, <span class="str">'Arjun Menon'</span>, <span class="str">'arjun@email.com'</span>);
+
+<span class="cmt">-- Insert multiple products in one round-trip (3x faster than 3 INSERTs)</span>
 <span class="kw">INSERT INTO</span> <span class="tbl">products</span> (product_id, name, category, price, stock)
 <span class="kw">VALUES</span>
-  (<span class="num">102</span>, <span class="str">'Sony WH-1000XM5'</span>, <span class="str">'Headphones'</span>, <span class="num">349.99</span>, <span class="num">120</span>),
-  (<span class="num">103</span>, <span class="str">'Logitech MX Keys'</span>, <span class="str">'Keyboard'</span>, <span class="num">99.99</span>, <span class="num">200</span>),
-  (<span class="num">104</span>, <span class="str">'Samsung 27" Monitor'</span>, <span class="str">'Monitor'</span>, <span class="num">449.99</span>, <span class="num">75</span>);</pre>
+  (<span class="num">106</span>, <span class="str">'Anker PowerBank 26800'</span>, <span class="str">'Accessories'</span>, <span class="num">59.99</span>,  <span class="num">300</span>),
+  (<span class="num">107</span>, <span class="str">'Razer DeathAdder V3'</span>,  <span class="str">'Mouse'</span>,       <span class="num">89.99</span>,  <span class="num">150</span>),
+  (<span class="num">108</span>, <span class="str">'LG 34" UltraWide'</span>,     <span class="str">'Monitor'</span>,    <span class="num">699.99</span>,  <span class="num">40</span>);
+
+<span class="cmt">-- INSERT … SELECT: archive all delivered orders from Q1 2024</span>
+<span class="kw">INSERT INTO</span> orders_archive (order_id, customer_id, product_id, quantity, order_date, status)
+<span class="kw">SELECT</span>                      order_id, customer_id, product_id, quantity, order_date, status
+<span class="kw">FROM</span>   <span class="tbl">orders</span>
+<span class="kw">WHERE</span>  status     <span class="op">=</span> <span class="str">'delivered'</span>
+  <span class="kw">AND</span>  order_date <span class="op">&lt;</span> <span class="str">'2024-04-01'</span>;
+
+<span class="cmt">-- INSERT OR IGNORE (SQLite) / INSERT IGNORE (MySQL):
+-- skip the row if a UNIQUE constraint would be violated</span>
+<span class="kw">INSERT OR IGNORE INTO</span> <span class="tbl">customers</span> (customer_id, full_name, email)
+<span class="kw">VALUES</span> (<span class="num">1</span>, <span class="str">'Priya Sharma'</span>, <span class="str">'priya@email.com'</span>);  <span class="cmt">-- already exists, silently skipped</span>
+
+<span class="cmt">-- UPSERT (INSERT … ON CONFLICT): insert if new, update if exists (PostgreSQL / SQLite)
+-- If customer_id already exists, update their city instead</span>
+<span class="kw">INSERT INTO</span> <span class="tbl">customers</span> (customer_id, full_name, email, city)
+<span class="kw">VALUES</span> (<span class="num">1</span>, <span class="str">'Priya Sharma'</span>, <span class="str">'priya@email.com'</span>, <span class="str">'Pune'</span>)
+<span class="kw">ON CONFLICT</span> (customer_id) <span class="kw">DO UPDATE SET</span>
+  city <span class="op">=</span> EXCLUDED.city;</pre>
         </div>
       </div>
     </div>
 
-    <!-- READ -->
-    <h3>1.2 READ (SELECT)</h3>
-    <p>The most-used SQL command. Retrieves rows matching your criteria.</p>
+    <div class="callout warn"><span class="callout-icon">⚠️</span><p><strong>Common mistake — inserting without column names:</strong> <code>INSERT INTO products VALUES (109, 'Item', 'Cat', 49.99, 10)</code> works today, but breaks silently if a column is added or reordered later. Always name your columns explicitly.</p></div>
+
+    <!-- ── SELECT ── -->
+    <h3>1.2 SELECT — Reading Data</h3>
+    <p>SELECT is the most-used SQL command by a large margin. It never modifies data — it only reads. A SELECT statement describes the shape of the result set you want: which table, which columns, which rows, in what order, how many.</p>
 
     <div class="formula">
-<span class="f-kw">SELECT</span> <span class="f-bracket">{</span><span class="f-sep">*</span> <span class="f-opt">| col1, col2, ...</span><span class="f-bracket">}</span>
-<span class="f-kw">FROM</span>   <span class="f-name">table_name</span>
-<span class="f-opt">[<span class="f-kw">WHERE</span>   <span class="f-name">condition</span>]</span>
-<span class="f-opt">[<span class="f-kw">ORDER BY</span> <span class="f-name">column</span> <span class="f-kw">ASC</span><span class="f-sep">|</span><span class="f-kw">DESC</span>]</span>
-<span class="f-opt">[<span class="f-kw">LIMIT</span>   <span class="f-num">n</span>]</span><span class="f-sep">;</span>
+<span class="f-kw">SELECT</span>   <span class="f-bracket">{</span><span class="f-sep">*</span> <span class="f-opt">| col1 [AS alias], col2, expression, ...</span><span class="f-bracket">}</span>
+<span class="f-kw">FROM</span>     <span class="f-name">table_name</span>  <span class="f-opt">[AS alias]</span>
+<span class="f-opt">[<span class="f-kw">WHERE</span>    condition]</span>
+<span class="f-opt">[<span class="f-kw">GROUP BY</span> col]</span>
+<span class="f-opt">[<span class="f-kw">HAVING</span>   group_condition]</span>
+<span class="f-opt">[<span class="f-kw">ORDER BY</span> col <span class="f-kw">ASC</span><span class="f-sep">|</span><span class="f-kw">DESC</span>]</span>
+<span class="f-opt">[<span class="f-kw">LIMIT</span>    n  <span class="f-kw">OFFSET</span>  m]</span><span class="f-sep">;</span>
     </div>
 
+    <div class="callout info"><span class="callout-icon">🔑</span><p><strong>SELECT * in production:</strong> Avoid <code>SELECT *</code> in application code. It returns all columns even if you only need two, wasting network bandwidth and memory. It also breaks silently when columns are added or reordered. Always name the columns you need.</p></div>
+
     <div class="usecase">
-      <div class="usecase-header">🔍 <h4>Use Case: Find all laptops priced under $1500</h4></div>
+      <div class="usecase-header">🔍 <h4>Use Case: Find and sort products — basic to advanced filters</h4></div>
       <div class="usecase-body">
         <div class="code-wrap">
-          <div class="code-header"><span>SQL — SELECT</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-          <pre><span class="cmt">-- Retrieve all columns for all products</span>
+          <div class="code-header"><span>SQL — SELECT (all forms)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- All columns, all rows (use only for quick inspection)</span>
 <span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> <span class="tbl">products</span>;
 
-<span class="cmt">-- Retrieve specific columns with a filter</span>
+<span class="cmt">-- Specific columns only</span>
+<span class="kw">SELECT</span> <span class="col">name</span>, <span class="col">category</span>, <span class="col">price</span> <span class="kw">FROM</span> <span class="tbl">products</span>;
+
+<span class="cmt">-- Computed column with alias</span>
+<span class="kw">SELECT</span>
+  <span class="col">name</span>,
+  <span class="col">price</span>,
+  <span class="col">stock</span>,
+  <span class="col">price</span> <span class="op">*</span> <span class="col">stock</span>  <span class="kw">AS</span> <span class="alias">inventory_value</span>  <span class="cmt">-- calculated column, not stored</span>
+<span class="kw">FROM</span> <span class="tbl">products</span>;
+
+<span class="cmt">-- Filter by category AND price range</span>
 <span class="kw">SELECT</span> <span class="col">name</span>, <span class="col">price</span>, <span class="col">stock</span>
 <span class="kw">FROM</span>   <span class="tbl">products</span>
 <span class="kw">WHERE</span>  <span class="col">category</span> <span class="op">=</span> <span class="str">'Laptop'</span>
-  <span class="kw">AND</span>  <span class="col">price</span> <span class="op">&lt;</span> <span class="num">1500</span>
-<span class="kw">ORDER BY</span> <span class="col">price</span> <span class="kw">ASC</span>;</pre>
+  <span class="kw">AND</span>  <span class="col">price</span> <span class="kw">BETWEEN</span> <span class="num">500</span> <span class="kw">AND</span> <span class="num">1500</span>
+  <span class="kw">AND</span>  <span class="col">stock</span> <span class="op">&gt;</span> <span class="num">0</span>
+<span class="kw">ORDER BY</span> <span class="col">price</span> <span class="kw">ASC</span>;
+
+<span class="cmt">-- Pattern matching: products starting with "Dell" or "Sony"</span>
+<span class="kw">SELECT</span> <span class="col">name</span>, <span class="col">price</span>
+<span class="kw">FROM</span>   <span class="tbl">products</span>
+<span class="kw">WHERE</span>  <span class="col">name</span> <span class="kw">LIKE</span> <span class="str">'Dell%'</span>
+  <span class="kw">OR</span>   <span class="col">name</span> <span class="kw">LIKE</span> <span class="str">'Sony%'</span>;
+
+<span class="cmt">-- IN list: products in multiple categories</span>
+<span class="kw">SELECT</span> <span class="col">name</span>, <span class="col">category</span>, <span class="col">price</span>
+<span class="kw">FROM</span>   <span class="tbl">products</span>
+<span class="kw">WHERE</span>  <span class="col">category</span> <span class="kw">IN</span> (<span class="str">'Laptop'</span>, <span class="str">'Tablet'</span>, <span class="str">'Monitor'</span>)
+<span class="kw">ORDER BY</span> <span class="col">category</span>, <span class="col">price</span> <span class="kw">DESC</span>;
+
+<span class="cmt">-- DISTINCT: unique cities where customers live</span>
+<span class="kw">SELECT DISTINCT</span> <span class="col">city</span> <span class="kw">FROM</span> <span class="tbl">customers</span> <span class="kw">ORDER BY</span> <span class="col">city</span>;
+
+<span class="cmt">-- Pagination: page 2 of results (rows 11-20)</span>
+<span class="kw">SELECT</span> <span class="col">name</span>, <span class="col">price</span>
+<span class="kw">FROM</span>   <span class="tbl">products</span>
+<span class="kw">ORDER BY</span> <span class="col">price</span> <span class="kw">DESC</span>
+<span class="kw">LIMIT</span>  <span class="num">10</span>  <span class="kw">OFFSET</span> <span class="num">10</span>;  <span class="cmt">-- skip first 10, return next 10</span>
+
+<span class="cmt">-- NULL check: customers who have no phone number on file</span>
+<span class="kw">SELECT</span> <span class="col">full_name</span>, <span class="col">email</span>
+<span class="kw">FROM</span>   <span class="tbl">customers</span>
+<span class="kw">WHERE</span>  <span class="col">phone</span> <span class="kw">IS NULL</span>;</pre>
         </div>
         <div class="result-box">
-          <div class="result-label">Result</div>
+          <div class="result-label">Result — Filter: Laptops between $500–$1500 with stock &gt; 0</div>
           <table><thead><tr><th>name</th><th>price</th><th>stock</th></tr></thead>
           <tbody><tr><td>Dell XPS 15</td><td>1299.99</td><td>50</td></tr></tbody></table>
         </div>
       </div>
     </div>
 
-    <!-- UPDATE -->
-    <h3>1.3 UPDATE</h3>
-    <p>Modifies the values of existing rows. Always use <code>WHERE</code> — without it, every row gets updated!</p>
+    <h3>1.3 UPDATE — Modifying Rows</h3>
+    <p>UPDATE changes the column values of existing rows. The WHERE clause filters which rows get changed. <strong>Without a WHERE clause, every single row in the table is updated</strong> — a mistake that can be catastrophic in production.</p>
 
     <div class="formula">
 <span class="f-kw">UPDATE</span> <span class="f-name">table_name</span>
-<span class="f-kw">SET</span>    <span class="f-name">col1</span> <span class="f-sep">=</span> <span class="f-lit">new_val1</span><span class="f-sep">,</span> <span class="f-name">col2</span> <span class="f-sep">=</span> <span class="f-lit">new_val2</span>
-<span class="f-kw">WHERE</span>  <span class="f-name">condition</span><span class="f-sep">;</span>
+<span class="f-kw">SET</span>
+  <span class="f-name">col1</span> <span class="f-sep">=</span> <span class="f-lit">new_val1</span><span class="f-sep">,</span>
+  <span class="f-name">col2</span> <span class="f-sep">=</span> <span class="f-lit">new_val2</span><span class="f-sep">,</span>
+  <span class="f-name">col3</span> <span class="f-sep">=</span> <span class="f-name">col3</span> <span class="f-sep">+</span> <span class="f-lit">expression</span>   <span class="f-cmt">← can reference the current value</span>
+<span class="f-kw">WHERE</span>  <span class="f-name">condition</span><span class="f-sep">;</span>              <span class="f-cmt">← ALWAYS include this</span>
     </div>
 
-    <div class="callout warn"><span class="callout-icon">⚠️</span><p><strong>Golden Rule:</strong> Always write and test the <code>SELECT</code> query first using the same <code>WHERE</code> clause to see which rows will be affected before running <code>UPDATE</code> or <code>DELETE</code>.</p></div>
+    <div class="callout warn"><span class="callout-icon">🛡️</span><p><strong>The safety habit:</strong> Before running any UPDATE or DELETE, first run the equivalent SELECT with the same WHERE clause to see exactly which rows will be affected. Only then convert SELECT to UPDATE/DELETE. Many engineers keep this as a permanent rule.</p></div>
 
     <div class="usecase">
-      <div class="usecase-header">📉 <h4>Use Case: Apply a 10% discount to all headphones</h4></div>
+      <div class="usecase-header">✏️ <h4>Use Case: Price changes, stock adjustments, order status updates</h4></div>
       <div class="usecase-body">
         <div class="code-wrap">
-          <div class="code-header"><span>SQL — UPDATE</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-          <pre><span class="cmt">-- First: CHECK what will be affected</span>
-<span class="kw">SELECT</span> <span class="col">name</span>, <span class="col">price</span> <span class="kw">FROM</span> <span class="tbl">products</span>
+          <div class="code-header"><span>SQL — UPDATE (all forms)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Step 1: always check first — which rows will be affected?</span>
+<span class="kw">SELECT</span> <span class="col">name</span>, <span class="col">price</span> <span class="kw">FROM</span> <span class="tbl">products</span> <span class="kw">WHERE</span> <span class="col">category</span> <span class="op">=</span> <span class="str">'Headphones'</span>;
+
+<span class="cmt">-- Step 2: apply 10% discount to all headphones</span>
+<span class="kw">UPDATE</span> <span class="tbl">products</span>
+<span class="kw">SET</span>   <span class="col">price</span> <span class="op">=</span> <span class="fn">ROUND</span>(<span class="col">price</span> <span class="op">*</span> <span class="num">0.90</span>, <span class="num">2</span>)  <span class="cmt">-- reduce by 10%</span>
 <span class="kw">WHERE</span> <span class="col">category</span> <span class="op">=</span> <span class="str">'Headphones'</span>;
 
-<span class="cmt">-- Then: Apply the 10% discount</span>
+<span class="cmt">-- Update multiple columns at once (comma-separate in SET)</span>
 <span class="kw">UPDATE</span> <span class="tbl">products</span>
-<span class="kw">SET</span>   <span class="col">price</span> <span class="op">=</span> <span class="col">price</span> <span class="op">*</span> <span class="num">0.90</span>,
-      <span class="col">updated_at</span> <span class="op">=</span> <span class="fn">CURRENT_TIMESTAMP</span>
-<span class="kw">WHERE</span> <span class="col">category</span> <span class="op">=</span> <span class="str">'Headphones'</span>;</pre>
+<span class="kw">SET</span>
+  <span class="col">price</span> <span class="op">=</span> <span class="num">1199.99</span>,
+  <span class="col">stock</span> <span class="op">=</span> <span class="col">stock</span> <span class="op">+</span> <span class="num">25</span>  <span class="cmt">-- increment current stock by 25 units</span>
+<span class="kw">WHERE</span> <span class="col">product_id</span> <span class="op">=</span> <span class="num">101</span>;
+
+<span class="cmt">-- Conditional update using CASE WHEN:
+-- give different discounts by category</span>
+<span class="kw">UPDATE</span> <span class="tbl">products</span>
+<span class="kw">SET</span>    <span class="col">price</span> <span class="op">=</span> <span class="kw">CASE</span>
+  <span class="kw">WHEN</span> <span class="col">category</span> <span class="op">=</span> <span class="str">'Laptop'</span>     <span class="kw">THEN</span> <span class="fn">ROUND</span>(<span class="col">price</span> <span class="op">*</span> <span class="num">0.95</span>, <span class="num">2</span>)  <span class="cmt">-- 5% off</span>
+  <span class="kw">WHEN</span> <span class="col">category</span> <span class="op">=</span> <span class="str">'Monitor'</span>   <span class="kw">THEN</span> <span class="fn">ROUND</span>(<span class="col">price</span> <span class="op">*</span> <span class="num">0.90</span>, <span class="num">2</span>)  <span class="cmt">-- 10% off</span>
+  <span class="kw">WHEN</span> <span class="col">category</span> <span class="op">=</span> <span class="str">'Keyboard'</span>  <span class="kw">THEN</span> <span class="fn">ROUND</span>(<span class="col">price</span> <span class="op">*</span> <span class="num">0.85</span>, <span class="num">2</span>)  <span class="cmt">-- 15% off</span>
+  <span class="kw">ELSE</span> <span class="col">price</span>  <span class="cmt">-- no change for other categories</span>
+<span class="kw">END</span>;
+
+<span class="cmt">-- Update from another table (UPDATE … JOIN in MySQL)</span>
+<span class="kw">UPDATE</span> <span class="tbl">orders</span> o
+<span class="kw">INNER JOIN</span> <span class="tbl">customers</span> c <span class="kw">ON</span> o.customer_id <span class="op">=</span> c.customer_id
+<span class="kw">SET</span>    o.status <span class="op">=</span> <span class="str">'priority'</span>
+<span class="kw">WHERE</span>  c.city <span class="op">=</span> <span class="str">'Bengaluru'</span>
+  <span class="kw">AND</span>  o.status <span class="op">=</span> <span class="str">'pending'</span>;  <span class="cmt">-- only pending Bengaluru orders</span>
+
+<span class="cmt">-- Equivalent in PostgreSQL (uses FROM clause)</span>
+<span class="kw">UPDATE</span> <span class="tbl">orders</span> o
+<span class="kw">SET</span>    status <span class="op">=</span> <span class="str">'priority'</span>
+<span class="kw">FROM</span>   <span class="tbl">customers</span> c
+<span class="kw">WHERE</span>  o.customer_id <span class="op">=</span> c.customer_id
+  <span class="kw">AND</span>  c.city <span class="op">=</span> <span class="str">'Bengaluru'</span>
+  <span class="kw">AND</span>  o.status <span class="op">=</span> <span class="str">'pending'</span>;</pre>
         </div>
       </div>
     </div>
 
-    <!-- DELETE -->
-    <h3>1.4 DELETE</h3>
-    <p>Removes rows from a table. The table structure remains intact. Use <code>TRUNCATE</code> to delete all rows faster.</p>
+    <h3>1.4 DELETE — Removing Rows</h3>
+    <p>DELETE removes rows from a table. The table structure, columns, and indexes remain intact. A DELETE without WHERE removes every row (equivalent to TRUNCATE but slower and transactional — see Section 2 for the comparison).</p>
 
     <div class="formula">
 <span class="f-kw">DELETE FROM</span> <span class="f-name">table_name</span>
-<span class="f-kw">WHERE</span>       <span class="f-name">condition</span><span class="f-sep">;</span>
-<span class="f-opt">
--- Remove ALL rows (no WHERE needed, but use with caution):
-<span class="f-kw">TRUNCATE TABLE</span> <span class="f-name">table_name</span><span class="f-sep">;</span></span>
+<span class="f-kw">WHERE</span>       <span class="f-name">condition</span><span class="f-sep">;</span>   <span class="f-cmt">← ALWAYS include this</span>
+
+<span class="f-cmt">-- Delete with a JOIN (MySQL) — delete rows from table A based on table B</span>
+<span class="f-kw">DELETE</span> <span class="f-name">a</span>
+<span class="f-kw">FROM</span>   <span class="f-name">table_A</span> <span class="f-kw">AS</span> <span class="f-lit">a</span>
+<span class="f-kw">INNER JOIN</span> <span class="f-name">table_B</span> <span class="f-kw">AS</span> <span class="f-lit">b</span> <span class="f-kw">ON</span> <span class="f-lit">a</span><span class="f-sep">.</span><span class="f-name">id</span> <span class="f-sep">=</span> <span class="f-lit">b</span><span class="f-sep">.</span><span class="f-name">id</span>
+<span class="f-kw">WHERE</span>  <span class="f-name">condition</span><span class="f-sep">;</span>
     </div>
 
     <div class="usecase">
-      <div class="usecase-header">🗑️ <h4>Use Case: Remove discontinued products (stock = 0)</h4></div>
+      <div class="usecase-header">🗑️ <h4>Use Case: Remove old data, duplicates, and orphaned records</h4></div>
       <div class="usecase-body">
         <div class="code-wrap">
-          <div class="code-header"><span>SQL — DELETE</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-          <pre><span class="cmt">-- Delete out-of-stock discontinued products</span>
+          <div class="code-header"><span>SQL — DELETE (all forms)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Delete a single specific row by PK (safest)</span>
+<span class="kw">DELETE FROM</span> <span class="tbl">products</span> <span class="kw">WHERE</span> product_id <span class="op">=</span> <span class="num">108</span>;
+
+<span class="cmt">-- Delete all out-of-stock AND discontinued products</span>
 <span class="kw">DELETE FROM</span> <span class="tbl">products</span>
-<span class="kw">WHERE</span>  <span class="col">stock</span> <span class="op">=</span> <span class="num">0</span>
-  <span class="kw">AND</span>  <span class="col">is_discontinued</span> <span class="op">=</span> <span class="kw">TRUE</span>;</pre>
+<span class="kw">WHERE</span>  stock <span class="op">=</span> <span class="num">0</span>
+  <span class="kw">AND</span>  is_discontinued <span class="op">=</span> <span class="kw">TRUE</span>;
+
+<span class="cmt">-- Delete old cancelled orders (data retention cleanup)</span>
+<span class="kw">DELETE FROM</span> <span class="tbl">orders</span>
+<span class="kw">WHERE</span>  status     <span class="op">=</span> <span class="str">'cancelled'</span>
+  <span class="kw">AND</span>  order_date <span class="op">&lt;</span> <span class="str">'2023-01-01'</span>;
+
+<span class="cmt">-- Delete duplicate emails — keep the row with the lowest customer_id</span>
+<span class="kw">DELETE FROM</span> <span class="tbl">customers</span>
+<span class="kw">WHERE</span> customer_id <span class="kw">NOT IN</span> (
+  <span class="kw">SELECT</span> <span class="fn">MIN</span>(customer_id)
+  <span class="kw">FROM</span>   <span class="tbl">customers</span>
+  <span class="kw">GROUP BY</span> email           <span class="cmt">-- one MIN per unique email</span>
+);
+
+<span class="cmt">-- Soft delete pattern: mark as deleted instead of removing
+-- (preferred in production — preserves audit trail)</span>
+<span class="kw">ALTER TABLE</span> <span class="tbl">customers</span> <span class="kw">ADD COLUMN</span> deleted_at <span class="fn">TIMESTAMP</span>;
+
+<span class="kw">UPDATE</span> <span class="tbl">customers</span>
+<span class="kw">SET</span>    deleted_at <span class="op">=</span> <span class="fn">CURRENT_TIMESTAMP</span>
+<span class="kw">WHERE</span>  customer_id <span class="op">=</span> <span class="num">6</span>;  <span class="cmt">-- "deleted" but row still exists</span>
+
+<span class="cmt">-- Then exclude soft-deleted rows in every query</span>
+<span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> <span class="tbl">customers</span> <span class="kw">WHERE</span> deleted_at <span class="kw">IS NULL</span>;</pre>
         </div>
       </div>
     </div>
+
+    <div class="callout tip"><span class="callout-icon">💡</span><p><strong>Soft delete vs hard delete:</strong> In most production systems, data is never truly deleted — it's marked with a <code>deleted_at</code> timestamp. This preserves audit history, supports undo, and avoids FK violations. Hard DELETE is reserved for GDPR/compliance erasure requests or genuine test-data cleanup.</p></div>
+
+    <h3>1.5 Transactions — Wrapping CRUD in Safety Nets</h3>
+    <p>A transaction groups multiple DML statements into one atomic unit. Either all succeed, or if anything fails, all are rolled back. Without transactions, a crash halfway through a multi-step operation leaves data in an inconsistent state.</p>
+
+    <div class="code-wrap">
+      <div class="code-header"><span>SQL — Transaction (COMMIT / ROLLBACK)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="cmt">-- Transfer an order from pending to shipped + deduct stock atomically</span>
+<span class="kw">BEGIN</span>;  <span class="cmt">-- start the transaction</span>
+
+<span class="kw">UPDATE</span> <span class="tbl">orders</span>
+<span class="kw">SET</span>    status <span class="op">=</span> <span class="str">'shipped'</span>
+<span class="kw">WHERE</span>  order_id <span class="op">=</span> <span class="num">3</span>;
+
+<span class="kw">UPDATE</span> <span class="tbl">products</span>
+<span class="kw">SET</span>    stock <span class="op">=</span> stock <span class="op">-</span> <span class="num">2</span>
+<span class="kw">WHERE</span>  product_id <span class="op">=</span> <span class="num">103</span>;
+
+<span class="cmt">-- If both succeed, commit. Both changes are now permanent.</span>
+<span class="kw">COMMIT</span>;
+
+<span class="cmt">-- If anything goes wrong (e.g. stock check failed), undo EVERYTHING</span>
+<span class="cmt">-- ROLLBACK;  ← run this instead of COMMIT if there is an error</span>
+
+<span class="cmt">-- SAVEPOINT: partial rollback (rollback to a checkpoint, not the full BEGIN)</span>
+<span class="kw">BEGIN</span>;
+<span class="kw">INSERT INTO</span> <span class="tbl">orders</span> (order_id, customer_id, product_id, quantity)
+<span class="kw">VALUES</span> (<span class="num">8</span>, <span class="num">2</span>, <span class="num">106</span>, <span class="num">1</span>);
+<span class="kw">SAVEPOINT</span> after_insert;
+
+<span class="kw">UPDATE</span> <span class="tbl">products</span> <span class="kw">SET</span> stock <span class="op">=</span> stock <span class="op">-</span> <span class="num">1</span> <span class="kw">WHERE</span> product_id <span class="op">=</span> <span class="num">106</span>;
+<span class="cmt">-- something went wrong with the stock update only</span>
+<span class="kw">ROLLBACK TO</span> after_insert;  <span class="cmt">-- undo only the UPDATE, keep the INSERT</span>
+<span class="kw">COMMIT</span>;</pre>
+    </div>
   </section>
+
 
   <hr class="section-divider"/>
 
-  <!-- ══ SECTION 2: SCHEMA ══ -->
+
   <section class="section" id="s2">
     <div class="section-header">
       <div class="section-num">2</div>
@@ -496,330 +685,403 @@ code{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padd
       <span class="tag">DDL</span>
     </div>
 
-    <p>DDL (Data Definition Language) commands define and modify the <em>structure</em> of your database. Unlike DML (INSERT/UPDATE/DELETE), DDL changes the schema itself — the tables, columns, constraints, and relationships. Most DDL statements are auto-committed and cannot be rolled back.</p>
+    <p>DDL — Data Definition Language — is the set of SQL commands that define, modify, and destroy the <em>structure</em> of your database. While DML (INSERT/UPDATE/DELETE) works on rows of data, DDL works on the containers that hold that data: tables, columns, indexes, views, constraints. Most DDL in traditional databases is auto-committed and cannot be rolled back, so it demands extra care.</p>
 
     <div class="card-grid" style="grid-template-columns:repeat(4,1fr)">
-      <div class="info-card" style="border-top:3px solid var(--green)"><div class="icon">🏗️</div><h4>CREATE</h4><p>Build new tables, indexes, views, databases</p></div>
-      <div class="info-card" style="border-top:3px solid var(--accent)"><div class="icon">✏️</div><h4>ALTER</h4><p>Modify existing table structure — columns, types, constraints</p></div>
-      <div class="info-card" style="border-top:3px solid var(--red)"><div class="icon">🗑️</div><h4>DROP</h4><p>Permanently delete a table (structure + data)</p></div>
-      <div class="info-card" style="border-top:3px solid var(--amber)"><div class="icon">⚡</div><h4>TRUNCATE</h4><p>Wipe all rows instantly, keep the table structure</p></div>
+      <div class="info-card" style="border-top:3px solid var(--green)"><div class="icon">🏗️</div><h4>CREATE</h4><p>Build new tables, indexes, views, sequences, databases</p></div>
+      <div class="info-card" style="border-top:3px solid var(--accent)"><div class="icon">✏️</div><h4>ALTER</h4><p>Evolve existing table structure — add/drop/rename columns, change types, manage constraints</p></div>
+      <div class="info-card" style="border-top:3px solid var(--red)"><div class="icon">🗑️</div><h4>DROP</h4><p>Permanently delete an object and all of its data. No undo.</p></div>
+      <div class="info-card" style="border-top:3px solid var(--amber)"><div class="icon">⚡</div><h4>TRUNCATE</h4><p>Wipe all rows instantly, keep the table shell. Far faster than DELETE.</p></div>
     </div>
 
-    <!-- ── DATA TYPES ── -->
-    <h3>2.1 Data Types Reference</h3>
-    <p>Every column must declare a data type — the kind of values it can hold. The DB engine uses this to validate input, allocate storage, and optimise queries.</p>
+    <h3>2.1 Data Types — Choosing the Right One</h3>
+    <p>Choosing the right data type is the most consequential schema decision you make. The wrong type wastes storage, silently truncates data, causes comparison bugs (comparing number stored as text), and prevents valid range indexes. The right type lets the engine validate data automatically and optimise storage and lookups.</p>
+
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Category</th><th>Type</th><th>Description</th><th>Example Value</th></tr></thead>
+        <thead><tr><th>Category</th><th>Type</th><th>When to use it</th><th>Watch out for</th></tr></thead>
         <tbody>
-          <tr><td><span class="badge badge-blue">Numeric</span></td><td><code>INT / INTEGER</code></td><td>Whole numbers (−2B to +2B for 32-bit)</td><td><code>42, -7, 1000000</code></td></tr>
-          <tr><td><span class="badge badge-blue">Numeric</span></td><td><code>BIGINT</code></td><td>Large whole numbers (64-bit)</td><td><code>9223372036854775807</code></td></tr>
-          <tr><td><span class="badge badge-blue">Numeric</span></td><td><code>DECIMAL(p, s)</code></td><td>Exact decimal. p = total digits, s = decimal places</td><td><code>DECIMAL(10,2) → 1299.99</code></td></tr>
-          <tr><td><span class="badge badge-blue">Numeric</span></td><td><code>FLOAT / REAL</code></td><td>Approximate floating-point (imprecise)</td><td><code>3.14159</code></td></tr>
-          <tr><td><span class="badge badge-green">Text</span></td><td><code>VARCHAR(n)</code></td><td>Variable-length string, max n characters</td><td><code>VARCHAR(100) → 'Priya'</code></td></tr>
-          <tr><td><span class="badge badge-green">Text</span></td><td><code>CHAR(n)</code></td><td>Fixed-length, pads with spaces to n</td><td><code>CHAR(2) → 'IN'</code></td></tr>
-          <tr><td><span class="badge badge-green">Text</span></td><td><code>TEXT</code></td><td>Unlimited length string</td><td>Blog post, JSON payload</td></tr>
-          <tr><td><span class="badge badge-amber">Date/Time</span></td><td><code>DATE</code></td><td>Calendar date only (YYYY-MM-DD)</td><td><code>2024-03-15</code></td></tr>
-          <tr><td><span class="badge badge-amber">Date/Time</span></td><td><code>TIME</code></td><td>Time of day (HH:MM:SS)</td><td><code>14:30:00</code></td></tr>
-          <tr><td><span class="badge badge-amber">Date/Time</span></td><td><code>TIMESTAMP</code></td><td>Date + time, optional timezone</td><td><code>2024-03-15 14:30:00</code></td></tr>
-          <tr><td><span class="badge badge-purple">Other</span></td><td><code>BOOLEAN</code></td><td>TRUE / FALSE (stored as 0/1 in many DBs)</td><td><code>TRUE, FALSE</code></td></tr>
-          <tr><td><span class="badge badge-purple">Other</span></td><td><code>JSON / JSONB</code></td><td>JSON document. JSONB (PostgreSQL) is binary-indexed</td><td><code>{"key": "val"}</code></td></tr>
-          <tr><td><span class="badge badge-purple">Other</span></td><td><code>BLOB / BYTEA</code></td><td>Binary data (images, files)</td><td>Raw bytes</td></tr>
+          <tr><td><span class="badge badge-blue">Integer</span></td><td><code>INT / INTEGER</code></td><td>Counts, IDs, quantities. 32-bit: −2,147,483,648 to +2,147,483,647</td><td>Overflow if IDs exceed 2.1B rows</td></tr>
+          <tr><td><span class="badge badge-blue">Integer</span></td><td><code>BIGINT</code></td><td>Very large counts, snowflake IDs, Unix timestamps in ms. 64-bit.</td><td>Slightly more storage than INT</td></tr>
+          <tr><td><span class="badge badge-blue">Decimal</span></td><td><code>DECIMAL(p, s)</code></td><td>Money, exact measurements. p=total digits, s=decimal places. DECIMAL(10,2) stores up to 99,999,999.99</td><td>Never use FLOAT for money — rounding errors</td></tr>
+          <tr><td><span class="badge badge-blue">Float</span></td><td><code>FLOAT / REAL / DOUBLE</code></td><td>Scientific measurements where approximate is fine (3.14159…)</td><td>Not exact — 0.1 + 0.2 ≠ 0.3 in floating point</td></tr>
+          <tr><td><span class="badge badge-green">Text</span></td><td><code>VARCHAR(n)</code></td><td>Variable-length text: names, emails, addresses. Stores only what you put in.</td><td>n is a cap, not a fixed allocation. Choose generously.</td></tr>
+          <tr><td><span class="badge badge-green">Text</span></td><td><code>CHAR(n)</code></td><td>Fixed-length codes where every value is exactly n chars: country codes, fixed codes</td><td>Pads with spaces — can cause subtle comparison issues</td></tr>
+          <tr><td><span class="badge badge-green">Text</span></td><td><code>TEXT</code></td><td>Long-form content: descriptions, comments, HTML, JSON blobs</td><td>Cannot be fully indexed; no length guarantee</td></tr>
+          <tr><td><span class="badge badge-amber">Date</span></td><td><code>DATE</code></td><td>Calendar dates without time: birthdays, joined_date</td><td>No timezone info. Comparison works correctly.</td></tr>
+          <tr><td><span class="badge badge-amber">Date</span></td><td><code>TIMESTAMP</code></td><td>Exact moment in time: created_at, updated_at, event times</td><td>Timezone handling differs by platform — use TIMESTAMPTZ in PostgreSQL</td></tr>
+          <tr><td><span class="badge badge-purple">Other</span></td><td><code>BOOLEAN</code></td><td>Binary flags: is_active, is_verified, is_deleted</td><td>SQLite stores as 0/1 integers. MySQL uses TINYINT(1).</td></tr>
+          <tr><td><span class="badge badge-purple">Other</span></td><td><code>JSON / JSONB</code></td><td>Flexible/dynamic attributes: product metadata, config, tags</td><td>JSONB (PostgreSQL) is indexed binary. JSON is plain text. Prefer JSONB.</td></tr>
+          <tr><td><span class="badge badge-purple">Other</span></td><td><code>UUID</code></td><td>Globally unique IDs (distributed systems, merging DBs)</td><td>Larger than INT. Random UUIDs hurt B-tree index locality.</td></tr>
         </tbody>
       </table>
     </div>
 
-    <!-- ── CONSTRAINTS ── -->
-    <h3>2.2 Constraints</h3>
-    <p>Constraints are rules attached to columns (or tables) that the DB engine enforces automatically on every INSERT and UPDATE.</p>
+    <div class="callout warn"><span class="callout-icon">💰</span><p><strong>Never store money as FLOAT.</strong> Floating-point arithmetic is imprecise: <code>0.1 + 0.2 = 0.30000000000000004</code> in binary floating point. Always use <code>DECIMAL(10,2)</code> for currency. This is one of the most common and costly bugs in financial systems.</p></div>
+
+    <h3>2.2 Constraints — Enforcing Data Quality at the Database Level</h3>
+    <p>Constraints are rules enforced by the database engine on every INSERT and UPDATE. They are your last line of defence against bad data. Application code can have bugs; the database constraint is always enforced regardless of which application or script writes the data.</p>
+
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Constraint</th><th>Scope</th><th>Rule enforced</th><th>Example</th></tr></thead>
+        <thead><tr><th>Constraint</th><th>What it enforces</th><th>NULL allowed?</th><th>Per-table limit</th></tr></thead>
         <tbody>
-          <tr><td><code>PRIMARY KEY</code></td><td>Column / Table</td><td>Unique + NOT NULL. Only one per table.</td><td><code>id INT PRIMARY KEY</code></td></tr>
-          <tr><td><code>FOREIGN KEY</code></td><td>Column / Table</td><td>Value must exist in referenced table's PK.</td><td><code>REFERENCES customers(id)</code></td></tr>
-          <tr><td><code>UNIQUE</code></td><td>Column / Table</td><td>No duplicate values (NULLs allowed once).</td><td><code>email VARCHAR(150) UNIQUE</code></td></tr>
-          <tr><td><code>NOT NULL</code></td><td>Column</td><td>Value cannot be NULL.</td><td><code>name VARCHAR(100) NOT NULL</code></td></tr>
-          <tr><td><code>CHECK</code></td><td>Column / Table</td><td>Value must satisfy a boolean expression.</td><td><code>CHECK (price &gt; 0)</code></td></tr>
-          <tr><td><code>DEFAULT</code></td><td>Column</td><td>Supplies a value when none is given on INSERT.</td><td><code>status VARCHAR DEFAULT 'active'</code></td></tr>
+          <tr><td><code>PRIMARY KEY</code></td><td>Unique + NOT NULL. Uniquely identifies each row. Auto-creates a unique index.</td><td class="td-red">Never</td><td>One only</td></tr>
+          <tr><td><code>FOREIGN KEY</code></td><td>Value must exist in the referenced table's PK/unique column. Prevents orphaned records.</td><td class="td-green">Yes (unless NOT NULL)</td><td>Multiple</td></tr>
+          <tr><td><code>UNIQUE</code></td><td>No two rows can share the same value. One NULL is typically allowed.</td><td class="td-green">Yes (once)</td><td>Multiple</td></tr>
+          <tr><td><code>NOT NULL</code></td><td>Column must always have a value. NULL is rejected on INSERT.</td><td class="td-red">Never</td><td>Multiple</td></tr>
+          <tr><td><code>CHECK</code></td><td>Value must satisfy a boolean expression. e.g., price &gt; 0, age BETWEEN 0 AND 150</td><td class="td-green">Yes</td><td>Multiple</td></tr>
+          <tr><td><code>DEFAULT</code></td><td>Supplies a value when INSERT omits the column. Can be a literal, a function (CURRENT_DATE), or an expression.</td><td class="td-green">Yes</td><td>Multiple</td></tr>
         </tbody>
       </table>
     </div>
 
-    <!-- ── CREATE ── -->
-    <h3>2.3 CREATE</h3>
-    <p><code>CREATE</code> builds new database objects — tables, indexes, views, sequences, or entire databases. It's the first DDL command you'll run on any new project.</p>
+    <div class="callout info"><span class="callout-icon">🔗</span><p><strong>Foreign Key ON DELETE behaviour — three options:</strong><br/>
+    <code>CASCADE</code> — deleting a parent row also deletes all its child rows automatically.<br/>
+    <code>RESTRICT / NO ACTION</code> — prevents deleting a parent that still has children (the default — safest).<br/>
+    <code>SET NULL</code> — sets the FK column to NULL in child rows when the parent is deleted.</p></div>
+
+    <h3>2.3 CREATE — Building Database Objects</h3>
+    <p>CREATE is the DDL command for building new objects. You use it to create a database itself, individual tables, indexes for performance, views for simplified access, and sequences for auto-incrementing IDs. The <code>IF NOT EXISTS</code> modifier makes scripts re-runnable — it silently skips creation if the object already exists, instead of throwing an error.</p>
 
     <div class="formula">
-<span class="f-cmt">-- Create a database</span>
-<span class="f-kw">CREATE DATABASE</span> <span class="f-name">db_name</span><span class="f-sep">;</span>
+<span class="f-cmt">-- Database</span>
+<span class="f-kw">CREATE DATABASE</span> <span class="f-opt">[IF NOT EXISTS]</span> <span class="f-name">db_name</span>
+  <span class="f-opt">[CHARACTER SET utf8mb4]</span> <span class="f-opt">[COLLATE utf8mb4_unicode_ci]</span><span class="f-sep">;</span>
 
-<span class="f-cmt">-- Create a table</span>
+<span class="f-cmt">-- Table</span>
 <span class="f-kw">CREATE TABLE</span> <span class="f-opt">[IF NOT EXISTS]</span> <span class="f-name">table_name</span> <span class="f-bracket">(</span>
-  <span class="f-name">col1</span>  <span class="f-lit">datatype</span>  <span class="f-opt">[constraint]</span><span class="f-sep">,</span>
-  <span class="f-name">col2</span>  <span class="f-lit">datatype</span>  <span class="f-opt">[constraint]</span><span class="f-sep">,</span>
+  <span class="f-name">col</span>  <span class="f-lit">datatype</span>  <span class="f-opt">[NOT NULL] [DEFAULT val] [UNIQUE] [PRIMARY KEY]</span><span class="f-sep">,</span>
   <span class="f-opt">...</span>
-  <span class="f-opt">[<span class="f-kw">CONSTRAINT</span> <span class="f-name">fk_name</span> <span class="f-kw">FOREIGN KEY</span> (<span class="f-name">col</span>) <span class="f-kw">REFERENCES</span> <span class="f-name">other</span>(<span class="f-name">col</span>)]</span>
+  <span class="f-opt">[CONSTRAINT name PRIMARY KEY (col)]</span>
+  <span class="f-opt">[CONSTRAINT name FOREIGN KEY (col) REFERENCES other(col) ON DELETE action]</span>
+  <span class="f-opt">[CONSTRAINT name CHECK (expression)]</span>
 <span class="f-bracket">)</span><span class="f-sep">;</span>
 
-<span class="f-cmt">-- Create table from a SELECT result (copy structure + data)</span>
-<span class="f-kw">CREATE TABLE</span> <span class="f-name">new_table</span> <span class="f-kw">AS</span>
-  <span class="f-kw">SELECT</span> <span class="f-opt">...</span> <span class="f-kw">FROM</span> <span class="f-name">existing_table</span><span class="f-sep">;</span>
+<span class="f-cmt">-- Copy structure and data from a SELECT</span>
+<span class="f-kw">CREATE TABLE</span> <span class="f-name">new_table</span> <span class="f-kw">AS</span> <span class="f-kw">SELECT</span> <span class="f-opt">...</span> <span class="f-kw">FROM</span> <span class="f-name">source</span><span class="f-sep">;</span>
 
-<span class="f-cmt">-- Create an index for faster lookups</span>
-<span class="f-kw">CREATE INDEX</span> <span class="f-name">idx_name</span> <span class="f-kw">ON</span> <span class="f-name">table_name</span> <span class="f-bracket">(</span><span class="f-name">col</span><span class="f-bracket">)</span><span class="f-sep">;</span>
+<span class="f-cmt">-- Index</span>
+<span class="f-kw">CREATE</span> <span class="f-opt">[UNIQUE]</span> <span class="f-kw">INDEX</span> <span class="f-name">idx_name</span> <span class="f-kw">ON</span> <span class="f-name">table</span> <span class="f-bracket">(</span><span class="f-name">col1</span><span class="f-sep">,</span> <span class="f-name">col2</span><span class="f-bracket">)</span><span class="f-sep">;</span>
+
+<span class="f-cmt">-- View (virtual table — no data stored)</span>
+<span class="f-kw">CREATE</span> <span class="f-opt">[OR REPLACE]</span> <span class="f-kw">VIEW</span> <span class="f-name">view_name</span> <span class="f-kw">AS</span> <span class="f-kw">SELECT</span> <span class="f-opt">...</span><span class="f-sep">;</span>
     </div>
 
     <div class="usecase">
-      <div class="usecase-header">🏗️ <h4>Use Case: Build the full e-commerce schema from scratch</h4></div>
+      <div class="usecase-header">🏗️ <h4>Use Case: Build the complete e-commerce schema with indexes and a view</h4></div>
       <div class="usecase-body">
+        <p>A well-designed schema anticipates query patterns. We create indexes on the columns that will appear in WHERE clauses and JOIN conditions most often, and a view that abstracts the common join for the reporting team.</p>
         <div class="code-wrap">
-          <div class="code-header"><span>SQL — CREATE TABLE (full schema)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-          <pre><span class="cmt">-- 1. Customers</span>
+          <div class="code-header"><span>SQL — CREATE (full schema)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Database</span>
+<span class="kw">CREATE DATABASE IF NOT EXISTS</span> ecommerce
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;  <span class="cmt">-- MySQL: full Unicode support</span>
+
+<span class="cmt">-- 1. Customers</span>
 <span class="kw">CREATE TABLE IF NOT EXISTS</span> <span class="tbl">customers</span> (
-  customer_id  <span class="fn">INT</span>           <span class="kw">PRIMARY KEY</span>,
-  full_name    <span class="fn">VARCHAR</span>(<span class="num">100</span>)  <span class="kw">NOT NULL</span>,
-  email        <span class="fn">VARCHAR</span>(<span class="num">150</span>)  <span class="kw">UNIQUE NOT NULL</span>,
-  phone        <span class="fn">VARCHAR</span>(<span class="num">15</span>),
-  city         <span class="fn">VARCHAR</span>(<span class="num">50</span>),
-  joined_date  <span class="fn">DATE</span>          <span class="kw">DEFAULT</span> <span class="fn">CURRENT_DATE</span>
+  customer_id   <span class="fn">INT</span>           <span class="kw">PRIMARY KEY</span>,
+  full_name     <span class="fn">VARCHAR</span>(<span class="num">100</span>)  <span class="kw">NOT NULL</span>,
+  email         <span class="fn">VARCHAR</span>(<span class="num">150</span>)  <span class="kw">NOT NULL UNIQUE</span>,
+  phone         <span class="fn">VARCHAR</span>(<span class="num">20</span>),                      <span class="cmt">-- nullable: optional</span>
+  city          <span class="fn">VARCHAR</span>(<span class="num">50</span>),
+  joined_date   <span class="fn">DATE</span>          <span class="kw">NOT NULL DEFAULT</span> (<span class="fn">CURRENT_DATE</span>),
+  is_active     <span class="fn">BOOLEAN</span>       <span class="kw">NOT NULL DEFAULT TRUE</span>
 );
 
-<span class="cmt">-- 2. Products</span>
+<span class="cmt">-- 2. Products with a CHECK on price and stock</span>
 <span class="kw">CREATE TABLE IF NOT EXISTS</span> <span class="tbl">products</span> (
-  product_id  <span class="fn">INT</span>            <span class="kw">PRIMARY KEY</span>,
-  name        <span class="fn">VARCHAR</span>(<span class="num">200</span>)  <span class="kw">NOT NULL</span>,
-  category    <span class="fn">VARCHAR</span>(<span class="num">50</span>),
-  price       <span class="fn">DECIMAL</span>(<span class="num">10</span>,<span class="num">2</span>) <span class="kw">NOT NULL</span> <span class="kw">CHECK</span> (price <span class="op">&gt;</span> <span class="num">0</span>),
-  stock       <span class="fn">INT</span>            <span class="kw">DEFAULT</span> <span class="num">0</span>
+  product_id    <span class="fn">INT</span>            <span class="kw">PRIMARY KEY</span>,
+  name          <span class="fn">VARCHAR</span>(<span class="num">200</span>)  <span class="kw">NOT NULL</span>,
+  category      <span class="fn">VARCHAR</span>(<span class="num">50</span>)   <span class="kw">NOT NULL</span>,
+  price         <span class="fn">DECIMAL</span>(<span class="num">10</span>,<span class="num">2</span>) <span class="kw">NOT NULL</span>,
+  stock         <span class="fn">INT</span>            <span class="kw">NOT NULL DEFAULT</span> <span class="num">0</span>,
+  <span class="kw">CONSTRAINT</span> chk_price <span class="kw">CHECK</span> (price <span class="op">&gt;</span> <span class="num">0</span>),          <span class="cmt">-- named constraint</span>
+  <span class="kw">CONSTRAINT</span> chk_stock <span class="kw">CHECK</span> (stock <span class="op">&gt;=</span> <span class="num">0</span>)
 );
 
-<span class="cmt">-- 3. Orders (references both parents)</span>
+<span class="cmt">-- 3. Orders — child of both customers and products</span>
 <span class="kw">CREATE TABLE IF NOT EXISTS</span> <span class="tbl">orders</span> (
-  order_id     <span class="fn">INT</span>           <span class="kw">PRIMARY KEY</span>,
-  customer_id  <span class="fn">INT</span>           <span class="kw">NOT NULL</span>,
-  product_id   <span class="fn">INT</span>           <span class="kw">NOT NULL</span>,
-  quantity     <span class="fn">INT</span>           <span class="kw">DEFAULT</span> <span class="num">1</span>,
-  order_date   <span class="fn">TIMESTAMP</span>     <span class="kw">DEFAULT</span> <span class="fn">CURRENT_TIMESTAMP</span>,
-  status       <span class="fn">VARCHAR</span>(<span class="num">20</span>)  <span class="kw">DEFAULT</span> <span class="str">'pending'</span>,
-  <span class="kw">CONSTRAINT</span> fk_customer <span class="kw">FOREIGN KEY</span> (customer_id)
-      <span class="kw">REFERENCES</span> <span class="tbl">customers</span>(customer_id) <span class="kw">ON DELETE CASCADE</span>,
-  <span class="kw">CONSTRAINT</span> fk_product  <span class="kw">FOREIGN KEY</span> (product_id)
-      <span class="kw">REFERENCES</span> <span class="tbl">products</span>(product_id)  <span class="kw">ON DELETE RESTRICT</span>
+  order_id      <span class="fn">INT</span>           <span class="kw">PRIMARY KEY</span>,
+  customer_id   <span class="fn">INT</span>           <span class="kw">NOT NULL</span>,
+  product_id    <span class="fn">INT</span>           <span class="kw">NOT NULL</span>,
+  quantity      <span class="fn">INT</span>           <span class="kw">NOT NULL DEFAULT</span> <span class="num">1</span>,
+  order_date    <span class="fn">TIMESTAMP</span>     <span class="kw">NOT NULL DEFAULT</span> <span class="fn">CURRENT_TIMESTAMP</span>,
+  status        <span class="fn">VARCHAR</span>(<span class="num">20</span>)  <span class="kw">NOT NULL DEFAULT</span> <span class="str">'pending'</span>,
+  <span class="kw">CONSTRAINT</span> chk_qty    <span class="kw">CHECK</span> (quantity <span class="op">&gt;</span> <span class="num">0</span>),
+  <span class="kw">CONSTRAINT</span> chk_status <span class="kw">CHECK</span> (status <span class="kw">IN</span> (<span class="str">'pending'</span>,<span class="str">'shipped'</span>,<span class="str">'delivered'</span>,<span class="str">'cancelled'</span>)),
+  <span class="kw">CONSTRAINT</span> fk_cust <span class="kw">FOREIGN KEY</span> (customer_id)
+      <span class="kw">REFERENCES</span> <span class="tbl">customers</span>(customer_id) <span class="kw">ON DELETE RESTRICT ON UPDATE CASCADE</span>,
+  <span class="kw">CONSTRAINT</span> fk_prod <span class="kw">FOREIGN KEY</span> (product_id)
+      <span class="kw">REFERENCES</span> <span class="tbl">products</span>(product_id)  <span class="kw">ON DELETE RESTRICT ON UPDATE CASCADE</span>
 );
 
-<span class="cmt">-- 4. Index: speed up order lookups by customer</span>
+<span class="cmt">-- 4. Indexes on FK columns (DB doesn't auto-create these for FK targets)</span>
 <span class="kw">CREATE INDEX</span> idx_orders_customer <span class="kw">ON</span> <span class="tbl">orders</span> (customer_id);
+<span class="kw">CREATE INDEX</span> idx_orders_product  <span class="kw">ON</span> <span class="tbl">orders</span> (product_id);
+<span class="kw">CREATE INDEX</span> idx_orders_date     <span class="kw">ON</span> <span class="tbl">orders</span> (order_date);   <span class="cmt">-- for date-range queries</span>
+<span class="kw">CREATE INDEX</span> idx_products_cat    <span class="kw">ON</span> <span class="tbl">products</span> (category);   <span class="cmt">-- for category filters</span>
 
-<span class="cmt">-- 5. Create a summary view (virtual table)</span>
-<span class="kw">CREATE VIEW</span> v_order_summary <span class="kw">AS</span>
-  <span class="kw">SELECT</span> o.order_id, c.full_name, p.name <span class="kw">AS</span> <span class="alias">product</span>,
-         o.quantity, (o.quantity <span class="op">*</span> p.price) <span class="kw">AS</span> <span class="alias">total</span>, o.status
+<span class="cmt">-- 5. View: join orders + customers + products — reporting team uses this</span>
+<span class="kw">CREATE OR REPLACE VIEW</span> v_order_detail <span class="kw">AS</span>
+  <span class="kw">SELECT</span>
+    o.order_id,
+    o.order_date,
+    c.full_name      <span class="kw">AS</span> <span class="alias">customer</span>,
+    c.city,
+    p.name           <span class="kw">AS</span> <span class="alias">product</span>,
+    p.category,
+    o.quantity,
+    p.price,
+    (o.quantity <span class="op">*</span> p.price) <span class="kw">AS</span> <span class="alias">line_total</span>,
+    o.status
   <span class="kw">FROM</span>       <span class="tbl">orders</span>    o
   <span class="kw">INNER JOIN</span> <span class="tbl">customers</span> c <span class="kw">ON</span> o.customer_id <span class="op">=</span> c.customer_id
   <span class="kw">INNER JOIN</span> <span class="tbl">products</span>  p <span class="kw">ON</span> o.product_id  <span class="op">=</span> p.product_id;
 
-<span class="cmt">-- 6. CREATE TABLE AS SELECT — copy high-value orders to archive</span>
-<span class="kw">CREATE TABLE</span> orders_archive <span class="kw">AS</span>
-  <span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> <span class="tbl">orders</span>
-  <span class="kw">WHERE</span>  status <span class="op">=</span> <span class="str">'delivered'</span>;</pre>
+<span class="cmt">-- Now the reporting team can just write:</span>
+<span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> v_order_detail <span class="kw">WHERE</span> city <span class="op">=</span> <span class="str">'Bengaluru'</span>;
+
+<span class="cmt">-- 6. CREATE TABLE AS SELECT — snapshot of premium products for a campaign</span>
+<span class="kw">CREATE TABLE</span> campaign_premium_products <span class="kw">AS</span>
+  <span class="kw">SELECT</span> product_id, name, category, price
+  <span class="kw">FROM</span>   <span class="tbl">products</span>
+  <span class="kw">WHERE</span>  price <span class="op">&gt;</span> <span class="num">500</span>;
+<span class="cmt">-- Note: CTAS copies data at this moment but does NOT copy indexes or constraints</span></pre>
         </div>
       </div>
     </div>
 
-    <div class="callout info"><span class="callout-icon">🔗</span><p><strong>ON DELETE behaviour:</strong> <code>CASCADE</code> — deleting a parent row also deletes all child rows. <code>RESTRICT</code> — prevents deleting a parent that still has children. <code>SET NULL</code> — sets the FK column to NULL when the parent is deleted.</p></div>
+    <h3>2.4 ALTER — Evolving Table Structure</h3>
+    <p>Schemas evolve. Business requirements change. ALTER TABLE modifies an existing table without losing its data. It is how you add new features (new columns), fix mistakes (rename a column, change its type), improve performance (add a constraint or index), or clean up (drop unused columns).</p>
 
-    <!-- ── ALTER ── -->
-    <h3>2.4 ALTER (Update Structure)</h3>
-    <p><code>ALTER TABLE</code> modifies an existing table's structure without touching the data. Use it to add/drop/rename columns, change data types, or manage constraints after the table is created.</p>
+    <p>In production, ALTER TABLE on large tables can be dangerous — adding a column on a 500-million-row table can lock the table for hours in older MySQL. Modern databases (PostgreSQL 11+, MySQL 8+, cloud databases) handle most ALTERs online (without locks), but always test first in a staging environment.</p>
 
     <div class="formula">
 <span class="f-kw">ALTER TABLE</span> <span class="f-name">table_name</span>
-  <span class="f-bracket">{</span>
-    <span class="f-kw">ADD COLUMN</span>    <span class="f-name">col</span> <span class="f-lit">datatype</span> <span class="f-opt">[constraint]</span>
-  <span class="f-sep">|</span> <span class="f-kw">DROP COLUMN</span>   <span class="f-name">col</span>
-  <span class="f-sep">|</span> <span class="f-kw">RENAME COLUMN</span> <span class="f-name">old_col</span> <span class="f-kw">TO</span> <span class="f-name">new_col</span>
-  <span class="f-sep">|</span> <span class="f-kw">MODIFY COLUMN</span> <span class="f-name">col</span> <span class="f-lit">new_datatype</span>        <span class="f-cmt">← MySQL</span>
-  <span class="f-sep">|</span> <span class="f-kw">ALTER COLUMN</span>  <span class="f-name">col</span> <span class="f-lit">new_datatype</span>        <span class="f-cmt">← PostgreSQL</span>
-  <span class="f-sep">|</span> <span class="f-kw">ADD CONSTRAINT</span>  <span class="f-name">name</span> <span class="f-lit">constraint_def</span>
-  <span class="f-sep">|</span> <span class="f-kw">DROP CONSTRAINT</span> <span class="f-name">name</span>
-  <span class="f-sep">|</span> <span class="f-kw">RENAME TO</span>     <span class="f-name">new_table_name</span>
-  <span class="f-bracket">}</span><span class="f-sep">;</span>
+  <span class="f-sep">-- Column operations</span>
+  <span class="f-kw">ADD COLUMN</span>    <span class="f-name">col</span> <span class="f-lit">type</span> <span class="f-opt">[constraint]</span>                   <span class="f-sep">|</span>
+  <span class="f-kw">DROP COLUMN</span>   <span class="f-opt">[IF EXISTS]</span> <span class="f-name">col</span>                           <span class="f-sep">|</span>
+  <span class="f-kw">RENAME COLUMN</span> <span class="f-name">old_col</span> <span class="f-kw">TO</span> <span class="f-name">new_col</span>                       <span class="f-sep">|</span>
+  <span class="f-kw">MODIFY COLUMN</span> <span class="f-name">col</span> <span class="f-lit">new_type</span> <span class="f-opt">[constraint]</span>   <span class="f-cmt">← MySQL</span>        <span class="f-sep">|</span>
+  <span class="f-kw">ALTER COLUMN</span>  <span class="f-name">col</span> <span class="f-kw">TYPE</span> <span class="f-lit">new_type</span>          <span class="f-cmt">← PostgreSQL</span>   <span class="f-sep">|</span>
+  <span class="f-sep">-- Constraint operations</span>
+  <span class="f-kw">ADD CONSTRAINT</span>  <span class="f-name">name</span> <span class="f-lit">constraint_def</span>                      <span class="f-sep">|</span>
+  <span class="f-kw">DROP CONSTRAINT</span> <span class="opt">[IF EXISTS]</span> <span class="f-name">name</span>                         <span class="f-sep">|</span>
+  <span class="f-sep">-- Table-level</span>
+  <span class="f-kw">RENAME TO</span>     <span class="f-name">new_table_name</span><span class="f-sep">;</span>
     </div>
 
     <div class="usecase">
-      <div class="usecase-header">✏️ <h4>Use Case: Evolve the customers table over time</h4></div>
+      <div class="usecase-header">✏️ <h4>Use Case: Six months of schema evolution on the customers table</h4></div>
       <div class="usecase-body">
+        <p>Real schemas evolve iteratively. Here's a timeline of changes a growing e-commerce company might make — and the exact ALTER statements that implement them.</p>
         <div class="code-wrap">
-          <div class="code-header"><span>SQL — ALTER TABLE (all variants)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-          <pre><span class="cmt">-- Add a new column (existing rows get the DEFAULT value)</span>
+          <div class="code-header"><span>SQL — ALTER TABLE (complete evolution timeline)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Month 1: Add loyalty programme columns</span>
 <span class="kw">ALTER TABLE</span> <span class="tbl">customers</span>
-  <span class="kw">ADD COLUMN</span> loyalty_points <span class="fn">INT</span> <span class="kw">DEFAULT</span> <span class="num">0</span> <span class="kw">NOT NULL</span>;
+  <span class="kw">ADD COLUMN</span> loyalty_points <span class="fn">INT</span>          <span class="kw">NOT NULL DEFAULT</span> <span class="num">0</span>,
+  <span class="kw">ADD COLUMN</span> tier           <span class="fn">VARCHAR</span>(<span class="num">20</span>) <span class="kw">NOT NULL DEFAULT</span> <span class="str">'Bronze'</span>;
+<span class="cmt">-- All existing rows instantly get loyalty_points=0, tier='Bronze'</span>
 
-<span class="cmt">-- Add multiple columns at once (MySQL)</span>
+<span class="cmt">-- Month 2: Enforce tier values with a CHECK constraint</span>
 <span class="kw">ALTER TABLE</span> <span class="tbl">customers</span>
-  <span class="kw">ADD COLUMN</span> tier      <span class="fn">VARCHAR</span>(<span class="num">20</span>) <span class="kw">DEFAULT</span> <span class="str">'Bronze'</span>,
-  <span class="kw">ADD COLUMN</span> last_seen <span class="fn">TIMESTAMP</span>;
+  <span class="kw">ADD CONSTRAINT</span> chk_tier
+    <span class="kw">CHECK</span> (tier <span class="kw">IN</span> (<span class="str">'Bronze'</span>, <span class="str">'Silver'</span>, <span class="str">'Gold'</span>, <span class="str">'Platinum'</span>));
 
-<span class="cmt">-- Rename a column (MySQL 8+ / PostgreSQL)</span>
+<span class="cmt">-- Month 3: "phone" is always a mobile now — rename it for clarity</span>
 <span class="kw">ALTER TABLE</span> <span class="tbl">customers</span>
   <span class="kw">RENAME COLUMN</span> phone <span class="kw">TO</span> mobile;
 
-<span class="cmt">-- Change a column's data type (MySQL)</span>
-<span class="kw">ALTER TABLE</span> <span class="tbl">products</span>
-  <span class="kw">MODIFY COLUMN</span> price <span class="fn">DECIMAL</span>(<span class="num">12</span>,<span class="num">2</span>) <span class="kw">NOT NULL</span>;
-
-<span class="cmt">-- Change a column's data type (PostgreSQL)</span>
-<span class="kw">ALTER TABLE</span> <span class="tbl">products</span>
-  <span class="kw">ALTER COLUMN</span> price <span class="kw">TYPE</span> <span class="fn">NUMERIC</span>(<span class="num">12</span>,<span class="num">2</span>);
-
-<span class="cmt">-- Add a CHECK constraint after creation</span>
-<span class="kw">ALTER TABLE</span> <span class="tbl">products</span>
-  <span class="kw">ADD CONSTRAINT</span> chk_stock <span class="kw">CHECK</span> (stock <span class="op">&gt;=</span> <span class="num">0</span>);
-
-<span class="cmt">-- Drop a constraint</span>
-<span class="kw">ALTER TABLE</span> <span class="tbl">products</span>
-  <span class="kw">DROP CONSTRAINT</span> chk_stock;
-
-<span class="cmt">-- Drop a column (data in that column is permanently lost)</span>
+<span class="cmt">-- Month 4: mobile numbers are longer internationally — widen the type</span>
 <span class="kw">ALTER TABLE</span> <span class="tbl">customers</span>
-  <span class="kw">DROP COLUMN</span> last_seen;
+  <span class="kw">MODIFY COLUMN</span> mobile <span class="fn">VARCHAR</span>(<span class="num">20</span>);  <span class="cmt">-- MySQL</span>
+<span class="cmt">-- ALTER TABLE customers ALTER COLUMN mobile TYPE VARCHAR(20);  -- PostgreSQL</span>
 
-<span class="cmt">-- Rename the table itself</span>
+<span class="cmt">-- Month 5: Add an audit timestamp — when was the record last changed?</span>
+<span class="kw">ALTER TABLE</span> <span class="tbl">customers</span>
+  <span class="kw">ADD COLUMN</span> updated_at <span class="fn">TIMESTAMP</span> <span class="kw">DEFAULT</span> <span class="fn">CURRENT_TIMESTAMP</span>
+             <span class="kw">ON UPDATE</span> <span class="fn">CURRENT_TIMESTAMP</span>;  <span class="cmt">-- MySQL auto-updates on any UPDATE</span>
+
+<span class="cmt">-- Month 6: Referral system — a customer can refer another customer
+-- Self-referential FK: referred_by points to another customer_id</span>
+<span class="kw">ALTER TABLE</span> <span class="tbl">customers</span>
+  <span class="kw">ADD COLUMN</span> referred_by <span class="fn">INT</span>,
+  <span class="kw">ADD CONSTRAINT</span> fk_referral
+    <span class="kw">FOREIGN KEY</span> (referred_by) <span class="kw">REFERENCES</span> <span class="tbl">customers</span>(customer_id)
+    <span class="kw">ON DELETE SET NULL</span>;  <span class="cmt">-- if the referrer is deleted, just set to NULL</span>
+
+<span class="cmt">-- Remove the loyalty constraint (business decided tier is free-form text)</span>
+<span class="kw">ALTER TABLE</span> <span class="tbl">customers</span>
+  <span class="kw">DROP CONSTRAINT</span> chk_tier;  <span class="cmt">-- PostgreSQL</span>
+<span class="cmt">-- ALTER TABLE customers DROP CHECK chk_tier;  -- MySQL</span>
+
+<span class="cmt">-- Rename the table (company re-brand)</span>
 <span class="kw">ALTER TABLE</span> <span class="tbl">customers</span>
   <span class="kw">RENAME TO</span> <span class="tbl">members</span>;
 
-<span class="cmt">-- Set / remove a DEFAULT on an existing column (PostgreSQL)</span>
+<span class="cmt">-- Set a new default on an existing column (PostgreSQL)</span>
 <span class="kw">ALTER TABLE</span> <span class="tbl">members</span>
   <span class="kw">ALTER COLUMN</span> tier <span class="kw">SET DEFAULT</span> <span class="str">'Silver'</span>;
+
+<span class="cmt">-- Drop a column that's no longer used</span>
 <span class="kw">ALTER TABLE</span> <span class="tbl">members</span>
-  <span class="kw">ALTER COLUMN</span> tier <span class="kw">DROP DEFAULT</span>;</pre>
+  <span class="kw">DROP COLUMN IF EXISTS</span> loyalty_points;</pre>
         </div>
       </div>
     </div>
 
-    <div class="callout warn"><span class="callout-icon">⚠️</span><p><strong>Changing data types on large tables</strong> is expensive — the DB may need to rewrite every row. On production systems, use a "expand-contract" migration: add the new column, backfill it, migrate app code, then drop the old column.</p></div>
+    <div class="callout tip"><span class="callout-icon">🚀</span><p><strong>Zero-downtime ALTER strategy (expand-contract):</strong> On large production tables, instead of <code>ALTER TABLE MODIFY COLUMN</code> (which can lock the table): (1) ADD the new column alongside the old one, (2) backfill it in batches, (3) deploy app code to write to both, (4) verify consistency, (5) switch app to read the new column, (6) DROP the old column. This is how big companies run schema migrations without downtime.</p></div>
 
-    <h3>2.5 Platform Differences for ALTER</h3>
+    <h3>2.5 ALTER — Platform Differences</h3>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Operation</th><th>MySQL</th><th>PostgreSQL</th><th>SQLite</th></tr></thead>
+        <thead><tr><th>Operation</th><th>MySQL 8+</th><th>PostgreSQL 14+</th><th>SQLite 3.35+</th></tr></thead>
         <tbody>
-          <tr><td>Change data type</td><td><code>MODIFY COLUMN</code></td><td><code>ALTER COLUMN … TYPE</code></td><td class="td-red">Not supported*</td></tr>
-          <tr><td>Rename column</td><td><code>RENAME COLUMN</code> (8+)</td><td><code>RENAME COLUMN</code></td><td><code>RENAME COLUMN</code> (3.25+)</td></tr>
-          <tr><td>Drop column</td><td><code>DROP COLUMN</code></td><td><code>DROP COLUMN</code></td><td><code>DROP COLUMN</code> (3.35+)</td></tr>
-          <tr><td>Multiple changes</td><td>Comma-separate in one ALTER</td><td>Comma-separate in one ALTER</td><td>One change per ALTER</td></tr>
+          <tr><td>Change type</td><td><code>MODIFY COLUMN col NEW_TYPE</code></td><td><code>ALTER COLUMN col TYPE new_type</code></td><td class="td-red">Not supported — recreate table</td></tr>
+          <tr><td>Rename column</td><td><code>RENAME COLUMN old TO new</code></td><td><code>RENAME COLUMN old TO new</code></td><td><code>RENAME COLUMN old TO new</code></td></tr>
+          <tr><td>Drop column</td><td><code>DROP COLUMN col</code></td><td><code>DROP COLUMN col</code></td><td><code>DROP COLUMN col</code></td></tr>
+          <tr><td>Multiple changes</td><td>Comma-separate in one ALTER</td><td>Comma-separate in one ALTER</td><td>One operation per ALTER only</td></tr>
+          <tr><td>Add NOT NULL to existing col</td><td>MODIFY COLUMN + NOT NULL</td><td>ALTER COLUMN SET NOT NULL (with existing NULLs: fails)</td><td>Not supported directly</td></tr>
+          <tr><td>Online (no lock)</td><td>Most ops in 8+ (ALGORITHM=INSTANT)</td><td>Most ops in 12+ (non-blocking)</td><td>Always rewrites the whole file</td></tr>
         </tbody>
       </table>
     </div>
-    <p style="font-size:.8rem;color:var(--text2)">* SQLite workaround: CREATE new table with new type → INSERT INTO new SELECT FROM old → DROP old → RENAME new.</p>
 
-    <!-- ── DROP ── -->
-    <h3>2.6 DROP</h3>
-    <p><code>DROP</code> permanently deletes a database object — its structure <em>and</em> all data inside it. There is no undo. Always double-check before running in production.</p>
+    <h3>2.6 DROP — Deleting Objects Permanently</h3>
+    <p>DROP permanently removes a database object — its structure and all data stored in it. Unlike DELETE (which removes rows), DROP removes the table itself. There is no UNDO, no recycle bin, no rollback in most databases. Run it only when you are absolutely certain.</p>
 
     <div class="formula">
-<span class="f-kw">DROP TABLE</span>    <span class="f-opt">[IF EXISTS]</span> <span class="f-name">table_name</span>    <span class="f-opt">[CASCADE | RESTRICT]</span><span class="f-sep">;</span>
-<span class="f-kw">DROP DATABASE</span> <span class="f-opt">[IF EXISTS]</span> <span class="f-name">db_name</span><span class="f-sep">;</span>
-<span class="f-kw">DROP INDEX</span>    <span class="f-opt">[IF EXISTS]</span> <span class="f-name">idx_name</span>    <span class="f-opt">[ON table_name]</span><span class="f-sep">;</span>
-<span class="f-kw">DROP VIEW</span>     <span class="f-opt">[IF EXISTS]</span> <span class="f-name">view_name</span><span class="f-sep">;</span>
+<span class="f-kw">DROP TABLE</span>      <span class="f-opt">[IF EXISTS]</span> <span class="f-name">table_name</span>   <span class="f-opt">[CASCADE | RESTRICT]</span><span class="f-sep">;</span>
+<span class="f-kw">DROP DATABASE</span>   <span class="f-opt">[IF EXISTS]</span> <span class="f-name">db_name</span><span class="f-sep">;</span>
+<span class="f-kw">DROP INDEX</span>      <span class="f-opt">[IF EXISTS]</span> <span class="f-name">idx_name</span>     <span class="f-opt">[ON table]</span><span class="f-sep">;</span>   <span class="f-cmt">← ON table: MySQL only</span>
+<span class="f-kw">DROP VIEW</span>       <span class="f-opt">[IF EXISTS]</span> <span class="f-name">view_name</span><span class="f-sep">;</span>
+<span class="f-kw">DROP PROCEDURE</span>  <span class="f-opt">[IF EXISTS]</span> <span class="f-name">proc_name</span><span class="f-sep">;</span>
     </div>
 
+    <div class="callout warn"><span class="callout-icon">🔴</span><p><strong>CASCADE vs RESTRICT:</strong> <code>CASCADE</code> drops the table AND all objects that depend on it (FK constraints from other tables, views, etc.). <code>RESTRICT</code> (the default) refuses to drop if any dependents exist — forcing you to manually clean them up first. In production, always use RESTRICT; use CASCADE only in dev/test teardowns where you know what you're doing.</p></div>
+
     <div class="usecase">
-      <div class="usecase-header">🗑️ <h4>Use Case: Clean up old archive tables and unused indexes</h4></div>
+      <div class="usecase-header">🗑️ <h4>Use Case: Safely tear down test data and drop temporary objects</h4></div>
       <div class="usecase-body">
         <div class="code-wrap">
-          <div class="code-header"><span>SQL — DROP (all variants)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-          <pre><span class="cmt">-- IF EXISTS prevents an error if the object doesn't exist</span>
-<span class="kw">DROP TABLE IF EXISTS</span> <span class="tbl">orders_archive</span>;
+          <div class="code-header"><span>SQL — DROP (safe patterns)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- IF EXISTS prevents error if the object was never created (idempotent scripts)</span>
+<span class="kw">DROP TABLE IF EXISTS</span> <span class="tbl">campaign_premium_products</span>;
 
-<span class="cmt">-- Drop multiple tables at once</span>
-<span class="kw">DROP TABLE IF EXISTS</span> <span class="tbl">temp_staging</span>, <span class="tbl">temp_results</span>;
+<span class="cmt">-- Drop multiple tables at once (MySQL / PostgreSQL)</span>
+<span class="kw">DROP TABLE IF EXISTS</span> <span class="tbl">staging_raw</span>, <span class="tbl">staging_clean</span>, <span class="tbl">staging_errors</span>;
 
-<span class="cmt">-- CASCADE: also drops dependent objects (views, FK constraints)</span>
-<span class="kw">DROP TABLE</span> <span class="tbl">customers</span> <span class="kw">CASCADE</span>;   <span class="cmt">-- PostgreSQL</span>
+<span class="cmt">-- Safe pattern: check if table exists BEFORE dropping (using information_schema)</span>
+<span class="kw">SELECT</span> table_name, table_rows
+<span class="kw">FROM</span>   information_schema.tables
+<span class="kw">WHERE</span>  table_schema <span class="op">=</span> <span class="str">'ecommerce'</span>
+  <span class="kw">AND</span>  table_name   <span class="op">=</span> <span class="str">'orders_archive'</span>;
+<span class="cmt">-- Only drop if you see it returned above</span>
 
-<span class="cmt">-- RESTRICT (default): refuses to drop if dependents exist</span>
-<span class="kw">DROP TABLE</span> <span class="tbl">customers</span> <span class="kw">RESTRICT</span>;
+<span class="cmt">-- CASCADE: drop customers even though orders FK references it (PostgreSQL)
+-- This also drops the FK constraint on orders automatically</span>
+<span class="kw">DROP TABLE IF EXISTS</span> <span class="tbl">customers</span> <span class="kw">CASCADE</span>;
 
-<span class="cmt">-- Drop an index</span>
-<span class="kw">DROP INDEX IF EXISTS</span> idx_orders_customer;         <span class="cmt">-- PostgreSQL / SQLite</span>
-<span class="kw">DROP INDEX</span> idx_orders_customer <span class="kw">ON</span> <span class="tbl">orders</span>;        <span class="cmt">-- MySQL</span>
+<span class="cmt">-- Drop an index when it's no longer needed (no reads on that column pattern)</span>
+<span class="kw">DROP INDEX IF EXISTS</span> idx_products_cat;             <span class="cmt">-- PostgreSQL / SQLite</span>
+<span class="kw">DROP INDEX</span> idx_products_cat <span class="kw">ON</span> <span class="tbl">products</span>;          <span class="cmt">-- MySQL</span>
 
-<span class="cmt">-- Drop a view</span>
-<span class="kw">DROP VIEW IF EXISTS</span> v_order_summary;
+<span class="cmt">-- Drop a view (underlying data is unaffected — only the virtual layer is removed)</span>
+<span class="kw">DROP VIEW IF EXISTS</span> v_order_detail;
 
-<span class="cmt">-- Drop the whole database (EXTREMELY destructive — everything gone)</span>
-<span class="kw">DROP DATABASE IF EXISTS</span> ecommerce_dev;
+<span class="cmt">-- List all tables in a schema before dropping (sanity check)</span>
+<span class="kw">SELECT</span> table_name <span class="kw">FROM</span> information_schema.tables
+<span class="kw">WHERE</span>  table_schema <span class="op">=</span> <span class="str">'public'</span>          <span class="cmt">-- PostgreSQL: schema name</span>
+  <span class="kw">AND</span>  table_type   <span class="op">=</span> <span class="str">'BASE TABLE'</span>
+<span class="kw">ORDER BY</span> table_name;
 
-<span class="cmt">-- Safe pattern: check before dropping (MySQL / PostgreSQL)</span>
-<span class="kw">SELECT</span> table_name
-<span class="kw">FROM</span>  information_schema.tables
-<span class="kw">WHERE</span> table_name <span class="op">=</span> <span class="str">'orders_archive'</span>
-  <span class="kw">AND</span>  table_schema <span class="op">=</span> <span class="str">'public'</span>;
-<span class="cmt">-- Only run DROP if the row comes back</span></pre>
+<span class="cmt">-- Nuclear option: drop the entire database (EVERYTHING gone)</span>
+<span class="cmt">-- DROP DATABASE IF EXISTS ecommerce_test;  -- commented out intentionally!</span></pre>
         </div>
       </div>
     </div>
 
-    <div class="callout warn"><span class="callout-icon">🔴</span><p><strong>Production safety checklist before DROP:</strong> (1) Is this table referenced by any FK? (2) Does any application code depend on it? (3) Is there a backup? (4) Are you connected to the right database? A common disaster is running DROP on prod when you meant to run it on dev.</p></div>
+    <h3>2.7 TRUNCATE — Fast Row Wipeout</h3>
+    <p>TRUNCATE removes all rows from a table in one fast operation, but keeps the table structure, columns, indexes, and constraints intact. Instead of deleting rows one by one (like DELETE does), TRUNCATE deallocates the data pages directly — making it orders of magnitude faster on large tables. A table with 100 million rows: DELETE takes minutes; TRUNCATE takes milliseconds.</p>
 
-    <!-- ── TRUNCATE ── -->
-    <h3>2.7 TRUNCATE</h3>
-    <p><code>TRUNCATE</code> removes <em>all rows</em> from a table instantly — but keeps the table structure, columns, and constraints intact. It's much faster than <code>DELETE FROM table</code> with no <code>WHERE</code> because it doesn't log individual row deletions.</p>
+    <p>The trade-off: TRUNCATE cannot be filtered (no WHERE clause), and in most databases it cannot be rolled back because it's DDL (auto-committed). It also does not fire row-level DELETE triggers.</p>
 
     <div class="formula">
 <span class="f-kw">TRUNCATE TABLE</span> <span class="f-name">table_name</span><span class="f-sep">;</span>
 
-<span class="f-cmt">-- PostgreSQL: truncate multiple tables, reset auto-increment sequences</span>
-<span class="f-kw">TRUNCATE TABLE</span> <span class="f-name">table1</span><span class="f-sep">,</span> <span class="f-name">table2</span> <span class="f-kw">RESTART IDENTITY CASCADE</span><span class="f-sep">;</span>
+<span class="f-cmt">-- PostgreSQL: truncate multiple tables + reset auto-increment ID counter</span>
+<span class="f-kw">TRUNCATE TABLE</span> <span class="f-name">table1</span><span class="f-sep">,</span> <span class="f-name">table2</span>
+  <span class="f-kw">RESTART IDENTITY</span>    <span class="f-cmt">← reset sequence/serial back to 1</span>
+  <span class="f-kw">CASCADE</span><span class="f-sep">;</span>           <span class="f-cmt">← also truncate FK child tables</span>
+
+<span class="f-cmt">-- MySQL: disable FK checks to truncate parent before child</span>
+<span class="f-kw">SET</span> FOREIGN_KEY_CHECKS <span class="f-sep">=</span> <span class="f-num">0</span><span class="f-sep">;</span>
+<span class="f-kw">TRUNCATE TABLE</span> <span class="f-name">parent_table</span><span class="f-sep">;</span>
+<span class="f-kw">SET</span> FOREIGN_KEY_CHECKS <span class="f-sep">=</span> <span class="f-num">1</span><span class="f-sep">;</span>
     </div>
 
     <div class="usecase">
-      <div class="usecase-header">⚡ <h4>Use Case: Reset staging tables before a fresh data load</h4></div>
+      <div class="usecase-header">⚡ <h4>Use Case: ETL pipeline — wipe staging tables before each load</h4></div>
       <div class="usecase-body">
+        <p>In data engineering, staging tables hold raw data for the current ETL batch. Before each run you must wipe them clean. TRUNCATE is the right tool: it's fast, keeps the structure (so you don't have to recreate it), and resets the ID counter so IDs are predictable.</p>
         <div class="code-wrap">
-          <div class="code-header"><span>SQL — TRUNCATE</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-          <pre><span class="cmt">-- Wipe the staging table for a fresh ETL load</span>
+          <div class="code-header"><span>SQL — TRUNCATE (all variants)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Basic: wipe the staging table for a fresh load</span>
 <span class="kw">TRUNCATE TABLE</span> <span class="tbl">staging_orders</span>;
 
-<span class="cmt">-- PostgreSQL: also reset the auto-increment ID back to 1</span>
+<span class="cmt">-- PostgreSQL: wipe + reset the SERIAL/BIGSERIAL ID back to 1
+-- Without RESTART IDENTITY, IDs continue from where they left off</span>
 <span class="kw">TRUNCATE TABLE</span> <span class="tbl">staging_orders</span> <span class="kw">RESTART IDENTITY</span>;
 
-<span class="cmt">-- PostgreSQL: truncate parent + all FK children in one go</span>
-<span class="kw">TRUNCATE TABLE</span> <span class="tbl">customers</span> <span class="kw">CASCADE</span>;
+<span class="cmt">-- PostgreSQL: truncate a parent and all its FK children in one statement</span>
+<span class="kw">TRUNCATE TABLE</span> <span class="tbl">customers</span>
+  <span class="kw">RESTART IDENTITY CASCADE</span>;
+<span class="cmt">-- This also truncates orders (which has FK to customers) automatically</span>
 
-<span class="cmt">-- MySQL: must disable FK checks first if child rows exist</span>
+<span class="cmt">-- MySQL: orders must be truncated before customers (FK child before parent)
+-- OR disable FK checks temporarily</span>
 <span class="kw">SET</span> FOREIGN_KEY_CHECKS <span class="op">=</span> <span class="num">0</span>;
 <span class="kw">TRUNCATE TABLE</span> <span class="tbl">orders</span>;
 <span class="kw">TRUNCATE TABLE</span> <span class="tbl">customers</span>;
-<span class="kw">SET</span> FOREIGN_KEY_CHECKS <span class="op">=</span> <span class="num">1</span>;</pre>
+<span class="kw">TRUNCATE TABLE</span> <span class="tbl">products</span>;
+<span class="kw">SET</span> FOREIGN_KEY_CHECKS <span class="op">=</span> <span class="num">1</span>;
+
+<span class="cmt">-- Practical ETL script pattern (PostgreSQL)</span>
+<span class="kw">BEGIN</span>;                             <span class="cmt">-- PostgreSQL allows TRUNCATE in a transaction</span>
+<span class="kw">TRUNCATE TABLE</span> <span class="tbl">staging_orders</span> <span class="kw">RESTART IDENTITY</span>;
+<span class="cmt">-- ... load new data via COPY or INSERT ...</span>
+<span class="kw">COMMIT</span>;                            <span class="cmt">-- commit both the truncate and the new data</span>
+<span class="cmt">-- if loading fails, ROLLBACK restores everything</span></pre>
         </div>
       </div>
     </div>
 
-    <!-- COMPARISON TABLE -->
-    <h3>2.8 DROP vs TRUNCATE vs DELETE — At a Glance</h3>
+    <h3>2.8 DROP vs TRUNCATE vs DELETE — The Definitive Comparison</h3>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Aspect</th><th>DELETE (no WHERE)</th><th>TRUNCATE</th><th>DROP</th></tr></thead>
         <tbody>
-          <tr><td>Removes rows</td><td class="td-green">Yes</td><td class="td-green">Yes</td><td class="td-green">Yes</td></tr>
+          <tr><td>Removes data rows</td><td class="td-green">Yes</td><td class="td-green">Yes</td><td class="td-green">Yes</td></tr>
           <tr><td>Removes table structure</td><td class="td-red">No</td><td class="td-red">No</td><td class="td-green">Yes</td></tr>
-          <tr><td>Can use WHERE</td><td class="td-green">Yes</td><td class="td-red">No</td><td class="td-red">No</td></tr>
-          <tr><td>Rolls back (transaction)</td><td class="td-green">Yes</td><td class="td-red">No (auto-commit)*</td><td class="td-red">No (auto-commit)</td></tr>
-          <tr><td>Resets auto-increment</td><td class="td-red">No</td><td class="td-green">Yes (with RESTART)</td><td class="td-green">Yes (if recreated)</td></tr>
-          <tr><td>Fires triggers</td><td class="td-green">Yes</td><td class="td-red">No</td><td class="td-red">No</td></tr>
-          <tr><td>Speed on large table</td><td class="td-red">Slow (row-by-row log)</td><td class="td-green">Very fast (page dealloc)</td><td class="td-green">Instant</td></tr>
-          <tr><td>DML or DDL?</td><td><span class="badge badge-green">DML</span></td><td><span class="badge badge-blue">DDL</span></td><td><span class="badge badge-blue">DDL</span></td></tr>
+          <tr><td>WHERE clause supported</td><td class="td-green">Yes — partial delete</td><td class="td-red">No — all or nothing</td><td class="td-red">No</td></tr>
+          <tr><td>Rollback (ROLLBACK)</td><td class="td-green">Yes — it's DML</td><td class="td-red">No (MySQL) / Yes (PostgreSQL)</td><td class="td-red">No — auto-commit</td></tr>
+          <tr><td>Fires DELETE triggers</td><td class="td-green">Yes</td><td class="td-red">No</td><td class="td-red">No</td></tr>
+          <tr><td>Resets auto-increment</td><td class="td-red">No</td><td class="td-green">Yes (with RESTART IDENTITY)</td><td class="td-green">Yes (when recreated)</td></tr>
+          <tr><td>Speed on 100M rows</td><td class="td-red">Minutes (row-by-row log)</td><td class="td-green">Milliseconds (page dealloc)</td><td class="td-green">Instant</td></tr>
+          <tr><td>Storage released immediately</td><td class="td-red">No (vacuumed later)</td><td class="td-green">Yes</td><td class="td-green">Yes</td></tr>
+          <tr><td>Sub-language</td><td><span class="badge badge-green">DML</span></td><td><span class="badge badge-blue">DDL</span></td><td><span class="badge badge-blue">DDL</span></td></tr>
+          <tr><td>Best for</td><td>Selective row removal</td><td>Full wipe, keep structure (ETL staging)</td><td>Full removal (table no longer needed)</td></tr>
         </tbody>
       </table>
     </div>
-    <p style="font-size:.8rem;color:var(--text2)">* PostgreSQL allows TRUNCATE inside a transaction block (it can be rolled back). MySQL does not.</p>
 
-    <div class="callout success"><span class="callout-icon">🎯</span><p><strong>Decision guide:</strong> Need to remove specific rows? → <code>DELETE … WHERE</code>. Need to empty a table fast and keep structure? → <code>TRUNCATE</code>. Need to remove the table completely? → <code>DROP</code>. Need to change the structure? → <code>ALTER TABLE</code>.</p></div>
+    <div class="callout success"><span class="callout-icon">🎯</span><p><strong>Decision guide:</strong> Remove specific rows? → <code>DELETE … WHERE</code>. Empty the table to reload data? → <code>TRUNCATE</code>. Remove the table completely? → <code>DROP</code>. Change the structure? → <code>ALTER TABLE</code>. Create new structure? → <code>CREATE TABLE</code>.</p></div>
 
   </section>
+
+
+  <hr class="section-divider"/>
 
   <hr class="section-divider"/>
 
@@ -916,94 +1178,236 @@ print(<span class="str">"✅ Database ready! Run sql('SELECT ...') to query."</s
 
   <hr class="section-divider"/>
 
-  <!-- ══ SECTION 4: SYNTAX & CLAUSES ══ -->
+  <hr class="section-divider"/>
+
   <section class="section" id="s4">
     <div class="section-header">
       <div class="section-num">4</div>
-      <h2>Syntax & Clauses</h2>
+      <h2>Syntax &amp; Clauses — Deep Reference</h2>
       <span class="tag">CORE</span>
     </div>
 
-    <h3>4.1 SELECT Execution Order</h3>
-    <p>SQL clauses are <em>written</em> in one order but <em>executed</em> in a different order. This is crucial for understanding what you can reference where.</p>
+    <p>The SELECT statement is the most complex statement in SQL. It has up to eight distinct clauses, each serving a specific role in filtering, grouping, or ordering the result. Understanding the interaction between clauses — especially their execution order — is the key to writing correct, performant queries.</p>
+
+    <h3>4.1 SELECT Execution Order vs. Writing Order</h3>
+    <p>This is one of the most important SQL concepts and one of the most commonly misunderstood. The order you <em>write</em> clauses is fixed by SQL syntax. But the order the database <em>executes</em> them is completely different. Failing to understand this leads to confusing errors like "column alias not found in WHERE".</p>
 
     <div class="card">
-      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
-        <div style="text-align:center;padding:10px 16px;background:var(--bg2);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.78rem;border:1px solid var(--border)"><span style="color:var(--text2);font-size:.6rem;display:block">① EXECUTION</span><span class="kw" style="color:var(--accent)">FROM</span></div>
-        <div style="color:var(--text2)">→</div>
-        <div style="text-align:center;padding:10px 16px;background:var(--bg2);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.78rem;border:1px solid var(--border)"><span style="color:var(--text2);font-size:.6rem;display:block">②</span><span class="kw" style="color:var(--accent)">JOIN</span></div>
-        <div style="color:var(--text2)">→</div>
-        <div style="text-align:center;padding:10px 16px;background:var(--bg2);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.78rem;border:1px solid var(--border)"><span style="color:var(--text2);font-size:.6rem;display:block">③</span><span class="kw" style="color:var(--accent)">WHERE</span></div>
-        <div style="color:var(--text2)">→</div>
-        <div style="text-align:center;padding:10px 16px;background:var(--bg2);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.78rem;border:1px solid var(--border)"><span style="color:var(--text2);font-size:.6rem;display:block">④</span><span class="kw" style="color:var(--accent)">GROUP BY</span></div>
-        <div style="color:var(--text2)">→</div>
-        <div style="text-align:center;padding:10px 16px;background:var(--bg2);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.78rem;border:1px solid var(--border)"><span style="color:var(--text2);font-size:.6rem;display:block">⑤</span><span class="kw" style="color:var(--accent)">HAVING</span></div>
-        <div style="color:var(--text2)">→</div>
-        <div style="text-align:center;padding:10px 16px;background:var(--bg2);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.78rem;border:1px solid var(--border)"><span style="color:var(--text2);font-size:.6rem;display:block">⑥</span><span class="kw" style="color:var(--accent)">SELECT</span></div>
-        <div style="color:var(--text2)">→</div>
-        <div style="text-align:center;padding:10px 16px;background:var(--bg2);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.78rem;border:1px solid var(--border)"><span style="color:var(--text2);font-size:.6rem;display:block">⑦</span><span class="kw" style="color:var(--accent)">ORDER BY</span></div>
-        <div style="color:var(--text2)">→</div>
-        <div style="text-align:center;padding:10px 16px;background:var(--bg2);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.78rem;border:1px solid var(--border)"><span style="color:var(--text2);font-size:.6rem;display:block">⑧</span><span class="kw" style="color:var(--accent)">LIMIT</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
+        <div>
+          <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:12px">Writing Order (How you type it)</p>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:2.4">
+            <div><span style="color:var(--accent);font-weight:700">SELECT</span> <span style="color:var(--text2)">col, AGG()</span></div>
+            <div><span style="color:var(--accent);font-weight:700">FROM</span> <span style="color:var(--text2)">table</span></div>
+            <div><span style="color:var(--accent);font-weight:700">JOIN</span> <span style="color:var(--text2)">other ON …</span></div>
+            <div><span style="color:var(--accent);font-weight:700">WHERE</span> <span style="color:var(--text2)">row_filter</span></div>
+            <div><span style="color:var(--accent);font-weight:700">GROUP BY</span> <span style="color:var(--text2)">col</span></div>
+            <div><span style="color:var(--accent);font-weight:700">HAVING</span> <span style="color:var(--text2)">group_filter</span></div>
+            <div><span style="color:var(--accent);font-weight:700">ORDER BY</span> <span style="color:var(--text2)">col</span></div>
+            <div><span style="color:var(--accent);font-weight:700">LIMIT</span> <span style="color:var(--text2)">n OFFSET m</span></div>
+          </div>
+        </div>
+        <div>
+          <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--green);margin-bottom:12px">Execution Order (How the engine runs it)</p>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:2.4">
+            <div><span style="background:rgba(16,185,129,.15);padding:1px 8px;border-radius:4px;color:var(--green);font-weight:700">① FROM</span> <span style="color:var(--text2);font-size:.75rem"> — identify source table(s)</span></div>
+            <div><span style="background:rgba(16,185,129,.15);padding:1px 8px;border-radius:4px;color:var(--green);font-weight:700">② JOIN</span> <span style="color:var(--text2);font-size:.75rem"> — combine tables</span></div>
+            <div><span style="background:rgba(16,185,129,.15);padding:1px 8px;border-radius:4px;color:var(--green);font-weight:700">③ WHERE</span> <span style="color:var(--text2);font-size:.75rem"> — filter rows</span></div>
+            <div><span style="background:rgba(16,185,129,.15);padding:1px 8px;border-radius:4px;color:var(--green);font-weight:700">④ GROUP BY</span> <span style="color:var(--text2);font-size:.75rem"> — group filtered rows</span></div>
+            <div><span style="background:rgba(16,185,129,.15);padding:1px 8px;border-radius:4px;color:var(--green);font-weight:700">⑤ HAVING</span> <span style="color:var(--text2);font-size:.75rem"> — filter groups</span></div>
+            <div><span style="background:rgba(16,185,129,.15);padding:1px 8px;border-radius:4px;color:var(--green);font-weight:700">⑥ SELECT</span> <span style="color:var(--text2);font-size:.75rem"> — compute output columns</span></div>
+            <div><span style="background:rgba(16,185,129,.15);padding:1px 8px;border-radius:4px;color:var(--green);font-weight:700">⑦ ORDER BY</span> <span style="color:var(--text2);font-size:.75rem"> — sort results</span></div>
+            <div><span style="background:rgba(16,185,129,.15);padding:1px 8px;border-radius:4px;color:var(--green);font-weight:700">⑧ LIMIT/OFFSET</span> <span style="color:var(--text2);font-size:.75rem"> — paginate</span></div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="callout info"><span class="callout-icon">🔑</span><p>Because <code>WHERE</code> runs <em>before</em> <code>SELECT</code>, you <strong>cannot</strong> use a column alias from SELECT in a WHERE clause. Use HAVING for filtering on aggregates (which runs after GROUP BY).</p></div>
+    <div class="callout warn"><span class="callout-icon">❗</span><p><strong>Alias visibility rules from the execution order:</strong><br/>
+    ❌ <code>WHERE total &gt; 100</code> — fails if <code>total</code> is a SELECT alias. WHERE runs before SELECT.<br/>
+    ✅ <code>HAVING total &gt; 100</code> — works in PostgreSQL (HAVING can see SELECT aliases in some DBs).<br/>
+    ✅ <code>ORDER BY total</code> — works. ORDER BY runs after SELECT, so aliases are visible.<br/>
+    ✅ <code>WHERE price * quantity &gt; 100</code> — always works. Reference source columns, not aliases, in WHERE.</p></div>
 
-    <h3>4.2 WHERE Clause Operators</h3>
+    <h3>4.2 WHERE Clause — Every Operator Explained</h3>
+    <p>WHERE is the row filter — it runs on each row before grouping, joining output, or selecting columns. Rows where the condition is TRUE pass through; FALSE or UNKNOWN (NULL comparisons) are excluded.</p>
+
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Operator</th><th>Meaning</th><th>Example</th></tr></thead>
+        <thead><tr><th>Operator</th><th>Meaning</th><th>Example</th><th>Common Gotcha</th></tr></thead>
         <tbody>
-          <tr><td><code>=</code></td><td>Equal to</td><td><code>WHERE city = 'Mumbai'</code></td></tr>
-          <tr><td><code>&lt;&gt;</code> or <code>!=</code></td><td>Not equal</td><td><code>WHERE status != 'cancelled'</code></td></tr>
-          <tr><td><code>&lt;, &gt;, &lt;=, &gt;=</code></td><td>Comparison</td><td><code>WHERE price &lt;= 500</code></td></tr>
-          <tr><td><code>BETWEEN a AND b</code></td><td>Inclusive range</td><td><code>WHERE price BETWEEN 100 AND 500</code></td></tr>
-          <tr><td><code>IN (list)</code></td><td>Match any in list</td><td><code>WHERE city IN ('Delhi','Mumbai')</code></td></tr>
-          <tr><td><code>NOT IN (list)</code></td><td>Exclude list values</td><td><code>WHERE status NOT IN ('pending','cancelled')</code></td></tr>
-          <tr><td><code>LIKE 'pattern'</code></td><td>Pattern match (<code>%</code>=any, <code>_</code>=one char)</td><td><code>WHERE name LIKE 'Dell%'</code></td></tr>
-          <tr><td><code>IS NULL</code></td><td>Value is missing</td><td><code>WHERE phone IS NULL</code></td></tr>
-          <tr><td><code>IS NOT NULL</code></td><td>Value exists</td><td><code>WHERE email IS NOT NULL</code></td></tr>
-          <tr><td><code>AND, OR, NOT</code></td><td>Logical operators</td><td><code>WHERE price &lt; 500 AND stock &gt; 0</code></td></tr>
+          <tr><td><code>=</code></td><td>Exactly equal</td><td><code>WHERE city = 'Mumbai'</code></td><td>Does NOT work with NULL — use IS NULL</td></tr>
+          <tr><td><code>&lt;&gt;</code> or <code>!=</code></td><td>Not equal</td><td><code>WHERE status != 'cancelled'</code></td><td>Rows where status IS NULL are also excluded!</td></tr>
+          <tr><td><code>&lt;, &gt;, &lt;=, &gt;=</code></td><td>Numeric/date comparison</td><td><code>WHERE price &lt;= 500</code></td><td>Works on dates too: <code>WHERE joined &gt;= '2024-01-01'</code></td></tr>
+          <tr><td><code>BETWEEN a AND b</code></td><td>Inclusive range (a &lt;= x &lt;= b)</td><td><code>WHERE price BETWEEN 100 AND 500</code></td><td>Both endpoints included. Equivalent to <code>&gt;= a AND &lt;= b</code></td></tr>
+          <tr><td><code>IN (list)</code></td><td>Equals any value in list</td><td><code>WHERE city IN ('Delhi','Mumbai')</code></td><td>IN with a NULL in the list can produce unexpected UNKNOWN results</td></tr>
+          <tr><td><code>NOT IN (list)</code></td><td>Matches none in list</td><td><code>WHERE status NOT IN ('cancelled')</code></td><td>If subquery returns any NULL, NOT IN returns no rows — use NOT EXISTS instead</td></tr>
+          <tr><td><code>LIKE 'pattern'</code></td><td>Pattern match. % = any chars, _ = one char</td><td><code>WHERE name LIKE 'Dell%'</code></td><td>Case-sensitive in PostgreSQL, case-insensitive in MySQL by default</td></tr>
+          <tr><td><code>ILIKE</code></td><td>Case-insensitive LIKE (PostgreSQL only)</td><td><code>WHERE name ILIKE 'dell%'</code></td><td>Not available in MySQL — use LOWER(name) LIKE LOWER('Dell%')</td></tr>
+          <tr><td><code>IS NULL</code></td><td>Value is absent</td><td><code>WHERE phone IS NULL</code></td><td>Never use = NULL — always IS NULL</td></tr>
+          <tr><td><code>IS NOT NULL</code></td><td>Value is present</td><td><code>WHERE email IS NOT NULL</code></td><td>Necessary after LEFT JOIN to find non-matching rows</td></tr>
+          <tr><td><code>AND</code></td><td>Both conditions must be true</td><td><code>WHERE price &lt; 500 AND stock &gt; 0</code></td><td>AND has higher precedence than OR — use parentheses to be explicit</td></tr>
+          <tr><td><code>OR</code></td><td>Either condition true</td><td><code>WHERE city = 'Delhi' OR city = 'Mumbai'</code></td><td>Can usually be replaced by IN for clarity</td></tr>
+          <tr><td><code>NOT</code></td><td>Negation</td><td><code>WHERE NOT is_active</code></td><td>NOT NULL is not the same as IS NOT NULL</td></tr>
         </tbody>
       </table>
     </div>
 
-    <h3>4.3 Useful Built-in Functions</h3>
     <div class="code-wrap">
-      <div class="code-header"><span>SQL — Functions Reference</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><span class="cmt">-- STRING FUNCTIONS</span>
-<span class="kw">SELECT</span>
-  <span class="fn">UPPER</span>(full_name)                    <span class="kw">AS</span> <span class="alias">name_upper</span>,     <span class="cmt">-- 'PRIYA SHARMA'</span>
-  <span class="fn">LOWER</span>(email)                        <span class="kw">AS</span> <span class="alias">email_lower</span>,
-  <span class="fn">LENGTH</span>(full_name)                   <span class="kw">AS</span> <span class="alias">name_length</span>,
-  <span class="fn">SUBSTRING</span>(email, <span class="num">1</span>, <span class="fn">INSTR</span>(email,<span class="str">'@'</span>)<span class="op">-</span><span class="num">1</span>) <span class="kw">AS</span> <span class="alias">username</span>,
-  <span class="fn">CONCAT</span>(full_name, <span class="str">' — '</span>, city)     <span class="kw">AS</span> <span class="alias">display</span>
-<span class="kw">FROM</span> <span class="tbl">customers</span>;
+      <div class="code-header"><span>SQL — WHERE: Practical Examples</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="cmt">-- AND + OR with parentheses (always parenthesise OR to avoid bugs)</span>
+<span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> <span class="tbl">orders</span>
+<span class="kw">WHERE</span>  (status <span class="op">=</span> <span class="str">'pending'</span> <span class="kw">OR</span> status <span class="op">=</span> <span class="str">'shipped'</span>)
+  <span class="kw">AND</span>  order_date <span class="op">&gt;=</span> <span class="str">'2024-01-01'</span>;
 
-<span class="cmt">-- DATE FUNCTIONS</span>
-<span class="kw">SELECT</span>
-  order_date,
-  <span class="fn">DATE</span>(order_date)                    <span class="kw">AS</span> <span class="alias">date_only</span>,
-  <span class="fn">STRFTIME</span>(<span class="str">'%Y-%m'</span>, order_date)      <span class="kw">AS</span> <span class="alias">year_month</span>,  <span class="cmt">-- SQLite</span>
-  <span class="fn">JULIANDAY</span>(<span class="str">'now'</span>) <span class="op">-</span> <span class="fn">JULIANDAY</span>(order_date) <span class="kw">AS</span> <span class="alias">days_ago</span>
-<span class="kw">FROM</span> <span class="tbl">orders</span>;
+<span class="cmt">-- LIKE: find products with "Pro" anywhere in the name (case-insensitive)</span>
+<span class="kw">SELECT</span> name, price <span class="kw">FROM</span> <span class="tbl">products</span>
+<span class="kw">WHERE</span>  <span class="fn">LOWER</span>(name) <span class="kw">LIKE</span> <span class="str">'%pro%'</span>;  <span class="cmt">-- works on all platforms</span>
 
-<span class="cmt">-- CONDITIONAL: CASE WHEN (like IF-ELSE)</span>
+<span class="cmt">-- BETWEEN on dates</span>
+<span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> <span class="tbl">orders</span>
+<span class="kw">WHERE</span>  order_date <span class="kw">BETWEEN</span> <span class="str">'2024-03-01'</span> <span class="kw">AND</span> <span class="str">'2024-03-31'</span>;
+
+<span class="cmt">-- NOT IN — but be careful: if the subquery can return NULL, use NOT EXISTS instead</span>
+<span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> <span class="tbl">products</span>
+<span class="kw">WHERE</span>  product_id <span class="kw">NOT IN</span> (
+  <span class="kw">SELECT</span> product_id <span class="kw">FROM</span> <span class="tbl">orders</span>
+  <span class="kw">WHERE</span>  product_id <span class="kw">IS NOT NULL</span>  <span class="cmt">-- guard against NULLs</span>
+);
+
+<span class="cmt">-- NULL-safe check: customers with no city OR city is Bengaluru</span>
+<span class="kw">SELECT</span> full_name <span class="kw">FROM</span> <span class="tbl">customers</span>
+<span class="kw">WHERE</span>  city <span class="kw">IS NULL</span> <span class="kw">OR</span> city <span class="op">=</span> <span class="str">'Bengaluru'</span>;</pre>
+    </div>
+
+    <h3>4.3 CASE WHEN — Conditional Logic Inside SQL</h3>
+    <p>CASE WHEN is SQL's if-else. It can appear in SELECT (to compute derived columns), WHERE (to conditionally filter), ORDER BY (to sort with custom logic), and UPDATE SET (to update different rows differently). There are two forms:</p>
+
+    <div class="formula">
+<span class="f-cmt">-- Searched CASE (most flexible — each WHEN has its own condition)</span>
+<span class="f-kw">CASE</span>
+  <span class="f-kw">WHEN</span> <span class="f-name">condition1</span>  <span class="f-kw">THEN</span> <span class="f-lit">result1</span>
+  <span class="f-kw">WHEN</span> <span class="f-name">condition2</span>  <span class="f-kw">THEN</span> <span class="f-lit">result2</span>
+  <span class="f-kw">ELSE</span>             <span class="f-lit">default_result</span>   <span class="f-cmt">← if omitted, NULL is returned</span>
+<span class="f-kw">END</span>
+
+<span class="f-cmt">-- Simple CASE (compares one expression against a list of values)</span>
+<span class="f-kw">CASE</span> <span class="f-name">column</span>
+  <span class="f-kw">WHEN</span> <span class="f-lit">'val1'</span>  <span class="f-kw">THEN</span> <span class="f-lit">result1</span>
+  <span class="f-kw">WHEN</span> <span class="f-lit">'val2'</span>  <span class="f-kw">THEN</span> <span class="f-lit">result2</span>
+  <span class="f-kw">ELSE</span>          <span class="f-lit">default_result</span>
+<span class="f-kw">END</span>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header"><span>SQL — CASE WHEN in all positions</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="cmt">-- In SELECT: create price tier label</span>
 <span class="kw">SELECT</span> name, price,
   <span class="kw">CASE</span>
-    <span class="kw">WHEN</span> price <span class="op">&lt;</span> <span class="num">100</span>  <span class="kw">THEN</span> <span class="str">'Budget'</span>
-    <span class="kw">WHEN</span> price <span class="op">&lt;</span> <span class="num">500</span>  <span class="kw">THEN</span> <span class="str">'Mid-range'</span>
-    <span class="kw">WHEN</span> price <span class="op">&lt;</span> <span class="num">1000</span> <span class="kw">THEN</span> <span class="str">'Premium'</span>
-    <span class="kw">ELSE</span>                     <span class="str">'Luxury'</span>
+    <span class="kw">WHEN</span> price <span class="op">&lt;</span>  <span class="num">100</span>  <span class="kw">THEN</span> <span class="str">'Budget'</span>
+    <span class="kw">WHEN</span> price <span class="op">&lt;</span>  <span class="num">500</span>  <span class="kw">THEN</span> <span class="str">'Mid-range'</span>
+    <span class="kw">WHEN</span> price <span class="op">&lt;</span> <span class="num">1000</span>  <span class="kw">THEN</span> <span class="str">'Premium'</span>
+    <span class="kw">ELSE</span>                    <span class="str">'Luxury'</span>
   <span class="kw">END</span> <span class="kw">AS</span> <span class="alias">price_tier</span>
 <span class="kw">FROM</span> <span class="tbl">products</span>;
 
-<span class="cmt">-- NULL handling</span>
+<span class="cmt">-- In ORDER BY: custom sort logic (pending first, then shipped, then delivered)</span>
+<span class="kw">SELECT</span> order_id, status
+<span class="kw">FROM</span>   <span class="tbl">orders</span>
+<span class="kw">ORDER BY</span>
+  <span class="kw">CASE</span> status
+    <span class="kw">WHEN</span> <span class="str">'pending'</span>   <span class="kw">THEN</span> <span class="num">1</span>
+    <span class="kw">WHEN</span> <span class="str">'shipped'</span>   <span class="kw">THEN</span> <span class="num">2</span>
+    <span class="kw">WHEN</span> <span class="str">'delivered'</span> <span class="kw">THEN</span> <span class="num">3</span>
+    <span class="kw">ELSE</span>                  <span class="num">4</span>
+  <span class="kw">END</span>;
+
+<span class="cmt">-- In aggregate: conditional COUNT (pivot-like pattern)</span>
 <span class="kw">SELECT</span>
-  <span class="fn">COALESCE</span>(phone, <span class="str">'N/A'</span>)             <span class="kw">AS</span> <span class="alias">contact</span>,  <span class="cmt">-- return first non-null</span>
-  <span class="fn">NULLIF</span>(stock, <span class="num">0</span>)                   <span class="kw">AS</span> <span class="alias">available</span> <span class="cmt">-- return null if stock=0</span>
-<span class="kw">FROM</span> <span class="tbl">customers</span>;</pre>
+  <span class="col">category</span>,
+  <span class="fn">COUNT</span>(<span class="op">*</span>)                                             <span class="kw">AS</span> <span class="alias">total_products</span>,
+  <span class="fn">COUNT</span>(<span class="kw">CASE WHEN</span> price <span class="op">&lt;</span> <span class="num">500</span>  <span class="kw">THEN</span> <span class="num">1</span> <span class="kw">END</span>)            <span class="kw">AS</span> <span class="alias">affordable</span>,
+  <span class="fn">COUNT</span>(<span class="kw">CASE WHEN</span> price <span class="op">&gt;=</span> <span class="num">500</span> <span class="kw">THEN</span> <span class="num">1</span> <span class="kw">END</span>)            <span class="kw">AS</span> <span class="alias">premium</span>,
+  <span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> stock <span class="op">=</span> <span class="num">0</span>     <span class="kw">THEN</span> <span class="num">1</span> <span class="kw">ELSE</span> <span class="num">0</span> <span class="kw">END</span>)    <span class="kw">AS</span> <span class="alias">out_of_stock</span>
+<span class="kw">FROM</span> <span class="tbl">products</span>
+<span class="kw">GROUP BY</span> category;</pre>
     </div>
+
+    <h3>4.4 Built-in Functions — String, Date, Numeric, NULL Handling</h3>
+
+    <div class="code-wrap">
+      <div class="code-header"><span>SQL — String Functions</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="kw">SELECT</span>
+  full_name,
+  <span class="fn">UPPER</span>(full_name)                               <span class="kw">AS</span> <span class="alias">name_upper</span>,     <span class="cmt">-- 'PRIYA SHARMA'</span>
+  <span class="fn">LOWER</span>(email)                                   <span class="kw">AS</span> <span class="alias">email_lower</span>,
+  <span class="fn">LENGTH</span>(full_name)                              <span class="kw">AS</span> <span class="alias">name_len</span>,       <span class="cmt">-- character count</span>
+  <span class="fn">TRIM</span>(<span class="str">'  hello  '</span>)                             <span class="kw">AS</span> <span class="alias">trimmed</span>,        <span class="cmt">-- 'hello'</span>
+  <span class="fn">LTRIM</span>(<span class="str">'  hello'</span>)                              <span class="kw">AS</span> <span class="alias">left_trimmed</span>,
+  <span class="fn">SUBSTR</span>(full_name, <span class="num">1</span>, <span class="num">5</span>)                       <span class="kw">AS</span> <span class="alias">first5</span>,         <span class="cmt">-- 'Priya'</span>
+  <span class="fn">INSTR</span>(email, <span class="str">'@'</span>)                             <span class="kw">AS</span> <span class="alias">at_position</span>,    <span class="cmt">-- position of @</span>
+  <span class="fn">REPLACE</span>(email, <span class="str">'@email.com'</span>, <span class="str">'@newdomain.in'</span>) <span class="kw">AS</span> <span class="alias">new_email</span>,
+  full_name <span class="op">||</span> <span class="str">' — '</span> <span class="op">||</span> city                    <span class="kw">AS</span> <span class="alias">display</span>         <span class="cmt">-- concat (SQLite/PG)</span>
+<span class="kw">FROM</span> <span class="tbl">customers</span>;
+
+<span class="cmt">-- COALESCE: return first non-NULL value (great for default values)</span>
+<span class="kw">SELECT</span>
+  full_name,
+  <span class="fn">COALESCE</span>(phone, mobile, <span class="str">'No contact'</span>) <span class="kw">AS</span> <span class="alias">contact</span>,  <span class="cmt">-- first non-null wins</span>
+  <span class="fn">NULLIF</span>(stock, <span class="num">0</span>)                       <span class="kw">AS</span> <span class="alias">avail_stock</span>  <span class="cmt">-- returns NULL if stock=0</span>
+<span class="kw">FROM</span> <span class="tbl">products</span>;</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header"><span>SQL — Date &amp; Time Functions</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="cmt">-- SQLite date functions (used in Colab examples)</span>
+<span class="kw">SELECT</span>
+  order_date,
+  <span class="fn">DATE</span>(order_date)                           <span class="kw">AS</span> <span class="alias">date_only</span>,
+  <span class="fn">STRFTIME</span>(<span class="str">'%Y'</span>,  order_date)               <span class="kw">AS</span> <span class="alias">year</span>,
+  <span class="fn">STRFTIME</span>(<span class="str">'%m'</span>,  order_date)               <span class="kw">AS</span> <span class="alias">month</span>,
+  <span class="fn">STRFTIME</span>(<span class="str">'%Y-%m'</span>, order_date)            <span class="kw">AS</span> <span class="alias">year_month</span>,
+  <span class="fn">JULIANDAY</span>(<span class="str">'now'</span>) <span class="op">-</span> <span class="fn">JULIANDAY</span>(order_date) <span class="kw">AS</span> <span class="alias">days_ago</span>
+<span class="kw">FROM</span> <span class="tbl">orders</span>;
+
+<span class="cmt">-- MySQL equivalents</span>
+<span class="kw">SELECT</span>
+  order_date,
+  <span class="fn">DATE</span>(order_date)                 <span class="kw">AS</span> <span class="alias">date_only</span>,
+  <span class="fn">YEAR</span>(order_date)                 <span class="kw">AS</span> <span class="alias">yr</span>,
+  <span class="fn">MONTH</span>(order_date)                <span class="kw">AS</span> <span class="alias">mo</span>,
+  <span class="fn">DATE_FORMAT</span>(order_date,<span class="str">'%Y-%m'</span>) <span class="kw">AS</span> <span class="alias">year_month</span>,
+  <span class="fn">DATEDIFF</span>(<span class="fn">NOW</span>(), order_date)     <span class="kw">AS</span> <span class="alias">days_ago</span>,
+  <span class="fn">DATE_ADD</span>(order_date, <span class="fn">INTERVAL</span> <span class="num">30</span> <span class="fn">DAY</span>) <span class="kw">AS</span> <span class="alias">due_date</span>
+<span class="kw">FROM</span> <span class="tbl">orders</span>;
+
+<span class="cmt">-- PostgreSQL equivalents</span>
+<span class="kw">SELECT</span>
+  order_date,
+  order_date<span class="op">::</span><span class="fn">DATE</span>                                <span class="kw">AS</span> <span class="alias">date_only</span>,
+  <span class="fn">EXTRACT</span>(<span class="fn">YEAR</span>  <span class="kw">FROM</span> order_date)                 <span class="kw">AS</span> <span class="alias">yr</span>,
+  <span class="fn">EXTRACT</span>(<span class="fn">MONTH</span> <span class="kw">FROM</span> order_date)                 <span class="kw">AS</span> <span class="alias">mo</span>,
+  <span class="fn">TO_CHAR</span>(order_date, <span class="str">'YYYY-MM'</span>)                 <span class="kw">AS</span> <span class="alias">year_month</span>,
+  <span class="fn">NOW</span>() <span class="op">-</span> order_date                              <span class="kw">AS</span> <span class="alias">age</span>,
+  order_date <span class="op">+</span> <span class="fn">INTERVAL</span> <span class="str">'30 days'</span>               <span class="kw">AS</span> <span class="alias">due_date</span>
+<span class="kw">FROM</span> <span class="tbl">orders</span>;</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header"><span>SQL — Numeric Functions</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="kw">SELECT</span>
+  price,
+  <span class="fn">ROUND</span>(price, <span class="num">1</span>)               <span class="kw">AS</span> <span class="alias">rounded</span>,     <span class="cmt">-- 349.99 → 350.0</span>
+  <span class="fn">CEIL</span>(price)                    <span class="kw">AS</span> <span class="alias">ceiling</span>,     <span class="cmt">-- 349.99 → 350</span>
+  <span class="fn">FLOOR</span>(price)                   <span class="kw">AS</span> <span class="alias">floor</span>,       <span class="cmt">-- 349.99 → 349</span>
+  <span class="fn">ABS</span>(price <span class="op">-</span> <span class="num">500</span>)               <span class="kw">AS</span> <span class="alias">diff_from500</span>,
+  <span class="fn">POWER</span>(price, <span class="num">2</span>)               <span class="kw">AS</span> <span class="alias">price_sq</span>,
+  <span class="fn">SQRT</span>(price)                    <span class="kw">AS</span> <span class="alias">price_sqrt</span>,
+  price <span class="op">%</span> <span class="num">100</span>                    <span class="kw">AS</span> <span class="alias">cents</span>,       <span class="cmt">-- remainder</span>
+  <span class="fn">CAST</span>(price <span class="kw">AS</span> <span class="fn">INT</span>)             <span class="kw">AS</span> <span class="alias">int_price</span>    <span class="cmt">-- type cast (truncates)</span>
+<span class="kw">FROM</span> <span class="tbl">products</span>;</pre>
+    </div>
+
   </section>
 
   <hr class="section-divider"/>
@@ -1076,6 +1480,8 @@ print(<span class="str">"✅ Database ready! Run sql('SELECT ...') to query."</s
       </div>
     </div>
   </section>
+
+  <hr class="section-divider"/>
 
   <hr class="section-divider"/>
 
@@ -1158,6 +1564,8 @@ print(<span class="str">"✅ Database ready! Run sql('SELECT ...') to query."</s
       </div>
     </div>
   </section>
+
+  <hr class="section-divider"/>
 
   <hr class="section-divider"/>
 
@@ -1415,6 +1823,8 @@ print(<span class="str">"✅ Database ready! Run sql('SELECT ...') to query."</s
 
   <hr class="section-divider"/>
 
+  <hr class="section-divider"/>
+
   <!-- ══ SECTION 8: EXISTS / ALL / ANY ══ -->
   <section class="section" id="s8">
     <div class="section-header">
@@ -1666,6 +2076,8 @@ print(<span class="str">"✅ Database ready! Run sql('SELECT ...') to query."</s
 
   <hr class="section-divider"/>
 
+  <hr class="section-divider"/>
+
   <!-- ══ SECTION 9: WINDOW FUNCTIONS ══ -->
   <section class="section" id="s9">
     <div class="section-header">
@@ -1865,6 +2277,8 @@ customer_segments <span class="kw">AS</span> (
 
   <hr class="section-divider"/>
 
+  <hr class="section-divider"/>
+
   <!-- ══ SECTION 10: STORED PROCEDURES ══ -->
   <section class="section" id="s11">
     <div class="section-header">
@@ -2039,5 +2453,16 @@ document.addEventListener('keydown',e=>{
   if(e.key==='d'&&!e.ctrlKey&&!e.metaKey&&e.target.tagName!=='INPUT') toggleTheme();
 });
 </script>
+</body>
+</html>
+
+  <hr class="section-divider"/>
+
+
+
+</main>
+</div>
+
+<button class="back-to-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
 </body>
 </html>

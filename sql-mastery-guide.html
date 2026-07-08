@@ -521,8 +521,70 @@ code{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padd
       </div>
     </div>
 
-    <h3>1.3 UPDATE — Modifying Rows</h3>
-    <p>UPDATE changes the column values of existing rows. The WHERE clause filters which rows get changed. <strong>Without a WHERE clause, every single row in the table is updated</strong> — a mistake that can be catastrophic in production.</p>
+    <div class="usecase">
+      <div class="usecase-header">🔬 <h4>More SELECT Scenarios</h4></div>
+      <div class="usecase-body">
+        <div class="code-wrap">
+          <div class="code-header"><span>SQL — SELECT: Advanced Scenarios</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Scenario: Alias a computed column and reuse it in ORDER BY
+-- (ORDER BY runs after SELECT, so aliases ARE visible here)</span>
+<span class="kw">SELECT</span>
+  name,
+  price,
+  stock,
+  price <span class="op">*</span> stock <span class="kw">AS</span> <span class="alias">inventory_value</span>
+<span class="kw">FROM</span>     <span class="tbl">products</span>
+<span class="kw">ORDER BY</span> inventory_value <span class="kw">DESC</span>;  <span class="cmt">-- alias visible here</span>
+
+<span class="cmt">-- Scenario: SELECT with CASE WHEN to bucket rows on the fly</span>
+<span class="kw">SELECT</span>
+  name, price,
+  <span class="kw">CASE</span>
+    <span class="kw">WHEN</span> stock <span class="op">=</span>  <span class="num">0</span>   <span class="kw">THEN</span> <span class="str">'Out of stock'</span>
+    <span class="kw">WHEN</span> stock <span class="op">&lt;</span>  <span class="num">20</span>  <span class="kw">THEN</span> <span class="str">'Low stock'</span>
+    <span class="kw">WHEN</span> stock <span class="op">&lt;</span> <span class="num">100</span>  <span class="kw">THEN</span> <span class="str">'Available'</span>
+    <span class="kw">ELSE</span>                    <span class="str">'Well stocked'</span>
+  <span class="kw">END</span> <span class="kw">AS</span> <span class="alias">availability</span>
+<span class="kw">FROM</span> <span class="tbl">products</span>;
+
+<span class="cmt">-- Scenario: SELECT INTO a variable (MySQL / PostgreSQL stored routines)</span>
+<span class="kw">SELECT</span> <span class="fn">COUNT</span>(<span class="op">*</span>) <span class="kw">INTO</span> @total_products <span class="kw">FROM</span> <span class="tbl">products</span>;  <span class="cmt">-- MySQL</span>
+<span class="kw">SELECT</span> @total_products;
+
+<span class="cmt">-- Scenario: SELECT with multiple aggregates in one pass</span>
+<span class="kw">SELECT</span>
+  <span class="fn">COUNT</span>(<span class="op">*</span>)                   <span class="kw">AS</span> <span class="alias">total_products</span>,
+  <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> category)   <span class="kw">AS</span> <span class="alias">unique_categories</span>,
+  <span class="fn">MIN</span>(price)                 <span class="kw">AS</span> <span class="alias">cheapest</span>,
+  <span class="fn">MAX</span>(price)                 <span class="kw">AS</span> <span class="alias">priciest</span>,
+  <span class="fn">ROUND</span>(<span class="fn">AVG</span>(price), <span class="num">2</span>)      <span class="kw">AS</span> <span class="alias">avg_price</span>,
+  <span class="fn">SUM</span>(stock <span class="op">*</span> price)        <span class="kw">AS</span> <span class="alias">total_inventory_value</span>
+<span class="kw">FROM</span> <span class="tbl">products</span>;
+
+<span class="cmt">-- Scenario: SELECT DISTINCT ON (PostgreSQL) — keep one row per group
+-- Get the cheapest product in each category</span>
+<span class="kw">SELECT DISTINCT ON</span> (category)
+  category, name, price
+<span class="kw">FROM</span>     <span class="tbl">products</span>
+<span class="kw">ORDER BY</span> category, price <span class="kw">ASC</span>;  <span class="cmt">-- PostgreSQL only</span>
+
+<span class="cmt">-- Scenario: SELECT with string search using LIKE + wildcards
+-- % = any number of chars   _ = exactly one char</span>
+<span class="kw">SELECT</span> name <span class="kw">FROM</span> <span class="tbl">products</span> <span class="kw">WHERE</span> name <span class="kw">LIKE</span> <span class="str">'S_ny%'</span>;    <span class="cmt">-- S + any 1 char + ny…</span>
+<span class="kw">SELECT</span> name <span class="kw">FROM</span> <span class="tbl">products</span> <span class="kw">WHERE</span> name <span class="kw">LIKE</span> <span class="str">'%27"%'</span>;  <span class="cmt">-- contains 27"</span>
+
+<span class="cmt">-- Scenario: SELECT … FOR UPDATE (row-level lock for concurrent writes)</span>
+<span class="kw">BEGIN</span>;
+<span class="kw">SELECT</span> stock <span class="kw">FROM</span> <span class="tbl">products</span>
+<span class="kw">WHERE</span>  product_id <span class="op">=</span> <span class="num">101</span>
+<span class="kw">FOR UPDATE</span>;  <span class="cmt">-- locks this row until COMMIT — prevents another session from changing stock simultaneously</span>
+<span class="kw">UPDATE</span> <span class="tbl">products</span> <span class="kw">SET</span> stock <span class="op">=</span> stock <span class="op">-</span> <span class="num">1</span> <span class="kw">WHERE</span> product_id <span class="op">=</span> <span class="num">101</span>;
+<span class="kw">COMMIT</span>;</pre>
+        </div>
+      </div>
+    </div>
+
+    <h3>1.3 UPDATE — Modifying Rows</h3> — a mistake that can be catastrophic in production.</p>
 
     <div class="formula">
 <span class="f-kw">UPDATE</span> <span class="f-name">table_name</span>
@@ -598,6 +660,61 @@ code{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padd
     </div>
 
     <div class="usecase">
+      <div class="usecase-header">✏️ <h4>More UPDATE Scenarios</h4></div>
+      <div class="usecase-body">
+        <div class="code-wrap">
+          <div class="code-header"><span>SQL — UPDATE: Advanced Scenarios</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Scenario: UPDATE with a sub-query in SET
+-- Set each customer's loyalty_points to their total number of orders</span>
+<span class="kw">UPDATE</span> <span class="tbl">customers</span> c
+<span class="kw">SET</span>    loyalty_points <span class="op">=</span> (
+  <span class="kw">SELECT</span> <span class="fn">COUNT</span>(<span class="op">*</span>)
+  <span class="kw">FROM</span>   <span class="tbl">orders</span> o
+  <span class="kw">WHERE</span>  o.customer_id <span class="op">=</span> c.customer_id  <span class="cmt">-- correlated</span>
+);
+
+<span class="cmt">-- Scenario: UPDATE with a LIMIT — only update the top 3 cheapest products
+-- (MySQL supports LIMIT in UPDATE; PostgreSQL uses a CTE)</span>
+<span class="kw">UPDATE</span> <span class="tbl">products</span>
+<span class="kw">SET</span>    stock <span class="op">=</span> stock <span class="op">+</span> <span class="num">50</span>
+<span class="kw">ORDER BY</span> price <span class="kw">ASC</span>
+<span class="kw">LIMIT</span>  <span class="num">3</span>;  <span class="cmt">-- MySQL only — restock the 3 cheapest lines</span>
+
+<span class="cmt">-- PostgreSQL equivalent using a CTE</span>
+<span class="kw">WITH</span> cheapest <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> product_id <span class="kw">FROM</span> <span class="tbl">products</span> <span class="kw">ORDER BY</span> price <span class="kw">ASC LIMIT</span> <span class="num">3</span>
+)
+<span class="kw">UPDATE</span> <span class="tbl">products</span>
+<span class="kw">SET</span>    stock <span class="op">=</span> stock <span class="op">+</span> <span class="num">50</span>
+<span class="kw">WHERE</span>  product_id <span class="kw">IN</span> (<span class="kw">SELECT</span> product_id <span class="kw">FROM</span> cheapest);
+
+<span class="cmt">-- Scenario: UPDATE RETURNING — get the updated rows back immediately (PostgreSQL)
+-- No need for a separate SELECT after the UPDATE</span>
+<span class="kw">UPDATE</span> <span class="tbl">orders</span>
+<span class="kw">SET</span>    status <span class="op">=</span> <span class="str">'shipped'</span>
+<span class="kw">WHERE</span>  status <span class="op">=</span> <span class="str">'pending'</span>
+<span class="kw">RETURNING</span> order_id, customer_id, status;  <span class="cmt">-- returns the changed rows</span>
+
+<span class="cmt">-- Scenario: Swap two column values atomically
+-- e.g. swap price of two products (no temp variable needed in SQL)</span>
+<span class="kw">UPDATE</span> <span class="tbl">products</span>
+<span class="kw">SET</span>    price <span class="op">=</span> <span class="kw">CASE</span>
+  <span class="kw">WHEN</span> product_id <span class="op">=</span> <span class="num">101</span> <span class="kw">THEN</span> (<span class="kw">SELECT</span> price <span class="kw">FROM</span> <span class="tbl">products</span> <span class="kw">WHERE</span> product_id <span class="op">=</span> <span class="num">102</span>)
+  <span class="kw">WHEN</span> product_id <span class="op">=</span> <span class="num">102</span> <span class="kw">THEN</span> (<span class="kw">SELECT</span> price <span class="kw">FROM</span> <span class="tbl">products</span> <span class="kw">WHERE</span> product_id <span class="op">=</span> <span class="num">101</span>)
+<span class="kw">END</span>
+<span class="kw">WHERE</span> product_id <span class="kw">IN</span> (<span class="num">101</span>, <span class="num">102</span>);
+
+<span class="cmt">-- Scenario: Increment a counter safely (idempotent with a guard)
+-- Add loyalty points only to active customers</span>
+<span class="kw">UPDATE</span> <span class="tbl">customers</span>
+<span class="kw">SET</span>    loyalty_points <span class="op">=</span> loyalty_points <span class="op">+</span> <span class="num">10</span>
+<span class="kw">WHERE</span>  is_active <span class="op">=</span> <span class="kw">TRUE</span>
+  <span class="kw">AND</span>  joined_date <span class="op">&lt;</span> <span class="str">'2024-01-01'</span>;  <span class="cmt">-- only loyal long-term customers</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="usecase">
       <div class="usecase-header">🗑️ <h4>Use Case: Remove old data, duplicates, and orphaned records</h4></div>
       <div class="usecase-body">
         <div class="code-wrap">
@@ -638,6 +755,56 @@ code{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padd
     </div>
 
     <div class="callout tip"><span class="callout-icon">💡</span><p><strong>Soft delete vs hard delete:</strong> In most production systems, data is never truly deleted — it's marked with a <code>deleted_at</code> timestamp. This preserves audit history, supports undo, and avoids FK violations. Hard DELETE is reserved for GDPR/compliance erasure requests or genuine test-data cleanup.</p></div>
+
+    <div class="usecase">
+      <div class="usecase-header">🗑️ <h4>More DELETE Scenarios</h4></div>
+      <div class="usecase-body">
+        <div class="code-wrap">
+          <div class="code-header"><span>SQL — DELETE: Advanced Scenarios</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Scenario: DELETE with JOIN (MySQL)
+-- Remove all orders belonging to customers in a city being offboarded</span>
+<span class="kw">DELETE</span> o
+<span class="kw">FROM</span>       <span class="tbl">orders</span>    o
+<span class="kw">INNER JOIN</span> <span class="tbl">customers</span> c <span class="kw">ON</span> o.customer_id <span class="op">=</span> c.customer_id
+<span class="kw">WHERE</span>  c.city <span class="op">=</span> <span class="str">'TestCity'</span>;
+
+<span class="cmt">-- Scenario: DELETE using EXISTS (works on all platforms)
+-- Delete products that have never been ordered</span>
+<span class="kw">DELETE FROM</span> <span class="tbl">products</span>
+<span class="kw">WHERE NOT EXISTS</span> (
+  <span class="kw">SELECT</span> <span class="num">1</span> <span class="kw">FROM</span> <span class="tbl">orders</span> o
+  <span class="kw">WHERE</span>  o.product_id <span class="op">=</span> products.product_id
+);
+
+<span class="cmt">-- Scenario: DELETE RETURNING (PostgreSQL) — delete and capture the deleted rows</span>
+<span class="kw">DELETE FROM</span> <span class="tbl">orders</span>
+<span class="kw">WHERE</span>  status <span class="op">=</span> <span class="str">'cancelled'</span>
+<span class="kw">RETURNING</span> order_id, customer_id, order_date;  <span class="cmt">-- rows are returned to caller</span>
+
+<span class="cmt">-- Scenario: Batch delete to avoid locking a huge table all at once
+-- Delete 1000 rows at a time to keep the operation light</span>
+<span class="kw">DELETE FROM</span> <span class="tbl">orders</span>
+<span class="kw">WHERE</span>  order_date <span class="op">&lt;</span> <span class="str">'2022-01-01'</span>
+<span class="kw">LIMIT</span>  <span class="num">1000</span>;  <span class="cmt">-- MySQL: run repeatedly until 0 rows affected</span>
+
+<span class="cmt">-- Scenario: DELETE all but the N most recent rows per customer
+-- Keep only the latest 3 orders per customer, delete the rest</span>
+<span class="kw">DELETE FROM</span> <span class="tbl">orders</span>
+<span class="kw">WHERE</span> order_id <span class="kw">NOT IN</span> (
+  <span class="kw">SELECT</span> order_id
+  <span class="kw">FROM</span>  (
+    <span class="kw">SELECT</span> order_id,
+           <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
+             <span class="kw">PARTITION BY</span> customer_id
+             <span class="kw">ORDER BY</span>     order_date <span class="kw">DESC</span>
+           ) <span class="kw">AS</span> <span class="alias">rn</span>
+    <span class="kw">FROM</span> <span class="tbl">orders</span>
+  ) ranked
+  <span class="kw">WHERE</span> rn <span class="op">&lt;=</span> <span class="num">3</span>  <span class="cmt">-- keep top 3 most recent per customer</span>
+);</pre>
+        </div>
+      </div>
+    </div>
 
     <h3>1.5 Transactions — Wrapping CRUD in Safety Nets</h3>
     <p>A transaction groups multiple DML statements into one atomic unit. Either all succeed, or if anything fails, all are rolled back. Without transactions, a crash halfway through a multi-step operation leaves data in an inconsistent state.</p>
@@ -852,6 +1019,65 @@ code{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padd
       </div>
     </div>
 
+    <div class="usecase">
+      <div class="usecase-header">🏗️ <h4>More CREATE Scenarios</h4></div>
+      <div class="usecase-body">
+        <div class="code-wrap">
+          <div class="code-header"><span>SQL — CREATE: Additional Scenarios</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Scenario: CREATE TABLE with a composite PRIMARY KEY
+-- When no single column is unique but a combination is</span>
+<span class="kw">CREATE TABLE</span> order_items (
+  order_id    <span class="fn">INT</span>  <span class="kw">NOT NULL</span>,
+  product_id  <span class="fn">INT</span>  <span class="kw">NOT NULL</span>,
+  quantity    <span class="fn">INT</span>  <span class="kw">NOT NULL DEFAULT</span> <span class="num">1</span>,
+  <span class="kw">PRIMARY KEY</span> (order_id, product_id),  <span class="cmt">-- composite PK — pair is unique</span>
+  <span class="kw">FOREIGN KEY</span> (order_id)   <span class="kw">REFERENCES</span> <span class="tbl">orders</span>(order_id),
+  <span class="kw">FOREIGN KEY</span> (product_id) <span class="kw">REFERENCES</span> <span class="tbl">products</span>(product_id)
+);
+
+<span class="cmt">-- Scenario: CREATE TABLE LIKE — copy column structure only (no data, no constraints)
+-- Useful for staging / temp tables with the same shape</span>
+<span class="kw">CREATE TABLE</span> products_staging <span class="kw">LIKE</span> <span class="tbl">products</span>;  <span class="cmt">-- MySQL</span>
+
+<span class="cmt">-- Scenario: Temporary table — exists only for the current session
+-- Automatically dropped when the connection closes</span>
+<span class="kw">CREATE TEMPORARY TABLE</span> temp_top_customers <span class="kw">AS</span>
+  <span class="kw">SELECT</span> customer_id, <span class="fn">SUM</span>(quantity <span class="op">*</span> price) <span class="kw">AS</span> <span class="alias">total</span>
+  <span class="kw">FROM</span>       <span class="tbl">orders</span>   o
+  <span class="kw">INNER JOIN</span> <span class="tbl">products</span> p <span class="kw">ON</span> o.product_id <span class="op">=</span> p.product_id
+  <span class="kw">GROUP BY</span>   customer_id
+  <span class="kw">ORDER BY</span>   total <span class="kw">DESC</span>
+  <span class="kw">LIMIT</span> <span class="num">10</span>;
+<span class="cmt">-- Reusable in the same session — no need to repeat the heavy query</span>
+<span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> temp_top_customers;
+
+<span class="cmt">-- Scenario: CREATE UNIQUE INDEX for enforcing compound uniqueness
+-- Ensure no customer places two orders for the same product on the same day</span>
+<span class="kw">CREATE UNIQUE INDEX</span> idx_one_order_per_day
+  <span class="kw">ON</span> <span class="tbl">orders</span> (customer_id, product_id, <span class="fn">DATE</span>(order_date));
+
+<span class="cmt">-- Scenario: CREATE VIEW with a WHERE clause (filtered/security view)
+-- Expose only delivered orders to the analytics role</span>
+<span class="kw">CREATE VIEW</span> v_delivered_orders <span class="kw">AS</span>
+  <span class="kw">SELECT</span> order_id, customer_id, product_id, quantity, order_date
+  <span class="kw">FROM</span>   <span class="tbl">orders</span>
+  <span class="kw">WHERE</span>  status <span class="op">=</span> <span class="str">'delivered'</span>;
+<span class="cmt">-- Grant read access to analytics role without exposing raw orders table</span>
+<span class="kw">GRANT SELECT ON</span> v_delivered_orders <span class="kw">TO</span> analytics_user;
+
+<span class="cmt">-- Scenario: CREATE TABLE with generated / computed column (MySQL 5.7+)
+-- total_value is always price * stock, maintained automatically</span>
+<span class="kw">CREATE TABLE</span> product_inventory (
+  product_id    <span class="fn">INT</span>            <span class="kw">PRIMARY KEY</span>,
+  price         <span class="fn">DECIMAL</span>(<span class="num">10</span>,<span class="num">2</span>) <span class="kw">NOT NULL</span>,
+  stock         <span class="fn">INT</span>            <span class="kw">NOT NULL DEFAULT</span> <span class="num">0</span>,
+  total_value   <span class="fn">DECIMAL</span>(<span class="num">14</span>,<span class="num">2</span>)
+    <span class="kw">GENERATED ALWAYS AS</span> (price <span class="op">*</span> stock) <span class="kw">STORED</span>  <span class="cmt">-- auto-computed, stored on disk</span>
+);</pre>
+        </div>
+      </div>
+    </div>
+
     <h3>2.4 ALTER — Evolving Table Structure</h3>
     <p>Schemas evolve. Business requirements change. ALTER TABLE modifies an existing table without losing its data. It is how you add new features (new columns), fix mistakes (rename a column, change its type), improve performance (add a constraint or index), or clean up (drop unused columns).</p>
 
@@ -1002,6 +1228,47 @@ code{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padd
       </div>
     </div>
 
+    <div class="usecase">
+      <div class="usecase-header">🗑️ <h4>More DROP Scenarios</h4></div>
+      <div class="usecase-body">
+        <div class="code-wrap">
+          <div class="code-header"><span>SQL — DROP: Additional Scenarios</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Scenario: Drop a column and its dependent index in one statement (PostgreSQL)
+-- PostgreSQL automatically drops indexes that depend on the dropped column</span>
+<span class="kw">ALTER TABLE</span> <span class="tbl">customers</span> <span class="kw">DROP COLUMN IF EXISTS</span> referral_code;
+<span class="cmt">-- Any index on referral_code is gone automatically</span>
+
+<span class="cmt">-- Scenario: Find and script all indexes on a table before dropping
+-- (so you can recreate them later if needed)</span>
+<span class="kw">SELECT</span> index_name, column_name, non_unique
+<span class="kw">FROM</span>   information_schema.statistics
+<span class="kw">WHERE</span>  table_schema <span class="op">=</span> <span class="str">'ecommerce'</span>
+  <span class="kw">AND</span>  table_name   <span class="op">=</span> <span class="str">'orders'</span>
+<span class="kw">ORDER BY</span> index_name, seq_in_index;  <span class="cmt">-- MySQL: audit all indexes before any DROP</span>
+
+<span class="cmt">-- Scenario: Drop a foreign key constraint by name (MySQL)
+-- Needed before you can DROP or MODIFY the referenced column</span>
+<span class="kw">ALTER TABLE</span> <span class="tbl">orders</span> <span class="kw">DROP FOREIGN KEY</span> fk_cust;
+<span class="kw">ALTER TABLE</span> <span class="tbl">orders</span> <span class="kw">DROP FOREIGN KEY</span> fk_prod;
+<span class="cmt">-- Now safe to DROP or restructure customers/products</span>
+
+<span class="cmt">-- Scenario: Drop a UNIQUE constraint (treated as an index in MySQL)</span>
+<span class="kw">ALTER TABLE</span> <span class="tbl">customers</span> <span class="kw">DROP INDEX</span> email;  <span class="cmt">-- MySQL: UNIQUE constraint name = index name</span>
+<span class="kw">ALTER TABLE</span> <span class="tbl">customers</span> <span class="kw">DROP CONSTRAINT</span> customers_email_key;  <span class="cmt">-- PostgreSQL</span>
+
+<span class="cmt">-- Scenario: Safely drop and recreate a view when its definition changes</span>
+<span class="kw">DROP VIEW IF EXISTS</span> v_order_summary;
+<span class="kw">CREATE VIEW</span> v_order_summary <span class="kw">AS</span>
+  <span class="kw">SELECT</span> o.order_id, c.full_name, p.name, o.status,
+         (o.quantity <span class="op">*</span> p.price) <span class="kw">AS</span> <span class="alias">total</span>
+  <span class="kw">FROM</span>       <span class="tbl">orders</span> o
+  <span class="kw">INNER JOIN</span> <span class="tbl">customers</span> c <span class="kw">ON</span> o.customer_id <span class="op">=</span> c.customer_id
+  <span class="kw">INNER JOIN</span> <span class="tbl">products</span>  p <span class="kw">ON</span> o.product_id  <span class="op">=</span> p.product_id;
+<span class="cmt">-- Or use CREATE OR REPLACE VIEW (PostgreSQL / MySQL 8+) to skip the drop step</span></pre>
+        </div>
+      </div>
+    </div>
+
     <h3>2.7 TRUNCATE — Fast Row Wipeout</h3>
     <p>TRUNCATE removes all rows from a table in one fast operation, but keeps the table structure, columns, indexes, and constraints intact. Instead of deleting rows one by one (like DELETE does), TRUNCATE deallocates the data pages directly — making it orders of magnitude faster on large tables. A table with 100 million rows: DELETE takes minutes; TRUNCATE takes milliseconds.</p>
 
@@ -1078,10 +1345,39 @@ code{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padd
 
     <div class="callout success"><span class="callout-icon">🎯</span><p><strong>Decision guide:</strong> Remove specific rows? → <code>DELETE … WHERE</code>. Empty the table to reload data? → <code>TRUNCATE</code>. Remove the table completely? → <code>DROP</code>. Change the structure? → <code>ALTER TABLE</code>. Create new structure? → <code>CREATE TABLE</code>.</p></div>
 
+    <div class="usecase">
+      <div class="usecase-header">⚡ <h4>More TRUNCATE Scenarios</h4></div>
+      <div class="usecase-body">
+        <div class="code-wrap">
+          <div class="code-header"><span>SQL — TRUNCATE: Additional Scenarios</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Scenario: TRUNCATE + re-seed in one transaction (PostgreSQL)
+-- Wipe and reload reference data atomically — either both happen or neither</span>
+<span class="kw">BEGIN</span>;
+<span class="kw">TRUNCATE TABLE</span> <span class="tbl">products</span> <span class="kw">RESTART IDENTITY CASCADE</span>;
+<span class="kw">INSERT INTO</span> <span class="tbl">products</span> (product_id, name, category, price, stock)
+<span class="kw">VALUES</span>
+  (<span class="num">1</span>, <span class="str">'Dell XPS 15'</span>,     <span class="str">'Laptop'</span>,     <span class="num">1299.99</span>, <span class="num">50</span>),
+  (<span class="num">2</span>, <span class="str">'Sony WH-1000XM5'</span>, <span class="str">'Headphones'</span>, <span class="num">349.99</span>,  <span class="num">120</span>);
+<span class="kw">COMMIT</span>;  <span class="cmt">-- if INSERT fails, TRUNCATE is also rolled back</span>
+
+<span class="cmt">-- Scenario: Simulate TRUNCATE with a DELETE + RESET when TRUNCATE isn't allowed
+-- (e.g. when triggers must fire, or in a system that blocks DDL in transactions)</span>
+<span class="kw">DELETE FROM</span> <span class="tbl">staging_orders</span>;
+<span class="kw">ALTER TABLE</span>  <span class="tbl">staging_orders</span> <span class="kw">AUTO_INCREMENT</span> <span class="op">=</span> <span class="num">1</span>;  <span class="cmt">-- MySQL: manually reset counter</span>
+
+<span class="cmt">-- Scenario: Check row count before and after TRUNCATE to confirm result</span>
+<span class="kw">SELECT</span> <span class="fn">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> <span class="alias">before_rows</span> <span class="kw">FROM</span> <span class="tbl">staging_orders</span>;
+<span class="kw">TRUNCATE TABLE</span> <span class="tbl">staging_orders</span>;
+<span class="kw">SELECT</span> <span class="fn">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> <span class="alias">after_rows</span>  <span class="kw">FROM</span> <span class="tbl">staging_orders</span>;  <span class="cmt">-- should return 0</span>
+
+<span class="cmt">-- Scenario: TRUNCATE vs DELETE performance test (run EXPLAIN ANALYZE in PostgreSQL)</span>
+<span class="cmt">-- EXPLAIN ANALYZE DELETE FROM big_log_table;     -- shows row-by-row cost</span>
+<span class="cmt">-- EXPLAIN ANALYZE TRUNCATE TABLE big_log_table;  -- shows instant plan</span></pre>
+        </div>
+      </div>
+    </div>
+
   </section>
-
-
-  <hr class="section-divider"/>
 
   <hr class="section-divider"/>
 
@@ -1175,8 +1471,6 @@ INSERT INTO orders VALUES
 print(<span class="str">"✅ Database ready! Run sql('SELECT ...') to query."</span>)</pre>
     </div>
   </section>
-
-  <hr class="section-divider"/>
 
   <hr class="section-divider"/>
 
@@ -1408,6 +1702,64 @@ print(<span class="str">"✅ Database ready! Run sql('SELECT ...') to query."</s
 <span class="kw">FROM</span> <span class="tbl">products</span>;</pre>
     </div>
 
+    <div class="usecase">
+      <div class="usecase-header">🔬 <h4>More Clause Scenarios</h4></div>
+      <div class="usecase-body">
+        <div class="code-wrap">
+          <div class="code-header"><span>SQL — Clauses: Additional Scenarios</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Scenario: Chained CASE to derive a shipping fee
+-- Different logic per category and per order size</span>
+<span class="kw">SELECT</span>
+  o.order_id,
+  p.name,
+  p.category,
+  o.quantity,
+  <span class="kw">CASE</span>
+    <span class="kw">WHEN</span> p.category <span class="op">=</span> <span class="str">'Laptop'</span>  <span class="kw">AND</span> o.quantity <span class="op">&gt;=</span> <span class="num">2</span> <span class="kw">THEN</span> <span class="num">0.00</span>   <span class="cmt">-- bulk: free</span>
+    <span class="kw">WHEN</span> p.category <span class="op">=</span> <span class="str">'Laptop'</span>                      <span class="kw">THEN</span> <span class="num">9.99</span>   <span class="cmt">-- single laptop</span>
+    <span class="kw">WHEN</span> p.price    <span class="op">&gt;</span>  <span class="num">500</span>                          <span class="kw">THEN</span> <span class="num">4.99</span>   <span class="cmt">-- premium item</span>
+    <span class="kw">ELSE</span>                                                    <span class="num">2.99</span>   <span class="cmt">-- standard</span>
+  <span class="kw">END</span> <span class="kw">AS</span> <span class="alias">shipping_fee</span>
+<span class="kw">FROM</span>       <span class="tbl">orders</span>   o
+<span class="kw">INNER JOIN</span> <span class="tbl">products</span> p <span class="kw">ON</span> o.product_id <span class="op">=</span> p.product_id;
+
+<span class="cmt">-- Scenario: WHERE with a date range using platform-specific functions</span>
+<span class="cmt">-- Orders placed in the last 30 days (works in SQLite / MySQL / PostgreSQL)</span>
+<span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> <span class="tbl">orders</span>
+<span class="kw">WHERE</span>  order_date <span class="op">&gt;=</span> <span class="fn">DATE</span>(<span class="str">'now'</span>, <span class="str">'-30 days'</span>);  <span class="cmt">-- SQLite</span>
+<span class="cmt">-- WHERE order_date &gt;= NOW() - INTERVAL 30 DAY;   -- MySQL</span>
+<span class="cmt">-- WHERE order_date &gt;= NOW() - INTERVAL '30 days'; -- PostgreSQL</span>
+
+<span class="cmt">-- Scenario: Aggregate with FILTER (PostgreSQL 9.4+) — cleaner than CASE WHEN</span>
+<span class="kw">SELECT</span>
+  <span class="fn">COUNT</span>(<span class="op">*</span>)                              <span class="kw">AS</span> <span class="alias">total</span>,
+  <span class="fn">COUNT</span>(<span class="op">*</span>) <span class="kw">FILTER</span> (<span class="kw">WHERE</span> status <span class="op">=</span> <span class="str">'delivered'</span>) <span class="kw">AS</span> <span class="alias">delivered</span>,
+  <span class="fn">COUNT</span>(<span class="op">*</span>) <span class="kw">FILTER</span> (<span class="kw">WHERE</span> status <span class="op">=</span> <span class="str">'pending'</span>)   <span class="kw">AS</span> <span class="alias">pending</span>,
+  <span class="fn">SUM</span>(quantity <span class="op">*</span> price) <span class="kw">FILTER</span> (<span class="kw">WHERE</span> status <span class="op">=</span> <span class="str">'delivered'</span>)
+                                        <span class="kw">AS</span> <span class="alias">delivered_revenue</span>
+<span class="kw">FROM</span>       <span class="tbl">orders</span>   o
+<span class="kw">INNER JOIN</span> <span class="tbl">products</span> p <span class="kw">ON</span> o.product_id <span class="op">=</span> p.product_id;
+
+<span class="cmt">-- Scenario: HAVING with multiple conditions
+-- Categories that have more than 1 product AND average price above 300</span>
+<span class="kw">SELECT</span> category, <span class="fn">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> <span class="alias">product_count</span>, <span class="fn">ROUND</span>(<span class="fn">AVG</span>(price),<span class="num">2</span>) <span class="kw">AS</span> <span class="alias">avg_price</span>
+<span class="kw">FROM</span>   <span class="tbl">products</span>
+<span class="kw">GROUP BY</span> category
+<span class="kw">HAVING</span> <span class="fn">COUNT</span>(<span class="op">*</span>) <span class="op">&gt;</span> <span class="num">1</span>
+  <span class="kw">AND</span>  <span class="fn">AVG</span>(price) <span class="op">&gt;</span> <span class="num">300</span>;
+
+<span class="cmt">-- Scenario: ORDER BY multiple columns with mixed direction</span>
+<span class="kw">SELECT</span> full_name, city, joined_date
+<span class="kw">FROM</span>   <span class="tbl">customers</span>
+<span class="kw">ORDER BY</span> city <span class="kw">ASC</span>, joined_date <span class="kw">DESC</span>;  <span class="cmt">-- sort by city A→Z, then newest first within each city</span>
+
+<span class="cmt">-- Scenario: LIMIT with OFFSET for cursor-based pagination
+-- Page 1: LIMIT 5 OFFSET 0  →  Page 2: LIMIT 5 OFFSET 5  →  Page 3: LIMIT 5 OFFSET 10</span>
+<span class="kw">SELECT</span> name, price <span class="kw">FROM</span> <span class="tbl">products</span> <span class="kw">ORDER BY</span> name <span class="kw">LIMIT</span> <span class="num">5</span> <span class="kw">OFFSET</span> <span class="num">5</span>;  <span class="cmt">-- page 2</span></pre>
+        </div>
+      </div>
+    </div>
+
   </section>
 
   <hr class="section-divider"/>
@@ -1416,7 +1768,7 @@ print(<span class="str">"✅ Database ready! Run sql('SELECT ...') to query."</s
   <section class="section" id="s5">
     <div class="section-header">
       <div class="section-num">5</div>
-      <h2>GROUP BY & Aggregates</h2>
+      <h2>GROUP BY &amp; Aggregates</h2>
       <span class="tag">ANALYTICS</span>
     </div>
 
@@ -1479,9 +1831,63 @@ print(<span class="str">"✅ Database ready! Run sql('SELECT ...') to query."</s
         </div>
       </div>
     </div>
-  </section>
 
-  <hr class="section-divider"/>
+    <div class="usecase">
+      <div class="usecase-header">📊 <h4>More GROUP BY Scenarios</h4></div>
+      <div class="usecase-body">
+        <div class="code-wrap">
+          <div class="code-header"><span>SQL — GROUP BY: Additional Scenarios</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Scenario: GROUP BY with ROLLUP — subtotals + grand total in one query (MySQL)
+-- Adds extra rows: one subtotal per category, one grand total at the end</span>
+<span class="kw">SELECT</span>
+  <span class="fn">COALESCE</span>(category, <span class="str">'ALL CATEGORIES'</span>) <span class="kw">AS</span> <span class="alias">category</span>,
+  <span class="fn">COUNT</span>(<span class="op">*</span>)                              <span class="kw">AS</span> <span class="alias">products</span>,
+  <span class="fn">SUM</span>(stock)                            <span class="kw">AS</span> <span class="alias">total_stock</span>,
+  <span class="fn">ROUND</span>(<span class="fn">AVG</span>(price), <span class="num">2</span>)                 <span class="kw">AS</span> <span class="alias">avg_price</span>
+<span class="kw">FROM</span>     <span class="tbl">products</span>
+<span class="kw">GROUP BY</span> category <span class="kw">WITH ROLLUP</span>;         <span class="cmt">-- MySQL; PostgreSQL: GROUP BY ROLLUP(category)</span>
+
+<span class="cmt">-- Scenario: GROUP BY on a computed expression
+-- Monthly order volume — group by the YYYY-MM derived from order_date</span>
+<span class="kw">SELECT</span>
+  <span class="fn">STRFTIME</span>(<span class="str">'%Y-%m'</span>, order_date)  <span class="kw">AS</span> <span class="alias">month</span>,
+  <span class="fn">COUNT</span>(<span class="op">*</span>)                       <span class="kw">AS</span> <span class="alias">order_count</span>,
+  <span class="fn">SUM</span>(quantity)                  <span class="kw">AS</span> <span class="alias">units</span>
+<span class="kw">FROM</span>     <span class="tbl">orders</span>
+<span class="kw">GROUP BY</span> <span class="fn">STRFTIME</span>(<span class="str">'%Y-%m'</span>, order_date)  <span class="cmt">-- group by the same expression</span>
+<span class="kw">ORDER BY</span> month;
+
+<span class="cmt">-- Scenario: COUNT DISTINCT — how many unique customers ordered each product?</span>
+<span class="kw">SELECT</span>
+  p.name,
+  <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> o.customer_id) <span class="kw">AS</span> <span class="alias">unique_buyers</span>,
+  <span class="fn">COUNT</span>(o.order_id)             <span class="kw">AS</span> <span class="alias">total_orders</span>
+<span class="kw">FROM</span>       <span class="tbl">orders</span>   o
+<span class="kw">INNER JOIN</span> <span class="tbl">products</span> p <span class="kw">ON</span> o.product_id <span class="op">=</span> p.product_id
+<span class="kw">GROUP BY</span>   p.product_id, p.name
+<span class="kw">ORDER BY</span>   unique_buyers <span class="kw">DESC</span>;
+
+<span class="cmt">-- Scenario: Nested GROUP BY using a sub-query
+-- Average revenue per customer per city (two-level aggregation)</span>
+<span class="kw">SELECT</span>
+  city,
+  <span class="fn">ROUND</span>(<span class="fn">AVG</span>(customer_revenue), <span class="num">2</span>) <span class="kw">AS</span> <span class="alias">avg_revenue_per_customer</span>
+<span class="kw">FROM</span> (
+  <span class="kw">SELECT</span>
+    c.city,
+    c.customer_id,
+    <span class="fn">SUM</span>(o.quantity <span class="op">*</span> p.price) <span class="kw">AS</span> <span class="alias">customer_revenue</span>
+  <span class="kw">FROM</span>       <span class="tbl">orders</span>    o
+  <span class="kw">INNER JOIN</span> <span class="tbl">customers</span> c <span class="kw">ON</span> o.customer_id <span class="op">=</span> c.customer_id
+  <span class="kw">INNER JOIN</span> <span class="tbl">products</span>  p <span class="kw">ON</span> o.product_id  <span class="op">=</span> p.product_id
+  <span class="kw">GROUP BY</span>   c.city, c.customer_id
+) city_customer
+<span class="kw">GROUP BY</span> city
+<span class="kw">ORDER BY</span> avg_revenue_per_customer <span class="kw">DESC</span>;</pre>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <hr class="section-divider"/>
 
@@ -1563,9 +1969,77 @@ print(<span class="str">"✅ Database ready! Run sql('SELECT ...') to query."</s
         </div>
       </div>
     </div>
-  </section>
 
-  <hr class="section-divider"/>
+    <div class="usecase">
+      <div class="usecase-header">🔗 <h4>More JOIN Scenarios</h4></div>
+      <div class="usecase-body">
+        <div class="code-wrap">
+          <div class="code-header"><span>SQL — JOINs: Additional Scenarios</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Scenario: SELF JOIN — find pairs of customers from the same city
+-- A self join treats the same table as two separate instances</span>
+<span class="kw">SELECT</span>
+  a.full_name <span class="kw">AS</span> <span class="alias">customer_1</span>,
+  b.full_name <span class="kw">AS</span> <span class="alias">customer_2</span>,
+  a.city
+<span class="kw">FROM</span>      <span class="tbl">customers</span> a
+<span class="kw">INNER JOIN</span> <span class="tbl">customers</span> b <span class="kw">ON</span> a.city <span class="op">=</span> b.city
+                       <span class="kw">AND</span> a.customer_id <span class="op">&lt;</span> b.customer_id  <span class="cmt">-- avoid duplicates and self-pair</span>
+<span class="kw">ORDER BY</span> a.city;
+
+<span class="cmt">-- Scenario: JOIN with an aggregated sub-query (joining to a derived table)
+-- Attach total spend to each customer without a separate query</span>
+<span class="kw">SELECT</span>
+  c.full_name,
+  c.city,
+  <span class="fn">ROUND</span>(s.total_spend, <span class="num">2</span>) <span class="kw">AS</span> <span class="alias">total_spend</span>
+<span class="kw">FROM</span>       <span class="tbl">customers</span> c
+<span class="kw">LEFT JOIN</span> (
+  <span class="kw">SELECT</span> o.customer_id, <span class="fn">SUM</span>(o.quantity <span class="op">*</span> p.price) <span class="kw">AS</span> <span class="alias">total_spend</span>
+  <span class="kw">FROM</span>       <span class="tbl">orders</span>   o
+  <span class="kw">INNER JOIN</span> <span class="tbl">products</span> p <span class="kw">ON</span> o.product_id <span class="op">=</span> p.product_id
+  <span class="kw">GROUP BY</span>   o.customer_id
+) s <span class="kw">ON</span> c.customer_id <span class="op">=</span> s.customer_id
+<span class="kw">ORDER BY</span> total_spend <span class="kw">DESC NULLS LAST</span>;  <span class="cmt">-- customers with no orders show NULL, sorted last</span>
+
+<span class="cmt">-- Scenario: Multiple LEFT JOINs — get order info even when product/customer is missing</span>
+<span class="kw">SELECT</span>
+  o.order_id,
+  <span class="fn">COALESCE</span>(c.full_name,  <span class="str">'[deleted customer]'</span>) <span class="kw">AS</span> <span class="alias">customer</span>,
+  <span class="fn">COALESCE</span>(p.name,       <span class="str">'[deleted product]'</span>)  <span class="kw">AS</span> <span class="alias">product</span>,
+  o.quantity,
+  o.status
+<span class="kw">FROM</span>      <span class="tbl">orders</span>    o
+<span class="kw">LEFT JOIN</span> <span class="tbl">customers</span> c <span class="kw">ON</span> o.customer_id <span class="op">=</span> c.customer_id
+<span class="kw">LEFT JOIN</span> <span class="tbl">products</span>  p <span class="kw">ON</span> o.product_id  <span class="op">=</span> p.product_id;
+
+<span class="cmt">-- Scenario: CROSS JOIN — generate a price matrix (every product × every customer)
+-- Useful for recommendation engines, pricing grids</span>
+<span class="kw">SELECT</span>
+  c.full_name,
+  p.name,
+  p.price,
+  p.price <span class="op">*</span> <span class="num">0.90</span> <span class="kw">AS</span> <span class="alias">loyalty_price</span>  <span class="cmt">-- 10% off for all customers</span>
+<span class="kw">FROM</span>        <span class="tbl">customers</span> c
+<span class="kw">CROSS JOIN</span>  <span class="tbl">products</span>  p
+<span class="kw">ORDER BY</span> c.full_name, p.price;
+
+<span class="cmt">-- Scenario: NON-EQUI JOIN — join on a range condition instead of equality
+-- Tag each order with its discount tier based on total value</span>
+<span class="kw">CREATE TABLE</span> discount_tiers (min_value <span class="fn">INT</span>, max_value <span class="fn">INT</span>, discount_pct <span class="fn">INT</span>);
+<span class="kw">INSERT INTO</span> discount_tiers <span class="kw">VALUES</span> (<span class="num">0</span>,<span class="num">199</span>,<span class="num">0</span>), (<span class="num">200</span>,<span class="num">499</span>,<span class="num">5</span>), (<span class="num">500</span>,<span class="num">999</span>,<span class="num">10</span>), (<span class="num">1000</span>,<span class="num">9999</span>,<span class="num">15</span>);
+
+<span class="kw">SELECT</span>
+  o.order_id,
+  (o.quantity <span class="op">*</span> p.price)  <span class="kw">AS</span> <span class="alias">order_value</span>,
+  dt.discount_pct
+<span class="kw">FROM</span>       <span class="tbl">orders</span>        o
+<span class="kw">INNER JOIN</span> <span class="tbl">products</span>      p  <span class="kw">ON</span> o.product_id <span class="op">=</span> p.product_id
+<span class="kw">INNER JOIN</span> discount_tiers dt <span class="kw">ON</span> (o.quantity <span class="op">*</span> p.price)
+                               <span class="kw">BETWEEN</span> dt.min_value <span class="kw">AND</span> dt.max_value;</pre>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <hr class="section-divider"/>
 
@@ -1819,9 +2293,69 @@ print(<span class="str">"✅ Database ready! Run sql('SELECT ...') to query."</s
 
     <div class="callout success"><span class="callout-icon">🎯</span><p><strong>Rule of thumb:</strong> If you find yourself writing a sub-query that references the outer table, ask — <em>"Can I express this as a JOIN with a GROUP BY or a Window Function?"</em> If yes, prefer that. Use correlated sub-queries when the logic is clearest written that way and the table is small-to-medium sized.</p></div>
 
-  </section>
+    <div class="usecase">
+      <div class="usecase-header">🔍 <h4>More Sub-Query Scenarios</h4></div>
+      <div class="usecase-body">
+        <div class="code-wrap">
+          <div class="code-header"><span>SQL — Sub-queries: Additional Scenarios</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Scenario: Sub-query in FROM as an inline view (derived table)
+-- Compute per-customer metrics once, then filter/sort them</span>
+<span class="kw">SELECT</span> full_name, city, total_spend, order_count
+<span class="kw">FROM</span> (
+  <span class="kw">SELECT</span>
+    c.customer_id,
+    c.full_name,
+    c.city,
+    <span class="fn">COUNT</span>(o.order_id)            <span class="kw">AS</span> <span class="alias">order_count</span>,
+    <span class="fn">SUM</span>(o.quantity <span class="op">*</span> p.price)   <span class="kw">AS</span> <span class="alias">total_spend</span>
+  <span class="kw">FROM</span>       <span class="tbl">orders</span>    o
+  <span class="kw">INNER JOIN</span> <span class="tbl">customers</span> c <span class="kw">ON</span> o.customer_id <span class="op">=</span> c.customer_id
+  <span class="kw">INNER JOIN</span> <span class="tbl">products</span>  p <span class="kw">ON</span> o.product_id  <span class="op">=</span> p.product_id
+  <span class="kw">GROUP BY</span> c.customer_id, c.full_name, c.city
+) summary
+<span class="kw">WHERE</span>  total_spend <span class="op">&gt;</span> <span class="num">500</span>
+<span class="kw">ORDER BY</span> total_spend <span class="kw">DESC</span>;
 
-  <hr class="section-divider"/>
+<span class="cmt">-- Scenario: Scalar sub-query to show "% of total revenue" per product</span>
+<span class="kw">SELECT</span>
+  p.name,
+  <span class="fn">SUM</span>(o.quantity <span class="op">*</span> p.price)                    <span class="kw">AS</span> <span class="alias">revenue</span>,
+  <span class="fn">ROUND</span>(
+    <span class="fn">SUM</span>(o.quantity <span class="op">*</span> p.price) <span class="op">*</span> <span class="num">100.0</span>
+    <span class="op">/</span> (<span class="kw">SELECT</span> <span class="fn">SUM</span>(o2.quantity <span class="op">*</span> p2.price)
+       <span class="kw">FROM</span>       <span class="tbl">orders</span>   o2
+       <span class="kw">INNER JOIN</span> <span class="tbl">products</span> p2 <span class="kw">ON</span> o2.product_id <span class="op">=</span> p2.product_id)
+  , <span class="num">1</span>)                                           <span class="kw">AS</span> <span class="alias">pct_of_total</span>
+<span class="kw">FROM</span>       <span class="tbl">orders</span>   o
+<span class="kw">INNER JOIN</span> <span class="tbl">products</span> p <span class="kw">ON</span> o.product_id <span class="op">=</span> p.product_id
+<span class="kw">GROUP BY</span>   p.product_id, p.name
+<span class="kw">ORDER BY</span>   revenue <span class="kw">DESC</span>;
+
+<span class="cmt">-- Scenario: Sub-query in HAVING — find products ordered more than the average order count</span>
+<span class="kw">SELECT</span> p.name, <span class="fn">COUNT</span>(o.order_id) <span class="kw">AS</span> <span class="alias">times_ordered</span>
+<span class="kw">FROM</span>       <span class="tbl">orders</span>   o
+<span class="kw">INNER JOIN</span> <span class="tbl">products</span> p <span class="kw">ON</span> o.product_id <span class="op">=</span> p.product_id
+<span class="kw">GROUP BY</span>   p.product_id, p.name
+<span class="kw">HAVING</span>     <span class="fn">COUNT</span>(o.order_id) <span class="op">&gt;</span> (
+  <span class="kw">SELECT</span> <span class="fn">AVG</span>(cnt)
+  <span class="kw">FROM</span>  (<span class="kw">SELECT</span> <span class="fn">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> <span class="alias">cnt</span> <span class="kw">FROM</span> <span class="tbl">orders</span> <span class="kw">GROUP BY</span> product_id) t
+);
+
+<span class="cmt">-- Scenario: ROW constructor sub-query — match on multiple columns at once
+-- Orders where (customer_id, product_id) matches any VIP combo</span>
+<span class="kw">SELECT</span> order_id, customer_id, product_id
+<span class="kw">FROM</span>   <span class="tbl">orders</span>
+<span class="kw">WHERE</span>  (customer_id, product_id) <span class="kw">IN</span> (
+  <span class="kw">SELECT</span> customer_id, product_id
+  <span class="kw">FROM</span>   <span class="tbl">orders</span>
+  <span class="kw">WHERE</span>  status <span class="op">=</span> <span class="str">'delivered'</span>
+    <span class="kw">AND</span>  quantity <span class="op">&gt;=</span> <span class="num">2</span>
+);  <span class="cmt">-- PostgreSQL / MySQL 8+</span></pre>
+        </div>
+      </div>
+    </div>
+
+  </section>
 
   <hr class="section-divider"/>
 
@@ -2076,8 +2610,6 @@ print(<span class="str">"✅ Database ready! Run sql('SELECT ...') to query."</s
 
   <hr class="section-divider"/>
 
-  <hr class="section-divider"/>
-
   <!-- ══ SECTION 9: WINDOW FUNCTIONS ══ -->
   <section class="section" id="s9">
     <div class="section-header">
@@ -2172,6 +2704,75 @@ print(<span class="str">"✅ Database ready! Run sql('SELECT ...') to query."</s
 <span class="kw">FROM</span>       <span class="tbl">orders</span>    o
 <span class="kw">INNER JOIN</span> <span class="tbl">customers</span> c <span class="kw">ON</span> o.customer_id <span class="op">=</span> c.customer_id
 <span class="kw">INNER JOIN</span> <span class="tbl">products</span>  p <span class="kw">ON</span> o.product_id  <span class="op">=</span> p.product_id;</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="usecase">
+      <div class="usecase-header">🪟 <h4>More Window Function Scenarios</h4></div>
+      <div class="usecase-body">
+        <div class="code-wrap">
+          <div class="code-header"><span>SQL — Window Functions: Additional Scenarios</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Scenario: NTILE — split customers into quartiles by spend</span>
+<span class="kw">SELECT</span>
+  c.full_name,
+  <span class="fn">SUM</span>(o.quantity <span class="op">*</span> p.price)                  <span class="kw">AS</span> <span class="alias">total_spend</span>,
+  <span class="fn">NTILE</span>(<span class="num">4</span>) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> <span class="fn">SUM</span>(o.quantity <span class="op">*</span> p.price) <span class="kw">DESC</span>)
+                                               <span class="kw">AS</span> <span class="alias">quartile</span>  <span class="cmt">-- 1=top 25%, 4=bottom 25%</span>
+<span class="kw">FROM</span>       <span class="tbl">orders</span>    o
+<span class="kw">INNER JOIN</span> <span class="tbl">customers</span> c <span class="kw">ON</span> o.customer_id <span class="op">=</span> c.customer_id
+<span class="kw">INNER JOIN</span> <span class="tbl">products</span>  p <span class="kw">ON</span> o.product_id  <span class="op">=</span> p.product_id
+<span class="kw">GROUP BY</span> c.customer_id, c.full_name;
+
+<span class="cmt">-- Scenario: LEAD — look ahead to the next order's date for each customer
+-- Use to compute days between consecutive orders (inter-order gap)</span>
+<span class="kw">SELECT</span>
+  c.full_name,
+  o.order_date                                                    <span class="kw">AS</span> <span class="alias">this_order</span>,
+  <span class="fn">LEAD</span>(o.order_date) <span class="kw">OVER</span>
+    (<span class="kw">PARTITION BY</span> o.customer_id <span class="kw">ORDER BY</span> o.order_date)           <span class="kw">AS</span> <span class="alias">next_order</span>,
+  <span class="fn">JULIANDAY</span>(<span class="fn">LEAD</span>(o.order_date) <span class="kw">OVER</span>
+    (<span class="kw">PARTITION BY</span> o.customer_id <span class="kw">ORDER BY</span> o.order_date))
+  <span class="op">-</span> <span class="fn">JULIANDAY</span>(o.order_date)                                      <span class="kw">AS</span> <span class="alias">days_to_next</span>
+<span class="kw">FROM</span>       <span class="tbl">orders</span>    o
+<span class="kw">INNER JOIN</span> <span class="tbl">customers</span> c <span class="kw">ON</span> o.customer_id <span class="op">=</span> c.customer_id;
+
+<span class="cmt">-- Scenario: FIRST_VALUE / LAST_VALUE — compare each order to the customer's first ever order</span>
+<span class="kw">SELECT</span>
+  c.full_name,
+  o.order_date,
+  p.price                                                         <span class="kw">AS</span> <span class="alias">this_price</span>,
+  <span class="fn">FIRST_VALUE</span>(p.price) <span class="kw">OVER</span>
+    (<span class="kw">PARTITION BY</span> o.customer_id <span class="kw">ORDER BY</span> o.order_date
+     <span class="kw">ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING</span>)  <span class="kw">AS</span> <span class="alias">first_order_price</span>
+<span class="kw">FROM</span>       <span class="tbl">orders</span>    o
+<span class="kw">INNER JOIN</span> <span class="tbl">customers</span> c <span class="kw">ON</span> o.customer_id <span class="op">=</span> c.customer_id
+<span class="kw">INNER JOIN</span> <span class="tbl">products</span>  p <span class="kw">ON</span> o.product_id  <span class="op">=</span> p.product_id;
+
+<span class="cmt">-- Scenario: Moving average — 3-order rolling average price per customer</span>
+<span class="kw">SELECT</span>
+  c.full_name,
+  o.order_date,
+  p.price,
+  <span class="fn">ROUND</span>(<span class="fn">AVG</span>(p.price) <span class="kw">OVER</span> (
+    <span class="kw">PARTITION BY</span> o.customer_id
+    <span class="kw">ORDER BY</span>     o.order_date
+    <span class="kw">ROWS BETWEEN</span> <span class="num">2</span> <span class="kw">PRECEDING AND CURRENT ROW</span>  <span class="cmt">-- this row + 2 before it</span>
+  ), <span class="num">2</span>)                                      <span class="kw">AS</span> <span class="alias">rolling_3_avg</span>
+<span class="kw">FROM</span>       <span class="tbl">orders</span>    o
+<span class="kw">INNER JOIN</span> <span class="tbl">customers</span> c <span class="kw">ON</span> o.customer_id <span class="op">=</span> c.customer_id
+<span class="kw">INNER JOIN</span> <span class="tbl">products</span>  p <span class="kw">ON</span> o.product_id  <span class="op">=</span> p.product_id;
+
+<span class="cmt">-- Scenario: Filtering on a window function result — top 2 products per category by price
+-- Window functions can't appear in WHERE, so wrap in a sub-query / CTE</span>
+<span class="kw">SELECT</span> name, category, price
+<span class="kw">FROM</span> (
+  <span class="kw">SELECT</span>
+    name, category, price,
+    <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (<span class="kw">PARTITION BY</span> category <span class="kw">ORDER BY</span> price <span class="kw">DESC</span>) <span class="kw">AS</span> <span class="alias">rn</span>
+  <span class="kw">FROM</span> <span class="tbl">products</span>
+) ranked
+<span class="kw">WHERE</span> rn <span class="op">&lt;=</span> <span class="num">2</span>;  <span class="cmt">-- top 2 most expensive per category</span></pre>
         </div>
       </div>
     </div>
@@ -2273,9 +2874,78 @@ customer_segments <span class="kw">AS</span> (
 )
 <span class="kw">SELECT</span> n <span class="kw">FROM</span> numbers;</pre>
     </div>
-  </section>
 
-  <hr class="section-divider"/>
+    <div class="usecase">
+      <div class="usecase-header">🌿 <h4>More CTE Scenarios</h4></div>
+      <div class="usecase-body">
+        <div class="code-wrap">
+          <div class="code-header"><span>SQL — CTEs: Additional Scenarios</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Scenario: CTE to deduplicate before inserting
+-- Keep only the first record for each email (remove duplicates from a staging table)</span>
+<span class="kw">WITH</span> deduped <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> <span class="op">*</span>,
+    <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (<span class="kw">PARTITION BY</span> email <span class="kw">ORDER BY</span> customer_id <span class="kw">ASC</span>) <span class="kw">AS</span> <span class="alias">rn</span>
+  <span class="kw">FROM</span> customers_staging
+)
+<span class="kw">INSERT INTO</span> <span class="tbl">customers</span> (customer_id, full_name, email, city)
+<span class="kw">SELECT</span> customer_id, full_name, email, city
+<span class="kw">FROM</span>   deduped
+<span class="kw">WHERE</span>  rn <span class="op">=</span> <span class="num">1</span>;  <span class="cmt">-- only the first occurrence of each email</span>
+
+<span class="cmt">-- Scenario: CTE used in an UPDATE (PostgreSQL)
+-- Apply tier upgrades using a CTE to compute new tier, then UPDATE</span>
+<span class="kw">WITH</span> new_tiers <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    o.customer_id,
+    <span class="kw">CASE</span>
+      <span class="kw">WHEN</span> <span class="fn">SUM</span>(o.quantity <span class="op">*</span> p.price) <span class="op">&gt;=</span> <span class="num">2000</span> <span class="kw">THEN</span> <span class="str">'Platinum'</span>
+      <span class="kw">WHEN</span> <span class="fn">SUM</span>(o.quantity <span class="op">*</span> p.price) <span class="op">&gt;=</span>  <span class="num">500</span> <span class="kw">THEN</span> <span class="str">'Gold'</span>
+      <span class="kw">ELSE</span>                                       <span class="str">'Silver'</span>
+    <span class="kw">END</span> <span class="kw">AS</span> <span class="alias">new_tier</span>
+  <span class="kw">FROM</span>       <span class="tbl">orders</span>   o
+  <span class="kw">INNER JOIN</span> <span class="tbl">products</span> p <span class="kw">ON</span> o.product_id <span class="op">=</span> p.product_id
+  <span class="kw">GROUP BY</span>   o.customer_id
+)
+<span class="kw">UPDATE</span> <span class="tbl">customers</span> c
+<span class="kw">SET</span>    tier <span class="op">=</span> nt.new_tier
+<span class="kw">FROM</span>   new_tiers nt
+<span class="kw">WHERE</span>  c.customer_id <span class="op">=</span> nt.customer_id;
+
+<span class="cmt">-- Scenario: Recursive CTE — traverse an org chart (employee → manager hierarchy)</span>
+<span class="kw">CREATE TABLE</span> employees (emp_id <span class="fn">INT</span>, name <span class="fn">TEXT</span>, manager_id <span class="fn">INT</span>);
+<span class="kw">INSERT INTO</span> employees <span class="kw">VALUES</span>
+  (<span class="num">1</span>,<span class="str">'CEO'</span>,<span class="kw">NULL</span>),(<span class="num">2</span>,<span class="str">'VP Eng'</span>,<span class="num">1</span>),(<span class="num">3</span>,<span class="str">'VP Sales'</span>,<span class="num">1</span>),
+  (<span class="num">4</span>,<span class="str">'Sr Dev'</span>,<span class="num">2</span>),(<span class="num">5</span>,<span class="str">'Jr Dev'</span>,<span class="num">4</span>),(<span class="num">6</span>,<span class="str">'Sales Rep'</span>,<span class="num">3</span>);
+
+<span class="kw">WITH RECURSIVE</span> org_chart(emp_id, name, manager_id, depth, path) <span class="kw">AS</span> (
+  <span class="cmt">-- Anchor: start from the root (no manager)</span>
+  <span class="kw">SELECT</span> emp_id, name, manager_id, <span class="num">0</span>, name
+  <span class="kw">FROM</span>   employees <span class="kw">WHERE</span> manager_id <span class="kw">IS NULL</span>
+  <span class="kw">UNION ALL</span>
+  <span class="cmt">-- Recursive: join each employee to their manager's row</span>
+  <span class="kw">SELECT</span> e.emp_id, e.name, e.manager_id,
+         o.depth <span class="op">+</span> <span class="num">1</span>,
+         o.path <span class="op">||</span> <span class="str">' → '</span> <span class="op">||</span> e.name
+  <span class="kw">FROM</span>       employees  e
+  <span class="kw">INNER JOIN</span> org_chart  o <span class="kw">ON</span> e.manager_id <span class="op">=</span> o.emp_id
+)
+<span class="kw">SELECT</span> depth, path <span class="kw">FROM</span> org_chart <span class="kw">ORDER BY</span> path;</pre>
+        </div>
+        <div class="result-box">
+          <div class="result-label">Org Chart Result</div>
+          <table><thead><tr><th>depth</th><th>path</th></tr></thead>
+          <tbody>
+            <tr><td>0</td><td>CEO</td></tr>
+            <tr><td>1</td><td>CEO → VP Eng</td></tr>
+            <tr><td>1</td><td>CEO → VP Sales</td></tr>
+            <tr><td>2</td><td>CEO → VP Eng → Sr Dev</td></tr>
+            <tr><td>2</td><td>CEO → VP Sales → Sales Rep</td></tr>
+            <tr><td>3</td><td>CEO → VP Eng → Sr Dev → Jr Dev</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <hr class="section-divider"/>
 
@@ -2388,7 +3058,119 @@ customer_segments <span class="kw">AS</span> (
       </table>
     </div>
 
-    <div class="callout success"><span class="callout-icon">🎯</span><p><strong>You've covered all 10 core SQL concepts!</strong> From CRUD basics to Window Functions and Stored Procedures — the foundation of data engineering, analytics, and backend development. Copy the Colab setup from Section 3 and try every snippet hands-on.</p></div>
+    <div class="callout success"><span class="callout-icon">🎯</span><p><strong>You've covered all 12 core SQL concepts!</strong> From CRUD basics to Window Functions and Stored Procedures — the foundation of data engineering, analytics, and backend development. Copy the Colab setup from Section 3 and try every snippet hands-on.</p></div>
+
+    <div class="usecase">
+      <div class="usecase-header">⚙️ <h4>More Stored Procedure Scenarios</h4></div>
+      <div class="usecase-body">
+        <div class="code-wrap">
+          <div class="code-header"><span>SQL — Stored Procedures: Additional Scenarios</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt">-- Scenario: Procedure with a cursor — process rows one at a time
+-- Award bonus loyalty points to every customer based on their tier (MySQL)</span>
+<span class="kw">DELIMITER</span> $$
+<span class="kw">CREATE PROCEDURE</span> <span class="fn">award_loyalty_points</span>()
+<span class="kw">BEGIN</span>
+  <span class="kw">DECLARE</span> done     <span class="fn">INT</span>     <span class="kw">DEFAULT FALSE</span>;
+  <span class="kw">DECLARE</span> v_id     <span class="fn">INT</span>;
+  <span class="kw">DECLARE</span> v_tier   <span class="fn">VARCHAR</span>(<span class="num">20</span>);
+  <span class="kw">DECLARE</span> v_points <span class="fn">INT</span>;
+
+  <span class="cmt">-- Declare and open the cursor</span>
+  <span class="kw">DECLARE</span> cur <span class="kw">CURSOR FOR</span>
+    <span class="kw">SELECT</span> customer_id, tier <span class="kw">FROM</span> <span class="tbl">customers</span> <span class="kw">WHERE</span> is_active <span class="op">=</span> <span class="kw">TRUE</span>;
+  <span class="kw">DECLARE CONTINUE HANDLER FOR NOT FOUND SET</span> done <span class="op">=</span> <span class="kw">TRUE</span>;
+
+  <span class="kw">OPEN</span> cur;
+  cursor_loop: <span class="kw">LOOP</span>
+    <span class="kw">FETCH</span> cur <span class="kw">INTO</span> v_id, v_tier;
+    <span class="kw">IF</span> done <span class="kw">THEN LEAVE</span> cursor_loop; <span class="kw">END IF</span>;
+
+    <span class="kw">SET</span> v_points <span class="op">=</span> <span class="kw">CASE</span> v_tier
+      <span class="kw">WHEN</span> <span class="str">'Platinum'</span> <span class="kw">THEN</span> <span class="num">500</span>
+      <span class="kw">WHEN</span> <span class="str">'Gold'</span>     <span class="kw">THEN</span> <span class="num">200</span>
+      <span class="kw">WHEN</span> <span class="str">'Silver'</span>   <span class="kw">THEN</span>  <span class="num">50</span>
+      <span class="kw">ELSE</span>                   <span class="num">10</span>
+    <span class="kw">END</span>;
+
+    <span class="kw">UPDATE</span> <span class="tbl">customers</span>
+    <span class="kw">SET</span>    loyalty_points <span class="op">=</span> loyalty_points <span class="op">+</span> v_points
+    <span class="kw">WHERE</span>  customer_id <span class="op">=</span> v_id;
+  <span class="kw">END LOOP</span>;
+  <span class="kw">CLOSE</span> cur;
+<span class="kw">END</span>$$
+<span class="kw">DELIMITER</span> ;
+
+<span class="kw">CALL</span> <span class="fn">award_loyalty_points</span>();
+
+<span class="cmt">-- Scenario: Stored function (not procedure) — returns a single value
+-- Can be used directly in SELECT, WHERE, ORDER BY</span>
+<span class="kw">DELIMITER</span> $$
+<span class="kw">CREATE FUNCTION</span> <span class="fn">customer_total_spend</span>(p_cust_id <span class="fn">INT</span>)
+<span class="kw">RETURNS DECIMAL</span>(<span class="num">12</span>,<span class="num">2</span>)
+<span class="kw">DETERMINISTIC READS SQL DATA</span>
+<span class="kw">BEGIN</span>
+  <span class="kw">DECLARE</span> v_total <span class="fn">DECIMAL</span>(<span class="num">12</span>,<span class="num">2</span>);
+  <span class="kw">SELECT</span> <span class="fn">COALESCE</span>(<span class="fn">SUM</span>(o.quantity <span class="op">*</span> p.price), <span class="num">0</span>)
+  <span class="kw">INTO</span>   v_total
+  <span class="kw">FROM</span>       <span class="tbl">orders</span>   o
+  <span class="kw">INNER JOIN</span> <span class="tbl">products</span> p <span class="kw">ON</span> o.product_id <span class="op">=</span> p.product_id
+  <span class="kw">WHERE</span>  o.customer_id <span class="op">=</span> p_cust_id;
+  <span class="kw">RETURN</span> v_total;
+<span class="kw">END</span>$$
+<span class="kw">DELIMITER</span> ;
+
+<span class="cmt">-- Now use it like a built-in function in any query</span>
+<span class="kw">SELECT</span> full_name, <span class="fn">customer_total_spend</span>(customer_id) <span class="kw">AS</span> <span class="alias">spend</span>
+<span class="kw">FROM</span>   <span class="tbl">customers</span>
+<span class="kw">ORDER BY</span> spend <span class="kw">DESC</span>;
+
+<span class="cmt">-- Scenario: Trigger — auto-update stock when an order is inserted
+-- Fires automatically on every INSERT into orders, no manual call needed</span>
+<span class="kw">DELIMITER</span> $$
+<span class="kw">CREATE TRIGGER</span> trg_deduct_stock
+<span class="kw">AFTER INSERT ON</span> <span class="tbl">orders</span>
+<span class="kw">FOR EACH ROW</span>
+<span class="kw">BEGIN</span>
+  <span class="kw">UPDATE</span> <span class="tbl">products</span>
+  <span class="kw">SET</span>    stock <span class="op">=</span> stock <span class="op">-</span> NEW.quantity  <span class="cmt">-- NEW refers to the just-inserted row</span>
+  <span class="kw">WHERE</span>  product_id <span class="op">=</span> NEW.product_id;
+<span class="kw">END</span>$$
+<span class="kw">DELIMITER</span> ;
+<span class="cmt">-- Now every INSERT INTO orders auto-deducts stock — no application code needed</span>
+
+<span class="cmt">-- Scenario: Procedure with error handling (DECLARE EXIT HANDLER)
+-- Rollback the whole transaction if anything fails</span>
+<span class="kw">DELIMITER</span> $$
+<span class="kw">CREATE PROCEDURE</span> <span class="fn">safe_cancel_order</span>(p_order_id <span class="fn">INT</span>)
+<span class="kw">BEGIN</span>
+  <span class="kw">DECLARE EXIT HANDLER FOR SQLEXCEPTION</span>
+  <span class="kw">BEGIN</span>
+    <span class="kw">ROLLBACK</span>;
+    <span class="kw">SELECT</span> <span class="str">'ERROR: transaction rolled back'</span> <span class="kw">AS</span> <span class="alias">result</span>;
+  <span class="kw">END</span>;
+
+  <span class="kw">START TRANSACTION</span>;
+
+  <span class="kw">UPDATE</span> <span class="tbl">orders</span>
+  <span class="kw">SET</span>    status <span class="op">=</span> <span class="str">'cancelled'</span>
+  <span class="kw">WHERE</span>  order_id <span class="op">=</span> p_order_id;
+
+  <span class="cmt">-- Restore stock for the cancelled order</span>
+  <span class="kw">UPDATE</span> <span class="tbl">products</span> p
+  <span class="kw">INNER JOIN</span> <span class="tbl">orders</span> o <span class="kw">ON</span> p.product_id <span class="op">=</span> o.product_id
+  <span class="kw">SET</span>    p.stock <span class="op">=</span> p.stock <span class="op">+</span> o.quantity
+  <span class="kw">WHERE</span>  o.order_id <span class="op">=</span> p_order_id;
+
+  <span class="kw">COMMIT</span>;
+  <span class="kw">SELECT</span> <span class="fn">CONCAT</span>(<span class="str">'OK: Order #'</span>, p_order_id, <span class="str">' cancelled and stock restored'</span>) <span class="kw">AS</span> <span class="alias">result</span>;
+<span class="kw">END</span>$$
+<span class="kw">DELIMITER</span> ;
+
+<span class="kw">CALL</span> <span class="fn">safe_cancel_order</span>(<span class="num">3</span>);</pre>
+        </div>
+      </div>
+    </div>
+
   </section>
 
 </main>

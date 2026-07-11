@@ -179,7 +179,7 @@ aside.rail{padding-top:8px}
 .verdict{flex:1;min-width:240px}
 .verdict .v-title{font-family:var(--font-display);font-weight:800;font-size:19px;display:flex;align-items:center;gap:8px}
 .verdict.ok .v-title{color:var(--green-dark)} .verdict.no .v-title{color:var(--red-dark)}
-.verdict .v-explain{font-size:14.5px;color:var(--ink);margin-top:3px;max-width:60ch}
+.verdict .v-explain{font-size:14.5px;color:var(--ink);margin-top:6px;max-width:68ch;line-height:1.55;max-height:min(38vh,260px);overflow-y:auto;padding-right:6px}
 .foot-inner .btn{min-width:150px}
 
 /* ---------- lesson complete ---------- */
@@ -325,23 +325,23 @@ An API is a <strong>contract</strong>: "send me a request shaped like <em>this</
 questions:[
  {type:"mcq", tag:"Pick the answer", q:"In the restaurant analogy, which part plays the role of the API?",
   choices:["The kitchen","The waiter","The menu card","The customer"], answer:1,
-  explain:"The waiter is the go-between: it carries requests to the kitchen (server) and responses back to the customer (client), without either side seeing the other's internals."},
+  explain:"Exactly — the waiter is the API. You (the client) never step into the kitchen (the server's internals); you hand the waiter a request in a format it understands, and it brings back a response. The kitchen is the backend doing the work, the menu is the documentation telling you what you're allowed to ask for, and the customer is the client. If the kitchen swaps its stove tomorrow, you'd never know — that separation is the entire point of an API."},
  {type:"mcq", tag:"Scenario", q:"The ChaiExpress mobile app asks your backend for today's menu. In this exchange, the app is…",
   choices:["The server","The database","The client","The API contract"], answer:2,
-  explain:"Whoever initiates the request is the client. Your backend, which answers, is the server."},
+  explain:"Whoever starts the conversation is the client — here, the mobile app asking for the menu. Your backend answers, so it's the server. Note that these are <strong>roles, not identities</strong>: when your backend later calls Razorpay to charge a card, your server becomes the client in that exchange. Ask 'who initiated this request?' and you'll never mix them up."},
  {type:"type", tag:"Type the answer", q:"What is the data format most modern web APIs use to exchange information? (4 letters)",
   answers:["json"], placeholder:"____",
-  explain:"JSON — lightweight, human-readable, and parseable by virtually every programming language."},
+  explain:"JSON — JavaScript Object Notation. It's plain text arranged as key–value pairs, so a Python service, a JavaScript frontend, and a human with a text editor can all read the same payload. Python parses it into a dict with one function call, and every language has an equivalent. Older APIs used XML; JSON won because it's lighter and maps directly onto the data structures programmers already use."},
  {type:"order", tag:"Arrange the steps", q:"Put the request–response cycle in the correct order.",
   hint:"Tap the steps below in order. Tap a placed step to remove it.",
   lines:["Client sends an HTTP request","Server receives and processes it","Server reads or writes the database","Server returns an HTTP response"],
-  explain:"The client always starts. The server processes, touches storage if needed, then answers. One request → one response."},
+  explain:"Write the business logic once, and every client — web, mobile, rider app — consumes the same API. One source of truth means one place to fix bugs, one place to change rules, and guaranteed consistency: the price the website shows is the price the app shows, because both asked the same server. The wrong options actually describe problems APIs <em>solve</em>, not benefits they bring."},
  {type:"mcq", tag:"Pick the answer", q:"ChaiExpress builds ONE backend API used by its website, mobile app, and rider app. What's the main win?",
   choices:["Each app can have different business rules","The same logic is written once and reused by every client","The database becomes optional","Users no longer need the internet"], answer:1,
-  explain:"That's the core reason APIs exist: one source of truth for logic and data, many clients consuming it."},
+  explain:"The client always opens the conversation — servers don't call you first in plain HTTP. Then the server processes the request, touches the database if the task needs stored data, and finally sends back exactly one response. One request in, one response out, and the exchange is complete. Every API call you'll ever make follows this same four-beat rhythm, so it's worth getting it into muscle memory now."},
  {type:"mcq", tag:"Scenario", q:"At checkout, ChaiExpress charges the customer through Razorpay instead of building its own payment system. This is an example of…",
   choices:["Hosting a database","Consuming a third-party API","Writing frontend code","Caching a response"], answer:1,
-  explain:"You're the client here — Razorpay's servers do the heavy lifting. Consuming other people's APIs is half of backend work."}
+  explain:"ChaiExpress is <strong>consuming</strong> Razorpay's API — playing the client role toward someone else's server. Razorpay built the hard parts (bank integrations, security, compliance) once and exposed them behind a clean contract, so thousands of businesses can charge cards without becoming banks. Real backend work flows in both directions: building APIs for your own clients, and consuming other people's APIs for everything outside your specialty."}
 ]},
 
 {
@@ -381,22 +381,22 @@ Reading? <code>GET</code>. Creating? <code>POST</code>. Full replace? <code>PUT<
 questions:[
  {type:"mcq", tag:"Pick the method", q:"The ChaiExpress app needs to display today's menu. Which method should it use?",
   choices:["POST","GET","PATCH","DELETE"], answer:1,
-  explain:"Reading data without changing anything is exactly what GET is for — it's the only 'safe' method here."},
+  explain:"Reading data without changing anything is GET's entire job — it's the only 'safe' method in that list, meaning the server's state is identical before and after the call. That safety is a promise the whole web relies on: browsers cache GETs, proxies replay them, crawlers fire them freely. POST would technically 'work' here, but you'd lose free caching and confuse every developer (and tool) that reads your API."},
  {type:"mcq", tag:"Pick the method", q:"A customer taps 'Place order'. Which method creates the new order on the server?",
   choices:["GET","PUT","POST","PATCH"], answer:2,
-  explain:"POST creates new resources. Each POST to /orders makes a brand-new order."},
+  explain:"POST means 'create something new under this collection' — each POST to /orders mints a fresh order with a fresh id. That's also exactly why POST is <strong>not</strong> idempotent: tap the button twice, get two orders (which is why payment pages beg you not to double-click). GET can't carry this intent, PUT would mean replacing a specific existing order, and PATCH edits one that already exists."},
  {type:"mcq", tag:"Scenario", q:"A customer wants to change ONLY the delivery note on order #91, keeping everything else. Best method?",
   choices:["PUT — replace the order","PATCH — update just that field","POST — create a corrected copy","GET — with the new note in the URL"], answer:1,
-  explain:"PATCH sends only the changed fields. PUT with a partial body risks wiping the fields you didn't send."},
+  explain:"PATCH says 'here are <em>just</em> the fields I'm changing — leave the rest alone', which is precisely this situation. PUT is the trap answer: it means 'here is the COMPLETE new version of this order', so sending only the note would wipe out the item and quantity. A reliable rule of thumb: if your request body contains the whole object, use PUT; if it contains only the edits, use PATCH."},
  {type:"mcq", tag:"Think it through", q:"Which statement describes an IDEMPOTENT request?",
   choices:["Calling it five times has the same final effect as calling it once","It always returns the same response body","It never touches the database","It can only be called by admins"], answer:0,
-  explain:"Idempotency is about the server's final state, not the response. PUT and DELETE qualify; POST famously doesn't."},
+  explain:"Idempotency is about the server's <strong>final state</strong> after repeats: one call or five calls, same outcome. DELETE /orders/17 five times? Order 17 is gone either way. PUT the same address five times? Still one address. This matters in the real world — when a flaky network makes a client retry, idempotent requests are safe to repeat, while a retried POST risks duplicates. And note it's about state, not about receiving identical response bodies."},
  {type:"type", tag:"Type the answer", q:"Which HTTP method removes a resource — e.g., cancelling /orders/17?",
   answers:["delete"], placeholder:"METHOD",
-  explain:"DELETE. And it's idempotent: deleting an already-deleted order leaves the server in the same state."},
+  explain:"DELETE — the verb <em>is</em> the intent. And notice that it's idempotent: deleting order 17 twice leaves the server in the same state (order gone), so the second call is a harmless no-op rather than a crisis. That's why many APIs answer a DELETE with 204 No Content — the job is done and there's nothing meaningful left to say."},
  {type:"mcq", tag:"Bug hunt", q:"Orders placed via GET /placeOrder started duplicating when a link-prefetching extension fired the URLs. What rule was broken?",
   choices:["GET requests must include a body","GET must be safe — it should never change server state","URLs cannot contain query strings","Orders must always use PUT"], answer:1,
-  explain:"Browsers, crawlers, and prefetchers freely repeat GETs because the spec promises they're side-effect-free. State changes belong to POST/PUT/PATCH/DELETE."}
+  explain:"The HTTP spec promises that GET is 'safe' — zero side effects — so browsers, prefetchers, crawlers, and antivirus link-scanners all feel free to fire GETs without asking anyone. The moment a GET creates an order, every one of those innocent tools becomes an order-placing machine. Anything that changes state belongs behind POST, PUT, PATCH, or DELETE, which the entire internet knows to treat with care. This isn't a style preference; it's a load-bearing contract."}
 ]},
 
 {
@@ -440,22 +440,22 @@ Clients write logic against your codes: retry on 503, refresh the token on 401, 
 questions:[
  {type:"mcq", tag:"Pick the code", q:"A POST to /orders successfully creates order #92. The most precise status code to return is…",
   choices:["200 OK","201 Created","204 No Content","302 Found"], answer:1,
-  explain:"201 Created signals 'a new resource now exists' — typically returned with the created object and its id."},
+  explain:"201 Created is the precise answer: 'your POST worked, and a new resource now exists.' Return the created order in the body — including its server-assigned id — so the client doesn't need a second request just to learn what it made. Plain 200 isn't wrong, merely vaguer; 204 means 'success with nothing to tell you', which wastes the chance to send the id; and 302 is a redirect with nothing to do with creation."},
  {type:"mcq", tag:"Pick the code", q:"A client requests GET /orders/99999 but no such order exists. Respond with…",
   choices:["400","403","404","500"], answer:2,
-  explain:"404 Not Found: the request was well-formed, the caller was allowed to ask, but the resource simply isn't there."},
+  explain:"404 Not Found: the request was perfectly formed — the client just asked for something that doesn't exist. Keep the blame model in mind: 400 would mean the request itself was malformed (it wasn't), 403 would mean permission was denied (there's nothing to deny), and 500 would mean <em>your</em> code broke (it didn't). A well-run API 404s calmly and precisely."},
  {type:"mcq", tag:"Scenario", q:"A logged-in customer tries to view ANOTHER customer's order. The server knows who they are. Correct code?",
   choices:["401 Unauthorized — they must log in","403 Forbidden — identity known, permission denied","404 Not Found — hide that orders exist","422 — the order id fails validation"], answer:1,
-  explain:"403 = authenticated but not allowed. 401 is only for missing/invalid credentials. (Some APIs do return 404 to hide existence — but the canonical answer for 'known user, no permission' is 403.)"},
+  explain:"403 Forbidden means 'I know exactly who you are — and this isn't yours to see.' 401 would mean the identity itself is missing or invalid, which isn't the case since they're logged in. The distinction has practical teeth: clients react to a 401 by re-authenticating (refresh the token, show the login screen), while a 403 says logging in again won't help. Some APIs deliberately answer 404 instead, to hide that the resource even exists — a legitimate privacy choice — but the canonical semantics for 'known user, no permission' are 403."},
  {type:"mcq", tag:"Scenario", q:"A POST body is valid JSON, but contains \"qty\": -2, which fails your validation rules. Best-fit code?",
   choices:["200 with an error message inside","500 Internal Server Error","422 Unprocessable Entity","301 Moved Permanently"], answer:2,
-  explain:"422: the syntax parsed fine but the values are semantically invalid. (Plain 400 is also seen in the wild, but 422 is the precise fit — and what FastAPI returns for validation failures.)"},
+  explain:"422 Unprocessable Entity: the JSON parsed fine and the shape was readable, but the <em>values</em> break your rules — you can't order minus two chais. Plain 400 is the coarser cousin ('your request is malformed') and plenty of APIs use it here too, but 422 is the precise fit, and it's exactly what FastAPI returns for validation failures. The real sin is option one: a 200 with the error buried in the body lies to every monitoring dashboard, cache, and retry mechanism watching your status codes."},
  {type:"type", tag:"Type the code", q:"During rush hour a script exceeds its request quota. Which status code tells it 'too many requests — back off'?",
   answers:["429"], placeholder:"3-digit code",
-  explain:"429 Too Many Requests — usually paired with a Retry-After header telling the client when to try again."},
+  explain:"429 Too Many Requests — the polite bouncer of status codes. Pair it with a Retry-After header ('come back in 30 seconds') and well-written clients will back off automatically instead of hammering harder. You'll meet it again in the production unit, where rate limiting is what keeps real customers served while a runaway script gets told to wait its turn."},
  {type:"mcq", tag:"Whose fault?", q:"An unhandled exception crashes your order handler mid-request. The client receives…",
   choices:["404 — the handler was not found","422 — the request was invalid","500 — a server-side failure","204 — no content was produced"], answer:2,
-  explain:"5xx codes mean the server broke. A 500 is your bug, not the client's — log it, alert on it, fix it."}
+  explain:"500 Internal Server Error — the 5xx family means the failure is on <strong>your</strong> side of the counter. The client did nothing wrong; your code threw an exception nothing caught. That's why 500s deserve different treatment from 4xx: log them with a stack trace, alert on them, fix them. A habit worth keeping: every 4xx is a conversation with the client; every 5xx is a bug report addressed to you."}
 ]},
 
 {
@@ -499,22 +499,22 @@ REST is the default for public web APIs, but know the neighbours: <strong>GraphQ
 questions:[
  {type:"mcq", tag:"Vocabulary", q:"REST is best described as…",
   choices:["A Python library you pip-install","An architectural style — a set of design constraints","A faster version of HTTP","A database query language"], answer:1,
-  explain:"REST is a style from Fielding's thesis. HTTP is the protocol it rides on; frameworks like Flask and FastAPI are tools for building APIs that follow it."},
+  explain:"An architectural style — a set of design constraints from Roy Fielding's 2000 thesis, not something you install. HTTP is the protocol REST typically rides on; Flask and FastAPI are tools that make building RESTful APIs pleasant. Keeping the layers straight sharpens your thinking: you can build a completely un-RESTful API in FastAPI, and a beautifully RESTful one with raw sockets if you enjoy suffering. The style lives in your design decisions, not your dependencies."},
  {type:"mcq", tag:"Key constraint", q:"An API is STATELESS when…",
   choices:["It never uses a database","Each request carries all the information needed, and the server keeps no session memory between requests","It only supports GET","Responses never change"], answer:1,
-  explain:"State can live in the database or travel with the request (like a token) — but the server holds no memory of 'the previous request'. Databases are fine; server-side session memory is what's out."},
+  explain:"Statelessness means each request is a complete, self-contained story: who's asking (the token), what they want, and everything needed to answer it. The server remembers nothing between requests — no session memory like 'this user just added chai to a cart I'm holding'. Careful with the tempting wrong option: databases are absolutely fine (that's persistent storage, not session state). What's forbidden is the server needing to <em>recall the previous request</em> to make sense of this one."},
  {type:"mcq", tag:"Scenario", q:"Carts were stored in a server's in-memory dict. A load balancer adds a second server, and customers' carts start vanishing. The RESTful fix?",
   choices:["Remove the load balancer forever","Pin every user to one server for life","Make requests self-contained and keep persistent state in a database","Store the cart in the URL"], answer:2,
-  explain:"Stateless servers are interchangeable — any server can answer any request if state lives in shared storage or the request itself. That interchangeability is exactly what lets you scale out."},
+  explain:"Make every request self-contained and move persistent state into shared storage — then any server can answer any request, and the load balancer can route freely. Pinning users to one server ('sticky sessions') technically works but reintroduces the fragility: that server restarts, the cart dies with it. This is statelessness paying rent: interchangeable servers are precisely what let you scale from one machine to fifty by just adding machines."},
  {type:"mcq", tag:"Maturity model", q:"An API with proper resource URLs, correct HTTP verbs, and accurate status codes sits at Richardson Level…",
   choices:["Level 0 — the RPC swamp","Level 1 — resources only","Level 2 — where most good production APIs live","Level 3 — full HATEOAS"], answer:2,
-  explain:"Level 2 = resources + verbs + status codes. Level 3 adds hypermedia links in responses — elegant but comparatively rare in the wild."},
+  explain:"Level 2 — resources with proper URLs, plus real HTTP verbs, plus accurate status codes. That's the sweet spot where almost every respected production API lives, including everything you're building in this course. Level 3 (HATEOAS) adds navigable links inside responses — elegant, but genuinely rare in the wild. When someone asks whether an API 'is RESTful', Level 2 is the practical bar they almost always mean."},
  {type:"type", tag:"Fill the blank", q:"An API that follows REST's constraints is described with one adjective: it is ________.",
   answers:["restful"], placeholder:"________",
-  explain:"RESTful — REST is the style, RESTful describes an API that adheres to it."},
+  explain:"RESTful — the adjective for an API that follows REST's constraints. Handy vocabulary: REST is the style itself; a 'RESTful API' is one built in that style. And now you can spot the everyday looseness: many so-called REST APIs are really just 'JSON over HTTP with tidy URLs' — usually close enough in practice, but you now know the actual definition underneath the buzzword."},
  {type:"mcq", tag:"Myth check", q:"Which of these is NOT actually a REST constraint?",
   choices:["Statelessness","A uniform interface","Responses must be JSON","Client–server separation"], answer:2,
-  explain:"REST says nothing about JSON — XML over the same design is equally RESTful. JSON won as a convention because it's convenient, not because REST requires it."}
+  explain:"JSON is <strong>not</strong> a REST constraint — it's simply the format everyone converged on because it's convenient. An API serving XML or CSV with the same resources, verbs, statelessness, and status codes would be exactly as RESTful. The real constraints are architectural: client–server separation, statelessness, cacheability, a uniform interface, layered systems. Format is fashion; constraints are structure."}
 ]},
 
 {
@@ -554,23 +554,23 @@ A developer who has seen <code>/chais</code> and <code>/orders</code> should be 
 questions:[
  {type:"mcq", tag:"Pick the endpoint", q:"Which endpoint best follows REST conventions for listing every chai on the menu?",
   choices:["GET /getChais","GET /chai/list","GET /chais","POST /chais/all"], answer:2,
-  explain:"Plural noun, no verb in the path, GET for reading. The method is the verb; the URL is the noun."},
+  explain:"GET /chais — a plural noun for the collection, no verb in the path, and the method (GET) carrying the intent. /getChais duplicates the verb the method already states, /chai/list mixes a singular noun with an action word, and POST /chais/all uses a state-changing method just to read. The payoff of the boring convention is huge: any developer can <em>guess</em> your endpoints without opening the docs — and guessable is the highest compliment an API design gets."},
  {type:"mcq", tag:"Pick the endpoint", q:"You need exactly one specific order — order 17. The conventional URL is…",
   choices:["/orders?number=17 (query param)","/orders/17 (path param)","/order-seventeen","/orders/get/17"], answer:1,
-  explain:"Path params identify a specific resource. Query params are for filtering and options, not identity."},
+  explain:"Path parameters answer '<strong>which</strong> thing?' — /orders/17 is order seventeen's home address on your API. Query parameters answer '<strong>how</strong> do you want the collection served?' — filtered, sorted, paginated. /orders?number=17 would technically function, but it misuses a filtering mechanism for identity, and infrastructure like caches and routers treats the path as a resource's identity. If it names one specific resource, it belongs in the path."},
  {type:"mcq", tag:"Think it through", q:"GET /orders?status=delivered&limit=20 — what are status and limit doing?",
   choices:["Identifying a single order","Filtering and limiting the collection via query params","Authenticating the request","Creating twenty orders"], answer:1,
-  explain:"Query params modify how a collection is returned — filters, sorting, pagination. They don't name a resource."},
+  explain:"Both are query parameters shaping how the collection comes back: status filters it, limit caps the size. That's their entire job — modifying a request without changing <em>what</em> resource is being addressed (still /orders). Their quiet superpower is composability: ?status=delivered&limit=20&sort=-created_at stacks three modifiers on one endpoint, with no new routes required."},
  {type:"type", tag:"Fill the blank", q:"Complete the endpoint that lists all orders belonging to user 42:  GET /users/42/______",
   answers:["orders","/orders"], placeholder:"resource",
-  explain:"Nesting expresses ownership: /users/42/orders reads as 'the orders of user 42'. Keep nesting to about one level."},
+  explain:"GET /users/42/orders — nesting that reads like plain English: 'the orders belonging to user 42'. One level of nesting expresses ownership beautifully; three levels deep (/users/42/orders/17/items/3) becomes a URL nobody can type, cache, or love. When you need to go deeper, flatten instead: /order-items/3 works perfectly once you're addressing the item directly."},
  {type:"mcq", tag:"Spot the anti-pattern", q:"Which of these endpoints breaks REST conventions?",
   choices:["DELETE /orders/17","GET /chais/5","POST /orders","POST /orders/17/delete"], answer:3,
-  explain:"A verb in the path duplicates the method's job — and contradicts it (POST…delete?). DELETE /orders/17 already says everything."},
+  explain:"POST /orders/17/delete commits two sins at once: it puts a verb in the path (URLs should name things; methods should act on them), and its verb <em>contradicts</em> its method — it says POST while meaning DELETE. Every tool that reasons about your API through methods — caches, gateways, security scanners — is now being lied to. DELETE /orders/17 says everything, with nothing left to explain."},
  {type:"order", tag:"Assemble the URL", q:"Build a request URL for pending orders, version 1 of the API, in the right order.",
   hint:"Tap parts in order, left to right, to build the full URL.",
   lines:["https://api.chaiexpress.in","/v1","/orders","?status=pending"],
-  explain:"Domain → version prefix → resource → query string. This exact shape will come back in the production unit."}
+  explain:"Domain, then version prefix, then resource, then query string — https://api.chaiexpress.in/v1/orders?status=pending. Each segment narrows the scope: which server, which contract version, which collection, which subset of it. File this anatomy away: the /v1 piece returns in the production unit as your safety valve for making breaking changes without breaking anybody."}
 ]},
 
 {
@@ -619,22 +619,22 @@ Metadata <em>about</em> the exchange (auth tokens, content types, caching hints,
 questions:[
  {type:"mcq", tag:"Pick the header", q:"Which header tells the server 'the body I'm sending is JSON'?",
   choices:["Accept: text/html","Content-Type: application/json","Authorization: Bearer …","Host: api.chaiexpress.in"], answer:1,
-  explain:"Content-Type describes the body you're sending. (Accept is the reverse — it states what you want back.)"},
+  explain:"Content-Type describes the body you're <strong>sending</strong> — 'what I'm handing you is JSON, parse it accordingly'. Its mirror twin, Accept, states what you want <strong>back</strong>. Omit Content-Type and many servers refuse to parse your body at all — which is the culprit behind a whole genre of confusing 'why is my POST body empty?!' bugs. Authorization says who you are; Host says where you're going; neither describes the payload."},
  {type:"mcq", tag:"Think it through", q:"The app submits a new order via POST. Where should the order data ({chai_id, qty}) travel?",
   choices:["In the URL query string","In the request body","In the Host header","In a cookie"], answer:1,
-  explain:"POST/PUT/PATCH carry their payload in the body. Query strings are for filters on reads — and they end up in logs."},
+  explain:"The request body — that's where POST, PUT, and PATCH carry their payload. Query strings are the wrong vehicle for data: they're length-limited, they land in server access logs and browser history (imagine a customer's address or phone number there), and semantically they exist to filter reads. Headers carry metadata about the exchange, not the domain data itself. Body for the data, headers for the metadata, query strings for the filters — that trio sorts almost everything."},
  {type:"mcq", tag:"Security", q:"A request arrives with \"qty\": -3 and a client-supplied \"price\": 1. What should your server do?",
   choices:["Save it — the frontend already validated","Reject qty with a 422, and ignore the client's price entirely","Accept it but email the admin","Round qty up to 0"], answer:1,
-  explain:"Server-side validation is the real boundary — and fields the server should compute (like price) must never be accepted from the client."},
+  explain:"Two moves, and both are essential. Reject the impossible qty with a 422 — frontend validation is a courtesy for honest users, but anyone with dev-tools open can bypass it, so the server's checks are the real security boundary. And ignore the client's price entirely: price is server-computed truth from <em>your</em> database. Any field the server should decide (price, id, status, role) must never be accepted from a request body — that hole is called mass assignment, and it's exactly how customers end up buying chai for one rupee."},
  {type:"type", tag:"Fill the blank", q:"An HTTP response has three parts: the status line, the headers, and the ______.",
   answers:["body"], placeholder:"____",
-  explain:"Status line (the code), headers (metadata), body (the payload). Same skeleton as a request."},
+  explain:"Body — the response is status line, headers, body: a mirror image of the request's method-line, headers, body. The status line delivers the verdict (201 Created), the headers describe the response (Content-Type, caching hints), and the body carries the goods. This skeleton makes debugging methodical: when something's weird, check the three layers in order — right code? right headers? right payload?"},
  {type:"mcq", tag:"Design taste", q:"Which is the best error response for a sold-out chai?",
   choices:["200 OK with body \"error!\"","500 with an empty body","409/422 with { \"error\": { \"code\": \"OUT_OF_STOCK\", \"message\": \"…\" } }","404 with an HTML page"], answer:2,
-  explain:"An accurate status code plus a structured body: a machine-readable code for logic, a human message for the UI."},
+  explain:"The winning shape pairs an accurate status code with a structured, two-part error body: a machine-readable code (OUT_OF_STOCK) that client code can branch on, plus a human message the UI can display. Option one — a 200 with 'error!' inside — is the classic anti-pattern: monitoring sees success, retry logic sees success, and every client must reverse-engineer your custom format to learn the truth. Errors are part of your API's contract; design them with the same care as your successes."},
  {type:"mcq", tag:"Headers or body?", q:"Which of these belongs in a HEADER rather than the body?",
   choices:["The customer's order items","The Bearer authentication token","The chai's description","The delivery address"], answer:1,
-  explain:"Auth tokens are metadata about the request → Authorization header. Domain data (orders, addresses) lives in the body."}
+  explain:"The Bearer token rides in the Authorization header because it's metadata <em>about</em> the request — 'here is who's asking' — not part of the domain data. The sorting rule: information about the exchange (auth, content types, caching, rate-limit info) goes in headers; the actual business payload (orders, items, addresses) goes in the body. There's a security bonus too: headers don't get logged and shared the way URLs do — a story the auth unit tells in full."}
 ]},
 
 {
@@ -707,22 +707,22 @@ questions:[
  {type:"order", tag:"Assemble the app", q:"Arrange the lines of a minimal Flask menu endpoint in the correct order.",
   hint:"Top to bottom, as they'd appear in main.py.",
   lines:["from flask import Flask, jsonify","app = Flask(__name__)","@app.route(\"/chais\")","def list_chais():","    return jsonify(CHAIS)"],
-  explain:"Import → create the app → decorate the route → define the handler → return a JSON response. Identical skeleton to FastAPI — the decorator always sits directly above its function."},
+  explain:"Import Flask, create the app object, decorate the route, define the handler, return JSON — the same five-beat skeleton FastAPI uses, and that's no accident: the decorator pattern is Python web tradition. The decorator must sit <strong>directly</strong> above its function, because it's literally registering that function as the handler for that URL — separate them and the wiring breaks. Get this skeleton into muscle memory and every Flask codebase you ever open will feel familiar."},
  {type:"mcq", tag:"Read the route", q:"Your route is /chais/&lt;int:chai_id&gt;. A client requests /chais/abc. What does Flask do?",
   choices:["Passes the string 'abc' into your function","Crashes with a 500","Returns 404 — the route simply never matches","Returns 422 with a validation message"], answer:2,
-  explain:"The int converter is part of the URL matching rule itself: a non-integer segment means no route matches, so Flask 404s. (FastAPI's philosophy differs — it matches, then rejects with 422.)"},
+  explain:"Flask returns a 404 — and the reason is elegant: the &lt;int:chai_id&gt; converter is part of the URL <em>matching rule itself</em>. A non-integer segment means the route simply never matches, as if it didn't exist, so Flask answers 'no such page'. FastAPI takes the opposite philosophy — match the route first, then validate the value — producing a 422. Neither is wrong, but knowing which mindset your framework has saves real head-scratching when 'the route works with 5 but breaks with abc'."},
  {type:"mcq", tag:"Pick the call", q:"Inside a POST handler, how do you read the JSON body the client sent?",
   choices:["request.args","request.get_json()","jsonify(request)","app.body"], answer:1,
-  explain:"request.get_json() parses the body. request.args is for query-string parameters — a classic mix-up."},
+  explain:"request.get_json() parses the request body into a Python dict. The tempting wrong answer is request.args — but that's the query string (?status=pending), an entirely different location. Think of the request object as Flask's per-request toolbox with four doors: .get_json() for the body, .args for query params, .headers for headers, .method for the verb. Knowing which door to open is half of everyday Flask."},
  {type:"mcq", tag:"Pick the call", q:"The client calls GET /orders?status=delivered. How do you read status in Flask?",
   choices:["request.get_json()[\"status\"]","request.args.get(\"status\")","request.headers[\"status\"]","app.route.status"], answer:1,
-  explain:"Query params live in request.args. Adding a default — request.args.get(\"status\", \"pending\") — makes the param optional."},
+  explain:"request.args.get(\"status\") — query parameters live in request.args. Adding a default, request.args.get(\"status\", \"pending\"), makes the parameter optional and self-documenting in one line. And the type=int keyword — which you'll use constantly for limits and offsets — converts the value safely, falling back to the default if someone sends ?limit=banana. A small API surface that covers ninety percent of real query handling."},
  {type:"mcq", tag:"Status codes", q:"Your handler created an order. How does Flask return it with a 201 status?",
   choices:["return jsonify(order), 201","return 201, jsonify(order)","jsonify(order).status = 201","return \"201: created\""], answer:0,
-  explain:"Return a tuple: (body, status). An optional third element carries extra headers. Without the tuple, Flask defaults to 200."},
+  explain:"return jsonify(order), 201 — returning a tuple is Flask's idiom for setting the status code, with an optional third element for extra headers. Forget the tuple and Flask defaults to 200, which quietly tells every client 'nothing new was created' right after you created something. Tiny syntax, outsized effect on how truthful your API is."},
  {type:"type", tag:"Type the function", q:"Which Flask helper converts a Python dict or list into a JSON response with the correct Content-Type?",
   answers:["jsonify","jsonify()"], placeholder:"function name",
-  explain:"jsonify() — it serializes your data and sets Content-Type: application/json so clients parse it correctly."}
+  explain:"jsonify() — it serializes your dict or list to JSON <em>and</em> sets Content-Type: application/json, which is the half people forget matters. Return a raw JSON string yourself and many clients will treat it as plain text and refuse to parse it. Modern Flask will also auto-jsonify a plain dict returned from a handler, which is fine — but jsonify remains the explicit, always-correct spelling, especially for lists and for tuple returns with custom statuses."}
 ]},
 
 {
@@ -840,23 +840,23 @@ def test_rejects_bad_qty():
 questions:[
  {type:"mcq", tag:"Read the code", q:"Why call request.get_json(silent=True) instead of plain get_json()?",
   choices:["It makes parsing faster","Malformed/missing JSON becomes None instead of raising — so you return a clean 422, not a 500","It hides the endpoint from logs","It skips validation"], answer:1,
-  explain:"silent=True turns a client's broken JSON into a value you can handle. The client's mistake stays a 4xx; 500s are reserved for your bugs."},
+  explain:"silent=True converts a client's malformed or missing JSON into None instead of raising an exception in the middle of your handler. You catch that (the 'or {}' pattern) and return a clean, honest 422: 'your input was invalid'. Without it, broken JSON detonates inside your code and the client receives a 500 — <em>your</em> error code — for <em>their</em> mistake. It's unit 3's blame model, enforced with one keyword argument."},
  {type:"mcq", tag:"Security", q:"The PATCH handler applies only keys in ALLOWED_PATCH = {\"qty\", \"note\"}. What attack does this whitelist stop?",
   choices:["SQL injection","A client overwriting server-controlled fields like id, price, or status","Cross-site scripting","Requests without a Content-Type"], answer:1,
-  explain:"Mass-assignment protection: the client edits what it may edit, and can never promote its own order to 'delivered' or rewrite its price."},
+  explain:"This is mass-assignment protection — one of the most common real-world API vulnerabilities. Without the whitelist, ORDERS[oid].update(data) would apply <em>any</em> field the client sends: status = delivered (free chai), price = 1 (nearly free chai), id = 1 (chaos). The whitelist also inverts the trust model in your favor: instead of blocking known-bad fields, you permit known-good ones — so fields you add to the model next month are protected by default. Client-editable and server-controlled fields are different castes; never let a request body blur them."},
  {type:"order", tag:"Arrange the handler", q:"Order the steps of the validated POST /orders handler.",
   hint:"From reading the request to answering it.",
   lines:["data = request.get_json(silent=True) or {}","problems = validate_order(data)","if problems: return error(..., 422)","order = build and store the new order","return jsonify(order), 201"],
-  explain:"Read → validate → reject early with 422 → only then create → answer 201 with the created resource. Validation always runs before anything is written."},
+  explain:"Read, validate, reject early — and only <em>then</em> create. The order of steps is itself the security: validation finishes before anything is written, so a rejected request leaves zero fingerprints on your data — no half-created orders, nothing to roll back. The return-early shape also keeps the happy path unindented and readable. This exact pipeline (parse → validate → 422 or proceed → 201 with the created resource) is the template for every create-endpoint you'll ever write."},
  {type:"mcq", tag:"Read the code", q:"request.args.get(\"limit\", 20, type=int) receives ?limit=banana. What is limit?",
   choices:["The string 'banana'","A 500 error is raised","20 — conversion failed, so the default is used","0"], answer:2,
-  explain:"type=int attempts conversion and quietly falls back to the default on failure — garbage query params can't crash the endpoint."},
+  explain:"limit is 20 — type=int attempted the conversion, failed on 'banana', and quietly fell back to the default. No exception, no 500, no extra code on your part. The principle underneath is worth keeping: query strings arrive from the wild and can contain absolutely anything, so every read of them deserves a safe landing. One keyword argument buys you exactly that."},
  {type:"mcq", tag:"Think it through", q:"ORDERS.pop(oid, None) in the DELETE handler means deleting order 17 twice returns 204 both times. Which property is that?",
   choices:["Statelessness","Idempotency — repeated calls leave the same final state","Caching","Pagination"], answer:1,
-  explain:"DELETE is idempotent: once gone, still gone. The default argument to pop() makes the second call a harmless no-op instead of a KeyError."},
+  explain:"Idempotency — repeated calls, same final state. pop(oid, None) does the work: the default argument means 'if the key is already gone, hand back None instead of raising KeyError', so a second DELETE is a calm no-op returning the same 204. There's a kindness to it too: if a client's first DELETE succeeded but the response got lost in transit, its retry now succeeds instead of erroring — idempotency making retries safe, exactly as unit 2 promised."},
  {type:"type", tag:"Type the feature", q:"Which Flask feature groups related routes into a module you mount with url_prefix=\"/v1\"?",
   answers:["blueprint","blueprints","a blueprint"], placeholder:"feature name",
-  explain:"Blueprints — orders, users, and riders each live in their own file, and registering with url_prefix gives you versioned URLs for free."}
+  explain:"Blueprints — Flask's mechanism for grouping related routes into their own module. Each domain (orders, users, riders) gets its own file with its own Blueprint, and main.py simply registers them all. The url_prefix argument is the quiet gift: register with url_prefix='/v1' and every route in the blueprint becomes versioned without touching a single route string — which will feel prophetic when the production unit explains why /v1 matters so much."}
 ]},
 
 {
@@ -920,22 +920,22 @@ questions:[
  {type:"order", tag:"Assemble the app", q:"Arrange the lines of a minimal FastAPI menu endpoint in the correct order.",
   hint:"Top to bottom, as they'd appear in main.py.",
   lines:["from fastapi import FastAPI","app = FastAPI()","@app.get(\"/chais\")","def list_chais():","    return CHAIS"],
-  explain:"Import → create the app object → decorate the route → define the handler → return data. The decorator must sit directly above its function."},
+  explain:"Import, create the app, decorate, define, return — the identical five-beat skeleton you learned in Flask, with @app.get(\"/chais\") replacing @app.route(\"/chais\"). FastAPI's spelling is slightly more opinionated: the HTTP method lives in the decorator's <em>name</em>, so a route's verb is visible at a glance while you scan a file. Same muscle memory, new accent — and the decorator still must sit directly above its function."},
  {type:"mcq", tag:"Pick the command", q:"Your app object is named app inside main.py. Which command starts the dev server with auto-reload?",
   choices:["python main.py --serve","uvicorn main:app --reload","fastapi start app","pip run main"], answer:1,
-  explain:"uvicorn module:variable — main:app means 'the app object in main.py'. --reload restarts on every code save."},
+  explain:"uvicorn main:app --reload — read it as module:variable. Uvicorn is the ASGI server that actually runs your application; main is main.py; app is the FastAPI() object inside it; and --reload restarts on every save (a development convenience — never use it in production). Rename your file to api.py and your object to service, and the incantation becomes uvicorn api:service. Remember the pattern, not the words."},
  {type:"mcq", tag:"Scenario", q:"Your route is /chais/{chai_id} with chai_id: int. A client requests /chais/abc. What happens?",
   choices:["The server crashes with a 500","chai_id arrives as the string 'abc'","FastAPI automatically returns a 422 validation error","The request is silently redirected to /chais"], answer:2,
-  explain:"Type hints are enforced at the edge: 'abc' can't become an int, so FastAPI rejects it with a descriptive 422 before your code even runs."},
+  explain:"FastAPI automatically returns a 422, with a JSON body spelling out which parameter failed and why — and your handler never even runs. The type hint chai_id: int quietly became a validation gate at the edge of your API. Compare Flask's take on the identical mistake: its int converter makes the route never <em>match</em>, so you get a 404. Two frameworks, two philosophies — validation versus route-matching — and you now speak both fluently."},
  {type:"type", tag:"Type the path", q:"FastAPI auto-generates interactive Swagger documentation. At which path does it live?",
   answers:["/docs","docs"], placeholder:"/____",
-  explain:"/docs — interactive docs generated from your code, complete with a 'Try it out' button. (/redoc offers an alternative view.)"},
+  explain:"/docs — interactive Swagger UI generated from your code: every endpoint, parameter, and model, with a 'Try it out' button that fires real requests. (There's a second rendering at /redoc if you prefer reading to clicking.) The deeper point is that this documentation <em>cannot drift out of date</em>, because it is literally derived from your type hints — one of the strongest practical arguments for writing honest, precise types in the first place."},
  {type:"mcq", tag:"Think it through", q:"What is the main job of a Pydantic BaseModel like OrderIn in a POST endpoint?",
   choices:["Styling the JSON output with colors","Parsing AND validating the request body against declared types and rules","Connecting to the database","Caching responses for speed"], answer:1,
-  explain:"The model declares the contract; FastAPI parses the JSON into it and returns 422 on any violation — like Field(gt=0) rejecting qty=-3."},
+  explain:"A Pydantic model declares your data contract once — field names, types, constraints like Field(gt=0, le=10) — and FastAPI enforces it on every request: parsing the JSON, validating each field, and returning a detailed 422 on any violation before your handler runs. Remember hand-writing validate_order() in the Flask workshop? This is that entire function, generated from a class definition. The −3 qty attack dies at gt=0, and you wrote zero if-statements to kill it."},
  {type:"mcq", tag:"Read the code", q:"def list_orders(status: str = \"pending\") on GET /orders — what is status here?",
   choices:["A required path parameter","An optional query parameter with a default","A response header","A Pydantic model"], answer:1,
-  explain:"Not in the path + has a default = optional query param. /orders and /orders?status=delivered both work."}
+  explain:"Not in the path + has a default = an optional query parameter. That's FastAPI's whole rule, and it makes function signatures self-documenting: /orders works (status defaults to 'pending'), /orders?status=delivered overrides it, and the str hint validates it. Remove the default and it flips to a <em>required</em> query param — omitting it earns a 422. Declaring path, query, and body inputs as ordinary function parameters is FastAPI's most elegant trick."}
 ]},
 
 {
@@ -1016,22 +1016,22 @@ A sync worker handling a request that waits 300&nbsp;ms on Razorpay just&hellip;
 questions:[
  {type:"mcq", tag:"Head to head", q:"Which framework validates request bodies automatically from type-hinted models, with no extra code?",
   choices:["Flask — via jsonify","FastAPI — via Pydantic models","Both, identically","Neither; validation is always manual"], answer:1,
-  explain:"Declaring OrderIn(BaseModel) is the validation. In Flask you write the checks yourself or bring an extension like Marshmallow."},
+  explain:"FastAPI, via Pydantic — declaring class OrderIn(BaseModel) <em>is</em> the validation. Every request body gets parsed, type-checked, and constraint-checked against it, with detailed 422s generated for free. Flask deliberately doesn't bundle this: you hand-roll the checks (as you did in the workshop) or bring an extension like Marshmallow. Neither approach is wrong — but 'who writes the boundary, you or the framework?' is the single biggest day-to-day difference between the two."},
  {type:"mcq", tag:"Spot the difference", q:"A client hits /chais/abc against an int-typed route. Flask answers 404. FastAPI answers…",
   choices:["404 as well","500","422 — the route matches, then validation rejects the value","301"], answer:2,
-  explain:"Flask's converter makes the route never match (404); FastAPI matches, then fails type validation (422). Same mistake, two philosophies — worth knowing when debugging either."},
+  explain:"422 — FastAPI matches the route first, <em>then</em> validates the typed value, and reports the failure precisely. Flask's converter is part of route matching itself, so the same bad URL simply matches nothing: 404. Keep this pair straight and you'll debug both frameworks noticeably faster — 'works with /5, breaks with /abc' is a philosophy difference (validation vs route-matching), not a bug in your handler."},
  {type:"mcq", tag:"Use-case", q:"A partner team asks for interactive, try-it-out API docs by Friday, with zero extra libraries. Your safest pick?",
   choices:["Flask — docs are built in","FastAPI — /docs is generated automatically from your code","Either; both auto-generate docs","Neither can produce docs"], answer:1,
-  explain:"FastAPI ships Swagger UI at /docs out of the box. Flask can get there too — but via extensions you'd have to add and configure."},
+  explain:"FastAPI — Swagger UI ships at /docs the moment the server starts, generated from your routes and models, with zero libraries to add. Flask can absolutely get there too (Flasgger and flask-smorest are solid), but that's an extension to choose, install, and configure — not a Friday-deadline answer. When the requirement is literally 'interactive docs, now, no new dependencies', this is the clearest win FastAPI has."},
  {type:"mcq", tag:"Use-case", q:"You must add three JSON endpoints to a large, healthy, server-rendered Flask website. Best engineering call?",
   choices:["Rewrite the site in FastAPI first","Add the endpoints in Flask — extending a working app beats a rewrite","Run both frameworks in one process","Refuse until the site uses async"], answer:1,
-  explain:"Framework choice is contextual: a few endpoints never justify a rewrite. Greenfield JSON APIs tilt FastAPI; existing Flask apps tilt Flask."},
+  explain:"Extend it in Flask — three endpoints never justify rewriting a large, healthy application. Rewrites carry enormous risk and freeze feature work for months; meanwhile Flask handles JSON endpoints perfectly well, as your workshop unit proved end to end. The engineering lesson is bigger than frameworks: tool choice is contextual, and 'what does this codebase already speak?' usually outweighs 'what's newest?'. Greenfield API? FastAPI has the edge. Living Flask app? Flask, without a shred of guilt."},
  {type:"mcq", tag:"Think it through", q:"Your endpoint spends most of its time awaiting Razorpay and two other external APIs. Why does async help?",
   choices:["It makes the CPU compute faster","One worker can serve other requests while this one waits on I/O","It compresses the responses","It removes the need for status codes"], answer:1,
-  explain:"Async shines on I/O-bound work: waiting time is reused instead of blocking a worker. CPU-bound work gains nothing — more cores help there, not async."},
+  explain:"Async lets one worker set a waiting request aside and serve others during the 300ms Razorpay pause — the waiting time gets recycled instead of blocking a worker. That's why it shines exactly when endpoints are I/O-bound: most of their life is spent awaiting networks and databases. Mind the boundary though: CPU-bound work (running a model, resizing images) gains nothing from async — the CPU is genuinely busy, and you need more workers or processes instead. Async reuses <em>waiting</em>, never <em>computing</em>."},
  {type:"type", tag:"Type the library", q:"FastAPI's request/response models come from which validation library?",
   answers:["pydantic"], placeholder:"library name",
-  explain:"Pydantic — type-hinted models that parse, validate, and document your data shapes. It's the engine behind FastAPI's 422s and /docs."}
+  explain:"Pydantic — the validation library FastAPI is built around. Type-hinted classes become parsers, validators, serializers, and documentation all at once: it powers the 422s, the /docs schemas, and those clean function signatures. It's worth knowing as a standalone tool too — data and ML engineers use Pydantic to validate configs and pipeline payloads far away from any web server. Learn it once, use it everywhere."}
 ]},
 
 {
@@ -1120,22 +1120,22 @@ Your frontend at <code>chaiexpress.in</code> calls the API at <code>api.chaiexpr
 questions:[
  {type:"mcq", tag:"Pick the header", q:"After login, where does the client conventionally send its JWT on each request?",
   choices:["In the URL: ?token=…","Authorization: Bearer <token> header","In the response body","As the User-Agent"], answer:1,
-  explain:"The Authorization header with the Bearer scheme is the standard. URLs leak into logs, history, and shared links."},
+  explain:"Authorization: Bearer &lt;token&gt; — the standard header, where 'Bearer' literally means 'whoever bears this token is authorized'. The tempting shortcut, ?token=... in the URL, is a genuine security hole: URLs are written into server access logs, proxy logs, and browser history, and get pasted into chat threads. Headers travel with the request but stay out of all of those places. Credentials ride in headers — one of the few API rules with no interesting exceptions."},
  {type:"mcq", tag:"Think it through", q:"What makes JWTs attractive for auth at scale?",
   choices:["They are encrypted so nobody can read them","The signature lets the server verify claims without a database lookup","They never expire","They only work over HTTP"], answer:1,
-  explain:"Signed = verifiable statelessly. But they're readable by anyone (encoded ≠ encrypted), so no secrets inside — and always set an expiry."},
+  explain:"The signature is the superpower: a server verifies a JWT cryptographically — using only its secret key — with no database lookup, which makes auth stateless and fast at any scale. But mind the two classic traps hiding in the wrong options: JWTs are <em>encoded, not encrypted</em> (anyone can base64-decode and read the claims, so never put secrets inside), and they absolutely must expire, because a stolen eternal token is an eternal problem. Signed yet readable, verifiable yet expiring — that's the JWT deal in full."},
  {type:"mcq", tag:"Security hygiene", q:"Where should ChaiExpress keep its SECRET_KEY?",
   choices:["Hardcoded in main.py for convenience","In a comment so teammates can find it","In an environment variable or secret manager","In the public README"], answer:2,
-  explain:"Anything committed to source ends up in git history forever. Environment variables / secret managers keep secrets out of code."},
+  explain:"Environment variables or a secret manager — never source code. A key hardcoded in main.py lives in your git history <em>permanently</em>, even after you delete the line; one leaked or accidentally-public repo and it's a breach. os.environ[\"SECRET_KEY\"] keeps the secret in the deployment environment where it belongs, lets dev, staging, and prod each hold a different key, and lets you rotate a compromised key without a code change. Commit code; never commit credentials."},
  {type:"mcq", tag:"Bug hunt", q:"Why is GET /orders?token=eyJhb… a security problem?",
   choices:["Query strings can't hold long values","URLs are logged, cached, and shared — leaking the credential everywhere","GET requests can't be authenticated at all","Tokens only work with POST"], answer:1,
-  explain:"Access logs, proxies, browser history, pasted links — URLs travel. Credentials belong in headers."},
+  explain:"URLs travel <em>everywhere</em>: server access logs, proxy and CDN logs, browser history, analytics tools, and any chat where someone pastes 'hey, this link is broken'. A token in a query string gets copied into all of them — silently, and effectively forever. The Authorization header carries the same bytes but stays out of logs and history by convention and by tooling defaults. Same credential, wildly different blast radius — that's the entire argument, and it's decisive."},
  {type:"type", tag:"Fill the blank", q:"Passwords are never stored directly — the server stores a one-way ______ instead (e.g., via bcrypt).",
   answers:["hash","hashed","hashes"], placeholder:"____",
-  explain:"A slow one-way hash. At login you hash the attempt and compare — a leaked database yields hashes, not passwords."},
+  explain:"A hash — a one-way transformation with no road back to the password. At login you hash the attempt and compare hashes; the plaintext is never stored, so even a full database leak yields only hashes. One crucial detail: use a deliberately <em>slow</em> algorithm like bcrypt or argon2 — the slowness is a feature that makes brute-forcing expensive. Fast hashes like MD5 or bare SHA-256 are the wrong tool here; attackers grind through those by the billions per second."},
  {type:"mcq", tag:"Scenario", q:"The browser console shows a CORS error when chaiexpress.in calls api.chaiexpress.in. What actually fixes it?",
   choices:["The user disables their firewall","The frontend retries with POST instead","The API server sends Access-Control-Allow-Origin headers permitting that origin","Switching the frontend to HTTP"], answer:2,
-  explain:"CORS is enforced by the browser but configured by the server — e.g., FastAPI's CORSMiddleware listing your allowed origins."}
+  explain:"CORS is enforced by the <strong>browser</strong> but configured on the <strong>server</strong> — the fix is your API responding with Access-Control-Allow-Origin headers naming who may call it (in FastAPI, CORSMiddleware listing your frontend's origins). Nothing on the user's machine is broken, and retrying with a different method changes nothing. Two nuances worth pocketing: CORS only restricts browser JavaScript (curl and server-to-server calls sail straight past it), and allowing '*' on an API that uses credentials trades the protection away — list your real origins instead."}
 ]},
 
 {
@@ -1189,23 +1189,23 @@ Menu, orders, typed validation, JWT auth, pagination, versioned URLs, rate limit
 questions:[
  {type:"mcq", tag:"Scenario", q:"GET /orders now matches 80,000 rows. The production-grade response is to…",
   choices:["Return all 80,000 in one response","Return pages via limit/offset (or cursor) parameters","Return a random sample of 100","Require clients to query the database directly"], answer:1,
-  explain:"Pagination bounds every response. Limit/offset is the simple default; cursors stay stable and fast at very large scale."},
+  explain:"Paginate — return bounded pages via limit/offset (or a cursor), plus a total so clients can build page controls. An 80,000-row response punishes everyone in the chain: your database, your bandwidth, and the phone that must parse it — usually to display twenty rows. Limit/offset is the friendly default you already built in the Flask workshop; cursor pagination ('everything after order_92') is the upgrade for huge, fast-moving datasets, because it stays fast and never skips or duplicates rows when new orders arrive mid-scroll."},
  {type:"mcq", tag:"Scenario", q:"You must rename eta_minutes to eta in the order response — a breaking change for deployed apps. Correct move?",
   choices:["Deploy it — clients should adapt","Release it under /v2 while /v1 keeps the old shape during a deprecation window","Return both fields forever in v1 with no plan","Email users asking them to update today"], answer:1,
-  explain:"Published response shapes are contracts. Breaking changes ride a new version; the old one gets a graceful deprecation period."},
+  explain:"Ship it as /v2 while /v1 keeps serving the old shape through a deprecation window. Published response shapes are <strong>contracts</strong> — apps in the field were compiled against eta_minutes and cannot be force-updated tonight. Versioning lets both truths coexist: old clients keep working, new clients get the better shape, and everyone migrates on a schedule instead of during an outage. Announce, deprecate, watch the usage numbers fall, then retire — that's the whole dance, and it's why /v1 has been in your URLs since unit 5."},
  {type:"type", tag:"Type the header", q:"Alongside a 429, which response header tells the client how long to wait before trying again?",
   answers:["retry-after","retry after","retryafter"], placeholder:"Header name",
-  explain:"Retry-After — e.g., Retry-After: 30 means back off for 30 seconds. Well-behaved clients honor it automatically."},
+  explain:"Retry-After — e.g. Retry-After: 30 means 'pause for 30 seconds before trying again'. It upgrades your 429 from a rejection into an instruction: well-written clients and every serious SDK honor it automatically with backoff, turning a hammering script into a polite queue. Alongside X-RateLimit-Remaining, it makes your limits <em>legible</em> — clients can pace themselves instead of discovering the wall by repeatedly hitting it."},
  {type:"mcq", tag:"Think it through", q:"What is the primary purpose of rate limiting?",
   choices:["To make the API feel exclusive","To protect capacity and keep service fair when some clients get greedy","To replace authentication","To compress responses"], answer:1,
-  explain:"A per-client budget stops one noisy script from starving everyone else — and 429 + headers tell it to back off politely."},
+  explain:"Protecting capacity and fairness — a per-client budget means one greedy script can't starve every real customer during the monsoon rush. It's not authentication (that's <em>who you are</em>; this is <em>how often you may ask</em>), and it also shields you from accidental self-inflicted floods, like a client stuck in a tight retry loop. Paired with 429 + Retry-After, the system degrades gracefully: it says 'slow down' long before it ever has to say 'I've crashed'."},
  {type:"mcq", tag:"Vocabulary", q:"OpenAPI (the spec behind Swagger) is best described as…",
   choices:["A Python web framework","A machine-readable description of your API that powers docs, clients, and tests","A database for JSON","An authentication protocol"], answer:1,
-  explain:"It's the standard schema of your API's surface. FastAPI generates it from your code — that's what /docs renders."},
+  explain:"A machine-readable description of your API's entire surface — endpoints, parameters, models, responses — in one standard schema. The machine-readability is the whole point: it powers Swagger UI (what /docs renders), generates client SDKs in other languages, and enables contract testing between teams. FastAPI derives it from your code automatically, so it can't drift stale; in other stacks you may write it by hand — either way, OpenAPI is the lingua franca that all modern API tooling speaks."},
  {type:"order", tag:"Arrange the pipeline", q:"Order the stages a request passes through in a production API.",
   hint:"From the moment it arrives to the moment it's answered.",
   lines:["Client request arrives","Rate limiter checks the budget","Auth verifies identity & permission","Validation runs, handler executes","Response returns with the right status"],
-  explain:"Cheap checks first: throttle, then authenticate, then do the real (expensive) work, then answer precisely."}
+  explain:"Cheap checks first, expensive work last. The rate limiter costs almost nothing, so it runs first and shields everything behind it; auth is a quick signature check, so it goes next; only fully-vetted requests reach validation and your actual handler — the costly part. The ordering is also security in depth: an unauthenticated flood gets repelled at the door by two bouncers before it can touch a single line of business logic. And then the response leaves with the precise status code this whole course taught you to choose. That's a production API."}
 ]}
 ];
 

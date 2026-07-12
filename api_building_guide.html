@@ -321,7 +321,31 @@ An API is a <strong>contract</strong>: "send me a request shaped like <em>this</
   "price": 25,
   "in_stock": true
 }</code></pre>
-<p>Python reads it as a dict, JavaScript as an object, and you can read it with your eyes. That universality is why it won.</p>`,
+<p>Python reads it as a dict, JavaScript as an object, and you can read it with your eyes. That universality is why it won.</p>
+
+<h3>An API can be tiny — three you could build this week</h3>
+<p>The word "API" sounds enterprise-sized, but the concept scales down beautifully. Each of these is one endpoint doing one honest job:</p>
+<table>
+<tr><th>Flavor</th><th>Request</th><th>Response</th></tr>
+<tr><td><strong>Maths</strong> — a GST calculator</td><td><code>GET /gst?amount=100</code></td><td><code>{"amount": 100, "gst": 5, "total": 105}</code></td></tr>
+<tr><td><strong>Logic</strong> — a stock checker</td><td><code>GET /chais/5/available</code></td><td><code>{"available": true, "left": 12}</code></td></tr>
+<tr><td><strong>Text</strong> — a name formatter</td><td><code>POST /format</code> with <code>{"name": "shrinivasa ph"}</code></td><td><code>{"formatted": "Shrinivasa PH"}</code></td></tr>
+</table>
+<p>A question goes in, an answer comes out — maths, a true/false verdict, or transformed text. Every big API is really a bundle of small, boring, predictable exchanges like these. In units 7 and 9 you'll build all three flavors yourself, in both Flask and FastAPI.</p>
+
+<h3>Watching one full exchange, end to end</h3>
+<p>Here's a complete, real conversation — the app fetching one chai. This is what actually travels over the wire:</p>
+<pre><code># ---- the request the app sends ----
+GET /chais/5 HTTP/1.1
+Host: api.chaiexpress.in
+Accept: application/json
+
+# ---- the response your server returns ----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{ "id": 5, "name": "Elaichi Chai", "price": 35, "in_stock": true }</code></pre>
+<p>Every piece of this — the method (GET), the path (/chais/5), the headers, the status code (200), the JSON body — gets its own unit in this course. By the end, you'll read exchanges like this the way you read a sentence.</p>`,
 questions:[
  {type:"mcq", tag:"Pick the answer", q:"In the restaurant analogy, which part plays the role of the API?",
   choices:["The kitchen","The waiter","The menu card","The customer"], answer:1,
@@ -375,6 +399,36 @@ An early ChaiExpress build placed orders with <code>GET /placeOrder?item=5</code
 <pre><code>{ "item": "Ginger Chai", "qty": 2, "note": "less sugar" }</code></pre>
 <p><code>PATCH /orders/91</code> with <code>{ "note": "no sugar" }</code> updates just the note.<br>
 <code>PUT /orders/91</code> with that same tiny body would <em>replace the whole order</em> — item and qty gone. PUT means "here is the complete new version"; PATCH means "here are just the changes".</p>
+
+<h3>The full lifecycle of order #92 — an exchange log</h3>
+<p>Here is one order's entire life, told as request → response pairs. Read it until it feels boring; boring means fluent:</p>
+<pre><code># CREATE — a new order is born
+POST /orders          { "chai_id": 5, "qty": 2 }
+-> 201  { "id": 92, "chai_id": 5, "qty": 2, "status": "pending" }
+
+# READ — check on it (safe, repeat freely)
+GET /orders/92
+-> 200  { "id": 92, "chai_id": 5, "qty": 2, "status": "pending" }
+
+# UPDATE — customer bumps the quantity (partial edit)
+PATCH /orders/92      { "qty": 3 }
+-> 200  { "id": 92, "chai_id": 5, "qty": 3, "status": "pending" }
+
+# REPLACE — a whole corrected version (full object!)
+PUT /orders/92        { "chai_id": 5, "qty": 3, "note": "less sugar" }
+-> 200  { "id": 92, "chai_id": 5, "qty": 3, "note": "less sugar", ... }
+
+# REMOVE — customer cancels
+DELETE /orders/92
+-> 204  (no body — nothing left to say)
+
+# REMOVE again — network retry? No drama. Idempotent.
+DELETE /orders/92
+-> 204</code></pre>
+<p>Notice the economy: one URL pattern (<code>/orders</code>, <code>/orders/92</code>) and five verbs cover the entire lifecycle. No <code>/createOrder</code>, no <code>/orders/92/edit</code> — the grammar does all the work.</p>
+
+<div class="scenario"><span class="tag">☕ Use-case: the rider app speaks the same grammar</span>
+The delivery-partner app needs completely different features — see assigned pickups, mark one as collected. Yet it's the <em>same five verbs</em>: <code>GET /riders/7/pickups</code> to list them, <code>PATCH /orders/92 { "status": "picked_up" }</code> to update one. Once a team agrees on this grammar, every new feature is a new noun, never a new language. That's why method discipline pays compound interest.</div>
 
 <div class="note"><span class="tag">Rule of thumb</span>
 Reading? <code>GET</code>. Creating? <code>POST</code>. Full replace? <code>PUT</code>. Partial edit? <code>PATCH</code>. Removing? <code>DELETE</code>. If your endpoint's verb and its behaviour disagree, every tool on the internet will eventually punish you for it.</div>`,
@@ -435,6 +489,21 @@ A logged-out user hits <code>GET /orders/91</code> → <code>401</code>: prove w
 <div class="scenario"><span class="tag">☕ Monsoon rush hour</span>
 It's raining in Bengaluru and everyone wants chai. One aggressive script hammers your menu endpoint 500 times a second. Rather than letting it starve real customers, your API answers it with <code>429 Too Many Requests</code> and a <code>Retry-After</code> header. Precise codes let well-behaved clients react correctly — a 429 tells them to back off, not to file a bug.</div>
 
+<h3>One afternoon in the logs — a story told in codes</h3>
+<p>A production access log is a diary written in status codes. Here's a believable ChaiExpress afternoon, annotated:</p>
+<pre><code>POST /orders  {"chai_id": 5, "qty": 0}        -> 422  # qty failed validation
+POST /orders  {"chai_id": 5, "qty": 2}        -> 201  # created: order 93
+GET  /orders/93                               -> 200  # owner checks it
+GET  /orders/93   (a different user's token)  -> 403  # known user, not theirs
+GET  /orders/93   (no token at all)           -> 401  # who even are you?
+GET  /orders/9300                             -> 404  # typo — no such order
+PATCH /orders/93  {"qty": 3}                  -> 200  # updated fine
+GET  /chais       (script, 400th call/min)    -> 429  # rate limit says relax
+GET  /orders/93                               -> 500  # uh oh — OUR bug. Page the on-call.
+DELETE /orders/93                             -> 204  # cancelled
+DELETE /orders/93                             -> 204  # retried; idempotent, no drama</code></pre>
+<p>A skilled engineer can diagnose most of an incident from lines like these alone — which client is broken (4xx clusters), whether the server is sick (5xx spikes), who's being greedy (429s). Precise codes turn your logs into a story anyone on the team can read.</p>
+
 <div class="note"><span class="tag">Why precision matters</span>
 Clients write logic against your codes: retry on 503, refresh the token on 401, show a form error on 422. If everything returns 200 with <code>{"error": "..."}</code> buried in the body — a real anti-pattern in the wild — every client must parse your custom format, and standard tooling (monitoring, caches, retries) goes blind.</div>`,
 questions:[
@@ -494,6 +563,18 @@ An early ChaiExpress build kept each customer's cart in a Python dict on the ser
 <li><strong>Level 3</strong> — responses embed links to related actions (HATEOAS): an order includes <code>"cancel": "/orders/17"</code>. Elegant, rarer in practice.</li>
 </ul>
 
+<h3>Use-case: the same feature at Level 0 vs Level 2</h3>
+<p>Abstract maturity levels click when you see the same two features written both ways:</p>
+<pre><code># ---- Level 0: one URL, the action hidden in the body ----
+POST /api    { "action": "getOrder",    "order_id": 17 }   -> 200 (always!)
+POST /api    { "action": "cancelOrder", "order_id": 17 }   -> 200 (even on failure,
+                                                               with an error inside)
+
+# ---- Level 2: resources, verbs, honest codes ----
+GET    /orders/17     -> 200 (or a truthful 404)
+DELETE /orders/17     -> 204</code></pre>
+<p>Level 0 <em>works</em> — plenty of older enterprise systems run exactly like this — but every standard tool goes blind. Caches can't cache (everything is POST, and unit 2 taught you POST is assumed unsafe). Monitoring can't tell reads from writes. Every new client must learn your private <code>action</code> vocabulary instead of guessing. Level 2 puts forty years of HTTP infrastructure — caches, proxies, monitors, retries — back to work for you, for free. That's the practical cash value of "being RESTful".</p>
+
 <div class="note"><span class="tag">And when REST isn't the answer</span>
 REST is the default for public web APIs, but know the neighbours: <strong>GraphQL</strong> lets clients query exactly the fields they need (great for complex UIs), <strong>gRPC</strong> is a fast binary protocol for service-to-service calls, and <strong>WebSockets</strong> keep a connection open for real-time push (live delivery tracking!). Picking REST should be a decision, not a reflex — it's just usually the right one.</div>`,
 questions:[
@@ -548,6 +629,33 @@ GET /users/42/orders/17     # one of them</code></pre>
 
 <div class="scenario"><span class="tag">☕ ChaiExpress design review</span>
 The intern proposes <code>GET /getAllChais</code>, <code>POST /chai/new</code>, and <code>GET /deleteOrder?id=17</code>. Three problems: verbs in paths (redundant), inconsistent singular/plural (pick plural, always), and — worst — a <strong>GET that deletes</strong>, which unit 2 taught us is how prefetchers destroy your data. The fix: <code>GET /chais</code>, <code>POST /chais</code>, <code>DELETE /orders/17</code>. Boring. Predictable. Perfect.</div>
+
+<h3>Use-case: turning a feature list into a URL map</h3>
+<p>This is the actual job: product hands you plain-English features, and you translate them into the grammar. Try covering each row yourself before reading the right column:</p>
+<table>
+<tr><th>Product says</th><th>You design</th></tr>
+<tr><td>"Customers browse the menu"</td><td><code>GET /chais</code></td></tr>
+<tr><td>"…and search it by name"</td><td><code>GET /chais?search=ginger</code></td></tr>
+<tr><td>"Customers place an order"</td><td><code>POST /orders</code></td></tr>
+<tr><td>"Customers see their own orders"</td><td><code>GET /users/42/orders</code></td></tr>
+<tr><td>"Riders mark an order delivered"</td><td><code>PATCH /orders/17</code> with <code>{"status": "delivered"}</code></td></tr>
+<tr><td>"Admins retire a discontinued chai"</td><td><code>DELETE /chais/9</code></td></tr>
+</table>
+<p>Six features, zero new grammar — every one is a noun you already have plus a verb HTTP already gives you. When a feature <em>can't</em> be expressed this way, that's a design signal worth pausing on (more below).</p>
+
+<h3>The query-string cookbook</h3>
+<p>Collections almost always end up needing the same four modifiers. The conventional spellings:</p>
+<pre><code>GET /orders?status=pending                  # filter by a field
+GET /orders?sort=-created_at                # sort ("-" prefix = descending)
+GET /orders?limit=20&offset=40              # paginate (page 3 of 20-per-page)
+GET /chais?search=ginger                    # free-text search
+
+# ...and they compose without any new endpoints:
+GET /orders?status=delivered&sort=-created_at&limit=10</code></pre>
+<p>None of these are HTTP rules — they're conventions. But they're conventions your users have seen in a hundred other APIs, which makes them the right choice. Save creativity for your product, not your query params.</p>
+
+<div class="scenario"><span class="tag">☕ Design debate: how do you cancel an order?</span>
+The team argues three options: <code>DELETE /orders/17</code>, <code>POST /orders/17/cancel</code>, or <code>PATCH /orders/17</code> with <code>{"status": "cancelled"}</code>. Think it through: DELETE implies the record is <em>gone</em> — but finance needs cancelled orders for reports, so deletion is wrong for the business. The verb-in-path POST breaks unit-long conventions. The PATCH wins: cancellation is truthfully a <em>status change</em> to a resource that continues to exist. The wider lesson: when an action feels hard to name RESTfully, ask what it does to the <strong>data</strong> — the answer usually points to the right verb. (And for genuinely action-shaped things like refunds, pragmatic REST models the action's <em>result</em> as a resource: <code>POST /orders/17/refunds</code> creates a refund record. Even the exceptions become nouns.)</div>
 
 <div class="note"><span class="tag">Consistency beats cleverness</span>
 A developer who has seen <code>/chais</code> and <code>/orders</code> should be able to <em>guess</em> <code>/users</code> and <code>/riders</code> without opening your docs. That guessability is the entire payoff of REST conventions.</div>`,
@@ -613,6 +721,25 @@ Someone opens browser dev-tools and posts <code>{ "chai_id": 5, "qty": -3, "pric
 { "error": { "code": "OUT_OF_STOCK",
              "message": "Ginger Chai is sold out today." } }</code></pre>
 <p>A structured error body lets the app show a friendly message <em>and</em> lets code branch on <code>error.code</code> without parsing English.</p>
+
+<h3>Beyond JSON — text, HTML, CSV, and friends</h3>
+<p>The body can carry <em>any</em> format; <code>Content-Type</code> is simply the label saying which. Here's the same chai, dressed four ways:</p>
+<table>
+<tr><th>Content-Type</th><th>The body looks like</th><th>Best for</th></tr>
+<tr><td><code>application/json</code></td><td><code>{"name": "Masala Chai", "price": 25}</code></td><td>Programs talking to programs — the API default</td></tr>
+<tr><td><code>text/plain</code></td><td><code>Masala Chai - Rs.25</code></td><td>Health checks, logs, simple bots</td></tr>
+<tr><td><code>text/html</code></td><td><code>&lt;h1&gt;Masala Chai&lt;/h1&gt;&lt;p&gt;Rs.25&lt;/p&gt;</code></td><td>Anything a browser should render</td></tr>
+<tr><td><code>text/csv</code></td><td><code>name,price\nMasala Chai,25</code></td><td>Spreadsheet exports, data teams</td></tr>
+</table>
+<p>Two more you'll meet on the <em>receiving</em> end:</p>
+<ul>
+<li><code>application/x-www-form-urlencoded</code> — classic HTML form submissions: <code>name=Masala+Chai&amp;price=25</code></li>
+<li><code>multipart/form-data</code> — forms that include file uploads (say, a photo of the new menu)</li>
+</ul>
+<div class="scenario"><span class="tag">☕ Use-case: the analyst wants Excel, not JSON</span>
+The data analyst doesn't want <code>{"data": [...]}</code> — she wants a file that opens in Excel. Same orders, same server, different label: an endpoint answering with <code>Content-Type: text/csv</code>. You'll build exactly this in units 7 and 12. The lesson generalizes: an API isn't "a JSON machine" — it's a request/response machine, and the Content-Type header is the costume department.</div>
+<div class="note"><span class="tag">How clients ask for a format</span>
+The polite, spec-blessed way is the <code>Accept</code> header — <code>Accept: text/csv</code> means "please respond in CSV if you can" (that's content negotiation). In practice, most APIs keep it simpler and clearer: a query param (<code>?format=csv</code>) or a dedicated path (<code>/orders/export.csv</code>). Both are perfectly respectable — explicit beats clever.</div>
 
 <div class="note"><span class="tag">Headers vs body — quick sorting rule</span>
 Metadata <em>about</em> the exchange (auth tokens, content types, caching hints, rate-limit info) → <strong>headers</strong>. The actual domain data (the order, the chai, the user) → <strong>body</strong>.</div>`,
@@ -701,6 +828,100 @@ The mobile team files a bug: "your 404 crashes our JSON parser." Sure enough —
 def not_found(e):
     return jsonify({"error": {"code": "NOT_FOUND",
                               "message": "Resource not found."}}), 404</code></pre>
+<h3>Warm-up APIs: maths, logic, and text</h3>
+<p>Before tackling CRUD, stretch with three tiny single-purpose endpoints — a question in, an answer out. Together they cover the three shapes most simple APIs take, and every line uses only what this unit taught.</p>
+<pre><code># 1 · MATHS — a calculator (query params in, JSON out)
+@app.route("/calc/add")
+def add():
+    a = request.args.get("a", type=float)
+    b = request.args.get("b", type=float)
+    if a is None or b is None:
+        return jsonify({"error": "a and b must be numbers"}), 422
+    return jsonify({"a": a, "b": b, "sum": a + b})
+
+# GET /calc/add?a=4&b=6   ->  {"a": 4.0, "b": 6.0, "sum": 10.0}
+# GET /calc/add?a=4&b=hi  ->  422 (b failed the float conversion)
+
+@app.route("/calc/divide")
+def divide():
+    a = request.args.get("a", type=float)
+    b = request.args.get("b", type=float)
+    if a is None or b is None:
+        return jsonify({"error": "a and b must be numbers"}), 422
+    if b == 0:
+        return jsonify({"error": "cannot divide by zero"}), 422
+    return jsonify({"a": a, "b": b, "result": a / b})</code></pre>
+<p>Note how divide-by-zero becomes a polite <code>422</code> instead of a crashing <code>500</code> — the client's impossible question gets a client-error code, exactly as unit 3 demands.</p>
+<pre><code># 2 · LOGIC — true/false verdicts (path param in, JSON out)
+@app.route("/check/even/&lt;int:n&gt;")
+def check_even(n):
+    return jsonify({"n": n, "even": n % 2 == 0})
+
+@app.route("/check/prime/&lt;int:n&gt;")
+def check_prime(n):
+    if n &lt; 2:
+        return jsonify({"n": n, "prime": False})
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return jsonify({"n": n, "prime": False, "divisible_by": i})
+    return jsonify({"n": n, "prime": True})
+
+# GET /check/prime/29  ->  {"n": 29, "prime": true}
+# GET /check/prime/28  ->  {"n": 28, "prime": false, "divisible_by": 2}</code></pre>
+<pre><code># 3 · TEXT — a textual query and its answers (JSON in, JSON out)
+@app.route("/text/analyze", methods=["POST"])
+def analyze_text():
+    data = request.get_json(silent=True) or {}
+    text = data.get("text", "")
+    if not text:
+        return jsonify({"error": "send JSON like {'text': 'hello'}"}), 422
+    cleaned = "".join(c.lower() for c in text if c.isalnum())
+    return jsonify({
+        "words": len(text.split()),
+        "characters": len(text),
+        "uppercase": text.upper(),
+        "reversed": text[::-1],
+        "is_palindrome": cleaned == cleaned[::-1],
+    })
+
+# POST /text/analyze  {"text": "Malayalam"}
+# ->  {"words": 1, "characters": 9, "uppercase": "MALAYALAM",
+#      "reversed": "malayalaM", "is_palindrome": true}</code></pre>
+<p>All three share one skeleton: <strong>read input → validate with a helpful 422 → compute → answer in JSON</strong>. Maths, logic, or text — the skeleton never changes. CRUD (next unit) is just this same skeleton pointed at stored data.</p>
+
+<h3>Speaking other formats from Flask</h3>
+<p>jsonify covers JSON, but unit 6 promised more costumes. Flask handles all of them with the <code>Response</code> object (or a plain string, which defaults to HTML):</p>
+<pre><code>from flask import Response
+
+# PLAIN TEXT — the classic health check monitoring bots poll
+@app.route("/health")
+def health():
+    return Response("OK", mimetype="text/plain")
+
+# HTML — a browser-friendly mini menu page
+@app.route("/menu.html")
+def menu_page():
+    items = "".join(f"&lt;li&gt;{c['name']} — Rs.{c['price']}&lt;/li&gt;" for c in CHAIS)
+    return f"&lt;h1&gt;Today's Menu&lt;/h1&gt;&lt;ul&gt;{items}&lt;/ul&gt;"
+    # a returned string is text/html by default — handy!
+
+# CSV — for the spreadsheet crowd
+@app.route("/chais.csv")
+def menu_csv():
+    rows = ["name,price"] + [f"{c['name']},{c['price']}" for c in CHAIS]
+    return Response("\\n".join(rows), mimetype="text/csv")</code></pre>
+<p>And the receiving side — one feedback endpoint that accepts <em>three</em> intake formats, using the Content-Type to pick the right door:</p>
+<pre><code>@app.route("/feedback", methods=["POST"])
+def feedback():
+    if request.is_json:                       # Content-Type: application/json
+        msg = (request.get_json() or {}).get("message", "")
+    elif request.form:                        # a classic HTML form post
+        msg = request.form.get("message", "")
+    else:                                     # raw text / bytes
+        msg = request.data.decode("utf-8")
+    return jsonify({"received": msg, "length": len(msg)})</code></pre>
+<p>Three doors, one rule: <code>request.get_json()</code> for JSON bodies, <code>request.form</code> for form posts, <code>request.data</code> for raw text or bytes. The Content-Type header from unit 6 is what tells you which door the client walked through.</p>
+
 <div class="note"><span class="tag">Where Flask leaves you the work</span>
 Notice what you did NOT get for free: body validation, typed request models, auto-docs. In Flask those are your job (or an extension's — Marshmallow, Flask-Smorest). The next unit builds a complete, validated CRUD API by hand — which is exactly how you'll appreciate what FastAPI later automates.</div>`,
 questions:[
@@ -811,6 +1032,45 @@ def delete_order(oid):
 <div class="scenario"><span class="tag">☕ QA tries the sneaky PATCH</span>
 QA sends <code>PATCH /v1/orders/3</code> with <code>{"status": "delivered", "qty": 3}</code> — free chai if it works. The whitelist silently drops <code>status</code>; only <code>qty</code> changes. One design decision remains yours: drop unknown fields silently (lenient) or reject the whole request with <code>422</code> (strict)? Both are defensible — pick one and document it.</div>
 
+<h3>Two more use-cases: search and stats</h3>
+<p>Real order systems need more than CRUD. Two everyday additions — a <strong>textual query</strong> and a <strong>maths endpoint</strong> — both built from parts you already own:</p>
+<pre><code># TEXTUAL QUERY — search orders by keyword in the note
+@app.route("/v1/orders/search")
+def search_orders():
+    q = request.args.get("q", "").strip().lower()
+    if not q:
+        return error("VALIDATION", "q parameter is required", 422)
+    hits = [o for o in ORDERS.values()
+            if q in o.get("note", "").lower()]
+    return jsonify({"query": q, "count": len(hits), "data": hits})
+
+# GET /v1/orders/search?q=sugar
+# -> {"query": "sugar", "count": 2, "data": [ ...matching orders... ]}
+
+
+# SIMPLE MATHS — the aggregate stats endpoint
+PRICES = {1: 25, 2: 30}                # chai_id -> price
+
+@app.route("/v1/orders/stats")
+def order_stats():
+    orders = list(ORDERS.values())
+    if not orders:
+        return jsonify({"orders": 0, "cups": 0, "revenue": 0, "avg_cups": 0})
+    cups = sum(o["qty"] for o in orders)
+    revenue = sum(o["qty"] * PRICES.get(o["chai_id"], 0) for o in orders)
+    return jsonify({
+        "orders": len(orders),
+        "cups": cups,
+        "revenue": revenue,
+        "avg_cups": round(cups / len(orders), 2),
+    })
+
+# GET /v1/orders/stats
+# -> {"orders": 12, "cups": 31, "revenue": 815, "avg_cups": 2.58}</code></pre>
+<div class="scenario"><span class="tag">☕ Monday morning metrics</span>
+The founder asks "how much chai did we sell this weekend?" Without an API, that's someone querying the database by hand every Monday. With <code>/orders/stats</code>, it's a URL — one a dashboard, a Slack bot, or the founder's browser can hit any time. Aggregation endpoints like this are precisely how BI dashboards get fed, and notice the sums and averages are computed <strong>server-side</strong>: clients get answers, not homework.</div>
+<p>A subtle routing pleasure: <code>/v1/orders/search</code> and <code>/v1/orders/stats</code> live happily beside <code>/v1/orders/&lt;int:oid&gt;</code>, because "search" and "stats" can't convert to int — the typed converter keeps the routes from colliding. Small win, typed converters.</p>
+
 <h3>Structure for growth: Blueprints</h3>
 <pre><code># orders.py
 from flask import Blueprint
@@ -910,6 +1170,77 @@ def create_order(order: OrderIn):
     new = {"id": 92, **order.model_dump(), "status": "pending"}
     return new</code></pre>
 <p>Declare the shape once as a <strong>Pydantic model</strong> and FastAPI parses the JSON body, validates every field (remember the −3 qty attack? <code>Field(gt=0)</code> kills it), and returns a detailed <code>422</code> when validation fails. The golden rule from unit 5, enforced by the framework.</p>
+
+<h3>The warm-up trio, FastAPI-style</h3>
+<p>Unit 7's maths/logic/text endpoints, rewritten. Watch how much of the manual checking simply evaporates:</p>
+<pre><code># 1 · MATHS — typed query params validate themselves
+@app.get("/calc/add")
+def add(a: float, b: float):
+    return {"a": a, "b": b, "sum": a + b}
+
+# /calc/add?a=4&b=6      -> {"a": 4.0, "b": 6.0, "sum": 10.0}
+# /calc/add?a=4&b=hello  -> 422, automatically
+# /calc/add?a=4          -> 422 (no default, so b is required)
+
+@app.get("/calc/divide")
+def divide(a: float, b: float):
+    if b == 0:
+        raise HTTPException(422, "cannot divide by zero")
+    return {"a": a, "b": b, "result": a / b}
+
+# 2 · LOGIC — a typed path param and a verdict
+@app.get("/check/prime/{n}")
+def check_prime(n: int):
+    if n &lt; 2:
+        return {"n": n, "prime": False}
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return {"n": n, "prime": False, "divisible_by": i}
+    return {"n": n, "prime": True}
+
+# 3 · TEXT — a Pydantic body in, analysis out
+class TextIn(BaseModel):
+    text: str = Field(min_length=1)
+
+@app.post("/text/analyze")
+def analyze_text(payload: TextIn):
+    t = payload.text
+    cleaned = "".join(c.lower() for c in t if c.isalnum())
+    return {
+        "words": len(t.split()),
+        "characters": len(t),
+        "uppercase": t.upper(),
+        "is_palindrome": cleaned == cleaned[::-1],
+    }</code></pre>
+<p>Compare line-for-line with the Flask versions in unit 7: every <code>is None</code> check and hand-written 422 has turned into a type hint. Only the divide-by-zero rule survives as code — because it's <em>business logic</em>, not type validation. That boundary (types are free, rules are yours) is worth internalizing.</p>
+
+<h3>Other formats in FastAPI</h3>
+<pre><code>from fastapi.responses import PlainTextResponse, HTMLResponse, Response
+
+# PLAIN TEXT — the health check
+@app.get("/health", response_class=PlainTextResponse)
+def health():
+    return "OK"
+
+# HTML — the browser-facing mini menu
+@app.get("/menu.html", response_class=HTMLResponse)
+def menu_page():
+    items = "".join(f"&lt;li&gt;{c['name']} — Rs.{c['price']}&lt;/li&gt;" for c in CHAIS)
+    return f"&lt;h1&gt;Today's Menu&lt;/h1&gt;&lt;ul&gt;{items}&lt;/ul&gt;"
+
+# CSV — the spreadsheet export
+@app.get("/chais.csv")
+def menu_csv():
+    rows = ["name,price"] + [f"{c['name']},{c['price']}" for c in CHAIS]
+    return Response("\\n".join(rows), media_type="text/csv")
+
+# RECEIVING a classic HTML form instead of JSON
+from fastapi import Form          # needs: pip install python-multipart
+
+@app.post("/feedback")
+def feedback(message: str = Form(...)):
+    return {"received": message, "length": len(message)}</code></pre>
+<p>Returning a dict stays the JSON default — FastAPI serializes it and labels it for you. <code>response_class</code> or <code>media_type</code> swaps the costume when the payload isn't JSON, and <code>Form(...)</code> declares "this arrives as form data, not a JSON body". Same Content-Type story as unit 6, now with type hints attached.</p>
 
 <div class="note"><span class="tag">The free lunch: /docs</span>
 Open <code>http://127.0.0.1:8000/docs</code> — FastAPI auto-generates interactive Swagger documentation from your code: every endpoint, parameter, and model, with a "Try it out" button. Your API is self-documenting from day one.</div>
@@ -1177,6 +1508,30 @@ def test_create_order():
     r = client.post("/v1/orders", json={"chai_id": 1, "qty": 2})
     assert r.status_code == 201
     assert r.json()["status"] == "pending"</code></pre>
+
+<h3>5 · Use-case: exports for the data team</h3>
+<div class="scenario"><span class="tag">☕ "Can I get that in Excel?"</span>
+The analyst needs every order for the quarterly review — in a spreadsheet, not JSON. This is one of the most-requested real-world endpoints, and it ties the whole formats story together: same data, <code>text/csv</code> costume, plus one header that turns a response into a download.</div>
+<pre><code>import csv, io
+from flask import Response
+
+@app.route("/v1/orders/export.csv")
+def export_orders():
+    buf = io.StringIO()
+    writer = csv.DictWriter(
+        buf,
+        fieldnames=["id", "chai_id", "qty", "status"],
+        extrasaction="ignore",       # skip fields not in the header row
+    )
+    writer.writeheader()
+    for o in ORDERS.values():
+        writer.writerow(o)
+    return Response(
+        buf.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment; filename=orders.csv"},
+    )</code></pre>
+<p><code>Content-Disposition: attachment</code> tells the browser to <em>download</em> the file rather than display it — and just like that, your API speaks fluent spreadsheet. (FastAPI spelling differs only cosmetically: <code>Response(csv_text, media_type="text/csv", headers=...)</code>.) The same pattern serves PDFs, images, or any bytes: set the right content type, stream the payload. One caution at scale: exporting 80,000 rows is heavy — production systems paginate exports too, or generate the file in the background and return a download link.</p>
 
 <h3>The full production request, end to end</h3>
 <pre><code>Client request
